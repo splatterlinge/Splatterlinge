@@ -3,8 +3,10 @@
 
 #include <QMainWindow>
 
+
 class GLScene;
 class GLView;
+
 
 class MainWindow : public QMainWindow
 {

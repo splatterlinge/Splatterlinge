@@ -15,7 +15,6 @@ class GLScene : public QGraphicsScene
 public:
 	GLScene();
 	void drawBackground( QPainter * painter, const QRectF & rect );
-//	void addItem( QGraphicsItem * item );
 	QGraphicsProxyWidget * addWidget( QWidget * widget, Qt::WindowFlags wFlags = 0 );
 
 protected:

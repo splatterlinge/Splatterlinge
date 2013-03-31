@@ -17,6 +17,7 @@ GLView::GLView( QGraphicsScene * scene, QWidget * parent ) : QGraphicsView( scen
 	setFrameShape( QFrame::NoFrame );
 }
 
+
 void GLView::resizeEvent( QResizeEvent * event )
 {
 	if( scene() )

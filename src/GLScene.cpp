@@ -23,13 +23,6 @@ GLScene::GLScene()
 	updateTimer->start();
 }
 
-/*
-void GLScene::addItem( QGraphicsItem * item )
-{
-	item->setCacheMode( QGraphicsItem::DeviceCoordinateCache );
-	QGraphicsScene::addItem( item );
-}
-*/
 
 QGraphicsProxyWidget * GLScene::addWidget( QWidget * widget, Qt::WindowFlags wFlags )
 {
@@ -85,7 +78,6 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & )
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-//	glViewport( 0, 0, width(), height() );
 	glMatrixMode( GL_PROJECTION );
 	glPushMatrix();
 	glLoadIdentity();
