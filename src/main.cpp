@@ -1,18 +1,21 @@
-#include <QApplication>
-#include "GLWidget.h"
+#include <QtGui>
+
+#include "MainWindow.h"
 
 
-int main( int argc, char *argv[] )
+int main( int argc, char * argv[] )
 {
+	QTextCodec::setCodecForCStrings( QTextCodec::codecForName("UTF-8") );
+	QTextCodec::setCodecForTr( QTextCodec::codecForName("UTF-8") );
+
+	QApplication::setDesktopSettingsAware( false );
+	QApplication::setStyle( new QPlastiqueStyle );
+
 	QApplication app( argc, argv );
 
-	QGLFormat glFormat( QGL::DoubleBuffer | QGL::DepthBuffer | QGL::Rgba | QGL::AlphaChannel | QGL::DirectRendering | QGL::SampleBuffers | QGL::NoAccumBuffer );
-	glFormat.setVersion( 2, 1 );
-//	glFormat.setSwapInterval( 1 );
-
-	GLWidget window( glFormat );
+	MainWindow window;
 	window.resize( 800,600 );
 	window.show();
-	
+
 	return app.exec();
 }

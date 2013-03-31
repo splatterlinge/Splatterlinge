@@ -1,20 +1,16 @@
-#include <stdio.h>
+#include "GLScene.h"
+
+#include <QtGui>
 #include <GL/glu.h>
-
-#include <QMouseEvent>
-#include <QTimer>
-
-#include <QDebug>
-#include <assert.h>
+#include <stdio.h>
 
 #include "teapot.h"
 
-#include "GLWidget.h"
 
-
-GLWidget::GLWidget( QGLFormat & glFormat, QWidget * parent ) : QGLWidget( glFormat, parent )
+GLScene::GLScene()
 {
 	frameCount = 0;
+	isDragging = false;
 
 	QTimer * secondTimer = new QTimer( this );
 	QObject::connect( secondTimer, SIGNAL(timeout()), this, SLOT(secondPassed()) );
@@ -27,8 +23,23 @@ GLWidget::GLWidget( QGLFormat & glFormat, QWidget * parent ) : QGLWidget( glForm
 	updateTimer->start();
 }
 
+/*
+void GLScene::addItem( QGraphicsItem * item )
+{
+	item->setCacheMode( QGraphicsItem::DeviceCoordinateCache );
+	QGraphicsScene::addItem( item );
+}
+*/
 
-void GLWidget::secondPassed()
+QGraphicsProxyWidget * GLScene::addWidget( QWidget * widget, Qt::WindowFlags wFlags )
+{
+	QGraphicsProxyWidget * proxy = QGraphicsScene::addWidget( widget );
+	proxy->setCacheMode( QGraphicsItem::DeviceCoordinateCache );
+	return proxy;
+}
+
+
+void GLScene::secondPassed()
 {
 	fprintf( stdout, "FPS: %d\r", frameCount );
 	fflush( stdout );
@@ -36,18 +47,22 @@ void GLWidget::secondPassed()
 }
 
 
-void GLWidget::initializeGL()
+void GLScene::drawBackground( QPainter * painter, const QRectF & )
 {
+	if( (painter->paintEngine()->type() != QPaintEngine::OpenGL2) &&
+		(painter->paintEngine()->type() != QPaintEngine::OpenGL))
+	{
+		qWarning("GLScene: drawBackground needs a QGLWidget to be set as viewport on the graphics view");
+		return;
+	}
+
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 	glDisable( GL_BLEND );
 	glDisable( GL_TEXTURE_2D );
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LEQUAL );
 	glShadeModel( GL_SMOOTH );
-// 	glEnable( GL_POLYGON_SMOOTH );
-// 	glEnable( GL_LINE_SMOOTH );
-// 	glPointSize( 1.0 );
-// 	glLineWidth( 1.0 );
 	glClearColor( 0, 0, 0, 0 );
 
 	GLfloat diffuseMaterial[] = {0.2, 0.6, 1.0};
@@ -67,43 +82,21 @@ void GLWidget::initializeGL()
 	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, emissiveMaterial );
 	glEnable( GL_LIGHTING );
 	glEnable( GL_LIGHT0 );
-}
 
-
-void GLWidget::resizeGL( int w, int h )
-{
-	glViewport( 0, 0, w, h );
-	glMatrixMode( GL_PROJECTION );
-	glLoadIdentity();
-	gluPerspective( 60.0f, (float)w/h, 0.1f, 100.0f );
-	glMatrixMode( GL_MODELVIEW );
-	glLoadIdentity();
-}
-
-
-static const char * glErrorString( GLenum err )
-{
-	switch(err)
-	{
-		case GL_INVALID_ENUM: return "Invalid Enum";
-		case GL_INVALID_VALUE: return "Invalid Value";
-		case GL_INVALID_OPERATION: return "Invalid Operation";
-		case GL_STACK_OVERFLOW: return "Stack Overflow";
-		case GL_STACK_UNDERFLOW: return "Stack Underflow";
-		case GL_OUT_OF_MEMORY: return "Out of Memory";
-		case GL_TABLE_TOO_LARGE: return "Table too Large";
-		default: return "Unknown Error";
-	}
-}
-
-
-void GLWidget::paintGL()
-{
-	frameCount++;
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+//	glViewport( 0, 0, width(), height() );
+	glMatrixMode( GL_PROJECTION );
+	glPushMatrix();
 	glLoadIdentity();
+	gluPerspective( 60.0f, (float)width()/height(), 0.1f, 100.0f );
+
+	glMatrixMode( GL_MODELVIEW );
+	glPushMatrix();
+	glLoadIdentity();
+
 	glTranslatef( 0, 0, -2 );
-	
+
 	static float rotateX = 0.0f;
 	static float rotateY = 0.0f;
 	rotateY += drag.x()/4.0f + 1.0f;
@@ -118,38 +111,56 @@ void GLWidget::paintGL()
 	teapot( 10, 1.0f, GL_LINE );
 	glEnable( GL_LIGHTING );
 */
-
 //	glFlush();
 	glFinish();
-	
-	GLenum err = glGetError();
-	if( err != GL_NO_ERROR )
+
+	glMatrixMode( GL_MODELVIEW );
+	glPopMatrix();
+	glMatrixMode( GL_PROJECTION );
+	glPopMatrix();
+	glPopAttrib();
+	frameCount++;
+}
+
+void GLScene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
+{
+	QGraphicsScene::mouseMoveEvent( event );
+	if( event->isAccepted() )
+		return;
+	if( isDragging )
 	{
-		qDebug() << glErrorString( err );
+		drag += event->screenPos() - event->lastScreenPos();
+		event->accept();
 	}
 }
 
-
-void GLWidget::mousePressEvent( QMouseEvent * event )
+void GLScene::mousePressEvent( QGraphicsSceneMouseEvent * event )
 {
-	lastMousePos = event->pos();
+	QGraphicsScene::mousePressEvent( event );
+	if( event->isAccepted() )
+		return;
+	isDragging = true;
 }
 
-
-void GLWidget::mouseMoveEvent( QMouseEvent * event )
+void GLScene::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
-	drag += event->pos() - lastMousePos;
-	lastMousePos = event->pos();
+	QGraphicsScene::mouseReleaseEvent(event);
+	isDragging = false;
 }
 
-
-void GLWidget::keyPressEvent( QKeyEvent * event )
+void GLScene::wheelEvent( QGraphicsSceneWheelEvent * event )
 {
+	QGraphicsScene::wheelEvent( event );
+
+}
+
+void GLScene::keyPressEvent( QKeyEvent * event )
+{
+	QGraphicsScene::keyPressEvent( event );
+	if( event->isAccepted() )
+		return;
 	switch( event->key() )
 	{
-	case Qt::Key_Escape:
-		close();
-		break;
 	default:
 		event->ignore();
 		break;
