@@ -13,7 +13,7 @@ MainWindow::MainWindow( QWidget * parent) : QMainWindow( parent )
 	glFormat.setVersion( 2, 1 );
 //	glFormat.setSwapInterval( 1 );
 
-	glScene = new GLScene();
+    glScene = new GLScene();
 
 	QGraphicsProxyWidget * proxy;
 
@@ -30,4 +30,29 @@ MainWindow::MainWindow( QWidget * parent) : QMainWindow( parent )
 	glView->setScene( glScene );
 
 	this->setCentralWidget( glView );
+}
+
+void MainWindow::toggleFullScreen()
+{
+    if (this->windowState() == Qt::WindowFullScreen)
+        this->showNormal();
+    else
+        this->showFullScreen();
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key())
+    {
+    case Qt::Key_Return:
+        qDebug() << event->key();
+        if (event->modifiers() == Qt::AltModifier)
+        {
+            toggleFullScreen();
+        }
+        break;
+    default:
+        event->ignore();
+        break;
+    }
 }
