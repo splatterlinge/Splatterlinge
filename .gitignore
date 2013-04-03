@@ -1,4 +1,6 @@
+bin/
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 Makefile
+moc_*.cxx
