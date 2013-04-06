@@ -14,6 +14,14 @@ GLScene::GLScene( QGLWidget * glWidget, QObject * parent ) : QGraphicsScene( par
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
 
+	glWidget->makeCurrent();
+
+	basicShader = new QGLShaderProgram( glWidget );
+	basicShader->addShaderFromSourceFile( QGLShader::Vertex, "./data/basic.vsh" );
+	basicShader->addShaderFromSourceFile( QGLShader::Fragment, "./data/basic.fsh" );
+	if( !basicShader->link() )
+		qWarning() << basicShader->log();
+
 	QTimer * secondTimer = new QTimer( this );
 	QObject::connect( secondTimer, SIGNAL(timeout()), this, SLOT(secondPassed()) );
 	secondTimer->setInterval( 1000 );
@@ -71,12 +79,10 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 	glMatrixMode( GL_PROJECTION );
-	glPushMatrix();
 	glLoadIdentity();
 	gluPerspective( 60.0f, (float)width()/height(), 0.1f, 100.0f );
 
 	glMatrixMode( GL_MODELVIEW );
-	glPushMatrix();
 	glLoadIdentity();
 
 	glTranslatef( 0, 0, -2 );
@@ -89,7 +95,9 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glRotatef( rotateX, 1,0,0 );
 	glRotatef( rotateY, 0,1,0 );
 	glColor3f( 1, 1, 1 );
+	basicShader->bind();
 	teapot( 20, 1.0f, GL_FILL );
+	basicShader->release();
 /*
 	glDisable( GL_LIGHTING );
 	teapot( 10, 1.0f, GL_LINE );
@@ -108,6 +116,10 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	painter->setPen( QColor(255,255,255) );
 	painter->setFont( mFont );
 	painter->drawText( rect, Qt::AlignTop | Qt::AlignRight, QString( tr("%1 FPS") ).arg(mFramesPerSecond) );
+
+	GLenum error = glGetError();
+	if( error )
+		qWarning() << QString( reinterpret_cast<const char*>(gluErrorString(error)) );
 }
 
 

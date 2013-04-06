@@ -37,6 +37,7 @@ private:
 	QPoint mDrag;
 	bool mDragging;
 	QFont mFont;
+	QGLShaderProgram * basicShader;
 
 private slots:
 	void secondPassed();
