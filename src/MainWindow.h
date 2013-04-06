@@ -13,14 +13,14 @@ class MainWindow : public QMainWindow
 	Q_OBJECT
 public:
 	MainWindow( QWidget * parent = 0 );
-    void toggleFullScreen();
+	void toggleFullScreen();
 
 protected:
-    void keyPressEvent( QKeyEvent * event );
+	// Overrides:
+	void keyPressEvent( QKeyEvent * event );
 
 private:
-	GLScene * glScene;
-	GLView * glView;
+	GLView * mGLView;
 };
 
 

@@ -26,6 +26,7 @@ set( Ununoctium_INCS
 # Additional compiler definitions
 set( Ununoctium_DEFS
 	${QT_DEFINITIONS}
+	-Wall
 )
 
 set( Ununoctium_HDRS_MOC )

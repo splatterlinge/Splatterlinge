@@ -2,15 +2,17 @@
 
 #include <QtGui>
 #include <GL/glu.h>
-#include <stdio.h>
-
 #include "teapot.h"
 
 
-GLScene::GLScene()
+GLScene::GLScene( QGLWidget * glWidget, QObject * parent ) : QGraphicsScene( parent )
 {
-	frameCount = 0;
-	isDragging = false;
+	mFrameCountSecond = 0;
+	mFramesPerSecond = 0;
+	mDragging = false;
+	mGLWidget = glWidget;
+
+	mFont = QFont( "Sans", 12, QFont::Normal );
 
 	QTimer * secondTimer = new QTimer( this );
 	QObject::connect( secondTimer, SIGNAL(timeout()), this, SLOT(secondPassed()) );
@@ -26,30 +28,20 @@ GLScene::GLScene()
 
 QGraphicsProxyWidget * GLScene::addWidget( QWidget * widget, Qt::WindowFlags wFlags )
 {
-	QGraphicsProxyWidget * proxy = QGraphicsScene::addWidget( widget );
+	QGraphicsProxyWidget * proxy = QGraphicsScene::addWidget( widget, wFlags );
+	proxy->setFlag( QGraphicsItem::ItemIsMovable );
 	proxy->setCacheMode( QGraphicsItem::DeviceCoordinateCache );
 	return proxy;
 }
 
 
-void GLScene::secondPassed()
+void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 {
-	fprintf( stdout, "FPS: %d\r", frameCount );
-	fflush( stdout );
-	frameCount = 0;
-}
+	glPushAttrib( GL_ALL_ATTRIB_BITS );
+	glMatrixMode( GL_TEXTURE );	glPushMatrix();
+	glMatrixMode( GL_PROJECTION );	glPushMatrix();
+	glMatrixMode( GL_MODELVIEW );	glPushMatrix();
 
-
-void GLScene::drawBackground( QPainter * painter, const QRectF & )
-{
-	if( (painter->paintEngine()->type() != QPaintEngine::OpenGL2) &&
-		(painter->paintEngine()->type() != QPaintEngine::OpenGL))
-	{
-		qWarning("GLScene: drawBackground needs a QGLWidget to be set as viewport on the graphics view");
-		return;
-	}
-
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 	glDisable( GL_BLEND );
 	glDisable( GL_TEXTURE_2D );
@@ -64,7 +56,7 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & )
 	GLfloat specularLight[] = {1.0, 1.0, 1.0};
 	GLfloat ambientLight[] = {0.01, 0.01, 0.01};
 	GLfloat diffuseLight[] = {0.9, 1.0, 1.0};
-	GLfloat blankMaterial[] = {0.0, 0.0, 0.0};
+//	GLfloat blankMaterial[] = {0.0, 0.0, 0.0};
 	GLfloat shininess[] = {64};
 	glLightfv( GL_LIGHT0, GL_SPECULAR, specularLight );
 	glLightfv( GL_LIGHT0, GL_AMBIENT, ambientLight );
@@ -91,9 +83,9 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & )
 
 	static float rotateX = 0.0f;
 	static float rotateY = 0.0f;
-	rotateY += drag.x()/4.0f + 1.0f;
-	rotateX += drag.y()/4.0f;
-	drag = QPoint(0,0);
+	rotateY += mDrag.x()/4.0f + 1.0f;
+	rotateX += mDrag.y()/4.0f;
+	mDrag = QPoint( 0, 0 );
 	glRotatef( rotateX, 1,0,0 );
 	glRotatef( rotateY, 0,1,0 );
 	glColor3f( 1, 1, 1 );
@@ -106,45 +98,60 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & )
 //	glFlush();
 	glFinish();
 
-	glMatrixMode( GL_MODELVIEW );
-	glPopMatrix();
-	glMatrixMode( GL_PROJECTION );
-	glPopMatrix();
+	glMatrixMode( GL_TEXTURE );	glPopMatrix();
+	glMatrixMode( GL_PROJECTION );	glPopMatrix();
+	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
 	glPopAttrib();
-	frameCount++;
+
+	mFrameCountSecond++;
+
+	painter->setPen( QColor(255,255,255) );
+	painter->setFont( mFont );
+	painter->drawText( rect, Qt::AlignTop | Qt::AlignRight, QString( tr("%1 FPS") ).arg(mFramesPerSecond) );
 }
+
+
+void GLScene::secondPassed()
+{
+	mFramesPerSecond = mFrameCountSecond;
+	mFrameCountSecond = 0;
+}
+
 
 void GLScene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 {
 	QGraphicsScene::mouseMoveEvent( event );
 	if( event->isAccepted() )
 		return;
-	if( isDragging )
+	if( mDragging )
 	{
-		drag += event->screenPos() - event->lastScreenPos();
+		mDrag += event->screenPos() - event->lastScreenPos();
 		event->accept();
 	}
 }
+
 
 void GLScene::mousePressEvent( QGraphicsSceneMouseEvent * event )
 {
 	QGraphicsScene::mousePressEvent( event );
 	if( event->isAccepted() )
 		return;
-	isDragging = true;
+	mDragging = true;
 }
+
 
 void GLScene::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 	QGraphicsScene::mouseReleaseEvent(event);
-	isDragging = false;
+	mDragging = false;
 }
+
 
 void GLScene::wheelEvent( QGraphicsSceneWheelEvent * event )
 {
 	QGraphicsScene::wheelEvent( event );
-
 }
+
 
 void GLScene::keyPressEvent( QKeyEvent * event )
 {

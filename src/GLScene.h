@@ -1,33 +1,42 @@
 #ifndef GLSCENE_INCLUDED
 #define GLSCENE_INCLUDED
 
-#include <QGraphicsScene>
-#include <QPointF>
+#include <QtGui>
+#include <QtOpenGL>
 
 
 class QGraphicsItem;
 class QGraphicsProxyWidget;
+class QGLWidget;
 
 
 class GLScene : public QGraphicsScene
 {
 	Q_OBJECT
 public:
-	GLScene();
+	explicit GLScene( QGLWidget * glWidget, QObject * parent = 0 );
+
+	// Overrides:
 	void drawBackground( QPainter * painter, const QRectF & rect );
 	QGraphicsProxyWidget * addWidget( QWidget * widget, Qt::WindowFlags wFlags = 0 );
 
+	QGLWidget * glWidget() { return mGLWidget; }
+
 protected:
+	// Overrides:
 	void keyPressEvent( QKeyEvent * event );
-	void mousePressEvent(QGraphicsSceneMouseEvent * event);
-	void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
-	void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+	void mousePressEvent( QGraphicsSceneMouseEvent * event );
+	void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
+	void mouseMoveEvent( QGraphicsSceneMouseEvent * event );
 	void wheelEvent(QGraphicsSceneWheelEvent * wheelEvent);
 
 private:
-	int frameCount;
-	QPointF drag;
-	bool isDragging;
+	QGLWidget * mGLWidget;
+	int mFrameCountSecond;
+	int mFramesPerSecond;
+	QPoint mDrag;
+	bool mDragging;
+	QFont mFont;
 
 private slots:
 	void secondPassed();
