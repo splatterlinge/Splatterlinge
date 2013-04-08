@@ -1,4 +1,4 @@
 language: cpp
 script: cmake . && make
 notifications:
-	irc: "irc.euirc.net#hswgt.ai"
+  irc: "irc.euirc.net#hswgt.ai"
