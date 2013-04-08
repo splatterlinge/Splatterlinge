@@ -28,7 +28,7 @@ protected:
 	void mousePressEvent( QGraphicsSceneMouseEvent * event );
 	void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
 	void mouseMoveEvent( QGraphicsSceneMouseEvent * event );
-	void wheelEvent(QGraphicsSceneWheelEvent * wheelEvent);
+	void wheelEvent( QGraphicsSceneWheelEvent * wheelEvent );
 
 private:
 	QGLWidget * mGLWidget;

@@ -1,4 +1,4 @@
-#include "GLScene.h"
+#include "GLScene.hpp"
 
 #include <QtGui>
 #include <GL/glu.h>

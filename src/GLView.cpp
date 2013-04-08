@@ -1,8 +1,8 @@
-#include "GLView.h"
+#include "GLView.hpp"
 
 #include <QResizeEvent>
 #include <QRect>
-#include "GLScene.h"
+#include "GLScene.hpp"
 
 
 GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )

@@ -10,7 +10,7 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ./bin )
 
 # Collect all source and header files
 file( GLOB_RECURSE Ununoctium_SRCS src/*.c src/*.cpp)
-file( GLOB_RECURSE Ununoctium_HDRS src/*.h)
+file( GLOB_RECURSE Ununoctium_HDRS src/*.h src/*.hpp)
 
 # Just in case you need additional libraries - add them here
 set( Ununoctium_LIBS
