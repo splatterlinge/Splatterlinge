@@ -38,6 +38,9 @@ private:
 	bool mDragging;
 	QFont mFont;
 	QGLShaderProgram * basicShader;
+	GLuint mDiffuseMap;
+	GLuint mSpecularMap;
+	GLuint mNormalMap;
 
 private slots:
 	void secondPassed();

@@ -1,0 +1,36 @@
+Uniforms:
+	activelights	# up to 8 light sources
+	TextureSamplers:
+		diffusemap:
+			rgb:
+				diffuse color
+			a:
+				transparency
+		specularmap:
+			rgb:
+				specular color
+			a:
+				shininess
+		normalmap:
+			rgb:
+				tangent space normals
+
+Normals
+
+TextureCoordinates:
+	MultiTexCoord0
+
+LightSource[activelights]:
+	constantAttenuation	# evaluated per vertex
+	linearAttenuation	# evaluated per vertex
+	quadraticAttenuation	# evaluated per vertex
+	ambient
+	diffuse
+	specular
+
+FrontMaterial:
+	emission
+	ambient
+	diffuse
+	specular
+	shininess
