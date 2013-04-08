@@ -1,4 +1,8 @@
 language: cpp
 script: cmake . && make
 notifications:
-  irc: "irc.euirc.net#hswgt.ai"
+  irc:
+    channels:
+      - "irc.euirc.net#hswgt.ai"
+    use_notice: true
+    skip_join: true
