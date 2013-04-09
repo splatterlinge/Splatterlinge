@@ -16,11 +16,19 @@ void main()
 	vViewDir = normalize(-v);
 	for( int i=0; i<activelights; ++i )
 	{
-		vLightDir[i] = vec3( gl_LightSource[i].position.xyz + vViewDir );
-		float d = length( vLightDir[i] );
-		vAtt[i] = 1.0 / (
-			gl_LightSource[i].constantAttenuation +
-			gl_LightSource[i].linearAttenuation * d +
-			gl_LightSource[i].quadraticAttenuation * d*d );
+		if( gl_LightSource[i].position.w == 0 )
+		{
+			vLightDir[i] = normalize( gl_LightSource[i].position.xyz );
+			vAtt[i] = 1.0;
+		}
+		else
+		{
+			vLightDir[i] = gl_LightSource[i].position.xyz + vViewDir;
+			float d = length( vLightDir[i] );
+			vAtt[i] = 1.0 / (
+				gl_LightSource[i].constantAttenuation +
+				gl_LightSource[i].linearAttenuation * d +
+				gl_LightSource[i].quadraticAttenuation * d*d );
+		}
 	}
 }

@@ -69,6 +69,9 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glLightfv( GL_LIGHT0, GL_AMBIENT, ambientLight );
 	glLightfv( GL_LIGHT0, GL_DIFFUSE, diffuseLight );
 
+	GLfloat lightPosition[] = {0.5, 1.0, 1.0, 0.0};
+	glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
+
 	GLfloat diffuseMaterial[] = {1.0, 1.0, 1.0};
 	GLfloat specularMaterial[] = {1.0, 1.0, 1.0};
 	GLfloat emissiveMaterial[] = {0.0, 0.0, 0.0};
