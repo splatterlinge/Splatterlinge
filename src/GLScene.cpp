@@ -17,8 +17,8 @@ GLScene::GLScene( QGLWidget * glWidget, QObject * parent ) : QGraphicsScene( par
 	mGLWidget->makeCurrent();
 
 	basicShader = new QGLShaderProgram( glWidget );
-	basicShader->addShaderFromSourceFile( QGLShader::Vertex, "./data/shader/versatile.high.vsh" );
-	basicShader->addShaderFromSourceFile( QGLShader::Fragment, "./data/shader/versatile.high.fsh" );
+	basicShader->addShaderFromSourceFile( QGLShader::Vertex, "./data/shader/versatile.medium.vsh" );
+	basicShader->addShaderFromSourceFile( QGLShader::Fragment, "./data/shader/versatile.medium.fsh" );
 	if( !basicShader->link() )
 		qWarning() << basicShader->log();
 
