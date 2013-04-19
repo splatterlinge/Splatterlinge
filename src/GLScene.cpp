@@ -2,6 +2,7 @@
 
 #include <QtGui>
 #include <GL/glu.h>
+#include <math.h>
 #include "Terrain.hpp"
 #include "teapot.h"
 
@@ -25,7 +26,7 @@ GLScene::GLScene( QGLWidget * glWidget, QObject * parent ) : QGraphicsScene( par
 
 	mGLWidget->makeCurrent();
 	
-	mTerrain = new Terrain("./data/terrain/", 100.0f );
+	mTerrain = new Terrain("./data/terrain/", QVector3D(1000,100,1000), QVector3D(-500,-50,-500) );
 
 	basicShader = new QGLShaderProgram( glWidget );
 	basicShader->addShaderFromSourceFile( QGLShader::Vertex, "./data/shader/versatile.medium.vsh" );
@@ -178,7 +179,11 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glActiveTexture( GL_TEXTURE2 );	glBindTexture( GL_TEXTURE_2D, mNormalMap2 );
 	glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, mSpecularMap2 );
 	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, mDiffuseMap2 );
+	glMatrixMode( GL_TEXTURE );	glPushMatrix();
+	glScalef( 100.0f, 100.0f, 100.0f );
 	mTerrain->draw();
+	glMatrixMode( GL_TEXTURE );	glPopMatrix();
+//	mTerrain->drawPatch( posX-200, posZ-200, 400, 400 );
 
 	basicShader->release();
 

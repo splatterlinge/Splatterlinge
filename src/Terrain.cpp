@@ -4,30 +4,36 @@
 #include <QDebug>
 
 
-Terrain::Terrain( QString terrainPath, float heightFactor )
+Terrain::Terrain( QString terrainPath, QVector3D scale, QVector3D offset )
 {
-	QImage heightMap( terrainPath+"height.png" );
-	mWidth = heightMap.width();
-	mHeight = heightMap.height();
-	mHeightFactor = heightFactor;
-	
+	QImage heightMap( terrainPath+"/height.png" );
+	mMapSize = heightMap.size();
+	mScale = scale;
+	mOffset = offset;
 	mVertices.clear();
-	// positions
+	mIndices.clear();
+
+	// prepare positions
 	QVector<QVector3D> rawPositions;
-	for( int h=0; h<heightMap.height(); h++ )
+	for( int h=0; h<mMapSize.height(); h++ )
 	{
-		for( int w=0; w<heightMap.width(); w++ )
+		for( int w=0; w<mMapSize.width(); w++ )
 		{
-			rawPositions.push_back( QVector3D( w, (float)qRed( heightMap.pixel( w, h ) )*(heightFactor/256.0), h ) );
+			rawPositions.push_back( offset + QVector3D(
+				w*(mScale.x()/mMapSize.width()),
+				(float)qRed( heightMap.pixel( w, h ) )*(mScale.y()/256.0),
+				h*(mScale.z()/mMapSize.height())
+			) );
 		}
 	}
-#define rawPosition(x,y) (rawPositions[(x)+(y)*mWidth])
-	for( int w=0; w<heightMap.width(); w++ )
+	// smoothed positions
+#define rawPosition(x,y) (rawPositions[(x)+(y)*mMapSize.width()])
+	for( int w=0; w<mMapSize.width(); w++ )
 		mVertices.push_back( rawPosition( w, 0 ) );
-	for( int h=1; h<heightMap.height()-1; h++ )
+	for( int h=1; h<mMapSize.height()-1; h++ )
 	{
 		mVertices.push_back( rawPosition( 0, h ) );
-		for( int w=1; w<heightMap.width()-1; w++ )
+		for( int w=1; w<mMapSize.width()-1; w++ )
 		{
 			QVector3D smoothed = QVector3D(0,0,0);
 			smoothed += rawPosition( w-1, h-1 );
@@ -42,31 +48,34 @@ Terrain::Terrain( QString terrainPath, float heightFactor )
 			smoothed /= 9.0f;
 			mVertices.push_back( smoothed );
 		}
-		mVertices.push_back( rawPosition( mWidth-1, h ) );
+		mVertices.push_back( rawPosition( mMapSize.width()-1, h ) );
 	}
-	for( int w=0; w<heightMap.width(); w++ )
-		mVertices.push_back( rawPosition( w, mHeight-1 ) );
+	for( int w=0; w<mMapSize.width(); w++ )
+		mVertices.push_back( rawPosition( w, mMapSize.height()-1 ) );
 #undef rawPosition
 	// normals
-	for( int h=0; h<heightMap.height()-1; h++ )
+	for( int h=0; h<mMapSize.height()-1; h++ )
 	{
-		for( int w=0; w<heightMap.width()-1; w++ )
+		for( int w=0; w<mMapSize.width()-1; w++ )
 		{
-			mVertices.push_back( QVector3D::normal( getVertexPosition(w,h), getVertexPosition(w,h+1), getVertexPosition(w+1,h) ) );
+			mVertices.push_back( QVector3D::normal(
+				getVertexPosition(w,h),
+				getVertexPosition(w,h+1),
+				getVertexPosition(w+1,h)
+			) );
 		}
 		mVertices.push_back( QVector3D(0,1,0) );	// last vertex in row
 	}
-	for( int w=0; w<heightMap.width(); w++ )	// last row
+	for( int w=0; w<mMapSize.width(); w++ )	// last row
 	{
 		mVertices.push_back( QVector3D(0,1,0) );
 	}
 	// texture coordinates
-	for( int h=0; h<heightMap.height(); h++ )
+	for( int h=0; h<mMapSize.height(); h++ )
 	{
-		for( int w=0; w<heightMap.width(); w++ )
+		for( int w=0; w<mMapSize.width(); w++ )
 		{
-//			mVertices.push_back( QVector3D( (float)w/(float)mWidth, (float)h/(float)mHeight, 0 ) );
-			mVertices.push_back( QVector3D( (float)w/(float)8, (float)h/(float)8, 0 ) );
+			mVertices.push_back( QVector3D( (float)w/(float)mMapSize.width(), (float)h/(float)mMapSize.height(), 0 ) );
 		}
 	}
 	mVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
@@ -75,13 +84,13 @@ Terrain::Terrain( QString terrainPath, float heightFactor )
 	mVertexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
 	mVertexBuffer.allocate( mVertices.data(), mVertices.size()*sizeof(QVector3D) );
 
-	mIndices.clear();
-	for( int h=0; h<heightMap.height()-1; h++ )
+	// indices
+	for( int h=0; h<mMapSize.height()-1; h++ )
 	{
-		for( int w=0; w<heightMap.width(); w++ )
+		for( int w=0; w<mMapSize.width(); w++ )
 		{
-			mIndices.push_back( w + h*mWidth );
-			mIndices.push_back( w + (h+1)*mWidth );
+			mIndices.push_back( w + h*mMapSize.width() );
+			mIndices.push_back( w + (h+1)*mMapSize.width() );
 		}
 	}
 	mIndexBuffer = QGLBuffer( QGLBuffer::IndexBuffer );
@@ -92,10 +101,48 @@ Terrain::Terrain( QString terrainPath, float heightFactor )
 }
 
 
-void Terrain::draw()
+QPoint Terrain::toMap( const QPointF & point ) const
 {
-	glPushMatrix();
-	glTranslatef( -mWidth/2.0f, -mHeightFactor/2.0f, -mHeight/2.0f );
+	return QPoint(
+		(point.x()-mOffset.x()) * (mMapSize.width()/mScale.x()),
+		(point.y()-mOffset.z()) * (mMapSize.height()/mScale.z())
+	);
+}
+
+
+QSize Terrain::toMap( const QSizeF & size ) const
+{
+	return QSize(
+		size.width() * (mMapSize.width()/mScale.x()),
+		size.height() * (mMapSize.height()/mScale.z())
+	);
+}
+
+
+QRect Terrain::toMap( const QRectF & rect ) const
+{
+	return QRect(
+		toMap(rect.topLeft()),
+		toMap(rect.size())
+	);
+}
+
+
+void Terrain::drawPatchMap( int x, int y, int width, int height )
+{
+	int w = x;
+	if( w < 0 )
+	{
+		width += w;
+		w = 0;
+	}
+	if( w >= mMapSize.width() )
+		w = mMapSize.width()-1;
+	if( w+width > mMapSize.width() )
+		width = mMapSize.width()-w;
+	if( width <= 0 )
+		return;
+
 	mVertexBuffer.bind();
 	mIndexBuffer.bind();
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -103,16 +150,42 @@ void Terrain::draw()
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glVertexPointer( 3, GL_FLOAT, 0, 0 );
-	glNormalPointer( GL_FLOAT, 0, (void*)((size_t)mWidth*mHeight*sizeof(QVector3D)) );
-	glTexCoordPointer( 3, GL_FLOAT, 0, (void*)((size_t)mWidth*mHeight*sizeof(QVector3D)*2) );
-	for( int h=0; h<mHeight-1; h++ )
+	glNormalPointer( GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)) );
+	glTexCoordPointer( 3, GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)*2) );
+	for( int h=y; h<y+height; h++ )
 	{
-		glDrawElements( GL_TRIANGLE_STRIP, mWidth*2, GL_UNSIGNED_INT, (void*)((size_t)(mWidth*2*sizeof(unsigned int)*h)) );
-//		glDrawElements( GL_LINE_STRIP, mWidth*2, GL_UNSIGNED_INT, (void*)((size_t)(mWidth*2*sizeof(unsigned int)*h)) );
+		if( h<0 || h>=mMapSize.height()-1 )
+			continue;
+		glDrawElements( GL_TRIANGLE_STRIP, width*2, GL_UNSIGNED_INT, (void*)((size_t)(w*2*sizeof(unsigned int)+mMapSize.width()*2*sizeof(unsigned int)*h)) );
 	}
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_INDEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	mVertexBuffer.release();
 	mIndexBuffer.release();
-	glPopMatrix();
+}
+
+
+void Terrain::draw()
+{
+	mVertexBuffer.bind();
+	mIndexBuffer.bind();
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_INDEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glVertexPointer( 3, GL_FLOAT, 0, 0 );
+	glNormalPointer( GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)) );
+	glTexCoordPointer( 3, GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)*2) );
+	for( int h=0; h<mMapSize.height()-1; h++ )
+	{
+		glDrawElements( GL_TRIANGLE_STRIP, mMapSize.width()*2, GL_UNSIGNED_INT, (void*)((size_t)(mMapSize.width()*2*sizeof(unsigned int)*h)) );
+	}
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_INDEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	mVertexBuffer.release();
+	mIndexBuffer.release();
 }

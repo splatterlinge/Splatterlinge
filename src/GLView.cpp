@@ -18,7 +18,7 @@ GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
 	QGraphicsProxyWidget * proxy;
 	QWidget * w = new QWidget();
 	w->setGeometry( 0, 0, 10, 10 );
-	w->setWindowTitle( tr("Title") );
+	w->setWindowTitle( tr("Ununoctium") );
 	w->setWindowOpacity( 0.8 );
 	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, w );
 	layout->addWidget( new QLabel("W\tForward\nA\tLeft\nS\tBackward\nD\tRight\nControl\tDown\nSpace\tUp\nShift\tSpeedup") );
