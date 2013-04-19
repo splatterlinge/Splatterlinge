@@ -9,6 +9,8 @@ class QGraphicsItem;
 class QGraphicsProxyWidget;
 class QGLWidget;
 
+class Terrain;
+
 
 class GLScene : public QGraphicsScene
 {
@@ -25,6 +27,7 @@ public:
 protected:
 	// Overrides:
 	void keyPressEvent( QKeyEvent * event );
+	void keyReleaseEvent( QKeyEvent * event );
 	void mousePressEvent( QGraphicsSceneMouseEvent * event );
 	void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
 	void mouseMoveEvent( QGraphicsSceneMouseEvent * event );
@@ -38,9 +41,22 @@ private:
 	bool mDragging;
 	QFont mFont;
 	QGLShaderProgram * basicShader;
-	GLuint mDiffuseMap;
-	GLuint mSpecularMap;
-	GLuint mNormalMap;
+	GLuint mDiffuseMap1;
+	GLuint mSpecularMap1;
+	GLuint mNormalMap1;
+	GLuint mDiffuseMap2;
+	GLuint mSpecularMap2;
+	GLuint mNormalMap2;
+
+	bool mForwardPressed;
+	bool mBackwardPressed;
+	bool mLeftPressed;
+	bool mRightPressed;
+	bool mUpPressed;
+	bool mDownPressed;
+	bool mSpeedPressed;
+	
+	Terrain * mTerrain;
 
 private slots:
 	void secondPassed();
