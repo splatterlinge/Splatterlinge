@@ -4,11 +4,11 @@
 #include <QDebug>
 
 
-Terrain::Terrain( QString terrainPath, QVector3D scale, QVector3D offset )
+Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 {
-	QImage heightMap( terrainPath+"/height.png" );
+	QImage heightMap( heightMapPath );
 	mMapSize = heightMap.size();
-	mScale = scale;
+	mSize = size;
 	mOffset = offset;
 	mVertices.clear();
 	mIndices.clear();
@@ -20,9 +20,9 @@ Terrain::Terrain( QString terrainPath, QVector3D scale, QVector3D offset )
 		for( int w=0; w<mMapSize.width(); w++ )
 		{
 			rawPositions.push_back( offset + QVector3D(
-				w*(mScale.x()/mMapSize.width()),
-				(float)qRed( heightMap.pixel( w, h ) )*(mScale.y()/256.0),
-				h*(mScale.z()/mMapSize.height())
+				w*(mSize.x()/mMapSize.width()),
+				(float)qRed( heightMap.pixel( w, h ) )*(mSize.y()/256.0),
+				h*(mSize.z()/mMapSize.height())
 			) );
 		}
 	}
@@ -104,8 +104,8 @@ Terrain::Terrain( QString terrainPath, QVector3D scale, QVector3D offset )
 QPoint Terrain::toMap( const QPointF & point ) const
 {
 	return QPoint(
-		(point.x()-mOffset.x()) * (mMapSize.width()/mScale.x()),
-		(point.y()-mOffset.z()) * (mMapSize.height()/mScale.z())
+		(point.x()-mOffset.x()) * (mMapSize.width()/mSize.x()),
+		(point.y()-mOffset.z()) * (mMapSize.height()/mSize.z())
 	);
 }
 
@@ -113,8 +113,8 @@ QPoint Terrain::toMap( const QPointF & point ) const
 QSize Terrain::toMap( const QSizeF & size ) const
 {
 	return QSize(
-		size.width() * (mMapSize.width()/mScale.x()),
-		size.height() * (mMapSize.height()/mScale.z())
+		size.width() * (mMapSize.width()/mSize.x()),
+		size.height() * (mMapSize.height()/mSize.z())
 	);
 }
 

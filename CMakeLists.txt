@@ -1,6 +1,14 @@
 project( Ununoctium )
 cmake_minimum_required( VERSION 2.8.0 )
 
+find_package( Doxygen )
+if( DOXYGEN_FOUND )
+	add_custom_target( doc ${DOXYGEN_EXECUTABLE} Doxyfile )
+	set_directory_properties( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "doc/html;doc/latex;" )
+else( DOXYGEN_FOUND )
+	message( "Doxygen not found - 'doc' can't be generated." )
+endif( DOXYGEN_FOUND )
+
 find_package( Qt4 COMPONENTS QtCore QtGui QtOpengl REQUIRED )
 find_package( OpenGL )
 

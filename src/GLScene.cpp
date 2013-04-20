@@ -26,7 +26,7 @@ GLScene::GLScene( QGLWidget * glWidget, QObject * parent ) : QGraphicsScene( par
 
 	mGLWidget->makeCurrent();
 	
-	mTerrain = new Terrain("./data/terrain/", QVector3D(1000,100,1000), QVector3D(-500,-50,-500) );
+	mTerrain = new Terrain("./data/terrain/height.png", QVector3D(1000,100,1000), QVector3D(-500,-50,-500) );
 
 	basicShader = new QGLShaderProgram( glWidget );
 	basicShader->addShaderFromSourceFile( QGLShader::Vertex, "./data/shader/versatile.medium.vsh" );
