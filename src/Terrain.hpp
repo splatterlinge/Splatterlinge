@@ -41,14 +41,6 @@ public:
 	/// Draws the terrain within a rectangle in world coordinates.
 	/**
 	 * The terrain is rendered using VBOs.
-	 * @param rect The rectangle to draw in world coordinates.
-	 */
-	void drawPatch( const QRectF & rect )
-		{ drawPatchMap( toMap(rect) ); }
-
-	/// Draws the terrain within a rectangle in world coordinates.
-	/**
-	 * The terrain is rendered using VBOs.
 	 * @param x Mnimum X-coordinate of the rectangle in world coordinates.
 	 * @param z Mnimum Z-coordinate of the rectangle in world coordinates.
 	 * @param rangeX Width of the rectangle in X-direction using world coordinates.
@@ -57,13 +49,13 @@ public:
 	void drawPatch( float x, float z, float rangeX, float rangeZ )
 		{ drawPatchMap( toMap( QRectF( x, z, rangeX, rangeZ ) ) ); }
 
-	/// Draws the terrain within a rectangle in heightmap coordinates.
+	/// Draws the terrain within a rectangle in world coordinates.
 	/**
 	 * The terrain is rendered using VBOs.
-	 * @param rect The rectangle to draw in heightmap coordinates.
+	 * @param rect The rectangle to draw in world coordinates.
 	 */
-	void drawPatchMap( const QRect & rect )
-		{ drawPatchMap( rect.x(), rect.y(), rect.width(), rect.height() ); }
+	void drawPatch( const QRectF & rect )
+		{ drawPatchMap( toMap(rect) ); }
 
 	/// Draws the terrain within a rectangle in heightmap coordinates.
 	/**
@@ -73,7 +65,15 @@ public:
 	 * @param width Width of the rectangle in heightmap coordinates.
 	 * @param height Height of the rectangle in heightmap coordinates.
 	 */
-	void drawPatchMap( int x, int y, int width, int height );
+	void drawPatchMap( int x, int y, int width, int height )
+		{ drawPatchMap( QRect( x, y, width, height ) ); }
+
+	/// Draws the terrain within a rectangle in heightmap coordinates.
+	/**
+	 * The terrain is rendered using VBOs.
+	 * @param rect The rectangle to draw in heightmap coordinates.
+	 */
+	void drawPatchMap( const QRect & rect );
 
 	QPoint toMap( const QPointF & point ) const;	///< Converts a point in world coordinates to heightmap coordinates.
 	QSize toMap( const QSizeF & size ) const;	///< Converts a size in world coordinates to heightmap coordinates.

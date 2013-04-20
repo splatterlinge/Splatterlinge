@@ -136,9 +136,9 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 		moveY -= 1.0f;
 	if( mSpeedPressed )
 	{
-		moveX *= 1.0;
-		moveY *= 1.0;
-		moveZ *= 1.0;
+		moveX *= 3.0;
+		moveY *= 3.0;
+		moveZ *= 3.0;
 	} else {
 		moveX *= 0.2;
 		moveY *= 0.2;
@@ -182,8 +182,8 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glMatrixMode( GL_TEXTURE );	glPushMatrix();
 	glScalef( 100.0f, 100.0f, 100.0f );
 	mTerrain->draw();
-	glMatrixMode( GL_TEXTURE );	glPopMatrix();
 //	mTerrain->drawPatch( posX-200, posZ-200, 400, 400 );
+	glMatrixMode( GL_TEXTURE );	glPopMatrix();
 
 	basicShader->release();
 

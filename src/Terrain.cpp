@@ -128,20 +128,13 @@ QRect Terrain::toMap( const QRectF & rect ) const
 }
 
 
-void Terrain::drawPatchMap( int x, int y, int width, int height )
+void Terrain::drawPatchMap( const QRect & rect )
 {
-	int w = x;
-	if( w < 0 )
-	{
-		width += w;
-		w = 0;
-	}
-	if( w >= mMapSize.width() )
-		w = mMapSize.width()-1;
-	if( w+width > mMapSize.width() )
-		width = mMapSize.width()-w;
-	if( width <= 0 )
-		return;
+	QRect rectToDraw = rect.intersected( QRect( QPoint(0,0), mMapSize ) );
+	if( rectToDraw.width() <= 1 || rectToDraw.height() <= 1 )
+		return;	// need at least 4 vertices to build triangle strip
+	if( rectToDraw.y() >= mMapSize.height()-1 )
+		return;	// reached the bottom row - there is no next row to build triangle strips with
 
 	mVertexBuffer.bind();
 	mIndexBuffer.bind();
@@ -149,15 +142,23 @@ void Terrain::drawPatchMap( int x, int y, int width, int height )
 	glEnableClientState(GL_INDEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	
 	glVertexPointer( 3, GL_FLOAT, 0, 0 );
 	glNormalPointer( GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)) );
 	glTexCoordPointer( 3, GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)*2) );
-	for( int h=y; h<y+height; h++ )
+
+	for( int slice=rectToDraw.y(); slice<rectToDraw.y()+rectToDraw.height(); slice++ )
 	{
-		if( h<0 || h>=mMapSize.height()-1 )
-			continue;
-		glDrawElements( GL_TRIANGLE_STRIP, width*2, GL_UNSIGNED_INT, (void*)((size_t)(w*2*sizeof(unsigned int)+mMapSize.width()*2*sizeof(unsigned int)*h)) );
+		glDrawElements(
+			GL_TRIANGLE_STRIP,
+			rectToDraw.width()*2,
+			GL_UNSIGNED_INT,
+			(void*)((size_t)(2*sizeof(unsigned int)*(	// convert index to pointer
+				rectToDraw.x() + mMapSize.width()*slice	// index to start
+			) ) )
+		);
 	}
+
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_INDEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
@@ -175,13 +176,23 @@ void Terrain::draw()
 	glEnableClientState(GL_INDEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
 	glVertexPointer( 3, GL_FLOAT, 0, 0 );
 	glNormalPointer( GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)) );
 	glTexCoordPointer( 3, GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)*2) );
-	for( int h=0; h<mMapSize.height()-1; h++ )
+
+	for( int slice=0; slice<mMapSize.height()-1; slice++ )
 	{
-		glDrawElements( GL_TRIANGLE_STRIP, mMapSize.width()*2, GL_UNSIGNED_INT, (void*)((size_t)(mMapSize.width()*2*sizeof(unsigned int)*h)) );
+		glDrawElements(
+			GL_TRIANGLE_STRIP,
+			mMapSize.width()*2,
+			GL_UNSIGNED_INT,
+			(void*)((size_t)(2*sizeof(unsigned int)*(	// convert index to pointer
+				mMapSize.width()*slice			// index to start
+			) ) )
+		);
 	}
+
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_INDEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
