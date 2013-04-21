@@ -13,7 +13,9 @@ GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
 	mGLWidget = new QGLWidget( glFormat, this );
 
 	setViewport( mGLWidget );
-	setScene( new GLScene( mGLWidget, this ) );
+
+	mGLScene = new GLScene( mGLWidget, this );
+	setScene( mGLScene );
 
 	QGraphicsProxyWidget * proxy;
 	QWidget * w = new QWidget();
@@ -25,6 +27,13 @@ GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
 	w->setLayout( layout );
 	proxy = scene()->addWidget( w, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint );
 	proxy->setPos( 32, 32 );
+}
+
+
+GLView::~GLView()
+{
+	delete mGLScene;
+	delete mGLWidget;
 }
 
 

@@ -17,9 +17,10 @@ class GLView : public QGraphicsView
 	Q_OBJECT
 public:
 	GLView( QGLFormat glFormat, QWidget * parent = 0 );
+	virtual ~GLView();
 
 	// Overrides:
-	GLScene * scene() const { return reinterpret_cast<GLScene*>(QGraphicsView::scene()); }
+	GLScene * scene() const { return mGLScene; }
 
 	QGLWidget * glWidget() const { return mGLWidget; }
 
@@ -29,6 +30,7 @@ protected:
 
 private:
 	QGLWidget * mGLWidget;
+	GLScene * mGLScene;
 };
 
 #endif

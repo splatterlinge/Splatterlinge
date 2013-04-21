@@ -6,3 +6,5 @@ cmake_install.cmake
 Makefile
 moc_*.cxx
 Ununoctium.cbp
+Ununoctium.kdev4
+.kdev4/

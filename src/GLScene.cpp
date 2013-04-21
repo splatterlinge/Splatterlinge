@@ -3,7 +3,7 @@
 #include <QtGui>
 #include <GL/glu.h>
 #include <math.h>
-#include "Terrain.hpp"
+#include "Landscape.hpp"
 #include "teapot.h"
 
 
@@ -25,22 +25,10 @@ GLScene::GLScene( QGLWidget * glWidget, QObject * parent ) : QGraphicsScene( par
 	mFont = QFont( "Sans", 12, QFont::Normal );
 
 	mGLWidget->makeCurrent();
-	
-	mTerrain = new Terrain("./data/terrain/height.png", QVector3D(1000,100,1000), QVector3D(-500,-50,-500) );
 
-	basicShader = new QGLShaderProgram( glWidget );
-	basicShader->addShaderFromSourceFile( QGLShader::Vertex, "./data/shader/versatile.medium.vsh" );
-	basicShader->addShaderFromSourceFile( QGLShader::Fragment, "./data/shader/versatile.medium.fsh" );
-	if( !basicShader->link() )
-		qWarning() << basicShader->log();
+	mLandscape = new Landscape( mGLWidget, "test" );
 
-	mDiffuseMap1 = mGLWidget->bindTexture( QPixmap("./data/texture/KirksEntry.diffuse.png"), GL_TEXTURE_2D, GL_RGBA, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
-	mNormalMap1 = mGLWidget->bindTexture( QPixmap("./data/texture/KirksEntry.normal.png"), GL_TEXTURE_2D, GL_RGBA, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
-	mSpecularMap1 = mGLWidget->bindTexture( QPixmap("./data/texture/KirksEntry.specular.png"), GL_TEXTURE_2D, GL_RGBA, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
-
-	mDiffuseMap2 = mGLWidget->bindTexture( QPixmap("./data/texture/DirtyConcrete.diffuse.png"), GL_TEXTURE_2D, GL_RGBA, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
-	mNormalMap2 = mGLWidget->bindTexture( QPixmap("./data/texture/DirtyConcrete.normal.png"), GL_TEXTURE_2D, GL_RGBA, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
-	mSpecularMap2 = mGLWidget->bindTexture( QPixmap("./data/texture/DirtyConcrete.specular.png"), GL_TEXTURE_2D, GL_RGBA, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
+	mTeapotMaterial = new Material( mGLWidget, "KirksEntry" );
 
 	QTimer * secondTimer = new QTimer( this );
 	QObject::connect( secondTimer, SIGNAL(timeout()), this, SLOT(secondPassed()) );
@@ -51,6 +39,13 @@ GLScene::GLScene( QGLWidget * glWidget, QObject * parent ) : QGraphicsScene( par
 	QObject::connect( updateTimer, SIGNAL(timeout()), this, SLOT(update()) );
 	updateTimer->setInterval( 10 );
 	updateTimer->start();
+}
+
+
+GLScene::~GLScene()
+{
+	delete mLandscape;
+	delete mTeapotMaterial;
 }
 
 
@@ -88,14 +83,6 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glLightfv( GL_LIGHT0, GL_AMBIENT, ambientLight );
 	glLightfv( GL_LIGHT0, GL_DIFFUSE, diffuseLight );
 
-	GLfloat diffuseMaterial[] = {1.0, 1.0, 1.0};
-	GLfloat specularMaterial[] = {1.0, 1.0, 1.0};
-	GLfloat emissiveMaterial[] = {0.0, 0.0, 0.0};
-	GLfloat shininess[] = {127};
-	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, specularMaterial );
-	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, diffuseMaterial );
-	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, emissiveMaterial );
-	glMaterialfv( GL_FRONT_AND_BACK, GL_SHININESS, shininess );
 	glEnable( GL_LIGHTING );
 	glEnable( GL_LIGHT0 );
 
@@ -107,6 +94,9 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
+
+	GLfloat lightPosition[] = {1.0, 0.5, 1.0, 0.0};
+	glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 
 	static float rotateX = 0.0f;
 	static float rotateY = 0.0f;
@@ -149,43 +139,29 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	posY += moveY;
 	glTranslatef( -posX, -posY, -posZ );
 	
-	GLfloat lightPosition[] = {1.0, 0.5, 1.0, 0.0};
-	glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 /*
 	glColor3f( 1, 1, 1 );
 	glDisable( GL_LIGHTING );
 	glDisable( GL_TEXTURE_2D );
 	mTerrain->draw();
 */
-	basicShader->bind();
-	basicShader->setUniformValue( "diffusemap", 0 );
-	basicShader->setUniformValue( "specularmap", 1 );
-	basicShader->setUniformValue( "normalmap", 2 );
-	basicShader->setUniformValue( "activelights", 1 );
 
-	glEnable( GL_TEXTURE_2D );
-
-	glActiveTexture( GL_TEXTURE2 );	glBindTexture( GL_TEXTURE_2D, mNormalMap1 );
-	glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, mSpecularMap1 );
-	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, mDiffuseMap1 );
-
+	mTeapotMaterial->bind();
 	glPushMatrix();
 	glTranslatef( 0, -16, 0 );
 	glDisable( GL_CULL_FACE );
-	teapot( 20, 32.0f, GL_FILL );
+	teapot( 20, 16.0f, GL_FILL );
 	glEnable( GL_CULL_FACE );
 	glPopMatrix();
-	
-	glActiveTexture( GL_TEXTURE2 );	glBindTexture( GL_TEXTURE_2D, mNormalMap2 );
-	glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, mSpecularMap2 );
-	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, mDiffuseMap2 );
+	mTeapotMaterial->release();
+
 	glMatrixMode( GL_TEXTURE );	glPushMatrix();
 	glScalef( 100.0f, 100.0f, 100.0f );
-	mTerrain->draw();
+//	mTerrain->draw();
 //	mTerrain->drawPatch( posX-200, posZ-200, 400, 400 );
+	mLandscape->draw();
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
 
-	basicShader->release();
 
 //	glFlush();
 	glFinish();

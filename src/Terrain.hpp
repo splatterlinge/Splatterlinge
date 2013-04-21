@@ -12,7 +12,6 @@
 #include <QVector>
 #include <QVector3D>
 #include <QGLBuffer>
-#include <QGLShaderProgram>
 
 
 /// Generates and draws a mesh based on a heightmap.
@@ -31,6 +30,8 @@ public:
 	 * @param offset Where to put the origin of the terrain.
 	 */
 	Terrain( QString heightMapPath, QVector3D size = QVector3D(1,1,1), QVector3D offset = QVector3D(0,0,0) );
+
+	~Terrain();
 
 	/// Draws the complete terrain.
 	/**
@@ -94,7 +95,6 @@ private:
 	QVector3D mOffset;
 	QVector3D mSize;
 	QVector<QVector3D> mVertices;
-	QVector<unsigned int> mIndices;
 	QGLBuffer mIndexBuffer;
 	QGLBuffer mVertexBuffer;
 };

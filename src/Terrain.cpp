@@ -11,7 +11,6 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 	mSize = size;
 	mOffset = offset;
 	mVertices.clear();
-	mIndices.clear();
 
 	// prepare positions
 	QVector<QVector3D> rawPositions;
@@ -85,19 +84,28 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 	mVertexBuffer.allocate( mVertices.data(), mVertices.size()*sizeof(QVector3D) );
 
 	// indices
+	QVector<unsigned int> indices;
 	for( int h=0; h<mMapSize.height()-1; h++ )
 	{
 		for( int w=0; w<mMapSize.width(); w++ )
 		{
-			mIndices.push_back( w + h*mMapSize.width() );
-			mIndices.push_back( w + (h+1)*mMapSize.width() );
+			indices.push_back( w + h*mMapSize.width() );
+			indices.push_back( w + (h+1)*mMapSize.width() );
 		}
 	}
 	mIndexBuffer = QGLBuffer( QGLBuffer::IndexBuffer );
 	mIndexBuffer.create();
 	mIndexBuffer.bind();
 	mIndexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
-	mIndexBuffer.allocate( mIndices.data(), mIndices.size()*sizeof(unsigned int) );
+	mIndexBuffer.allocate( indices.data(), indices.size()*sizeof(unsigned int) );
+}
+
+
+Terrain::~Terrain()
+{
+	mVertices.clear();
+	mVertexBuffer.destroy();
+	mIndexBuffer.destroy();
 }
 
 

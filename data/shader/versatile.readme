@@ -1,5 +1,4 @@
 Uniforms:
-	activelights	# up to 8 light sources
 	TextureSamplers:
 		diffusemap:
 			rgb:
@@ -20,7 +19,7 @@ Normals
 TextureCoordinates:
 	MultiTexCoord0
 
-LightSource[activelights]:
+LightSource[2]:
 	constantAttenuation	# evaluated per vertex
 	linearAttenuation	# evaluated per vertex
 	quadraticAttenuation	# evaluated per vertex

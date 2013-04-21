@@ -4,12 +4,14 @@
 #include <QtGui>
 #include <QtOpenGL>
 
+#include "Material.hpp"
+
 
 class QGraphicsItem;
 class QGraphicsProxyWidget;
 class QGLWidget;
 
-class Terrain;
+class Landscape;
 
 
 class GLScene : public QGraphicsScene
@@ -17,6 +19,7 @@ class GLScene : public QGraphicsScene
 	Q_OBJECT
 public:
 	explicit GLScene( QGLWidget * glWidget, QObject * parent = 0 );
+	~GLScene();
 
 	// Overrides:
 	void drawBackground( QPainter * painter, const QRectF & rect );
@@ -40,13 +43,8 @@ private:
 	QPoint mDrag;
 	bool mDragging;
 	QFont mFont;
-	QGLShaderProgram * basicShader;
-	GLuint mDiffuseMap1;
-	GLuint mSpecularMap1;
-	GLuint mNormalMap1;
-	GLuint mDiffuseMap2;
-	GLuint mSpecularMap2;
-	GLuint mNormalMap2;
+
+	Material * mTeapotMaterial;
 
 	bool mForwardPressed;
 	bool mBackwardPressed;
@@ -55,8 +53,8 @@ private:
 	bool mUpPressed;
 	bool mDownPressed;
 	bool mSpeedPressed;
-	
-	Terrain * mTerrain;
+
+	Landscape * mLandscape;
 
 private slots:
 	void secondPassed();
