@@ -30,6 +30,9 @@ public:
 private:
 	Terrain * mTerrain;
 	Material * mTerrainMaterial;
+	QVector3D mTerrainSize;
+	QVector3D mTerrainOffset;
+	QVector2D mTerrainMaterialScale;
 };
 
 

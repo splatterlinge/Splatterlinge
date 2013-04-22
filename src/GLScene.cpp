@@ -76,6 +76,10 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glEnable( GL_CULL_FACE );
 	glClearColor( 0, 0, 0, 0 );
 
+	glLightf( GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.75 );
+	glLightf( GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.002 );
+	glLightf( GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0002 );
+
 	GLfloat specularLight[] = {1.0, 1.0, 1.0};
 	GLfloat ambientLight[] = {0.01, 0.01, 0.01};
 	GLfloat diffuseLight[] = {0.9, 1.0, 1.0};
@@ -95,7 +99,7 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 
-	GLfloat lightPosition[] = {1.0, 0.5, 1.0, 0.0};
+	GLfloat lightPosition[] = {0.0, 1.0, 0.0, 1.0};
 	glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 
 	static float rotateX = 0.0f;
@@ -138,7 +142,7 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	posZ += sinf( rotateY*(M_PI/180.0) ) * moveX + cosf( rotateY*(M_PI/180.0) ) * moveZ;
 	posY += moveY;
 	glTranslatef( -posX, -posY, -posZ );
-	
+
 /*
 	glColor3f( 1, 1, 1 );
 	glDisable( GL_LIGHTING );
@@ -155,12 +159,9 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glPopMatrix();
 	mTeapotMaterial->release();
 
-	glMatrixMode( GL_TEXTURE );	glPushMatrix();
-	glScalef( 100.0f, 100.0f, 100.0f );
 //	mTerrain->draw();
 //	mTerrain->drawPatch( posX-200, posZ-200, 400, 400 );
 	mLandscape->draw();
-	glMatrixMode( GL_TEXTURE );	glPopMatrix();
 
 
 //	glFlush();

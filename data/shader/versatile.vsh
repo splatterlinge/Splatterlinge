@@ -17,13 +17,13 @@ void main()
 		
 		if( gl_LightSource[i].position.w == 0 )
 		{
-			vLightDir[i] = normalize( gl_NormalMatrix * gl_LightSource[i].position.xyz );
+			vLightDir[i] = normalize( gl_LightSource[i].position.xyz );
 			vAtt[i] = 1.0;
 		}
 		else
 		{
-			vLightDir[i] = gl_NormalMatrix * gl_LightSource[i].position.xyz + vViewDir;
-			float d = length( vLightDir[i] );
+			vLightDir[i] = normalize( gl_LightSource[i].position.xyz - v );
+			float d = length( gl_LightSource[i].position.xyz - v );
 			vAtt[i] = 1.0 / (
 				gl_LightSource[i].constantAttenuation +
 				gl_LightSource[i].linearAttenuation * d +
