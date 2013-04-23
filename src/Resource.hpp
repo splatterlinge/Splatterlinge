@@ -2,7 +2,7 @@
 #define RESOURCE_INCLUDED
 
 
-#include <QMap>
+#include <QHash>
 #include <QWeakPointer>
 #include <QString>
 
@@ -30,14 +30,14 @@ template< class T >
 class Resource
 {
 private:
-	static QMap< QString, QWeakPointer<T> > cached;
+	static QHash< QString, QWeakPointer<T> > cached;
 	QSharedPointer<T> mData;
 
 protected:
 	QSharedPointer<T> & data() { return mData; }
 	void cache( QSharedPointer<T> data )
 	{
-		if( cached.contains(data->uid()) )
+		if( cached.contains(data->uid()) && !(cached[data->uid()].isNull()) )
 		{
 			mData = cached[data->uid()];
 		} else {
@@ -54,8 +54,8 @@ public:
 
 
 #define RESOURCE_CACHE( ResourceDataType ) \
-	template<> QMap< QString, QWeakPointer<ResourceDataType> > Resource<ResourceDataType>::cached \
-		= QMap< QString, QWeakPointer<ResourceDataType> >()
+	template<> QHash< QString, QWeakPointer<ResourceDataType> > Resource<ResourceDataType>::cached \
+		= QHash< QString, QWeakPointer<ResourceDataType> >()
 
 
 #endif

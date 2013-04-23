@@ -16,6 +16,7 @@ public:
 	virtual ~MaterialData();
 	bool load();
 
+	const QString & name() const { return mName; }
 	const QVector4D & ambient() const { return mAmbient; }
 	const QVector4D & diffuse() const { return mDiffuse; }
 	const QVector4D & specular() const { return mSpecular; }
@@ -24,11 +25,12 @@ public:
 	const GLuint & diffuseMap() const { return mDiffuseMap; }
 	const GLuint & specularMap() const { return mSpecularMap; }
 	const GLuint & normalMap() const { return mNormalMap; }
-	Shader * shader() { return mShader; }
+	const QString & defaultShaderName() const { return mDefaultShaderName; }
 
 private:
 	QGLWidget * mGLWidget;
 	QString mName;
+	QString mDefaultShaderName;
 
 	QVector4D mAmbient;
 	QVector4D mDiffuse;
@@ -38,16 +40,23 @@ private:
 	GLuint mDiffuseMap;
 	GLuint mSpecularMap;
 	GLuint mNormalMap;
-	Shader * mShader;
 };
 
 
 class Material : public Resource<MaterialData>
 {
+private:
+	QGLWidget * mGLWidget;
+	Shader * mShader;
+	GLuint mMaskMap;
+
 public:
 	Material( QGLWidget * glWidget, QString name );
 	virtual ~Material();
 	
+	void setShader( QString shaderName );
+	void setDefaultShader();
+	void addMaskMap( QString path );
 	void bind();
 	void release();
 };

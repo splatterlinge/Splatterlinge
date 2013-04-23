@@ -17,6 +17,12 @@ MainWindow::MainWindow( QWidget * parent) : QMainWindow( parent )
 }
 
 
+MainWindow::~MainWindow()
+{
+	delete mGLView;
+}
+
+
 void MainWindow::toggleFullScreen()
 {
 	if( this->windowState() == Qt::WindowFullScreen )

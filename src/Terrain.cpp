@@ -74,7 +74,7 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 	{
 		for( int w=0; w<mMapSize.width(); w++ )
 		{
-			mVertices.push_back( QVector3D( (float)w/(float)mMapSize.width(), (float)h/(float)mMapSize.height(), 0 ) );
+			mVertices.push_back( QVector3D( (float)w, (float)h, 0 ) );
 		}
 	}
 	mVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );

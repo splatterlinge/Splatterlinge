@@ -99,9 +99,6 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 
-	GLfloat lightPosition[] = {0.0, 1.0, 0.0, 1.0};
-	glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
-
 	static float rotateX = 0.0f;
 	static float rotateY = 0.0f;
 	rotateY += mDrag.x()/4.0f;
@@ -143,12 +140,8 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	posY += moveY;
 	glTranslatef( -posX, -posY, -posZ );
 
-/*
-	glColor3f( 1, 1, 1 );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_TEXTURE_2D );
-	mTerrain->draw();
-*/
+	GLfloat lightPosition[] = {1.0, 1.0, 1.0, 0.0};
+	glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
 
 	mTeapotMaterial->bind();
 	glPushMatrix();
@@ -159,8 +152,6 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glPopMatrix();
 	mTeapotMaterial->release();
 
-//	mTerrain->draw();
-//	mTerrain->drawPatch( posX-200, posZ-200, 400, 400 );
 	mLandscape->draw();
 
 

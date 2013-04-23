@@ -11,20 +11,23 @@ MaterialData::MaterialData( QGLWidget * glWidget, QString name ) :
 	ResourceData( name ),
 	mGLWidget(glWidget),
 	mName(name),
-	mShader(0)
+	mDiffuseMap(-1),
+	mSpecularMap(-1),
+	mNormalMap(-1)
 {
 }
 
 
 MaterialData::~MaterialData()
 {
-	delete mShader;
+	qDebug() << "- MaterialData" << uid();
 }
 
 
 bool MaterialData::load()
 {
-	qDebug() << "MaterialData load" << mName;
+	qDebug() << "+ MaterialData" << uid();
+
 	QSettings s( "./data/material/"+mName+"/material.ini", QSettings::IniFormat );
 
 	s.beginGroup( "Material" );
@@ -56,29 +59,28 @@ bool MaterialData::load()
 			s.value( "emissionAlpha", 1.0f ).toFloat()
 		);
 		mShininess = s.value( "shininess", 0 ).toFloat();
-		QString shaderName = s.value( "shader", "" ).toString();
+		mDefaultShaderName = s.value( "shader", "versatile" ).toString();
 	s.endGroup();
 	
-	QPixmap diffuseMap = QPixmap(diffuseMapPath);
+	QPixmap diffuseMap = QPixmap( diffuseMapPath );
 	if( diffuseMap.isNull() )
 	{
-		qWarning() << diffuseMapPath << " not found!";
+		qWarning() << diffuseMapPath << "not found!";
 	}
-	QPixmap specularMap = QPixmap(specularMapPath);
+	QPixmap specularMap = QPixmap( specularMapPath );
 	if( specularMapPath.isNull() )
 	{
-		qWarning() << specularMapPath << " not found!";
+		qWarning() << specularMapPath << "not found!";
 	}
-	QPixmap normalMap = QPixmap(normalMapPath);
+	QPixmap normalMap = QPixmap( normalMapPath );
 	if( normalMap.isNull() )
 	{
-		qWarning() << normalMapPath << " not found!";
+		qWarning() << normalMapPath << "not found!";
 	}
 
 	mDiffuseMap =  mGLWidget->bindTexture( diffuseMap, GL_TEXTURE_2D, GL_RGBA, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
 	mSpecularMap =  mGLWidget->bindTexture( specularMap, GL_TEXTURE_2D, GL_RGBA, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
 	mNormalMap =  mGLWidget->bindTexture( normalMap, GL_TEXTURE_2D, GL_RGB, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
-	mShader = new Shader( mGLWidget, shaderName );
 
 	return ResourceData::load();
 }
@@ -86,19 +88,25 @@ bool MaterialData::load()
 
 Material::Material( QGLWidget * glWidget, QString name ) : Resource()
 {
+	mGLWidget = glWidget;
+	mMaskMap = -1;
+	mShader = 0;
 	QSharedPointer<MaterialData> n( new MaterialData( glWidget, name ) );
 	cache( n );
+	setDefaultShader();
 }
 
 
 Material::~Material()
 {
+	delete mShader;
 }
 
 
 void Material::bind()
 {
-	data()->shader()->bind();
+	if( mShader )
+		mShader->bind();
 
 	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, reinterpret_cast<const GLfloat*>( &(data()->ambient()) ) );
 	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, reinterpret_cast<const GLfloat*>( &(data()->diffuse()) ) );
@@ -106,13 +114,45 @@ void Material::bind()
 	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, reinterpret_cast<const GLfloat*>( &(data()->emission()) ) );
 	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, data()->shininess() );
 
-	glActiveTexture( GL_TEXTURE2 );	glBindTexture( GL_TEXTURE_2D, data()->normalMap() );
-	glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, data()->specularMap() );
-	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, data()->diffuseMap() );
+	if( mMaskMap >= 0 )
+		glActiveTexture( GL_TEXTURE3 );	glBindTexture( GL_TEXTURE_2D, mMaskMap );
+	if( data()->normalMap() >= 0 )
+		glActiveTexture( GL_TEXTURE2 );	glBindTexture( GL_TEXTURE_2D, data()->normalMap() );
+	if( data()->specularMap() >= 0 )
+		glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, data()->specularMap() );
+	if( data()->diffuseMap() >= 0 )
+		glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, data()->diffuseMap() );
 }
 
 
 void Material::release()
 {
-	data()->shader()->release();
+	if( mShader )
+		mShader->release();
+}
+
+
+void Material::setShader( QString shaderName )
+{
+	delete mShader;
+	mShader = new Shader( mGLWidget, shaderName );
+}
+
+
+void Material::setDefaultShader()
+{
+	delete mShader;
+	mShader = new Shader( mGLWidget, data()->defaultShaderName() );
+}
+
+
+void Material::addMaskMap( QString path )
+{
+	QPixmap maskMap = QPixmap( path );
+	if( maskMap.isNull() )
+	{
+		qWarning() << path << "not found!";
+	}
+
+	mMaskMap =  mGLWidget->bindTexture( maskMap, GL_TEXTURE_2D, GL_LUMINANCE, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
 }

@@ -8,6 +8,7 @@ varying float vAtt[MAX_LIGHTS];
 uniform sampler2D diffuseMap;
 uniform sampler2D specularMap;
 uniform sampler2D normalMap;
+uniform sampler2D maskMap;
 
 
 void main()
@@ -54,5 +55,5 @@ void main()
 		}
 	}
 
-	gl_FragColor = vec4( final_color, colorFromMap.a );
+	gl_FragColor = vec4( final_color, colorFromMap.a * texture2D( maskMap, gl_TexCoord[1].st ).r );
 }

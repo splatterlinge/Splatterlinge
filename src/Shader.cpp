@@ -1,6 +1,7 @@
 #include "Shader.hpp"
 
 #include <QDebug>
+#include <GL/glu.h>
 
 
 RESOURCE_CACHE(ShaderData);
@@ -17,13 +18,16 @@ ShaderData::ShaderData( QGLWidget * glWidget, QString name ) :
 
 ShaderData::~ShaderData()
 {
+	qDebug() << "- ShaderData" << uid();
 	delete mShader;
+	mShader = 0;
 }
 
 
 bool ShaderData::load()
 {
-	qDebug() << "ShaderData load" << mName;
+	qDebug() << "+ ShaderData" << uid();
+	delete mShader;
 	mShader = new QGLShaderProgram( mGLWidget );
 	mShader->addShaderFromSourceFile( QGLShader::Vertex, "./data/shader/"+mName+".vsh" );
 	mShader->addShaderFromSourceFile( QGLShader::Fragment, "./data/shader/"+mName+".fsh" );
@@ -48,7 +52,12 @@ bool ShaderData::load()
 	{
 		qDebug() << "Uniform \"normalMap\" not found - disabled.";
 	}
-	
+	mUniform_maskMap = mShader->uniformLocation("maskMap");
+	if( mUniform_maskMap < 0 )
+	{
+		qDebug() << "Uniform \"maskMap\" not found - disabled.";
+	}
+
 	return ResourceData::load();
 }
 
@@ -74,6 +83,8 @@ void Shader::bind()
 		data()->shader()->setUniformValue( data()->uniform_specularMap(), 1 );
 	if( data()->uniform_normalMap() >= 0 )
 		data()->shader()->setUniformValue( data()->uniform_normalMap(), 2 );
+	if( data()->uniform_maskMap() >= 0 )
+		data()->shader()->setUniformValue( data()->uniform_maskMap(), 3 );
 }
 
 
