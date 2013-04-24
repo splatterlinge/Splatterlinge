@@ -109,6 +109,15 @@ Terrain::~Terrain()
 }
 
 
+QPoint Terrain::toMap( const QVector3D & point ) const
+{
+	return QPoint(
+		(point.x()-mOffset.x()) * (mMapSize.width()/mSize.x()),
+		(point.z()-mOffset.z()) * (mMapSize.height()/mSize.z())
+	);
+}
+
+
 QPoint Terrain::toMap( const QPointF & point ) const
 {
 	return QPoint(
@@ -207,4 +216,58 @@ void Terrain::draw()
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	mVertexBuffer.release();
 	mIndexBuffer.release();
+}
+
+
+float Terrain::getHeight( const QVector3D & position )
+{
+	QPointF posF = QPointF(
+		(position.x()-(float)mOffset.x()) * ((float)mMapSize.width()/(float)mSize.x()),
+		(position.z()-(float)mOffset.z()) * ((float)mMapSize.height()/(float)mSize.z())
+	);
+	QPoint pos = QPoint( posF.x(), posF.y() );
+	posF = QPointF( posF.x()-(float)pos.x(), posF.y()-(float)pos.y() );
+
+	if( pos.x() >= mMapSize.width()-1 )
+		pos.setX( mMapSize.width()-2 );
+	if( pos.y() >= mMapSize.height()-1 )
+		pos.setY( mMapSize.height()-2 );
+	if( pos.x() < 0 )
+		pos.setX( 0 );
+	if( pos.y() < 0 )
+		pos.setY( 0 );
+	
+	QVector3D v1;
+	QVector3D v2;
+	QVector3D v3;
+
+	if( posF.x() + posF.y() < 1.0f )
+	{
+		v1 = getVertexPosition( pos.x(), pos.y() );
+		v2 = getVertexPosition( pos.x(), pos.y()+1 );
+		v3 = getVertexPosition( pos.x()+1, pos.y() );
+	} else {
+		v1 = getVertexPosition( pos.x()+1, pos.y()+1 );
+		v2 = getVertexPosition( pos.x()+1, pos.y() );
+		v3 = getVertexPosition( pos.x(), pos.y()+1 );
+	}
+/*
+	qDebug() << position.distanceToPlane( v1, v2, v3 ) << posF;
+*/
+/*
+	glPushAttrib( GL_ALL_ATTRIB_BITS );
+	glColor4f( 1,0,0,1 );
+	glLineWidth( 8.0f );
+	glDisable( GL_CULL_FACE );
+	glDisable( GL_LINE_SMOOTH );
+	glDisable( GL_TEXTURE_2D );
+	glDisable( GL_LIGHTING );
+	glBegin( GL_LINE_LOOP );
+		glVertex3f( v1.x(), v1.y(), v1.z() );
+		glVertex3f( v2.x(), v2.y(), v2.z() );
+		glVertex3f( v3.x(), v3.y(), v3.z() );
+	glEnd();
+	glPopAttrib();
+*/
+	return 0.0f;
 }

@@ -76,6 +76,7 @@ public:
 	 */
 	void drawPatchMap( const QRect & rect );
 
+	QPoint toMap( const QVector3D & point ) const;	///< Converts a vector in world coordinates to heightmap coordinates.
 	QPoint toMap( const QPointF & point ) const;	///< Converts a point in world coordinates to heightmap coordinates.
 	QSize toMap( const QSizeF & size ) const;	///< Converts a size in world coordinates to heightmap coordinates.
 	QRect toMap( const QRectF & rect ) const;	///< Converts a rectangle in world coordinates to heightmap coordinates.
@@ -87,6 +88,12 @@ public:
 	/// Direct access to the vertex at heightmap coordinates.
 	const QVector3D & getVertexPosition( int x, int y ) const
 		{ return mVertices[x+y*mMapSize.width()]; }
+
+	/// Direct access to the vertex at heightmap coordinates.
+	const QVector3D & getVertexPosition( QPoint p ) const
+		{ return getVertexPosition( p.x(), p.y() ); }
+
+	float getHeight( const QVector3D & position );
 
 protected:
 
