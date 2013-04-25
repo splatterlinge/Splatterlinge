@@ -20,13 +20,14 @@ MaterialData::MaterialData( QGLWidget * glWidget, QString name ) :
 
 MaterialData::~MaterialData()
 {
-	qDebug() << "- MaterialData" << uid();
+	if( loaded() )
+		qDebug() << "-" << this << "MaterialData" << uid();
 }
 
 
 bool MaterialData::load()
 {
-	qDebug() << "+ MaterialData" << uid();
+	qDebug() << "+" << this << "MaterialData" << uid();
 
 	QSettings s( "./data/material/"+mName+"/material.ini", QSettings::IniFormat );
 

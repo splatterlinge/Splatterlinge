@@ -102,6 +102,7 @@ public:
 	const QVector3D & getVertexNormal( const QPoint & p ) const
 		{ return getVertexNormal( p.x(), p.y() ); }
 
+	/// Calculates the height of the terrain at given position.
 	float getHeight( const QVector3D & position );
 
 protected:
