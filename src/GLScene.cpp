@@ -138,11 +138,11 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	posX += cosf( rotateY*(M_PI/180.0) ) * moveX - sinf( rotateY*(M_PI/180.0) ) * moveZ;
 	posZ += sinf( rotateY*(M_PI/180.0) ) * moveX + cosf( rotateY*(M_PI/180.0) ) * moveZ;
 	posY += moveY;
-/*
+
 	float landscapeHeight = mLandscape->getTerrain()->getHeight( QVector3D(posX,posY,posZ) );
 	if( posY < landscapeHeight + 1 )
 		posY = landscapeHeight + 1;
-*/
+
 	glTranslatef( -posX, -posY, -posZ );
 
 	GLfloat lightPosition[] = {1.0, 1.0, 1.0, 0.0};

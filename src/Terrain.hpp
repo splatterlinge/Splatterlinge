@@ -76,6 +76,7 @@ public:
 	 */
 	void drawPatchMap( const QRect & rect );
 
+	QPointF toMapF( const QVector3D & point ) const;	///< Converts a vector in world coordinates to heightmap coordinates.
 	QPoint toMap( const QVector3D & point ) const;	///< Converts a vector in world coordinates to heightmap coordinates.
 	QPoint toMap( const QPointF & point ) const;	///< Converts a point in world coordinates to heightmap coordinates.
 	QSize toMap( const QSizeF & size ) const;	///< Converts a size in world coordinates to heightmap coordinates.
@@ -85,13 +86,21 @@ public:
 	const QVector3D & size() const { return mSize; }	///< The size of the terrain.
 	const QVector3D & offset() const { return mOffset; }	///< The offset of the terrain.
 	
-	/// Direct access to the vertex at heightmap coordinates.
-	const QVector3D & getVertexPosition( int x, int y ) const
+	/// Direct access to the vertex-position at heightmap coordinates.
+	const QVector3D & getVertexPosition( const int & x, const int & y ) const
 		{ return mVertices[x+y*mMapSize.width()]; }
 
-	/// Direct access to the vertex at heightmap coordinates.
-	const QVector3D & getVertexPosition( QPoint p ) const
+	/// Direct access to the vertex-position at heightmap coordinates.
+	const QVector3D & getVertexPosition( const QPoint & p ) const
 		{ return getVertexPosition( p.x(), p.y() ); }
+
+	/// Direct access to the vertex-normal at heightmap coordinates.
+	const QVector3D & getVertexNormal( const int & x, const int & y ) const
+		{ return mVertices[mMapSize.width()*mMapSize.height() + x+y*mMapSize.width()]; }
+
+	/// Direct access to the vertex-normal at heightmap coordinates.
+	const QVector3D & getVertexNormal( const QPoint & p ) const
+		{ return getVertexNormal( p.x(), p.y() ); }
 
 	float getHeight( const QVector3D & position );
 
