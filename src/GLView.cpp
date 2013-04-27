@@ -3,6 +3,7 @@
 #include <QResizeEvent>
 #include <QRect>
 #include "GLScene.hpp"
+#include "GLWidget.hpp"
 
 
 GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
@@ -10,7 +11,9 @@ GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
 	setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
 	setFrameShape( QFrame::NoFrame );
 
-	mGLWidget = new QGLWidget( glFormat, this );
+	mGLWidget = new GLWidget( glFormat, this );
+	mGLWidget->makeCurrent();
+	mGLWidget->initializeGL();
 
 	setViewport( mGLWidget );
 

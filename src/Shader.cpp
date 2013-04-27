@@ -11,7 +11,7 @@ ShaderData::ShaderData( QGLWidget * glWidget, QString name ) :
 	ResourceData( name ),
 	mGLWidget(glWidget),
 	mName(name),
-	mShader(0)
+	mProgram(0)
 {
 }
 
@@ -21,44 +21,65 @@ ShaderData::~ShaderData()
 	if( loaded() )
 	{
 		qDebug() << "-" << this << "ShaderData" << uid();
-		delete mShader;
-		mShader = 0;
+		delete mProgram;
+		mProgram = 0;
 	}
 }
 
 
 bool ShaderData::load()
 {
-	delete mShader;
-	mShader = new QGLShaderProgram( mGLWidget );
+	delete mProgram;
+	mProgram = new QGLShaderProgram( mGLWidget );
 	qDebug() << "+" << this << "ShaderData" << uid();
-	mShader->addShaderFromSourceFile( QGLShader::Vertex, "./data/shader/"+mName+".vsh" );
-	mShader->addShaderFromSourceFile( QGLShader::Fragment, "./data/shader/"+mName+".fsh" );
-	if( !mShader->link() )
+	mProgram->addShaderFromSourceFile( QGLShader::Vertex, "./data/shader/"+mName+".vsh" );
+	mProgram->addShaderFromSourceFile( QGLShader::Fragment, "./data/shader/"+mName+".fsh" );
+	if( !mProgram->link() )
 	{
-		qWarning() << mShader->log();
+		qWarning() << mProgram->log();
 		return false;
 	}
 
-	mUniform_diffuseMap = mShader->uniformLocation("diffuseMap");
+	unsigned int texUnit = 0;
+	mUniform_diffuseMap = mProgram->uniformLocation("diffuseMap");
 	if( mUniform_diffuseMap < 0 )
 	{
-		qDebug() << "Uniform \"diffuseMap\" not found - disabled.";
+		qDebug() << "Uniform \"diffuseMap\" not found - texture disabled.";
+	} else {
+		mTexUnit_diffuseMap = texUnit++;
+		qDebug() << "Texture \"diffuseMap\" on Unit" << mTexUnit_diffuseMap;
 	}
-	mUniform_specularMap = mShader->uniformLocation("specularMap");
-	if( mUniform_diffuseMap < 0 )
+	mUniform_specularMap = mProgram->uniformLocation("specularMap");
+	if( mUniform_specularMap < 0 )
 	{
-		qDebug() << "Uniform \"specularMap\" not found - disabled.";
+		qDebug() << "Uniform \"specularMap\" not found - texture disabled.";
+	} else {
+		mTexUnit_specularMap = texUnit++;
+		qDebug() << "Texture \"specularMap\" on Unit" << mTexUnit_specularMap;
 	}
-	mUniform_normalMap = mShader->uniformLocation("normalMap");
-	if( mUniform_diffuseMap < 0 )
+	mUniform_normalMap = mProgram->uniformLocation("normalMap");
+	if( mUniform_normalMap < 0 )
 	{
-		qDebug() << "Uniform \"normalMap\" not found - disabled.";
+		qDebug() << "Uniform \"normalMap\" not found - texture disabled.";
+	} else {
+		mTexUnit_normalMap = texUnit++;
+		qDebug() << "Texture \"normalMap\" on Unit" << mTexUnit_normalMap;
 	}
-	mUniform_maskMap = mShader->uniformLocation("maskMap");
+	mUniform_maskMap = mProgram->uniformLocation("maskMap");
 	if( mUniform_maskMap < 0 )
 	{
-		qDebug() << "Uniform \"maskMap\" not found - disabled.";
+		qDebug() << "Uniform \"maskMap\" not found - texture disabled.";
+	} else {
+		mTexUnit_maskMap = texUnit++;
+		qDebug() << "Texture \"maskMap\" on Unit" << mTexUnit_maskMap;
+	}
+	mUniform_cubeMap = mProgram->uniformLocation("cubeMap");
+	if( mUniform_cubeMap < 0 )
+	{
+		qDebug() << "Uniform \"cubeMap\" not found - texture disabled.";
+	} else {
+		mTexUnit_cubeMap = texUnit++;
+		qDebug() << "Texture \"cubeMap\" on Unit" << mTexUnit_cubeMap;
 	}
 
 	return ResourceData::load();
@@ -79,19 +100,21 @@ Shader::~Shader()
 
 void Shader::bind()
 {
-	data()->shader()->bind();
+	data()->program()->bind();
 	if( data()->uniform_diffuseMap() >= 0 )
-		data()->shader()->setUniformValue( data()->uniform_diffuseMap(), 0 );
+		data()->program()->setUniformValue( data()->uniform_diffuseMap(), data()->texUnit_diffuseMap() );
 	if( data()->uniform_specularMap() >= 0 )
-		data()->shader()->setUniformValue( data()->uniform_specularMap(), 1 );
+		data()->program()->setUniformValue( data()->uniform_specularMap(), data()->texUnit_specularMap() );
 	if( data()->uniform_normalMap() >= 0 )
-		data()->shader()->setUniformValue( data()->uniform_normalMap(), 2 );
+		data()->program()->setUniformValue( data()->uniform_normalMap(), data()->texUnit_normalMap() );
 	if( data()->uniform_maskMap() >= 0 )
-		data()->shader()->setUniformValue( data()->uniform_maskMap(), 3 );
+		data()->program()->setUniformValue( data()->uniform_maskMap(), data()->texUnit_maskMap() );
+	if( data()->uniform_cubeMap() >= 0 )
+		data()->program()->setUniformValue( data()->uniform_cubeMap(), data()->texUnit_cubeMap() );
 }
 
 
 void Shader::release()
 {
-	data()->shader()->release();
+	data()->program()->release();
 }

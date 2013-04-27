@@ -25,12 +25,18 @@ public:
 		Blob( Landscape * landscape, QRect rect, QString material, QVector2D materialScale, QString maskPath );
 		~Blob();
 		void draw();
+		void drawPatchMap( const QRect & visible );
+		void drawPatch( const QRectF & visible )
+			{ drawPatchMap( mLandscape->getTerrain()->toMap(visible) ); }
 	};
 
 	Landscape( QGLWidget * glWidget, QString rootDir );
 	~Landscape();
 
 	void draw();
+	void drawPatchMap( const QRect & visible );
+	void drawPatch( const QRectF & visible )
+		{ drawPatchMap( mTerrain->toMap(visible) ); }
 
 	Terrain * getTerrain() { return mTerrain; }
 	const Terrain * getTerrain() const { return mTerrain; }

@@ -10,6 +10,7 @@ class QGraphicsScene;
 class QResizeEvent;
 
 class GLScene;
+class GLWidget;
 
 
 class GLView : public QGraphicsView
@@ -22,14 +23,14 @@ public:
 	// Overrides:
 	GLScene * scene() const { return mGLScene; }
 
-	QGLWidget * glWidget() const { return mGLWidget; }
+	GLWidget * glWidget() const { return mGLWidget; }
 
 protected:
 	// Overrides:
 	void resizeEvent( QResizeEvent * event );
 
 private:
-	QGLWidget * mGLWidget;
+	GLWidget * mGLWidget;
 	GLScene * mGLScene;
 };
 

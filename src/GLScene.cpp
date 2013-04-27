@@ -2,12 +2,14 @@
 
 #include <QtGui>
 #include <GL/glu.h>
-#include <math.h>
+
+#include "GLWidget.hpp"
 #include "Landscape.hpp"
+#include "Sky.hpp"
 #include "teapot.h"
 
 
-GLScene::GLScene( QGLWidget * glWidget, QObject * parent ) : QGraphicsScene( parent )
+GLScene::GLScene( GLWidget * glWidget, QObject * parent ) : QGraphicsScene( parent )
 {
 	mFrameCountSecond = 0;
 	mFramesPerSecond = 0;
@@ -24,8 +26,8 @@ GLScene::GLScene( QGLWidget * glWidget, QObject * parent ) : QGraphicsScene( par
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
 
-	mGLWidget->makeCurrent();
-
+	mTimeOfDay = 0.0f;
+	mSky = new Sky( mGLWidget, "./data/sky/earth.tga", &mTimeOfDay );
 	mLandscape = new Landscape( mGLWidget, "test" );
 
 	mTeapotMaterial = new Material( mGLWidget, "KirksEntry" );
@@ -39,6 +41,8 @@ GLScene::GLScene( QGLWidget * glWidget, QObject * parent ) : QGraphicsScene( par
 	QObject::connect( updateTimer, SIGNAL(timeout()), this, SLOT(update()) );
 	updateTimer->setInterval( 10 );
 	updateTimer->start();
+	
+	mElapsedTimer.start();
 }
 
 
@@ -60,6 +64,8 @@ QGraphicsProxyWidget * GLScene::addWidget( QWidget * widget, Qt::WindowFlags wFl
 
 void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 {
+	mDelta = (double)mElapsedTimer.restart()/1000.0;
+
 	glPushAttrib( GL_ALL_ATTRIB_BITS );
 	glMatrixMode( GL_TEXTURE );	glPushMatrix();
 	glMatrixMode( GL_PROJECTION );	glPushMatrix();
@@ -79,16 +85,17 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glLightf( GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.75 );
 	glLightf( GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.002 );
 	glLightf( GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0002 );
-
+/*
 	GLfloat specularLight[] = {1.0, 1.0, 1.0};
 	GLfloat ambientLight[] = {0.01, 0.01, 0.01};
 	GLfloat diffuseLight[] = {0.9, 1.0, 1.0};
 	glLightfv( GL_LIGHT0, GL_SPECULAR, specularLight );
 	glLightfv( GL_LIGHT0, GL_AMBIENT, ambientLight );
 	glLightfv( GL_LIGHT0, GL_DIFFUSE, diffuseLight );
-
+*/
 	glEnable( GL_LIGHTING );
 	glEnable( GL_LIGHT0 );
+
 
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -140,13 +147,26 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	posY += moveY;
 
 	float landscapeHeight = mLandscape->getTerrain()->getHeight( QVector3D(posX,posY,posZ) );
-	if( posY < landscapeHeight + 1 )
-		posY = landscapeHeight + 1;
+	if( posY < landscapeHeight + 2 )
+		posY = landscapeHeight + 2;
 
 	glTranslatef( -posX, -posY, -posZ );
 
-	GLfloat lightPosition[] = {1.0, 1.0, 1.0, 0.0};
-	glLightfv( GL_LIGHT0, GL_POSITION, lightPosition );
+	if( mSpeedPressed )
+		mTimeOfDay += 0.002f;
+	else
+		mTimeOfDay += 0.0002f;
+
+	if( mTimeOfDay > 1.0f )
+		mTimeOfDay -= 1.0f;
+
+	mSky->update( mDelta );
+	glLightfv( GL_LIGHT0, GL_POSITION, reinterpret_cast<const GLfloat*>(&mSky->sunDirection()) );
+	glLightfv( GL_LIGHT0, GL_AMBIENT, reinterpret_cast<const GLfloat*>(&mSky->ambient()) );
+	glLightfv( GL_LIGHT0, GL_DIFFUSE, reinterpret_cast<const GLfloat*>(&mSky->diffuse()) );
+	glLightfv( GL_LIGHT0, GL_SPECULAR, reinterpret_cast<const GLfloat*>(&mSky->specular()) );
+	mSky->draw( QVector3D( posX, posY, posZ ) );
+
 
 	mTeapotMaterial->bind();
 	glPushMatrix();
@@ -157,7 +177,7 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glPopMatrix();
 	mTeapotMaterial->release();
 
-	mLandscape->draw();
+	mLandscape->drawPatch( QRectF( posX-200, posZ-200, 400, 400 ) );
 
 
 //	glFlush();
@@ -172,7 +192,7 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	painter->setPen( QColor(255,255,255) );
 	painter->setFont( mFont );
-	painter->drawText( rect, Qt::AlignTop | Qt::AlignRight, QString( tr("%1 FPS") ).arg(mFramesPerSecond) );
+	painter->drawText( rect, Qt::AlignTop | Qt::AlignRight, QString( tr("(%2s) %1 FPS") ).arg(mFramesPerSecond).arg(mDelta) );
 
 	GLenum error = glGetError();
 	if( error )

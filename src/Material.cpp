@@ -91,6 +91,7 @@ Material::Material( QGLWidget * glWidget, QString name ) : Resource()
 {
 	mGLWidget = glWidget;
 	mMaskMap = -1;
+	mCubeMap = -1;
 	mShader = 0;
 	QSharedPointer<MaterialData> n( new MaterialData( glWidget, name ) );
 	cache( n );
@@ -106,8 +107,10 @@ Material::~Material()
 
 void Material::bind()
 {
-	if( mShader )
-		mShader->bind();
+	if( !mShader )
+		return;
+	
+	mShader->bind();
 
 	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, reinterpret_cast<const GLfloat*>( &(data()->ambient()) ) );
 	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, reinterpret_cast<const GLfloat*>( &(data()->diffuse()) ) );
@@ -115,21 +118,29 @@ void Material::bind()
 	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, reinterpret_cast<const GLfloat*>( &(data()->emission()) ) );
 	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, data()->shininess() );
 
-	if( mMaskMap >= 0 )
-		glActiveTexture( GL_TEXTURE3 );	glBindTexture( GL_TEXTURE_2D, mMaskMap );
-	if( data()->normalMap() >= 0 )
-		glActiveTexture( GL_TEXTURE2 );	glBindTexture( GL_TEXTURE_2D, data()->normalMap() );
-	if( data()->specularMap() >= 0 )
-		glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, data()->specularMap() );
-	if( data()->diffuseMap() >= 0 )
-		glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, data()->diffuseMap() );
+	if( mCubeMap >= 0 && mShader->hasCubeMap() )
+		glActiveTexture( GL_TEXTURE0+(mShader->texUnit_cubeMap()) );	glBindTexture( GL_TEXTURE_2D, mCubeMap );
+
+	if( mMaskMap >= 0 && mShader->hasMaskMap() )
+		glActiveTexture( GL_TEXTURE0+(mShader->texUnit_maskMap()) );	glBindTexture( GL_TEXTURE_2D, mMaskMap );
+
+	if( data()->normalMap() >= 0 && mShader->hasNormalMap() )
+		glActiveTexture( GL_TEXTURE0+(mShader->texUnit_normalMap()) );	glBindTexture( GL_TEXTURE_2D, data()->normalMap() );
+
+	if( data()->specularMap() >= 0 && mShader->hasSpecularMap() )
+		glActiveTexture( GL_TEXTURE0+(mShader->texUnit_specularMap()) );	glBindTexture( GL_TEXTURE_2D, data()->specularMap() );
+
+	if( data()->diffuseMap() >= 0 && mShader->hasDiffuseMap() )
+		glActiveTexture( GL_TEXTURE0+(mShader->texUnit_diffuseMap()) );	glBindTexture( GL_TEXTURE_2D, data()->diffuseMap() );
 }
 
 
 void Material::release()
 {
-	if( mShader )
-		mShader->release();
+	if( !mShader )
+		return;
+	
+	mShader->release();
 }
 
 
@@ -147,7 +158,7 @@ void Material::setDefaultShader()
 }
 
 
-void Material::addMaskMap( QString path )
+void Material::setMaskMap( QString path )
 {
 	QPixmap maskMap = QPixmap( path );
 	if( maskMap.isNull() )

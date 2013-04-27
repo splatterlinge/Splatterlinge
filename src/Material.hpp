@@ -49,6 +49,7 @@ private:
 	QGLWidget * mGLWidget;
 	Shader * mShader;
 	GLuint mMaskMap;
+	GLuint mCubeMap;
 
 public:
 	Material( QGLWidget * glWidget, QString name );
@@ -56,7 +57,9 @@ public:
 	
 	void setShader( QString shaderName );
 	void setDefaultShader();
-	void addMaskMap( QString path );
+	void setMaskMap( QString path );
+	void setMaskMap( GLuint maskMap ) { mMaskMap = maskMap; }
+	void setCubeMap( GLuint cubeMap ) { mCubeMap = cubeMap; }
 	void bind();
 	void release();
 };

@@ -11,21 +11,23 @@ class QGraphicsItem;
 class QGraphicsProxyWidget;
 class QGLWidget;
 
+class GLWidget;
 class Landscape;
+class Sky;
 
 
 class GLScene : public QGraphicsScene
 {
 	Q_OBJECT
 public:
-	explicit GLScene( QGLWidget * glWidget, QObject * parent = 0 );
+	explicit GLScene( GLWidget * glWidget, QObject * parent = 0 );
 	~GLScene();
 
 	// Overrides:
 	void drawBackground( QPainter * painter, const QRectF & rect );
 	QGraphicsProxyWidget * addWidget( QWidget * widget, Qt::WindowFlags wFlags = 0 );
 
-	QGLWidget * glWidget() { return mGLWidget; }
+	GLWidget * glWidget() { return mGLWidget; }
 
 protected:
 	// Overrides:
@@ -37,7 +39,9 @@ protected:
 	void wheelEvent( QGraphicsSceneWheelEvent * wheelEvent );
 
 private:
-	QGLWidget * mGLWidget;
+	GLWidget * mGLWidget;
+	QElapsedTimer mElapsedTimer;
+	float mDelta;
 	int mFrameCountSecond;
 	int mFramesPerSecond;
 	QPoint mDrag;
@@ -54,6 +58,8 @@ private:
 	bool mDownPressed;
 	bool mSpeedPressed;
 
+	float mTimeOfDay;
+	Sky * mSky;
 	Landscape * mLandscape;
 
 private slots:

@@ -164,10 +164,10 @@ void Terrain::drawPatchMap( const QRect & rect )
 
 	mVertexBuffer.bind();
 	mIndexBuffer.bind();
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_INDEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState( GL_VERTEX_ARRAY );
+	glEnableClientState( GL_INDEX_ARRAY );
+	glEnableClientState( GL_NORMAL_ARRAY );
+	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	
 	glVertexPointer( 3, GL_FLOAT, 0, 0 );
 	glNormalPointer( GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)) );
@@ -185,10 +185,10 @@ void Terrain::drawPatchMap( const QRect & rect )
 		);
 	}
 
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_INDEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState( GL_VERTEX_ARRAY );
+	glDisableClientState( GL_INDEX_ARRAY );
+	glDisableClientState( GL_NORMAL_ARRAY );
+	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 	mVertexBuffer.release();
 	mIndexBuffer.release();
 }
