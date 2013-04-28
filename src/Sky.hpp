@@ -15,7 +15,7 @@ class GLWidget;
 class Sky
 {
 public:
-	Sky( GLWidget * glWidget, const QString & skyMapPath, const float * timeOfDay );
+	Sky( GLWidget * glWidget, QString name, const float * timeOfDay );
 	~Sky();
 
 	void update( const float & delta );
@@ -24,8 +24,8 @@ public:
 	const QVector4D & diffuse() const { return mDiffuse; }
 	const QVector4D & specular() const { return mSpecular; }
 	const QVector4D & sunDirection() const { return mSunDirection; }
-	const QVector3D & sunAxis() const { return mSunAxis; }
-	void setSunAxis( const QVector3D & axis ) { mSunAxis = axis.normalized(); }
+	const QVector3D & axis() const { return mAxis; }
+	void setAxis( const QVector3D & axis ) { mAxis = axis.normalized(); }
 
 	GLWidget * getGLWidget() { return mGLWidget; }
 
@@ -33,19 +33,21 @@ private:
 	GLWidget * mGLWidget;
 	const float * mTimeOfDay;
 	QImage mSkyDomeImage;
-	Shader * mSkyDomeShader;
-	int mSkyDomeShader_sunDir;
-	int mSkyDomeShader_timeOfDay;
-	int mSkyDomeShader_sunBrightness;
-	float mSunBrightness;
+	Shader * mDomeShader;
+	Shader * mStarCubeShader;
+	int mDomeShader_sunDir;
+	int mDomeShader_timeOfDay;
+	int mDomeShader_sunSpotPower;
+	float mSunSpotPower;
 	QGLBuffer mCubeIndexBuffer;
 	QGLBuffer mCubeVertexBuffer;
-	GLuint mSkyDomeMap;
+	GLuint mDomeMap;
+	GLuint mStarCubeMap;
 	QVector4D mAmbient;
 	QVector4D mDiffuse;
 	QVector4D mSpecular;
 	QVector4D mSunDirection;
-	QVector3D mSunAxis;
+	QVector3D mAxis;
 };
 
 

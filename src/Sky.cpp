@@ -3,6 +3,7 @@
 #include <QtOpenGL>
 #include <GL/glu.h>
 #include <math.h>
+#include <QDebug>
 
 #include "GLWidget.hpp"
 
@@ -31,12 +32,40 @@ static GLushort cubeIndices[] =
 };
 
 
-Sky::Sky( GLWidget * glWidget, const QString & skyMapPath, const float * timeOfDay = 0 ) :
+static void TexImage( QGLWidget * glWidget, GLenum target, QString path )
+{
+	QImage image( path );
+	if( image.isNull() )
+	{
+		qFatal( "\"%s\" not found!", path.toLocal8Bit().constData() );
+	}
+	QImage glImage = QGLWidget::convertToGLFormat( image );
+	glTexImage2D( target, 0, GL_RGBA8, glImage.width(), glImage.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, glImage.bits() );
+}
+
+
+Sky::Sky( GLWidget * glWidget, QString name, const float * timeOfDay = 0 ) :
 	mGLWidget(glWidget),
 	mTimeOfDay(timeOfDay)
 {
-	mSunBrightness = 10;
-	setSunAxis( QVector3D(1,0,1) );
+	QSettings s( "./data/sky/"+name+"/sky.ini", QSettings::IniFormat );
+
+	s.beginGroup( "Sky" );
+		QString skyDomePath = "./data/sky/"+name+"/"+s.value( "domeMapPath", "dome.png").toString();
+		QVector3D axis = QVector3D(
+			s.value( "axisX", 1.0f ).toFloat(),
+			s.value( "axisY", 0.0f ).toFloat(),
+			s.value( "axisZ", 1.0f ).toFloat()
+		);
+		setAxis( axis );
+		mSunSpotPower = s.value( "sunSpotPower", 10.0f ).toFloat();
+		QString starMapPathPX = "./data/sky/"+name+"/"+s.value( "starMapPathPX", "star.px.png").toString();
+		QString starMapPathNX = "./data/sky/"+name+"/"+s.value( "starMapPathNY", "star.nx.png").toString();
+		QString starMapPathPY = "./data/sky/"+name+"/"+s.value( "starMapPathPZ", "star.py.png").toString();
+		QString starMapPathNY = "./data/sky/"+name+"/"+s.value( "starMapPathNX", "star.ny.png").toString();
+		QString starMapPathPZ = "./data/sky/"+name+"/"+s.value( "starMapPathPY", "star.pz.png").toString();
+		QString starMapPathNZ = "./data/sky/"+name+"/"+s.value( "starMapPathNZ", "star.nz.png").toString();
+	s.endGroup();
 
 	mCubeVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
 	mCubeVertexBuffer.create();
@@ -50,31 +79,48 @@ Sky::Sky( GLWidget * glWidget, const QString & skyMapPath, const float * timeOfD
 	mCubeIndexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
 	mCubeIndexBuffer.allocate( cubeIndices, sizeof(cubeIndices) );
 	
-	mSkyDomeShader = new Shader( glWidget, "skydome" );
-	mSkyDomeShader_sunDir = mSkyDomeShader->program()->uniformLocation( "sunDir" );
-	mSkyDomeShader_timeOfDay = mSkyDomeShader->program()->uniformLocation( "timeOfDay" );
-	mSkyDomeShader_sunBrightness = mSkyDomeShader->program()->uniformLocation( "sunBrightness" );
+	mDomeShader = new Shader( glWidget, "skydome" );
+	mDomeShader_sunDir = mDomeShader->program()->uniformLocation( "sunDir" );
+	mDomeShader_timeOfDay = mDomeShader->program()->uniformLocation( "timeOfDay" );
+	mDomeShader_sunSpotPower = mDomeShader->program()->uniformLocation( "sunSpotPower" );
 
-	mSkyDomeImage = QImage( skyMapPath );
+	mSkyDomeImage = QImage( skyDomePath );
 	if( mSkyDomeImage.isNull() )
 	{
-		qWarning() << skyMapPath << "not found!";
+		qFatal( "\"%s\" not found!", skyDomePath.toLocal8Bit().constData() );
 	}
 
-	mSkyDomeMap =  mGLWidget->bindTexture( mSkyDomeImage, GL_TEXTURE_2D, GL_RGBA );
-	if( mSkyDomeMap >= 0 && mSkyDomeShader->hasDiffuseMap() )
+	mDomeMap =  mGLWidget->bindTexture( mSkyDomeImage, GL_TEXTURE_2D, GL_RGBA );
+	if( mDomeMap >= 0 && mDomeShader->hasDiffuseMap() )
 	{
-		glActiveTexture( GL_TEXTURE0+(mSkyDomeShader->texUnit_diffuseMap()) );	glBindTexture( GL_TEXTURE_2D, mSkyDomeMap );
+		glActiveTexture( GL_TEXTURE0+(mDomeShader->texUnit_diffuseMap()) );
+		glBindTexture( GL_TEXTURE_2D, mDomeMap );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	}
+
+	mStarCubeShader = new Shader( glWidget, "cube" );
+
+	glGenTextures( 1, &mStarCubeMap );
+	glBindTexture( GL_TEXTURE_CUBE_MAP, mStarCubeMap );
+	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	TexImage( glWidget, GL_TEXTURE_CUBE_MAP_POSITIVE_X, starMapPathPX );
+	TexImage( glWidget, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, starMapPathNX );
+	TexImage( glWidget, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, starMapPathPY );
+	TexImage( glWidget, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, starMapPathNY );
+	TexImage( glWidget, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, starMapPathPZ );
+	TexImage( glWidget, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, starMapPathNZ );
 }
 
 
 void Sky::update( const float & delta )
 {
 	float angle = (*mTimeOfDay)*(M_PI*2.0f);
-	QQuaternion q = QQuaternion::fromAxisAndAngle ( mSunAxis, angle*(180.0/M_PI) );
+	QQuaternion q = QQuaternion::fromAxisAndAngle ( mAxis, angle*(180.0/M_PI) );
 	mSunDirection = q.rotatedVector( QVector3D(0,0,-1) );
 
 	float xA=(*mTimeOfDay)*(float)mSkyDomeImage.width()-0.5f;
@@ -113,11 +159,10 @@ void Sky::draw( const QVector3D & eye )
 	glMatrixMode( GL_MODELVIEW );	glPushMatrix();
 	glTranslatef( eye.x(), eye.y(), eye.z() );
 
-	mSkyDomeShader->bind();
-	mSkyDomeShader->program()->setUniformValue( mSkyDomeShader_sunDir, mSunDirection.toVector3D() );
-	mSkyDomeShader->program()->setUniformValue( mSkyDomeShader_timeOfDay, *mTimeOfDay );
-	mSkyDomeShader->program()->setUniformValue( mSkyDomeShader_sunBrightness, mSunBrightness );
-	glActiveTexture( GL_TEXTURE0+(mSkyDomeShader->texUnit_diffuseMap()) );	glBindTexture( GL_TEXTURE_2D, mSkyDomeMap );
+	glPushMatrix();
+	float angle = (*mTimeOfDay)*(360.0f);
+	glRotatef( angle, mAxis.x(), mAxis.y(), mAxis.z() );
+	mStarCubeShader->bind();
 	mCubeVertexBuffer.bind();
 	mCubeIndexBuffer.bind();
 	glEnableClientState( GL_VERTEX_ARRAY );
@@ -128,7 +173,28 @@ void Sky::draw( const QVector3D & eye )
 	glDisableClientState( GL_INDEX_ARRAY );
 	mCubeVertexBuffer.release();
 	mCubeIndexBuffer.release();
-	mSkyDomeShader->release();
+	mStarCubeShader->release();
+	glPopMatrix();
+
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	mDomeShader->bind();
+	mDomeShader->program()->setUniformValue( mDomeShader_sunDir, mSunDirection.toVector3D() );
+	mDomeShader->program()->setUniformValue( mDomeShader_timeOfDay, *mTimeOfDay );
+	mDomeShader->program()->setUniformValue( mDomeShader_sunSpotPower, mSunSpotPower );
+	glActiveTexture( GL_TEXTURE0+(mDomeShader->texUnit_diffuseMap()) );	glBindTexture( GL_TEXTURE_2D, mDomeMap );
+	mCubeVertexBuffer.bind();
+	mCubeIndexBuffer.bind();
+	glEnableClientState( GL_VERTEX_ARRAY );
+	glEnableClientState( GL_INDEX_ARRAY );
+	glVertexPointer( 3, GL_FLOAT, 0, 0 );
+	glDrawElements( GL_QUADS, sizeof(cubeIndices)/sizeof(GLushort), GL_UNSIGNED_SHORT, 0 );
+	glDisableClientState( GL_VERTEX_ARRAY );
+	glDisableClientState( GL_INDEX_ARRAY );
+	mCubeVertexBuffer.release();
+	mCubeIndexBuffer.release();
+	mDomeShader->release();
+	glDisable( GL_BLEND );
 
 	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
 	glEnable( GL_CULL_FACE );

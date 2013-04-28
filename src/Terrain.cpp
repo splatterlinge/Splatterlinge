@@ -7,6 +7,10 @@
 Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 {
 	QImage heightMap( heightMapPath );
+	if( heightMap.isNull() )
+	{
+		qFatal( "\"%s\" not found!", heightMapPath.toLocal8Bit().constData() );
+	}
 	mMapSize = heightMap.size();
 	mSize = size;
 	mOffset = offset;

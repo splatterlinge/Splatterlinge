@@ -66,17 +66,17 @@ bool MaterialData::load()
 	QPixmap diffuseMap = QPixmap( diffuseMapPath );
 	if( diffuseMap.isNull() )
 	{
-		qWarning() << diffuseMapPath << "not found!";
+		qFatal( "\"%s\" not found!", diffuseMapPath.toLocal8Bit().constData() );
 	}
 	QPixmap specularMap = QPixmap( specularMapPath );
 	if( specularMapPath.isNull() )
 	{
-		qWarning() << specularMapPath << "not found!";
+		qFatal( "\"%s\" not found!", specularMapPath.toLocal8Bit().constData() );
 	}
 	QPixmap normalMap = QPixmap( normalMapPath );
 	if( normalMap.isNull() )
 	{
-		qWarning() << normalMapPath << "not found!";
+		qFatal( "\"%s\" not found!", normalMapPath.toLocal8Bit().constData() );
 	}
 
 	mDiffuseMap =  mGLWidget->bindTexture( diffuseMap, GL_TEXTURE_2D, GL_RGBA, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
@@ -163,7 +163,7 @@ void Material::setMaskMap( QString path )
 	QPixmap maskMap = QPixmap( path );
 	if( maskMap.isNull() )
 	{
-		qWarning() << path << "not found!";
+		qFatal( "\"%s\" not found!", path.toLocal8Bit().constData() );
 	}
 
 	mMaskMap =  mGLWidget->bindTexture( maskMap, GL_TEXTURE_2D, GL_LUMINANCE, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );

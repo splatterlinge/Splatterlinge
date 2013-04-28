@@ -42,44 +42,44 @@ bool ShaderData::load()
 
 	unsigned int texUnit = 0;
 	mUniform_diffuseMap = mProgram->uniformLocation("diffuseMap");
-	if( mUniform_diffuseMap < 0 )
+	if( mUniform_diffuseMap >= 0 )
 	{
-		qDebug() << "Uniform \"diffuseMap\" not found - texture disabled.";
-	} else {
 		mTexUnit_diffuseMap = texUnit++;
 		qDebug() << "Texture \"diffuseMap\" on Unit" << mTexUnit_diffuseMap;
+	} else {
+//		qDebug() << "Uniform \"diffuseMap\" not found - texture disabled.";
 	}
 	mUniform_specularMap = mProgram->uniformLocation("specularMap");
-	if( mUniform_specularMap < 0 )
+	if( mUniform_specularMap >= 0 )
 	{
-		qDebug() << "Uniform \"specularMap\" not found - texture disabled.";
-	} else {
 		mTexUnit_specularMap = texUnit++;
 		qDebug() << "Texture \"specularMap\" on Unit" << mTexUnit_specularMap;
+	} else {
+//		qDebug() << "Uniform \"specularMap\" not found - texture disabled.";
 	}
 	mUniform_normalMap = mProgram->uniformLocation("normalMap");
-	if( mUniform_normalMap < 0 )
+	if( mUniform_normalMap >= 0 )
 	{
-		qDebug() << "Uniform \"normalMap\" not found - texture disabled.";
-	} else {
 		mTexUnit_normalMap = texUnit++;
 		qDebug() << "Texture \"normalMap\" on Unit" << mTexUnit_normalMap;
+	} else {
+//		qDebug() << "Uniform \"normalMap\" not found - texture disabled.";
 	}
 	mUniform_maskMap = mProgram->uniformLocation("maskMap");
-	if( mUniform_maskMap < 0 )
+	if( mUniform_maskMap >= 0 )
 	{
-		qDebug() << "Uniform \"maskMap\" not found - texture disabled.";
-	} else {
 		mTexUnit_maskMap = texUnit++;
 		qDebug() << "Texture \"maskMap\" on Unit" << mTexUnit_maskMap;
+	} else {
+//		qDebug() << "Uniform \"maskMap\" not found - texture disabled.";
 	}
 	mUniform_cubeMap = mProgram->uniformLocation("cubeMap");
-	if( mUniform_cubeMap < 0 )
+	if( mUniform_cubeMap >= 0 )
 	{
-		qDebug() << "Uniform \"cubeMap\" not found - texture disabled.";
-	} else {
 		mTexUnit_cubeMap = texUnit++;
 		qDebug() << "Texture \"cubeMap\" on Unit" << mTexUnit_cubeMap;
+	} else {
+//		qDebug() << "Uniform \"cubeMap\" not found - texture disabled.";
 	}
 
 	return ResourceData::load();

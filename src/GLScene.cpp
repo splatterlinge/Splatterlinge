@@ -9,12 +9,13 @@
 #include "teapot.h"
 
 
-GLScene::GLScene( GLWidget * glWidget, QObject * parent ) : QGraphicsScene( parent )
+GLScene::GLScene( GLWidget * glWidget, QObject * parent ) :
+	QGraphicsScene( parent ),
+	mGLWidget( glWidget )
 {
 	mFrameCountSecond = 0;
 	mFramesPerSecond = 0;
 	mDragging = false;
-	mGLWidget = glWidget;
 
 	mForwardPressed = false;
 	mLeftPressed = false;
@@ -27,7 +28,7 @@ GLScene::GLScene( GLWidget * glWidget, QObject * parent ) : QGraphicsScene( pare
 	mFont = QFont( "Sans", 12, QFont::Normal );
 
 	mTimeOfDay = 0.0f;
-	mSky = new Sky( mGLWidget, "./data/sky/earth.tga", &mTimeOfDay );
+	mSky = new Sky( mGLWidget, "earth", &mTimeOfDay );
 	mLandscape = new Landscape( mGLWidget, "test" );
 
 	mTeapotMaterial = new Material( mGLWidget, "KirksEntry" );
@@ -48,6 +49,7 @@ GLScene::GLScene( GLWidget * glWidget, QObject * parent ) : QGraphicsScene( pare
 
 GLScene::~GLScene()
 {
+	delete mSky;
 	delete mLandscape;
 	delete mTeapotMaterial;
 }
@@ -74,29 +76,16 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 	glDisable( GL_BLEND );
 	glDisable( GL_TEXTURE_2D );
+	glEnable( GL_LIGHTING );
+	glEnable( GL_LIGHT0 );
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LEQUAL );
 	glShadeModel( GL_SMOOTH );
 	glCullFace( GL_BACK );
 	glFrontFace( GL_CCW );
 	glEnable( GL_CULL_FACE );
+
 	glClearColor( 0, 0, 0, 0 );
-
-	glLightf( GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.75 );
-	glLightf( GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.002 );
-	glLightf( GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.0002 );
-/*
-	GLfloat specularLight[] = {1.0, 1.0, 1.0};
-	GLfloat ambientLight[] = {0.01, 0.01, 0.01};
-	GLfloat diffuseLight[] = {0.9, 1.0, 1.0};
-	glLightfv( GL_LIGHT0, GL_SPECULAR, specularLight );
-	glLightfv( GL_LIGHT0, GL_AMBIENT, ambientLight );
-	glLightfv( GL_LIGHT0, GL_DIFFUSE, diffuseLight );
-*/
-	glEnable( GL_LIGHTING );
-	glEnable( GL_LIGHT0 );
-
-
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 	glMatrixMode( GL_PROJECTION );

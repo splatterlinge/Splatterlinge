@@ -5,7 +5,7 @@ varying vec3 vViewDir;
 
 uniform vec3 sunDir;
 uniform float timeOfDay;
-uniform float sunBrightness;
+uniform float sunSpotPower;
 
 uniform sampler2D diffuseMap;
 
@@ -23,9 +23,9 @@ float phase( float alpha, float g )
 
 void main()
 {
-	vec3 viewDir = normalize(vViewDir);
-	float alpha = dot(viewDir, normalize(sunDir));
-	float spot = smoothstep( 0.0, 15.0, phase( alpha, 0.9995 ) ) * sunBrightness;
+	vec3 viewDir = normalize( vViewDir );
+	float alpha = dot( viewDir, normalize(sunDir) );
+	float spot = smoothstep( 0.0, 15.0, phase( alpha, 0.9995 ) ) * sunSpotPower;
 	vec4 skyColor = texture2D( diffuseMap, vec2( timeOfDay, viewDir.y ) );
 	gl_FragColor = skyColor + skyColor*spot;
 }
