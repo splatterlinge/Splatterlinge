@@ -1,19 +1,23 @@
 #ifndef GLSCENE_INCLUDED
 #define GLSCENE_INCLUDED
 
-#include <QtGui>
-#include <QtOpenGL>
+#include <QGraphicsScene>
+#include <QElapsedTimer>
+#include <QRectF>
 
-#include "Material.hpp"
 
-
+class QPainter;
 class QGraphicsItem;
 class QGraphicsProxyWidget;
 class QGLWidget;
+class QKeyEvent;
+class QGraphicsSceneMouseEvent;
+class QGraphicsSceneWheelEvent;
 
 class GLWidget;
 class Landscape;
 class Sky;
+class Material;
 
 
 class GLScene : public QGraphicsScene

@@ -1,6 +1,6 @@
 #include "GLScene.hpp"
 
-#include <QtGui>
+#include <QPainter>
 #include <GL/glu.h>
 
 #include "GLWidget.hpp"

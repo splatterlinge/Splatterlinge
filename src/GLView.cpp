@@ -1,7 +1,12 @@
 #include "GLView.hpp"
 
+#include <QBoxLayout>
+#include <QLabel>
 #include <QResizeEvent>
+#include <QGraphicsWidget>
+#include <QGraphicsProxyWidget>
 #include <QRect>
+
 #include "GLScene.hpp"
 #include "GLWidget.hpp"
 

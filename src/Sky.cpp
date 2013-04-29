@@ -1,11 +1,13 @@
 #include "Sky.hpp"
 
-#include <QtOpenGL>
+#include <QString>
+#include <QImage>
 #include <GL/glu.h>
 #include <math.h>
 #include <QDebug>
 
 #include "GLWidget.hpp"
+#include "Shader.hpp"
 
 
 static GLfloat cubeVertices[] =
@@ -117,6 +119,15 @@ Sky::Sky( GLWidget * glWidget, QString name, const float * timeOfDay = 0 ) :
 }
 
 
+Sky::~Sky()
+{
+	delete mDomeShader;
+	delete mStarCubeShader;
+	mCubeVertexBuffer.destroy();
+	mCubeIndexBuffer.destroy();
+}
+
+
 void Sky::update( const float & delta )
 {
 	float angle = (*mTimeOfDay)*(M_PI*2.0f);
@@ -140,9 +151,9 @@ void Sky::update( const float & delta )
 
 	QVector4D baseColor = colorAF + (colorBF-colorAF) * (xA-floorf(xA));
 
-	float g = mSunDirection.y()*5.0f + 0.5f;
-	if( g < 0.0f )
-		g = 0.0f;
+	float g = mSunDirection.y()*5.0f + 0.75f;
+	if( g < 0.2f )
+		g = 0.2f;
 	if( g > 1.0f )
 		g = 1.0f;
 	mDiffuse = baseColor.toVector3D() * g;
@@ -199,11 +210,4 @@ void Sky::draw( const QVector3D & eye )
 	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
 	glEnable( GL_CULL_FACE );
 	glDepthMask( GL_TRUE );
-}
-
-
-Sky::~Sky()
-{
-	mCubeVertexBuffer.destroy();
-	mCubeIndexBuffer.destroy();
 }
