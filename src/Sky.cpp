@@ -8,6 +8,7 @@
 
 #include "GLWidget.hpp"
 #include "Shader.hpp"
+#include "util.h"
 
 
 static GLfloat cubeVertices[] =
@@ -54,12 +55,16 @@ Sky::Sky( GLWidget * glWidget, QString name, const float * timeOfDay = 0 ) :
 
 	s.beginGroup( "Sky" );
 		QString skyDomePath = "./data/sky/"+name+"/"+s.value( "domeMapPath", "dome.png").toString();
-		QVector3D axis = QVector3D(
+		mAxis = QVector3D(
 			s.value( "axisX", 1.0f ).toFloat(),
 			s.value( "axisY", 0.0f ).toFloat(),
 			s.value( "axisZ", 1.0f ).toFloat()
-		);
-		setAxis( axis );
+		).normalized();
+		mSunInitialDir = QVector3D(
+			s.value( "sunInitialX", 0.0f ).toFloat(),
+			s.value( "sunInitialY", 0.0f ).toFloat(),
+			s.value( "sunInitialZ", -1.0f ).toFloat()
+		).normalized();
 		mSunSpotPower = s.value( "sunSpotPower", 10.0f ).toFloat();
 		QString starMapPathPX = "./data/sky/"+name+"/"+s.value( "starMapPathPX", "star.px.png").toString();
 		QString starMapPathNX = "./data/sky/"+name+"/"+s.value( "starMapPathNY", "star.nx.png").toString();
@@ -67,6 +72,15 @@ Sky::Sky( GLWidget * glWidget, QString name, const float * timeOfDay = 0 ) :
 		QString starMapPathNY = "./data/sky/"+name+"/"+s.value( "starMapPathNX", "star.ny.png").toString();
 		QString starMapPathPZ = "./data/sky/"+name+"/"+s.value( "starMapPathPY", "star.pz.png").toString();
 		QString starMapPathNZ = "./data/sky/"+name+"/"+s.value( "starMapPathNZ", "star.nz.png").toString();
+		mDiffuseFactorDay = s.value( "diffuseFactorDay", 3.0f ).toFloat();
+		mDiffuseFactorNight = s.value( "diffuseFactorNight", 0.2f ).toFloat();
+		mDiffuseFactorMax = s.value( "diffuseFactorMax", 2.0f ).toFloat();
+		mSpecularFactorDay = s.value( "specularFactorDay", 2.0f ).toFloat();
+		mSpecularFactorNight = s.value( "specularFactorNight", 0.3f ).toFloat();
+		mSpecularFactorMax = s.value( "specularFactorMax", 2.0f ).toFloat();
+		mAmbientFactorDay = s.value( "ambientFactorDay", 0.3f ).toFloat();
+		mAmbientFactorNight = s.value( "ambientFactorNight", 0.1f ).toFloat();
+		mAmbientFactorMax = s.value( "ambientFactorMax", 0.2f ).toFloat();
 	s.endGroup();
 
 	mCubeVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
@@ -131,9 +145,11 @@ Sky::~Sky()
 void Sky::update( const float & delta )
 {
 	float angle = (*mTimeOfDay)*(M_PI*2.0f);
-	QQuaternion q = QQuaternion::fromAxisAndAngle ( mAxis, angle*(180.0/M_PI) );
-	mSunDirection = q.rotatedVector( QVector3D(0,0,-1) );
-
+	QMatrix4x4 m;
+	m.setToIdentity();
+	m.rotate( angle*(180.0/M_PI), mAxis );
+	mSunDirection = m.map( mSunInitialDir );
+	
 	float xA=(*mTimeOfDay)*(float)mSkyDomeImage.width()-0.5f;
 	if( xA < 0.0f )
 		xA = (float)mSkyDomeImage.width()+xA;
@@ -150,15 +166,23 @@ void Sky::update( const float & delta )
 	colorBF /= 255.0f;
 
 	QVector4D baseColor = colorAF + (colorBF-colorAF) * (xA-floorf(xA));
+	mFogColor = baseColor;
 
-	float g = mSunDirection.y()*5.0f + 0.75f;
-	if( g < 0.2f )
-		g = 0.2f;
-	if( g > 1.0f )
-		g = 1.0f;
-	mDiffuse = baseColor.toVector3D() * g;
-	mSpecular = baseColor.toVector3D() * g;
-	mAmbient = baseColor.toVector3D().normalized() * (-g);
+	float diffuseFactor = interpolateLinear( mDiffuseFactorDay, mDiffuseFactorNight, (float)((sunDirection().y()+1.0f)*0.5f) );
+	if( diffuseFactor > mDiffuseFactorMax )
+		diffuseFactor = mDiffuseFactorMax;
+
+	float specularFactor = interpolateLinear( mSpecularFactorDay, mSpecularFactorNight, (float)((sunDirection().y()+1.0f)*0.5f) );
+	if( diffuseFactor > mSpecularFactorMax )
+		diffuseFactor = mSpecularFactorMax;
+
+	float ambientFactor = interpolateLinear( mAmbientFactorDay, mAmbientFactorNight, (float)((sunDirection().y()+1.0f)*0.5f) );
+	if( ambientFactor > mAmbientFactorMax )
+		ambientFactor = mAmbientFactorMax;
+
+	mDiffuse = baseColor.toVector3D() * diffuseFactor;
+	mSpecular = baseColor.toVector3D() * specularFactor;
+	mAmbient = baseColor.toVector3D().normalized() * ambientFactor;
 }
 
 

@@ -156,6 +156,11 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glLightfv( GL_LIGHT0, GL_SPECULAR, reinterpret_cast<const GLfloat*>(&mSky->specular()) );
 	mSky->draw( QVector3D( posX, posY, posZ ) );
 
+	float viewDistance = 400.0f;
+	glFogfv( GL_FOG_COLOR, reinterpret_cast<const GLfloat*>(&mSky->fogColor()) );
+	glFogf( GL_FOG_START, viewDistance*0.75f );
+	glFogf( GL_FOG_END, viewDistance );
+//	glFogf( GL_FOG_DENSITY, 0.01f );
 
 	mTeapotMaterial->bind();
 	glPushMatrix();
@@ -166,7 +171,7 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glPopMatrix();
 	mTeapotMaterial->release();
 
-	mLandscape->drawPatch( QRectF( posX-200, posZ-200, 400, 400 ) );
+	mLandscape->drawPatch( QRectF( posX-viewDistance, posZ-viewDistance, viewDistance*2, viewDistance*2 ) );
 
 
 //	glFlush();

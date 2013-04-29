@@ -20,12 +20,12 @@ public:
 
 	void update( const float & delta );
 	void draw( const QVector3D & eye );
+	const QVector4D & fogColor() const { return mFogColor; }
 	const QVector4D & ambient() const { return mAmbient; }
 	const QVector4D & diffuse() const { return mDiffuse; }
 	const QVector4D & specular() const { return mSpecular; }
 	const QVector4D & sunDirection() const { return mSunDirection; }
 	const QVector3D & axis() const { return mAxis; }
-	void setAxis( const QVector3D & axis ) { mAxis = axis.normalized(); }
 
 	GLWidget * getGLWidget() { return mGLWidget; }
 
@@ -43,11 +43,23 @@ private:
 	QGLBuffer mCubeVertexBuffer;
 	GLuint mDomeMap;
 	GLuint mStarCubeMap;
+	QVector4D mFogColor;
 	QVector4D mAmbient;
 	QVector4D mDiffuse;
 	QVector4D mSpecular;
 	QVector4D mSunDirection;
+	QVector3D mSunInitialDir;
 	QVector3D mAxis;
+	
+	float mDiffuseFactorDay;
+	float mDiffuseFactorNight;
+	float mDiffuseFactorMax;
+	float mSpecularFactorDay;
+	float mSpecularFactorNight;
+	float mSpecularFactorMax;
+	float mAmbientFactorDay;
+	float mAmbientFactorNight;
+	float mAmbientFactorMax;
 };
 
 
