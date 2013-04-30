@@ -6,6 +6,7 @@
 #include "GLWidget.hpp"
 #include "Landscape.hpp"
 #include "Sky.hpp"
+#include "TextureRenderer.hpp"
 #include "teapot.h"
 
 
@@ -32,6 +33,8 @@ GLScene::GLScene( GLWidget * glWidget, QObject * parent ) :
 	mLandscape = new Landscape( mGLWidget, "test" );
 
 	mTeapotMaterial = new Material( mGLWidget, "KirksEntry" );
+
+//	mTexRenderer = new TextureRenderer( mGLWidget, QSize(256,256), true );
 
 	QTimer * secondTimer = new QTimer( this );
 	QObject::connect( secondTimer, SIGNAL(timeout()), this, SLOT(secondPassed()) );
@@ -173,14 +176,35 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	mLandscape->drawPatch( QRectF( posX-viewDistance, posZ-viewDistance, viewDistance*2, viewDistance*2 ) );
 
+/*
+	glPushAttrib( GL_VIEWPORT_BIT );
+	mTexRenderer->bind();
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glViewport( 0, 0, mTexRenderer->size().width(), mTexRenderer->size().width() );
+	mSky->draw( QVector3D( posX, posY, posZ ) );
+	mLandscape->drawPatch( QRectF( posX-viewDistance, posZ-viewDistance, viewDistance*2, viewDistance*2 ) );
+	mTexRenderer->release();
+	glPopAttrib();
 
-//	glFlush();
-	glFinish();
+	glActiveTexture( GL_TEXTURE0 );
+	glEnable( GL_TEXTURE_2D );
+	glBindTexture( GL_TEXTURE_2D, mTexRenderer->texID() );
+	glBegin( GL_QUADS );
+		glNormal3f(0,1,0);	glMultiTexCoord2f( GL_TEXTURE0, 0, 0 );	glVertex3f(-100, 10, 100 );
+		glNormal3f(0,1,0);	glMultiTexCoord2f( GL_TEXTURE0, 1, 0 );	glVertex3f( 100, 10, 100 );
+		glNormal3f(0,1,0);	glMultiTexCoord2f( GL_TEXTURE0, 1, 1 );	glVertex3f( 100, 10,-100 );
+		glNormal3f(0,1,0);	glMultiTexCoord2f( GL_TEXTURE0, 0, 1 );	glVertex3f(-100, 10,-100 );
+	glEnd();
+*/
 
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
 	glMatrixMode( GL_PROJECTION );	glPopMatrix();
 	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
 	glPopAttrib();
+
+//	glFlush();
+	glFinish();
+
 
 	mFrameCountSecond++;
 

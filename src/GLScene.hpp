@@ -18,6 +18,7 @@ class GLWidget;
 class Landscape;
 class Sky;
 class Material;
+class TextureRenderer;
 
 
 class GLScene : public QGraphicsScene
@@ -53,6 +54,8 @@ private:
 	QFont mFont;
 
 	Material * mTeapotMaterial;
+	
+	TextureRenderer * mTexRenderer;
 
 	bool mForwardPressed;
 	bool mBackwardPressed;

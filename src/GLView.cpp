@@ -17,9 +17,6 @@ GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
 	setFrameShape( QFrame::NoFrame );
 
 	mGLWidget = new GLWidget( glFormat, this );
-	mGLWidget->makeCurrent();
-	mGLWidget->initializeGL();
-
 	setViewport( mGLWidget );
 
 	mGLScene = new GLScene( mGLWidget, this );
