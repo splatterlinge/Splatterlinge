@@ -4,8 +4,8 @@
 
 #include "Object3D.hpp"
 #include "KeyListener.hpp"
+#include "MouseListener.hpp"
 
-class Teapot;
 
 class Sky;
 class Landscape;
@@ -19,6 +19,7 @@ public:
 	
 	virtual void updateSelf( const float & delta );
 	virtual void drawSelf();
+	virtual void drawSelfPost();
 
 	virtual void keyPressEvent( QKeyEvent * event );
 	virtual void keyReleaseEvent( QKeyEvent * event );

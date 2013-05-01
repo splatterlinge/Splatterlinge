@@ -4,6 +4,8 @@
 #include <QGLWidget>
 #include <QGLFunctions>
 
+#include <GL/glu.h>
+
 
 class GLWidget : public QGLWidget, public QGLFunctions
 {

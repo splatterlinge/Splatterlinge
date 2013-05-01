@@ -44,6 +44,8 @@ public:
 	virtual void draw();
 	virtual void updateSelf( const float & delta ) = 0;
 	virtual void drawSelf() = 0;
+	virtual void updateSelfPost( const float & delta ) {};
+	virtual void drawSelfPost() {};
 
 protected:
 	mutable QMatrix4x4 mMatrix;

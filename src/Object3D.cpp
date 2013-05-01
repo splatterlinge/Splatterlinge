@@ -61,6 +61,7 @@ void Object3D::update( const float & delta )
 	{
 		(*i)->update( delta );
 	}
+	updateSelfPost( delta );
 }
 
 
@@ -74,5 +75,6 @@ void Object3D::draw()
 	{
 		(*i)->draw();
 	}
+	drawSelfPost();
 	glPopMatrix();
 }

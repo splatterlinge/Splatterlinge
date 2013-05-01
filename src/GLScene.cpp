@@ -68,9 +68,9 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	mDelta = (double)mElapsedTimer.restart()/1000.0;
 
 	glPushAttrib( GL_ALL_ATTRIB_BITS );
-	glMatrixMode( GL_TEXTURE );	glPushMatrix();
-	glMatrixMode( GL_PROJECTION );	glPushMatrix();
-	glMatrixMode( GL_MODELVIEW );	glPushMatrix();
+	glMatrixMode( GL_TEXTURE );	glPushMatrix();	glLoadIdentity();
+	glMatrixMode( GL_PROJECTION );	glPushMatrix();	glLoadIdentity();
+	glMatrixMode( GL_MODELVIEW );	glPushMatrix();	glLoadIdentity();
 
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 	glDisable( GL_BLEND );
@@ -86,14 +86,6 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	glClearColor( 0, 0, 0, 0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-	glMatrixMode( GL_PROJECTION );
-	glLoadIdentity();
-	gluPerspective( 60.0f, (float)width()/height(), 0.1f, 1000.0f );
-
-	glMatrixMode( GL_MODELVIEW );
-	glLoadIdentity();
-
 
 	static float rotateX = 0.0f;
 	static float rotateY = 0.0f;
@@ -191,6 +183,10 @@ void GLScene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 		mDrag += event->screenPos() - event->lastScreenPos();
 		event->accept();
 	}
+	
+	QList< MouseListener* >::iterator i;
+	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
+		(*i)->mouseMoveEvent( event );
 }
 
 
@@ -200,6 +196,10 @@ void GLScene::mousePressEvent( QGraphicsSceneMouseEvent * event )
 	if( event->isAccepted() )
 		return;
 	mDragging = true;
+
+	QList< MouseListener* >::iterator i;
+	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
+		(*i)->mousePressEvent( event );
 }
 
 
@@ -207,12 +207,24 @@ void GLScene::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 	QGraphicsScene::mouseReleaseEvent(event);
 	mDragging = false;
+	if( event->isAccepted() )
+		return;
+
+	QList< MouseListener* >::iterator i;
+	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
+		(*i)->mouseReleaseEvent( event );
 }
 
 
 void GLScene::wheelEvent( QGraphicsSceneWheelEvent * event )
 {
 	QGraphicsScene::wheelEvent( event );
+	if( event->isAccepted() )
+		return;
+
+	QList< MouseListener* >::iterator i;
+	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
+		(*i)->wheelEvent( event );
 }
 
 
@@ -221,6 +233,11 @@ void GLScene::keyPressEvent( QKeyEvent * event )
 	QGraphicsScene::keyPressEvent( event );
 	if( event->isAccepted() )
 		return;
+
+	QList< KeyListener* >::iterator i;
+	for( i = mKeyListeners.begin(); i != mKeyListeners.end(); ++i )
+		(*i)->keyPressEvent( event );
+
 	switch( event->key() )
 	{
 	case Qt::Key_W:
@@ -248,11 +265,6 @@ void GLScene::keyPressEvent( QKeyEvent * event )
 		event->ignore();
 		return;
 	}
-
-	QList< KeyListener* >::iterator i;
-	for( i = mKeyListeners.begin(); i != mKeyListeners.end(); ++i )
-		(*i)->keyPressEvent( event );
-
 	event->accept();
 }
 
@@ -262,6 +274,11 @@ void GLScene::keyReleaseEvent( QKeyEvent * event )
 	QGraphicsScene::keyReleaseEvent( event );
 	if( event->isAccepted() )
 		return;
+
+	QList< KeyListener* >::iterator i;
+	for( i = mKeyListeners.begin(); i != mKeyListeners.end(); ++i )
+		(*i)->keyReleaseEvent( event );
+
 	switch( event->key() )
 	{
 	case Qt::Key_W:
@@ -289,10 +306,5 @@ void GLScene::keyReleaseEvent( QKeyEvent * event )
 		event->ignore();
 		return;
 	}
-
-	QList< KeyListener* >::iterator i;
-	for( i = mKeyListeners.begin(); i != mKeyListeners.end(); ++i )
-		(*i)->keyReleaseEvent( event );
-
 	event->accept();
 }

@@ -74,14 +74,18 @@ void World::updateSelf( const float & delta )
 
 void World::drawSelf()
 {
-	float viewDistance = 400.0f;
 	glLightfv( GL_LIGHT0, GL_POSITION, reinterpret_cast<const GLfloat*>(&mSky->sunDirection()) );
 	glLightfv( GL_LIGHT0, GL_AMBIENT, reinterpret_cast<const GLfloat*>(&mSky->ambient()) );
 	glLightfv( GL_LIGHT0, GL_DIFFUSE, reinterpret_cast<const GLfloat*>(&mSky->diffuse()) );
 	glLightfv( GL_LIGHT0, GL_SPECULAR, reinterpret_cast<const GLfloat*>(&mSky->specular()) );
 	glFogfv( GL_FOG_COLOR, reinterpret_cast<const GLfloat*>(&mSky->fogColor()) );
-	glFogf( GL_FOG_START, viewDistance*0.75f );
-	glFogf( GL_FOG_END, viewDistance );
+	glFogf( GL_FOG_START, scene()->eye()->far()*0.66f );
+	glFogf( GL_FOG_END, scene()->eye()->far()*1.1 );
 	mSky->draw( scene()->eye()->position() );
-	mLandscape->drawPatch( QRectF( scene()->eye()->position().x()-viewDistance, scene()->eye()->position().z()-viewDistance, viewDistance*2, viewDistance*2 ) );
+}
+
+
+void World::drawSelfPost()
+{
+	mLandscape->drawPatch( QRectF( scene()->eye()->position().x()-scene()->eye()->far(), scene()->eye()->position().z()-scene()->eye()->far(), scene()->eye()->far()*2, scene()->eye()->far()*2 ) );
 }
