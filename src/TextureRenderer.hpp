@@ -1,5 +1,5 @@
-#ifndef TEXRENDERER__INCLUDED
-#define TEXRENDERER__INCLUDED
+#ifndef TEXRENDERER_INCLUDED
+#define TEXRENDERER_INCLUDED
 
 
 #include "GLWidget.hpp"

@@ -6,6 +6,10 @@
 #include <QRectF>
 
 
+#include "Object3D.hpp"
+#include "Eye.hpp"
+
+
 class QPainter;
 class QGraphicsItem;
 class QGraphicsProxyWidget;
@@ -15,10 +19,10 @@ class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 
 class GLWidget;
-class Landscape;
-class Sky;
-class Material;
-class TextureRenderer;
+class MouseListener;
+class KeyListener;
+
+//class TextureRenderer;
 
 
 class GLScene : public QGraphicsScene
@@ -33,6 +37,12 @@ public:
 	QGraphicsProxyWidget * addWidget( QWidget * widget, Qt::WindowFlags wFlags = 0 );
 
 	GLWidget * glWidget() { return mGLWidget; }
+	Object3D * root() { return mEye; }
+	Eye * eye() { return mEye; }
+	void addKeyListener( KeyListener * listener ) { mKeyListeners.append( listener ); }
+	void addMouseListener( MouseListener * listener ) { mMouseListeners.append( listener ); }
+	void removeKeyListener( KeyListener * listener ) { mKeyListeners.removeOne( listener ); }
+	void removeMouseListener( MouseListener * listener ) { mMouseListeners.removeOne( listener ); }
 
 protected:
 	// Overrides:
@@ -53,9 +63,7 @@ private:
 	bool mDragging;
 	QFont mFont;
 
-	Material * mTeapotMaterial;
-	
-	TextureRenderer * mTexRenderer;
+//	TextureRenderer * mTexRenderer;
 
 	bool mForwardPressed;
 	bool mBackwardPressed;
@@ -65,9 +73,9 @@ private:
 	bool mDownPressed;
 	bool mSpeedPressed;
 
-	float mTimeOfDay;
-	Sky * mSky;
-	Landscape * mLandscape;
+	QList<MouseListener*> mMouseListeners;
+	QList<KeyListener*> mKeyListeners;
+	Eye * mEye;
 
 private slots:
 	void secondPassed();

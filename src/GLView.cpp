@@ -9,6 +9,7 @@
 
 #include "GLScene.hpp"
 #include "GLWidget.hpp"
+#include "World.hpp"
 
 
 GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
@@ -21,6 +22,7 @@ GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
 
 	mGLScene = new GLScene( mGLWidget, this );
 	setScene( mGLScene );
+	mGLScene->root()->addNode( QSharedPointer<Object3D>( new World(mGLScene,mGLScene->root()) ) );
 
 	QGraphicsProxyWidget * proxy;
 	QWidget * w = new QWidget();

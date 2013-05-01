@@ -8,10 +8,13 @@
 #include "Resource.hpp"
 
 
+class GLWidget;
+
+
 class ShaderData : public ResourceData
 {
 public:
-	ShaderData( QGLWidget * glWidget, QString name );
+	ShaderData( GLWidget * glWidget, QString name );
 	virtual ~ShaderData();
 	bool load();
 	
@@ -33,7 +36,7 @@ public:
 	int texUnit_cubeMap() const { return mTexUnit_cubeMap; }
 
 private:
-	QGLWidget * mGLWidget;
+	GLWidget * mGLWidget;
 	QString mName;
 
 	QGLShaderProgram * mProgram;
@@ -53,7 +56,7 @@ private:
 class Shader : public Resource<ShaderData>
 {
 public:
-	Shader( QGLWidget * glWidget, QString name );
+	Shader( GLWidget * glWidget, QString name );
 	virtual ~Shader();
 
 	bool hasDiffuseMap() const { return data()->uniform_diffuseMap() >= 0; }

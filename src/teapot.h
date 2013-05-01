@@ -1,5 +1,5 @@
-#ifndef TEAPOT_INCLUDED
-#define TEAPOT_INCLUDED
+#ifndef TEAPOT_H_INCLUDED
+#define TEAPOT_H_INCLUDED
 
 #ifdef __cplusplus
 extern "C" {

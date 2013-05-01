@@ -1,13 +1,12 @@
 #include "Material.hpp"
 
-#include <QCryptographicHash>
-#include <stdio.h>
+#include "GLWidget.hpp"
 
 
 RESOURCE_CACHE(MaterialData);
 
 
-MaterialData::MaterialData( QGLWidget * glWidget, QString name ) :
+MaterialData::MaterialData( GLWidget * glWidget, QString name ) :
 	ResourceData( name ),
 	mGLWidget(glWidget),
 	mName(name),
@@ -87,7 +86,7 @@ bool MaterialData::load()
 }
 
 
-Material::Material( QGLWidget * glWidget, QString name ) : Resource()
+Material::Material( GLWidget * glWidget, QString name ) : Resource()
 {
 	mGLWidget = glWidget;
 	mMaskMap = -1;

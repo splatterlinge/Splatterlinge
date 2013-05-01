@@ -11,6 +11,9 @@
 #include "Material.hpp"
 
 
+class GLWidget;
+
+
 class Landscape
 {
 public:
@@ -30,7 +33,7 @@ public:
 			{ drawPatchMap( mLandscape->getTerrain()->toMap(visible) ); }
 	};
 
-	Landscape( QGLWidget * glWidget, QString rootDir );
+	Landscape( GLWidget * glWidget, QString rootDir );
 	~Landscape();
 
 	void draw();
@@ -40,11 +43,11 @@ public:
 
 	Terrain * getTerrain() { return mTerrain; }
 	const Terrain * getTerrain() const { return mTerrain; }
-	QGLWidget * getGLWidget() { return mGLWidget; }
+	GLWidget * getGLWidget() { return mGLWidget; }
 
 private:
 	QString mName;
-	QGLWidget * mGLWidget;
+	GLWidget * mGLWidget;
 	QVector<Blob*> mBlobs;
 	Terrain * mTerrain;
 	Material * mTerrainMaterial;

@@ -1,13 +1,15 @@
 #include "GLScene.hpp"
 
 #include <QPainter>
+#include <QTimer>
+#include <QGraphicsItem>
+#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsProxyWidget>
 #include <GL/glu.h>
 
 #include "GLWidget.hpp"
-#include "Landscape.hpp"
-#include "Sky.hpp"
-#include "TextureRenderer.hpp"
-#include "teapot.h"
+#include "World.hpp"
+//#include "TextureRenderer.hpp"
 
 
 GLScene::GLScene( GLWidget * glWidget, QObject * parent ) :
@@ -28,13 +30,9 @@ GLScene::GLScene( GLWidget * glWidget, QObject * parent ) :
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
 
-	mTimeOfDay = 0.0f;
-	mSky = new Sky( mGLWidget, "earth", &mTimeOfDay );
-	mLandscape = new Landscape( mGLWidget, "test" );
-
-	mTeapotMaterial = new Material( mGLWidget, "KirksEntry" );
-
 //	mTexRenderer = new TextureRenderer( mGLWidget, QSize(256,256), true );
+
+	mEye = new Eye( this );
 
 	QTimer * secondTimer = new QTimer( this );
 	QObject::connect( secondTimer, SIGNAL(timeout()), this, SLOT(secondPassed()) );
@@ -52,9 +50,7 @@ GLScene::GLScene( GLWidget * glWidget, QObject * parent ) :
 
 GLScene::~GLScene()
 {
-	delete mSky;
-	delete mLandscape;
-	delete mTeapotMaterial;
+	delete mEye;
 }
 
 
@@ -98,20 +94,19 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 
+
 	static float rotateX = 0.0f;
 	static float rotateY = 0.0f;
 	rotateY += mDrag.x()/4.0f;
 	rotateX += mDrag.y()/4.0f;
 	mDrag = QPoint( 0, 0 );
-	glRotatef( rotateX, 1,0,0 );
-	glRotatef( rotateY, 0,1,0 );
-	
+	QQuaternion qX = QQuaternion::fromAxisAndAngle( 1,0,0, rotateX );
+	QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, rotateY );
+	mEye->setRotation( qX * qY );
+
 	float moveX = 0.0f;
 	float moveY = 0.0f;
 	float moveZ = 0.0f;
-	static float posX = 0.0f;
-	static float posY = 0.0f;
-	static float posZ = 0.0f;
 	if( mForwardPressed )
 		moveZ -= 1.0f;
 	if( mBackwardPressed )
@@ -134,48 +129,10 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 		moveY *= 0.2;
 		moveZ *= 0.2;
 	}
-	posX += cosf( rotateY*(M_PI/180.0) ) * moveX - sinf( rotateY*(M_PI/180.0) ) * moveZ;
-	posZ += sinf( rotateY*(M_PI/180.0) ) * moveX + cosf( rotateY*(M_PI/180.0) ) * moveZ;
-	posY += moveY;
-
-	float landscapeHeight = mLandscape->getTerrain()->getHeight( QVector3D(posX,posY,posZ) );
-	if( posY < landscapeHeight + 2 )
-		posY = landscapeHeight + 2;
-
-	glTranslatef( -posX, -posY, -posZ );
-
-	if( mSpeedPressed )
-		mTimeOfDay += 0.002f;
-	else
-		mTimeOfDay += 0.0002f;
-
-	if( mTimeOfDay > 1.0f )
-		mTimeOfDay -= 1.0f;
-
-	mSky->update( mDelta );
-	glLightfv( GL_LIGHT0, GL_POSITION, reinterpret_cast<const GLfloat*>(&mSky->sunDirection()) );
-	glLightfv( GL_LIGHT0, GL_AMBIENT, reinterpret_cast<const GLfloat*>(&mSky->ambient()) );
-	glLightfv( GL_LIGHT0, GL_DIFFUSE, reinterpret_cast<const GLfloat*>(&mSky->diffuse()) );
-	glLightfv( GL_LIGHT0, GL_SPECULAR, reinterpret_cast<const GLfloat*>(&mSky->specular()) );
-	mSky->draw( QVector3D( posX, posY, posZ ) );
-
-	float viewDistance = 400.0f;
-	glFogfv( GL_FOG_COLOR, reinterpret_cast<const GLfloat*>(&mSky->fogColor()) );
-	glFogf( GL_FOG_START, viewDistance*0.75f );
-	glFogf( GL_FOG_END, viewDistance );
-//	glFogf( GL_FOG_DENSITY, 0.01f );
-
-	mTeapotMaterial->bind();
-	glPushMatrix();
-	glTranslatef( 0, -16, 0 );
-	glDisable( GL_CULL_FACE );
-	teapot( 20, 16.0f, GL_FILL );
-	glEnable( GL_CULL_FACE );
-	glPopMatrix();
-	mTeapotMaterial->release();
-
-	mLandscape->drawPatch( QRectF( posX-viewDistance, posZ-viewDistance, viewDistance*2, viewDistance*2 ) );
-
+	mEye->setPosition( mEye->position() + moveX*mEye->left() + moveY*mEye->up() + moveZ*mEye->direction() );
+	
+	mEye->update( mDelta );
+	mEye->draw();
 /*
 	glPushAttrib( GL_VIEWPORT_BIT );
 	mTexRenderer->bind();
@@ -196,7 +153,6 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 		glNormal3f(0,1,0);	glMultiTexCoord2f( GL_TEXTURE0, 0, 1 );	glVertex3f(-100, 10,-100 );
 	glEnd();
 */
-
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
 	glMatrixMode( GL_PROJECTION );	glPopMatrix();
 	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
@@ -292,6 +248,11 @@ void GLScene::keyPressEvent( QKeyEvent * event )
 		event->ignore();
 		return;
 	}
+
+	QList< KeyListener* >::iterator i;
+	for( i = mKeyListeners.begin(); i != mKeyListeners.end(); ++i )
+		(*i)->keyPressEvent( event );
+
 	event->accept();
 }
 
@@ -328,5 +289,10 @@ void GLScene::keyReleaseEvent( QKeyEvent * event )
 		event->ignore();
 		return;
 	}
+
+	QList< KeyListener* >::iterator i;
+	for( i = mKeyListeners.begin(); i != mKeyListeners.end(); ++i )
+		(*i)->keyReleaseEvent( event );
+
 	event->accept();
 }

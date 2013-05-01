@@ -5,14 +5,16 @@
 #include <QtOpenGL>
 #include <QDebug>
 #include "Resource.hpp"
-
 #include "Shader.hpp"
+
+
+class GLWidget;
 
 
 class MaterialData : public ResourceData
 {
 public:
-	MaterialData( QGLWidget * glWidget, QString name );
+	MaterialData( GLWidget * glWidget, QString name );
 	virtual ~MaterialData();
 	bool load();
 
@@ -28,7 +30,7 @@ public:
 	const QString & defaultShaderName() const { return mDefaultShaderName; }
 
 private:
-	QGLWidget * mGLWidget;
+	GLWidget * mGLWidget;
 	QString mName;
 	QString mDefaultShaderName;
 
@@ -46,13 +48,13 @@ private:
 class Material : public Resource<MaterialData>
 {
 private:
-	QGLWidget * mGLWidget;
+	GLWidget * mGLWidget;
 	Shader * mShader;
 	GLuint mMaskMap;
 	GLuint mCubeMap;
 
 public:
-	Material( QGLWidget * glWidget, QString name );
+	Material( GLWidget * glWidget, QString name );
 	virtual ~Material();
 	
 	void setShader( QString shaderName );

@@ -25,21 +25,19 @@ void Landscape::Blob::draw()
 {
 	mMaterial->bind();
 	glMatrixMode( GL_TEXTURE );
-
 	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
 	glScalef( mMaterialScale.x(), mMaterialScale.y(), 1.0f );
-
 	glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
 	glScalef( 1.0f/((float)mRect.width()), 1.0f/((float)mRect.height()), 1.0f );
 	glTranslatef( -mRect.x(), -mRect.y(), 0.0f );
 
 	mLandscape->getTerrain()->drawPatchMap( mRect );
-	glMatrixMode( GL_TEXTURE );
 
+	glMatrixMode( GL_TEXTURE );
 	glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
 	glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
 
-	glMatrixMode( GL_TEXTURE );
+	glMatrixMode( GL_MODELVIEW );
 	mMaterial->release();
 }
 
@@ -52,26 +50,24 @@ void Landscape::Blob::drawPatchMap( const QRect & visible )
 
 	mMaterial->bind();
 	glMatrixMode( GL_TEXTURE );
-
 	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
 	glScalef( mMaterialScale.x(), mMaterialScale.y(), 1.0f );
-
 	glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
 	glScalef( 1.0f/((float)mRect.width()), 1.0f/((float)mRect.height()), 1.0f );
 	glTranslatef( -mRect.x(), -mRect.y(), 0.0f );
 
 	mLandscape->getTerrain()->drawPatchMap( rectToDraw );
-	glMatrixMode( GL_TEXTURE );
 
+	glMatrixMode( GL_TEXTURE );
 	glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
 	glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
 
-	glMatrixMode( GL_TEXTURE );
+	glMatrixMode( GL_MODELVIEW );
 	mMaterial->release();
 }
 
 
-Landscape::Landscape( QGLWidget * glWidget, QString name )
+Landscape::Landscape( GLWidget * glWidget, QString name )
 {
 	mGLWidget = glWidget;
 	mName = name;
@@ -138,6 +134,7 @@ void Landscape::draw()
 	glScalef( mTerrainMaterialScale.x(), mTerrainMaterialScale.y(), 1.0f );
 	mTerrain->draw();
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
+	glMatrixMode( GL_MODELVIEW );
 	mTerrainMaterial->release();
 
 	glDepthMask( GL_FALSE );
@@ -159,6 +156,7 @@ void Landscape::drawPatchMap( const QRect & visible )
 	glScalef( mTerrainMaterialScale.x(), mTerrainMaterialScale.y(), 1.0f );
 	mTerrain->drawPatchMap( visible );
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
+	glMatrixMode( GL_MODELVIEW );
 	mTerrainMaterial->release();
 
 	glDepthMask( GL_FALSE );

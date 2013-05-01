@@ -3,11 +3,13 @@
 #include <QDebug>
 #include <GL/glu.h>
 
+#include "GLWidget.hpp"
+
 
 RESOURCE_CACHE(ShaderData);
 
 
-ShaderData::ShaderData( QGLWidget * glWidget, QString name ) :
+ShaderData::ShaderData( GLWidget * glWidget, QString name ) :
 	ResourceData( name ),
 	mGLWidget(glWidget),
 	mName(name),
@@ -86,7 +88,7 @@ bool ShaderData::load()
 }
 
 
-Shader::Shader( QGLWidget * glWidget, QString name ) : Resource()
+Shader::Shader( GLWidget * glWidget, QString name ) : Resource()
 {
 	QSharedPointer<ShaderData> n( new ShaderData( glWidget, name ) );
 	cache( n );
