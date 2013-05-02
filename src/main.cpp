@@ -5,17 +5,18 @@
 
 int main( int argc, char * argv[] )
 {
-	QTextCodec::setCodecForCStrings( QTextCodec::codecForName("UTF-8") );
-	QTextCodec::setCodecForTr( QTextCodec::codecForName("UTF-8") );
+	//QTextCodec::setCodecForCStrings( QTextCodec::codecForName("UTF-8") );
+	//QTextCodec::setCodecForTr( QTextCodec::codecForName("UTF-8") );
 
-	QApplication::setDesktopSettingsAware( false );
-	QApplication::setStyle( new QPlastiqueStyle );
+	//QApplication::setDesktopSettingsAware( false );
+	//QApplication::setStyle( new QPlastiqueStyle );
 
-	QApplication app( argc, argv );
+	//QApplication app( argc, argv );
 
-	MainWindow window;
-	window.resize( 800,600 );
-	window.show();
+	//MainWindow window;
+	//window.resize( 800,600 );
+	//window.show();
 
-	return app.exec();
+    //return app.exec();
+    return 0;
 }

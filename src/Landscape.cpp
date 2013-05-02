@@ -25,17 +25,17 @@ void Landscape::Blob::draw()
 {
 	mMaterial->bind();
 	glMatrixMode( GL_TEXTURE );
-	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
+	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
 	glScalef( mMaterialScale.x(), mMaterialScale.y(), 1.0f );
-	glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
+	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
 	glScalef( 1.0f/((float)mRect.width()), 1.0f/((float)mRect.height()), 1.0f );
 	glTranslatef( -mRect.x(), -mRect.y(), 0.0f );
 
 	mLandscape->getTerrain()->drawPatchMap( mRect );
 
 	glMatrixMode( GL_TEXTURE );
-	glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
-	glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
+	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
+	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
 
 	glMatrixMode( GL_MODELVIEW );
 	mMaterial->release();
@@ -50,17 +50,17 @@ void Landscape::Blob::drawPatchMap( const QRect & visible )
 
 	mMaterial->bind();
 	glMatrixMode( GL_TEXTURE );
-	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
+	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
 	glScalef( mMaterialScale.x(), mMaterialScale.y(), 1.0f );
-	glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
+	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
 	glScalef( 1.0f/((float)mRect.width()), 1.0f/((float)mRect.height()), 1.0f );
 	glTranslatef( -mRect.x(), -mRect.y(), 0.0f );
 
 	mLandscape->getTerrain()->drawPatchMap( rectToDraw );
 
 	glMatrixMode( GL_TEXTURE );
-	glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
-	glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
+	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
+	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
 
 	glMatrixMode( GL_MODELVIEW );
 	mMaterial->release();

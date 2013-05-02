@@ -28,15 +28,15 @@ TextureRenderer::TextureRenderer( GLWidget * glWidget, const QSize & size, bool 
 	if( mHasDepthBuffer )
 	{
 		mGLWidget->glGenRenderbuffers( 1, &mDepthBuffer );
-		mGLWidget->glBindRenderbuffer( GL_RENDERBUFFER_EXT, mDepthBuffer );
-		mGLWidget->glRenderbufferStorage( GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, mSize.width(), mSize.height() );
-		mGLWidget->glFramebufferRenderbuffer( GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER_EXT, mDepthBuffer );
+		mGLWidget->glBindRenderbuffer( GL_RENDERBUFFER, mDepthBuffer );
+		mGLWidget->glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, mSize.width(), mSize.height() );
+		mGLWidget->glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepthBuffer );
 
 		glGenTextures( 1, &mDepth );
 		glBindTexture( GL_TEXTURE_2D, mDepth );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-		glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, mSize.width(), mSize.height(), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL );
+		glTexImage2D( GL_TEXTURE_2D, 0, 0x81A6, mSize.width(), mSize.height(), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL );
 
 		mGLWidget->glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mDepth, 0 );
 	}

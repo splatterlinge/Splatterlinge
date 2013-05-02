@@ -6,6 +6,7 @@
 #include <QString>
 #include <QSize>
 
+#include "GL/glext.h"
 #include "Shader.hpp"
 
 

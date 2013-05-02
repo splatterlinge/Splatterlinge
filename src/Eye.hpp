@@ -14,13 +14,13 @@ public:
 	virtual void updateSelf( const float & delta );
 	virtual void drawSelf();
 
-	float fov() const { return mFOV; }
-	float near() const { return mNear; }
-	float far() const { return mFar; }
+	float getFov() const { return mFOV; }
+	float getNear() const { return mNear; }
+	float getFar() const { return mFar; }
 
-	void setFOV( float fov ) { mFOV = fov; }
-	void setNear( float near ) { mNear = near; }
-	void setFar( float far ) { mFar = far; }
+	void setFOV( float _fov ) { mFOV = _fov; }
+	void setNear( float _near ) { mNear = _near; }
+	void setFar( float _far ) { mFar = _far; }
 
 protected:
 	void updateMatrix() const;

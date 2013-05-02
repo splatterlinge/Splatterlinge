@@ -7,6 +7,7 @@
 #include <QSizeF>
 #include <QDebug>
 
+#include "GLWidget.hpp"
 #include "Terrain.hpp"
 #include "Material.hpp"
 

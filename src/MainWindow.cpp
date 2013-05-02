@@ -11,15 +11,15 @@ MainWindow::MainWindow( QWidget * parent) : QMainWindow( parent )
 	glFormat.setVersion( 2, 1 );
 //	glFormat.setSwapInterval( 1 );
 
-	mGLView = new GLView( glFormat, this );
+	//mGLView = new GLView( glFormat, this );
 
-	this->setCentralWidget( mGLView );
+	//this->setCentralWidget( mGLView );
 }
 
 
 MainWindow::~MainWindow()
 {
-	delete mGLView;
+	//delete mGLView;
 }
 
 
