@@ -79,13 +79,13 @@ void World::drawSelf()
 	glLightfv( GL_LIGHT0, GL_DIFFUSE, reinterpret_cast<const GLfloat*>(&mSky->diffuse()) );
 	glLightfv( GL_LIGHT0, GL_SPECULAR, reinterpret_cast<const GLfloat*>(&mSky->specular()) );
 	glFogfv( GL_FOG_COLOR, reinterpret_cast<const GLfloat*>(&mSky->fogColor()) );
-	glFogf( GL_FOG_START, scene()->eye()->getFar()*0.66f );
-	glFogf( GL_FOG_END, scene()->eye()->getFar()*1.1 );
+	glFogf( GL_FOG_START, scene()->eye()->far()*0.66f );
+	glFogf( GL_FOG_END, scene()->eye()->far()*1.1 );
 	mSky->draw( scene()->eye()->position() );
 }
 
 
 void World::drawSelfPost()
 {
-	mLandscape->drawPatch( QRectF( scene()->eye()->position().x()-scene()->eye()->getFar(), scene()->eye()->position().z()-scene()->eye()->getFar(), scene()->eye()->getFar()*2, scene()->eye()->getFar()*2 ) );
+	mLandscape->drawPatch( QRectF( scene()->eye()->position().x()-scene()->eye()->far(), scene()->eye()->position().z()-scene()->eye()->far(), scene()->eye()->far()*2, scene()->eye()->far()*2 ) );
 }

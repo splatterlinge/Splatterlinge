@@ -14,9 +14,9 @@ public:
 	virtual void updateSelf( const float & delta );
 	virtual void drawSelf();
 
-	float getFov() const { return mFOV; }
-	float getNear() const { return mNear; }
-	float getFar() const { return mFar; }
+	float fov() const { return mFOV; }
+	float near() const { return mNear; }
+	float far() const { return mFar; }
 
 	void setFOV( float _fov ) { mFOV = _fov; }
 	void setNear( float _near ) { mNear = _near; }
