@@ -15,20 +15,20 @@ public:
 	virtual void drawSelf();
 
 	float fov() const { return mFOV; }
-	float near() const { return mNear; }
-	float far() const { return mFar; }
+	float nearPlane() const { return mNearPlane; }
+	float farPlane() const { return mFarPlane; }
 
-	void setFOV( float _fov ) { mFOV = _fov; }
-	void setNear( float _near ) { mNear = _near; }
-	void setFar( float _far ) { mFar = _far; }
+	void setFOV( float fov ) { mFOV = fov; }
+	void setNearPlane( float nearPlane ) { mNearPlane = nearPlane; }
+	void setFarPlane( float farPlane ) { mFarPlane = farPlane; }
 
 protected:
 	void updateMatrix() const;
 
 private:
 	float mFOV;
-	float mNear;
-	float mFar;
+	float mNearPlane;
+	float mFarPlane;
 };
 
 

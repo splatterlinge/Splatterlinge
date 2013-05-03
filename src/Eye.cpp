@@ -8,8 +8,8 @@
 Eye::Eye( GLScene * scene, const Object3D * parent ) :
 	Object3D( scene, parent ),
 	mFOV(60.0f),
-	mNear(0.1f),
-	mFar(400.0f)
+	mNearPlane(0.1f),
+	mFarPlane(400.0f)
 {
 }
 
@@ -35,6 +35,6 @@ void Eye::updateSelf( const float & delta )
 void Eye::drawSelf()
 {
 	glMatrixMode( GL_PROJECTION );
-	gluPerspective( mFOV, (float)scene()->width()/scene()->height(), mNear, mFar );
+	gluPerspective( mFOV, (float)scene()->width()/scene()->height(), mNearPlane, mFarPlane );
 	glMatrixMode( GL_MODELVIEW );
 }

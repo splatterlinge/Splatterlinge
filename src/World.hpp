@@ -9,6 +9,8 @@
 
 class Sky;
 class Landscape;
+class Shader;
+class TextureRenderer;
 
 
 class World : public Object3D, public KeyListener
@@ -29,6 +31,9 @@ private:
 	float mTimeOfDay;
 	Sky * mSky;
 	Landscape * mLandscape;
+	
+//	Shader * mWaterShader;
+//	TextureRenderer * mTexRenderer;
 };
 
 

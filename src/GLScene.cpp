@@ -9,7 +9,6 @@
 
 #include "GLWidget.hpp"
 #include "World.hpp"
-//#include "TextureRenderer.hpp"
 
 
 GLScene::GLScene( GLWidget * glWidget, QObject * parent ) :
@@ -29,8 +28,6 @@ GLScene::GLScene( GLWidget * glWidget, QObject * parent ) :
 	mSpeedPressed = false;
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
-
-//	mTexRenderer = new TextureRenderer( mGLWidget, QSize(256,256), true );
 
 	mEye = new Eye( this );
 
@@ -125,26 +122,7 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	
 	mEye->update( mDelta );
 	mEye->draw();
-/*
-	glPushAttrib( GL_VIEWPORT_BIT );
-	mTexRenderer->bind();
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glViewport( 0, 0, mTexRenderer->size().width(), mTexRenderer->size().width() );
-	mSky->draw( QVector3D( posX, posY, posZ ) );
-	mLandscape->drawPatch( QRectF( posX-viewDistance, posZ-viewDistance, viewDistance*2, viewDistance*2 ) );
-	mTexRenderer->release();
-	glPopAttrib();
 
-	glActiveTexture( GL_TEXTURE0 );
-	glEnable( GL_TEXTURE_2D );
-	glBindTexture( GL_TEXTURE_2D, mTexRenderer->texID() );
-	glBegin( GL_QUADS );
-		glNormal3f(0,1,0);	glMultiTexCoord2f( GL_TEXTURE0, 0, 0 );	glVertex3f(-100, 10, 100 );
-		glNormal3f(0,1,0);	glMultiTexCoord2f( GL_TEXTURE0, 1, 0 );	glVertex3f( 100, 10, 100 );
-		glNormal3f(0,1,0);	glMultiTexCoord2f( GL_TEXTURE0, 1, 1 );	glVertex3f( 100, 10,-100 );
-		glNormal3f(0,1,0);	glMultiTexCoord2f( GL_TEXTURE0, 0, 1 );	glVertex3f(-100, 10,-100 );
-	glEnd();
-*/
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
 	glMatrixMode( GL_PROJECTION );	glPopMatrix();
 	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
