@@ -40,7 +40,7 @@ GLScene::GLScene( GLWidget * glWidget, QObject * parent ) :
 
 	QTimer * updateTimer = new QTimer( this );
 	QObject::connect( updateTimer, SIGNAL(timeout()), this, SLOT(update()) );
-	updateTimer->setInterval( 1 );
+	updateTimer->setInterval( 10 );
 	updateTimer->start();
 	
 	mElapsedTimer.start();
