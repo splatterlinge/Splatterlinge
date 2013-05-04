@@ -11,7 +11,7 @@ class Material;
 class Teapot : public Object3D
 {
 public:
-	Teapot( GLScene * scene, const Object3D * parent = 0 );
+	Teapot( GLScene * scene );
 	virtual ~Teapot();
 	
 	virtual void updateSelf( const float & delta );

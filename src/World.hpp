@@ -16,7 +16,7 @@ class TextureRenderer;
 class World : public Object3D, public KeyListener
 {
 public:
-	World( GLScene * scene, const Object3D * parent = 0 );
+	World( GLScene * scene );
 	virtual ~World();
 	
 	virtual void updateSelf( const float & delta );
@@ -30,10 +30,7 @@ private:
 	bool mTimeLapse;
 	float mTimeOfDay;
 	Sky * mSky;
-	Landscape * mLandscape;
-	
-//	Shader * mWaterShader;
-//	TextureRenderer * mTexRenderer;
+	QSharedPointer<Landscape> mLandscape;
 };
 
 

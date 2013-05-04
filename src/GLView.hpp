@@ -12,6 +12,7 @@ class QResizeEvent;
 
 class GLScene;
 class GLWidget;
+class Eye;
 
 
 class GLView : public QGraphicsView
@@ -31,6 +32,7 @@ protected:
 	void resizeEvent( QResizeEvent * event );
 
 private:
+	Eye * mEye;
 	GLWidget * mGLWidget;
 	GLScene * mGLScene;
 };

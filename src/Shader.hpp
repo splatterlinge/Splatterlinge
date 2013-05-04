@@ -59,17 +59,17 @@ public:
 	Shader( GLWidget * glWidget, QString name );
 	virtual ~Shader();
 
-	bool hasDiffuseMap() const { return data()->uniform_diffuseMap() >= 0; }
-	bool hasSpecularMap() const { return data()->uniform_specularMap() >= 0; }
-	bool hasNormalMap() const { return data()->uniform_normalMap() >= 0; }
-	bool hasMaskMap() const { return data()->uniform_maskMap() >= 0; }
-	bool hasCubeMap() const { return data()->uniform_cubeMap() >= 0; }
+	bool hasDiffuseMap() const { return constData()->uniform_diffuseMap() >= 0; }
+	bool hasSpecularMap() const { return constData()->uniform_specularMap() >= 0; }
+	bool hasNormalMap() const { return constData()->uniform_normalMap() >= 0; }
+	bool hasMaskMap() const { return constData()->uniform_maskMap() >= 0; }
+	bool hasCubeMap() const { return constData()->uniform_cubeMap() >= 0; }
 
-	int texUnit_diffuseMap() const { return data()->texUnit_diffuseMap(); }
-	int texUnit_specularMap() const { return data()->texUnit_specularMap(); }
-	int texUnit_normalMap() const { return data()->texUnit_normalMap(); }
-	int texUnit_maskMap() const { return data()->texUnit_maskMap(); }
-	int texUnit_cubeMap() const { return data()->texUnit_cubeMap(); }
+	int texUnit_diffuseMap() const { return constData()->texUnit_diffuseMap(); }
+	int texUnit_specularMap() const { return constData()->texUnit_specularMap(); }
+	int texUnit_normalMap() const { return constData()->texUnit_normalMap(); }
+	int texUnit_maskMap() const { return constData()->texUnit_maskMap(); }
+	int texUnit_cubeMap() const { return constData()->texUnit_cubeMap(); }
 
 	QGLShaderProgram * program() { return data()->program(); }
 

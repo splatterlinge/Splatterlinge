@@ -1,5 +1,7 @@
 #include "Material.hpp"
 
+#include <unistd.h>
+
 #include "GLWidget.hpp"
 
 
@@ -86,12 +88,18 @@ bool MaterialData::load()
 }
 
 
+Material::Quality Material::sGlobalMaxQuality = Material::HIGH_QUALITY;
+
+
 Material::Material( GLWidget * glWidget, QString name ) : Resource()
 {
 	mGLWidget = glWidget;
 	mMaskMap = -1;
 	mCubeMap = -1;
-	mShader = 0;
+	mDefaultQuality = HIGH_QUALITY;
+	mShader[HIGH_QUALITY] = 0;
+	mShader[MEDIUM_QUALITY] = 0;
+	mShader[LOW_QUALITY] = 0;
 	QSharedPointer<MaterialData> n( new MaterialData( glWidget, name ) );
 	cache( n );
 	setDefaultShader();
@@ -100,16 +108,35 @@ Material::Material( GLWidget * glWidget, QString name ) : Resource()
 
 Material::~Material()
 {
-	delete mShader;
+	delete mShader[HIGH_QUALITY];
+	delete mShader[MEDIUM_QUALITY];
+	delete mShader[LOW_QUALITY];
+}
+
+
+Material::Quality Material::getBindingQuality()
+{
+	Quality q = mDefaultQuality;
+	if( mDefaultQuality > sGlobalMaxQuality )
+		q = sGlobalMaxQuality;
+
+	if( !mShader[q] && q==HIGH_QUALITY )
+		q = MEDIUM_QUALITY;
+	if( !mShader[q] && q==MEDIUM_QUALITY )
+		q = LOW_QUALITY;
+
+	return q;
 }
 
 
 void Material::bind()
 {
-	if( !mShader )
+	mBoundQuality = getBindingQuality();
+
+	if( !mShader[mBoundQuality] )
 		return;
 	
-	mShader->bind();
+	mShader[mBoundQuality]->bind();
 
 	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, reinterpret_cast<const GLfloat*>( &(data()->ambient()) ) );
 	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, reinterpret_cast<const GLfloat*>( &(data()->diffuse()) ) );
@@ -117,43 +144,75 @@ void Material::bind()
 	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, reinterpret_cast<const GLfloat*>( &(data()->emission()) ) );
 	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, data()->shininess() );
 
-	if( mCubeMap >= 0 && mShader->hasCubeMap() )
-		mGLWidget->glActiveTexture( GL_TEXTURE0+(mShader->texUnit_cubeMap()) );	glBindTexture( GL_TEXTURE_2D, mCubeMap );
-
-	if( mMaskMap >= 0 && mShader->hasMaskMap() )
-		mGLWidget->glActiveTexture( GL_TEXTURE0+(mShader->texUnit_maskMap()) );	glBindTexture( GL_TEXTURE_2D, mMaskMap );
-
-	if( data()->normalMap() >= 0 && mShader->hasNormalMap() )
-		mGLWidget->glActiveTexture( GL_TEXTURE0+(mShader->texUnit_normalMap()) );	glBindTexture( GL_TEXTURE_2D, data()->normalMap() );
-
-	if( data()->specularMap() >= 0 && mShader->hasSpecularMap() )
-		mGLWidget->glActiveTexture( GL_TEXTURE0+(mShader->texUnit_specularMap()) );	glBindTexture( GL_TEXTURE_2D, data()->specularMap() );
-
-	if( data()->diffuseMap() >= 0 && mShader->hasDiffuseMap() )
-		mGLWidget->glActiveTexture( GL_TEXTURE0+(mShader->texUnit_diffuseMap()) );	glBindTexture( GL_TEXTURE_2D, data()->diffuseMap() );
+	if( mCubeMap >= 0 && mShader[mBoundQuality]->hasCubeMap() )
+	{
+		mGLWidget->glActiveTexture( GL_TEXTURE0+(mShader[mBoundQuality]->texUnit_cubeMap()) );
+		glBindTexture( GL_TEXTURE_2D, mCubeMap );
+	}
+	if( mMaskMap >= 0 && mShader[mBoundQuality]->hasMaskMap() )
+	{
+		mGLWidget->glActiveTexture( GL_TEXTURE0+(mShader[mBoundQuality]->texUnit_maskMap()) );
+		glBindTexture( GL_TEXTURE_2D, mMaskMap );
+	}
+	if( data()->normalMap() >= 0 && mShader[mBoundQuality]->hasNormalMap() )
+	{
+		mGLWidget->glActiveTexture( GL_TEXTURE0+(mShader[mBoundQuality]->texUnit_normalMap()) );
+		glBindTexture( GL_TEXTURE_2D, data()->normalMap() );
+	}
+	if( data()->specularMap() >= 0 && mShader[mBoundQuality]->hasSpecularMap() )
+	{
+		mGLWidget->glActiveTexture( GL_TEXTURE0+(mShader[mBoundQuality]->texUnit_specularMap()) );
+		glBindTexture( GL_TEXTURE_2D, data()->specularMap() );
+	}
+	if( data()->diffuseMap() >= 0 && mShader[mBoundQuality]->hasDiffuseMap() )
+	{
+		mGLWidget->glActiveTexture( GL_TEXTURE0+(mShader[mBoundQuality]->texUnit_diffuseMap()) );
+		glBindTexture( GL_TEXTURE_2D, data()->diffuseMap() );
+	}
 }
 
 
 void Material::release()
 {
-	if( !mShader )
+	if( !mShader[mBoundQuality] )
 		return;
-	
-	mShader->release();
+
+	mShader[mBoundQuality]->release();
 }
 
 
 void Material::setShader( QString shaderName )
 {
-	delete mShader;
-	mShader = new Shader( mGLWidget, shaderName );
+	delete mShader[HIGH_QUALITY];
+	delete mShader[MEDIUM_QUALITY];
+	delete mShader[LOW_QUALITY];
+
+	if( access( QString("./data/shader/"+shaderName+".high.vert").toLocal8Bit().constData(), R_OK ) == 0 )
+	{
+		mShader[HIGH_QUALITY] = new Shader( mGLWidget, shaderName+".high" );
+	} else {
+		mShader[HIGH_QUALITY] = 0;
+	}
+
+	if( access( QString("./data/shader/"+shaderName+".medium.vert").toLocal8Bit().constData(), R_OK ) == 0 )
+	{
+		mShader[MEDIUM_QUALITY] = new Shader( mGLWidget, shaderName+".medium" );
+	} else {
+		mShader[MEDIUM_QUALITY] = 0;
+	}
+
+	if( access( QString("./data/shader/"+shaderName+".low.vert").toLocal8Bit().constData(), R_OK ) == 0 )
+	{
+		mShader[LOW_QUALITY] = new Shader( mGLWidget, shaderName+".low" );
+	} else {
+		mShader[LOW_QUALITY] = 0;
+	}
 }
 
 
 void Material::setDefaultShader()
 {
-	delete mShader;
-	mShader = new Shader( mGLWidget, data()->defaultShaderName() );
+	setShader( data()->defaultShaderName() );
 }
 
 

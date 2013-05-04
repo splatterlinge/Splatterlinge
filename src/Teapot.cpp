@@ -7,8 +7,8 @@
 #include "teapot.h"
 
 
-Teapot::Teapot( GLScene * scene, const Object3D * parent ) :
-	Object3D( scene, parent )
+Teapot::Teapot( GLScene * scene ) :
+	Object3D( scene )
 {
 	mMaterial = new Material( scene->glWidget(), "KirksEntry" );
 }

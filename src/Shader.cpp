@@ -34,8 +34,8 @@ bool ShaderData::load()
 	delete mProgram;
 	mProgram = new QGLShaderProgram( mGLWidget );
 	qDebug() << "+" << this << "ShaderData" << uid();
-	mProgram->addShaderFromSourceFile( QGLShader::Vertex, "./data/shader/"+mName+".vsh" );
-	mProgram->addShaderFromSourceFile( QGLShader::Fragment, "./data/shader/"+mName+".fsh" );
+	mProgram->addShaderFromSourceFile( QGLShader::Vertex, "./data/shader/"+mName+".vert" );
+	mProgram->addShaderFromSourceFile( QGLShader::Fragment, "./data/shader/"+mName+".frag" );
 	if( !mProgram->link() )
 	{
 		qWarning() << mProgram->log();

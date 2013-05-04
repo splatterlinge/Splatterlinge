@@ -47,16 +47,14 @@ private:
 
 class Material : public Resource<MaterialData>
 {
-private:
-	GLWidget * mGLWidget;
-	Shader * mShader;
-	GLuint mMaskMap;
-	GLuint mCubeMap;
-
 public:
+	typedef enum { HIGH_QUALITY=2, MEDIUM_QUALITY=1, LOW_QUALITY=0 } Quality;
+	static void setGlobalMaxQuality( Quality q ) { sGlobalMaxQuality = q; }
+	static Quality globalMaxQuality() { return sGlobalMaxQuality; }
+
 	Material( GLWidget * glWidget, QString name );
 	virtual ~Material();
-	
+
 	void setShader( QString shaderName );
 	void setDefaultShader();
 	void setMaskMap( QString path );
@@ -64,6 +62,20 @@ public:
 	void setCubeMap( GLuint cubeMap ) { mCubeMap = cubeMap; }
 	void bind();
 	void release();
+	
+	void setDefaultQuality( Quality q ) { mDefaultQuality = q; }
+
+private:
+	static Quality sGlobalMaxQuality;
+
+	GLWidget * mGLWidget;
+	Shader * mShader[3];
+	Quality mDefaultQuality;
+	Quality mBoundQuality;
+	GLuint mMaskMap;
+	GLuint mCubeMap;
+
+	Quality getBindingQuality();
 };
 
 

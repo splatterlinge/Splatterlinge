@@ -50,7 +50,7 @@ protected:
 public:
 	Resource() {};
 	virtual ~Resource() {};
-	const QSharedPointer<T> & data() const { return mData; }
+	const QSharedPointer<T> & constData() const { return mData; }
 };
 
 

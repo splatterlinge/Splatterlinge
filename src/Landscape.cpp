@@ -3,13 +3,17 @@
 #include <QString>
 #include <QSettings>
 
+#include "GLScene.hpp"
+#include "TextureRenderer.hpp"
+
 
 Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, QVector2D materialScale, QString maskPath )
 {
+	mGLWidget = landscape->scene()->glWidget();
 	mLandscape = landscape;
 	mRect = rect;
 	mMaterialScale = materialScale;
-	mMaterial = new Material( mLandscape->getGLWidget(), materialName );
+	mMaterial = new Material( mGLWidget, materialName );
 	mMaterial->setShader( "versatileBlob" );
 	mMaterial->setMaskMap( maskPath );
 }
@@ -25,17 +29,17 @@ void Landscape::Blob::draw()
 {
 	mMaterial->bind();
 	glMatrixMode( GL_TEXTURE );
-	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
+	mGLWidget->glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
 	glScalef( mMaterialScale.x(), mMaterialScale.y(), 1.0f );
-	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
+	mGLWidget->glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
 	glScalef( 1.0f/((float)mRect.width()), 1.0f/((float)mRect.height()), 1.0f );
 	glTranslatef( -mRect.x(), -mRect.y(), 0.0f );
 
-	mLandscape->getTerrain()->drawPatchMap( mRect );
+	mLandscape->terrain()->drawPatchMap( mRect );
 
 	glMatrixMode( GL_TEXTURE );
-	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
-	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
+	mGLWidget->glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
+	mGLWidget->glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
 
 	glMatrixMode( GL_MODELVIEW );
 	mMaterial->release();
@@ -50,32 +54,32 @@ void Landscape::Blob::drawPatchMap( const QRect & visible )
 
 	mMaterial->bind();
 	glMatrixMode( GL_TEXTURE );
-	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
+	mGLWidget->glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
 	glScalef( mMaterialScale.x(), mMaterialScale.y(), 1.0f );
-	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
+	mGLWidget->glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
 	glScalef( 1.0f/((float)mRect.width()), 1.0f/((float)mRect.height()), 1.0f );
 	glTranslatef( -mRect.x(), -mRect.y(), 0.0f );
 
-	mLandscape->getTerrain()->drawPatchMap( rectToDraw );
+	mLandscape->terrain()->drawPatchMap( rectToDraw );
 
 	glMatrixMode( GL_TEXTURE );
-	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
-	mLandscape->getGLWidget()->glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
+	mGLWidget->glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
+	mGLWidget->glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
 
 	glMatrixMode( GL_MODELVIEW );
 	mMaterial->release();
 }
 
 
-Landscape::Landscape( GLWidget * glWidget, QString name )
+Landscape::Landscape( GLScene * scene, QString name ) :
+	Object3D( scene )
 {
-	mGLWidget = glWidget;
 	mName = name;
 
 	QSettings s( "./data/landscape/"+name+"/landscape.ini", QSettings::IniFormat );
 
 	s.beginGroup( "Terrain" );
-		QString heightMapPath = s.value( "heightMapPath" ).toString();
+		QString heightMapPath = s.value( "heightMapPath", "height.png" ).toString();
 		mTerrainSize = QVector3D(
 			s.value( "sizeX", 1000.0f ).toFloat(),
 			s.value( "sizeY", 100.0f ).toFloat(),
@@ -91,6 +95,9 @@ Landscape::Landscape( GLWidget * glWidget, QString name )
 			s.value( "materialScaleS", 1.0f ).toFloat(),
 			s.value( "materialScaleT", 1.0f ).toFloat()
 		);
+	s.endGroup();
+	s.beginGroup( "Water" );
+		mWaterHeight = s.value( "height", 0.0f ).toFloat();
 	s.endGroup();
 
 	int blobNum = s.beginReadArray( "Blob" );
@@ -111,8 +118,10 @@ Landscape::Landscape( GLWidget * glWidget, QString name )
 	s.endArray();
 
 	mTerrain = new Terrain( "./data/landscape/"+name+"/"+heightMapPath, mTerrainSize, mTerrainOffset );
-	
-	mTerrainMaterial = new Material( glWidget, terrainMaterial );
+	mTerrainMaterial = new Material( scene->glWidget(), terrainMaterial );
+
+	mWaterShader = new Shader( scene->glWidget(), "water" );
+	mReflectionRenderer = new TextureRenderer( scene->glWidget(), QSize(256,256), true );
 }
 
 
@@ -127,12 +136,27 @@ Landscape::~Landscape()
 }
 
 
-void Landscape::draw()
+void Landscape::updateSelf( const float & delta )
 {
+}
+
+
+void Landscape::drawSelf()
+{
+}
+
+
+void Landscape::drawSelfPost()
+{
+	QRectF visible( scene()->eye()->position().x() - scene()->eye()->farPlane(),
+			scene()->eye()->position().z() - scene()->eye()->farPlane(),
+			scene()->eye()->farPlane()*2,
+			scene()->eye()->farPlane()*2 );
+
 	mTerrainMaterial->bind();
 	glMatrixMode( GL_TEXTURE );	glPushMatrix();
 	glScalef( mTerrainMaterialScale.x(), mTerrainMaterialScale.y(), 1.0f );
-	mTerrain->draw();
+	mTerrain->drawPatchMap( mTerrain->toMap(visible) );
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
 	glMatrixMode( GL_MODELVIEW );
 	mTerrainMaterial->release();
@@ -142,30 +166,58 @@ void Landscape::draw()
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	for( int i = 0; i < mBlobs.size(); ++i )
 	{
-		mBlobs[i]->draw();
+		mBlobs[i]->drawPatchMap( mTerrain->toMap(visible) );
 	}
 	glDisable( GL_BLEND );
 	glDepthMask( GL_TRUE );
 }
 
 
-void Landscape::drawPatchMap( const QRect & visible )
+void Landscape::drawSelfPostProc()
 {
-	mTerrainMaterial->bind();
-	glMatrixMode( GL_TEXTURE );	glPushMatrix();
-	glScalef( mTerrainMaterialScale.x(), mTerrainMaterialScale.y(), 1.0f );
-	mTerrain->drawPatchMap( visible );
-	glMatrixMode( GL_TEXTURE );	glPopMatrix();
-	glMatrixMode( GL_MODELVIEW );
-	mTerrainMaterial->release();
+	Material::Quality defaultQuality = Material::globalMaxQuality();
+	Material::setGlobalMaxQuality( Material::LOW_QUALITY );
+	mReflectionRenderer->bind();
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glMatrixMode( GL_PROJECTION ); glPushMatrix();
+	glLoadIdentity();
+	glMatrixMode( GL_MODELVIEW ); glPushMatrix();
+	glLoadIdentity();
 
-	glDepthMask( GL_FALSE );
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	for( int i = 0; i < mBlobs.size(); ++i )
-	{
-		mBlobs[i]->drawPatchMap( visible );
-	}
-	glDisable( GL_BLEND );
-	glDepthMask( GL_TRUE );
+	Eye * sceneEye = scene()->eye();
+	Eye mirroredEye( *sceneEye );
+	QQuaternion r = mirroredEye.rotation();
+	r.setX( -r.x() );
+	r.setZ( -r.z() );
+	mirroredEye.setRotation( r );
+	mirroredEye.setPositionY( -mirroredEye.position().y() +2* mWaterHeight);
+	mirroredEye.setClippingPlane( 0, QVector4D(0,1,0, -mWaterHeight+0.1) );
+
+	scene()->setEye( &mirroredEye );
+	glScalef( 1,-1,1 );
+	glCullFace( GL_FRONT );
+	mirroredEye.draw();
+	glCullFace( GL_BACK );
+	scene()->setEye( sceneEye );
+
+	Material::setGlobalMaxQuality( defaultQuality );
+	mReflectionRenderer->release();
+	glMatrixMode( GL_PROJECTION ); glPopMatrix();
+	glMatrixMode( GL_MODELVIEW ); glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef( scene()->eye()->position().x(), mWaterHeight, scene()->eye()->position().z() );
+	mWaterShader->bind();
+	mWaterShader->program()->setUniformValue( "reflectionMap", 0 );
+	mWaterShader->program()->setUniformValue( "refractionMap", 1 );
+	glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, scene()->frameBufferRenderer()->texID() );
+	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, mReflectionRenderer->texID() );
+	glBegin( GL_QUADS );
+		glVertex3f(-scene()->eye()->farPlane(), 0, scene()->eye()->farPlane() );
+		glVertex3f( scene()->eye()->farPlane(), 0, scene()->eye()->farPlane() );
+		glVertex3f( scene()->eye()->farPlane(), 0,-scene()->eye()->farPlane() );
+		glVertex3f(-scene()->eye()->farPlane(), 0,-scene()->eye()->farPlane() );
+	glEnd();
+	mWaterShader->release();
+	glPopMatrix();
 }

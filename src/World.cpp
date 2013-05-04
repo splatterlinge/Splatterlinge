@@ -7,22 +7,19 @@
 #include "Landscape.hpp"
 #include "Sky.hpp"
 #include "Teapot.hpp"
-#include "TextureRenderer.hpp"
 
 
-World::World( GLScene * scene, const Object3D * parent ) :
-	Object3D( scene, parent )
+World::World( GLScene * scene ) :
+	Object3D( scene )
 {
-	addNode( QSharedPointer<Object3D>( new Teapot(scene,this) ) );
+	add( QSharedPointer<Teapot>( new Teapot( scene ) ) );
+	mLandscape = QSharedPointer<Landscape>( new Landscape( scene, "test" ) );
+	add( mLandscape );
 
 	mTimeLapse = false;
 	mTimeOfDay = 0.0f;
 	mSky = new Sky( scene->glWidget(), "earth", &mTimeOfDay );
-	mLandscape = new Landscape( scene->glWidget(), "test" );
 
-//	mWaterShader = new Shader( scene->glWidget(), "water" );
-//	mTexRenderer = new TextureRenderer( scene->glWidget(), QSize(256,256), true );
-	
 	scene->addKeyListener( this );
 }
 
@@ -31,7 +28,6 @@ World::~World()
 {
 	scene()->removeKeyListener( this );
 	delete mSky;
-	delete mLandscape;
 }
 
 
@@ -66,12 +62,12 @@ void World::updateSelf( const float & delta )
 	if( mTimeLapse )
 		mTimeOfDay += 0.002f;
 	else
-		mTimeOfDay += 0.0002f;
+		mTimeOfDay += 0.0001f;
 	if( mTimeOfDay > 1.0f )
 		mTimeOfDay -= 1.0f;
 	mSky->update( delta );
 
-	float landscapeHeight = mLandscape->getTerrain()->getHeight( scene()->eye()->position() );
+	float landscapeHeight = mLandscape->terrain()->getHeight( scene()->eye()->position() );
 	if( scene()->eye()->position().y() < landscapeHeight + 2 )
 		scene()->eye()->setPositionY( landscapeHeight + 2 );
 }
@@ -92,28 +88,5 @@ void World::drawSelf()
 
 void World::drawSelfPost()
 {
-	mLandscape->drawPatch( QRectF( scene()->eye()->position().x()-scene()->eye()->farPlane(), scene()->eye()->position().z()-scene()->eye()->farPlane(), scene()->eye()->farPlane()*2, scene()->eye()->farPlane()*2 ) );
-/*
-	glPushAttrib( GL_VIEWPORT_BIT );
-	mTexRenderer->bind();
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glViewport( 0, 0, mTexRenderer->size().width(), mTexRenderer->size().width() );
-	mSky->draw( scene()->eye()->position() );
-	mLandscape->drawPatch( QRectF( scene()->eye()->position().x()-scene()->eye()->farPlane(), scene()->eye()->position().z()-scene()->eye()->farPlane(), scene()->eye()->farPlane()*2, scene()->eye()->farPlane()*2 ) );
-	mTexRenderer->release();
-	glPopAttrib();
 
-	mWaterShader->bind();
-	mWaterShader->program()->setUniformValue( "refractionMap", 0 );
-	glActiveTexture( GL_TEXTURE0 );
-	glEnable( GL_TEXTURE_2D );
-	glBindTexture( GL_TEXTURE_2D, mTexRenderer->texID() );
-	glBegin( GL_QUADS );
-		glVertex3f(-100, 5, 100 );
-		glVertex3f( 100, 5, 100 );
-		glVertex3f( 100, 5,-100 );
-		glVertex3f(-100, 5,-100 );
-	glEnd();
-	mWaterShader->release();
-*/
 }

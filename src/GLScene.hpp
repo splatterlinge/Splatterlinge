@@ -22,7 +22,7 @@ class GLWidget;
 class MouseListener;
 class KeyListener;
 
-//class TextureRenderer;
+class TextureRenderer;
 
 
 class GLScene : public QGraphicsScene
@@ -39,10 +39,13 @@ public:
 	GLWidget * glWidget() { return mGLWidget; }
 	Object3D * root() { return mEye; }
 	Eye * eye() { return mEye; }
+	void setEye( Eye * eye ) { mEye = eye; }
 	void addKeyListener( KeyListener * listener ) { mKeyListeners.append( listener ); }
 	void addMouseListener( MouseListener * listener ) { mMouseListeners.append( listener ); }
 	void removeKeyListener( KeyListener * listener ) { mKeyListeners.removeOne( listener ); }
 	void removeMouseListener( MouseListener * listener ) { mMouseListeners.removeOne( listener ); }
+
+	TextureRenderer * frameBufferRenderer() { return mTexRenderer; }
 
 protected:
 	// Overrides:
@@ -63,8 +66,6 @@ private:
 	bool mDragging;
 	QFont mFont;
 
-//	TextureRenderer * mTexRenderer;
-
 	bool mForwardPressed;
 	bool mBackwardPressed;
 	bool mLeftPressed;
@@ -76,6 +77,7 @@ private:
 	QList<MouseListener*> mMouseListeners;
 	QList<KeyListener*> mKeyListeners;
 	Eye * mEye;
+	TextureRenderer * mTexRenderer;
 
 private slots:
 	void secondPassed();

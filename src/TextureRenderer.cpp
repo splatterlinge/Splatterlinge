@@ -68,11 +68,14 @@ void TextureRenderer::bind()
 {
 	mGLWidget->glBindFramebuffer( GL_FRAMEBUFFER, mFrameBuffer );
 	mGLWidget->glBindRenderbuffer( GL_RENDERBUFFER, mDepthBuffer );
+	glPushAttrib( GL_VIEWPORT_BIT );
+	glViewport( 0, 0, size().width(), size().width() );
 }
 
 
 void TextureRenderer::release()
 {
+	glPopAttrib();
 	mGLWidget->glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	mGLWidget->glBindRenderbuffer( GL_RENDERBUFFER, 0 );
 }

@@ -3,9 +3,9 @@
 #include <GL/gl.h>
 
 
-Object3D::Object3D( GLScene * scene, const Object3D * parent ) :
+Object3D::Object3D( GLScene * scene ) :
 	mScene(scene),
-	mParent(parent),
+	mParent(),
 	mPosition(0,0,0),
 	mRotation(),
 	mSubNodes(),
@@ -77,4 +77,34 @@ void Object3D::draw()
 	}
 	drawSelfPost();
 	glPopMatrix();
+}
+
+
+void Object3D::drawPostProc()
+{
+	glPushMatrix();
+	glMultMatrixd( matrix().constData() );
+	drawSelfPostProc();
+	QList< QSharedPointer<Object3D> >::iterator i;
+	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
+	{
+		(*i)->drawPostProc();
+	}
+	glPopMatrix();
+}
+
+
+void Object3D::add( QSharedPointer<Object3D> other )
+{
+	if( other->parent() )
+		other->parent()->remove( other );
+	mSubNodes.append( other );
+	other->setParent( this );
+}
+
+
+void Object3D::remove( QSharedPointer<Object3D> other )
+{
+	other->setParent( 0 );
+	mSubNodes.removeOne( other );
 }
