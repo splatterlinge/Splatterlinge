@@ -32,7 +32,6 @@ public:
 	public:
 		Blob( Landscape * landscape, QRect rect, QString material, QVector2D materialScale, QString maskPath );
 		~Blob();
-		void draw();
 		void drawPatchMap( const QRect & visible );
 		void drawPatch( const QRectF & visible )
 			{ drawPatchMap( mLandscape->terrain()->toMap(visible) ); }
@@ -61,6 +60,11 @@ private:
 	float mWaterHeight;
 	Shader * mWaterShader;
 	TextureRenderer * mReflectionRenderer;
+	TextureRenderer * mRefractionRenderer;
+	float mWaterClippingPlaneOffset;
+	
+	void renderReflection();
+	void renderRefraction();
 };
 
 

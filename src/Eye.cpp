@@ -9,7 +9,7 @@ Eye::Eye( GLScene * scene ) :
 	Object3D( scene ),
 	mFOV(60.0f),
 	mNearPlane(0.1f),
-	mFarPlane(200.0f)
+	mFarPlane(500.0f)
 {
 }
 

@@ -31,7 +31,7 @@ void Teapot::drawSelf()
 	glPushMatrix();
 	glTranslatef( 0, -16, 0 );
 	glDisable( GL_CULL_FACE );
-	teapot( 20, 16.0f, GL_FILL );
+	teapot( 8, 16.0f, GL_FILL );
 	glEnable( GL_CULL_FACE );
 	glPopMatrix();
 	mMaterial->release();

@@ -31,18 +31,17 @@ GLScene::GLScene( GLWidget * glWidget, QObject * parent ) :
 	mSpeedPressed = false;
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
-	mTexRenderer = 0;
 
 	QTimer * secondTimer = new QTimer( this );
 	QObject::connect( secondTimer, SIGNAL(timeout()), this, SLOT(secondPassed()) );
 	secondTimer->setInterval( 1000 );
 	secondTimer->start();
-
+/*
 	QTimer * updateTimer = new QTimer( this );
 	QObject::connect( updateTimer, SIGNAL(timeout()), this, SLOT(update()) );
 	updateTimer->setInterval( 10 );
 	updateTimer->start();
-	
+*/
 	mElapsedTimer.start();
 }
 
@@ -63,17 +62,14 @@ QGraphicsProxyWidget * GLScene::addWidget( QWidget * widget, Qt::WindowFlags wFl
 
 void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 {
-	if( !mTexRenderer )
-		mTexRenderer = new TextureRenderer( glWidget(), QSize(512,512), true );
-
 	mDelta = (double)mElapsedTimer.restart()/1000.0;
 
 	glPushAttrib( GL_ALL_ATTRIB_BITS );
 
 	static float rotateX = 0.0f;
 	static float rotateY = 0.0f;
-	rotateY += mDrag.x()/4.0f;
-	rotateX += mDrag.y()/4.0f;
+	rotateY += mDrag.x()/5.0f;
+	rotateX += mDrag.y()/5.0f;
 	mDrag = QPoint( 0, 0 );
 	QQuaternion qX = QQuaternion::fromAxisAndAngle( 1,0,0, rotateX );
 	QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, rotateY );
@@ -125,20 +121,8 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	glEnable( GL_CULL_FACE );
 	glClearColor( 0, 0, 0, 0 );
 
-// Pass 1: draw everything that does not need any FBO
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	mEye->draw();
-// Pass 2: draw a copy of the scene to an FBO
-	mTexRenderer->bind();
-	glClearColor( 1, 0, 0, 0 );
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glMatrixMode( GL_MODELVIEW ); glLoadIdentity();
-	Material::Quality defaultQuality = Material::globalMaxQuality();
-	Material::setGlobalMaxQuality( Material::LOW_QUALITY );
-	mEye->draw();
-	Material::setGlobalMaxQuality( defaultQuality );
-	mTexRenderer->release();
-// Pass 3: draw the stuff that needs access to the scene FBO
 	mEye->drawPostProc();
 
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
@@ -160,6 +144,8 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 	GLenum error = glGetError();
 	if( error )
 		qWarning() << QString( reinterpret_cast<const char*>(gluErrorString(error)) );
+
+	emit update();
 }
 
 

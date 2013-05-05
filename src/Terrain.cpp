@@ -78,7 +78,7 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 	{
 		for( int w=0; w<mMapSize.width(); w++ )
 		{
-			mVertices.push_back( QVector3D( (float)w, (float)h, 0 ) );
+			mVertices.push_back( QVector3D( w, h, 0 ) );
 		}
 	}
 	mVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
@@ -160,7 +160,7 @@ QRect Terrain::toMap( const QRectF & rect ) const
 
 void Terrain::drawPatchMap( const QRect & rect )
 {
-	QRect rectToDraw = rect.intersected( QRect( QPoint(0,0), mMapSize ) );
+	QRect rectToDraw = rect.intersected( QRect( QPoint(0,0), QSize(mMapSize.width()-1,mMapSize.height()-1) ) );
 	if( rectToDraw.width() <= 1 || rectToDraw.height() <= 1 )
 		return;	// need at least 4 vertices to build triangle strip
 	if( rectToDraw.y() >= mMapSize.height()-1 )
@@ -181,7 +181,7 @@ void Terrain::drawPatchMap( const QRect & rect )
 	{
 		glDrawElements(
 			GL_TRIANGLE_STRIP,
-			rectToDraw.width()*2,
+			rectToDraw.width()*2+2,
 			GL_UNSIGNED_INT,
 			(void*)((size_t)(2*sizeof(unsigned int)*(	// convert index to pointer
 				rectToDraw.x() + mMapSize.width()*slice	// index to start

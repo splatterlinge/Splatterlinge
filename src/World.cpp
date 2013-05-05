@@ -65,6 +65,7 @@ void World::updateSelf( const float & delta )
 		mTimeOfDay += 0.0001f;
 	if( mTimeOfDay > 1.0f )
 		mTimeOfDay -= 1.0f;
+
 	mSky->update( delta );
 
 	float landscapeHeight = mLandscape->terrain()->getHeight( scene()->eye()->position() );

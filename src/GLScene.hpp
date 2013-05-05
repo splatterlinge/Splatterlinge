@@ -45,8 +45,6 @@ public:
 	void removeKeyListener( KeyListener * listener ) { mKeyListeners.removeOne( listener ); }
 	void removeMouseListener( MouseListener * listener ) { mMouseListeners.removeOne( listener ); }
 
-	TextureRenderer * frameBufferRenderer() { return mTexRenderer; }
-
 protected:
 	// Overrides:
 	void keyPressEvent( QKeyEvent * event );
@@ -77,7 +75,6 @@ private:
 	QList<MouseListener*> mMouseListeners;
 	QList<KeyListener*> mKeyListeners;
 	Eye * mEye;
-	TextureRenderer * mTexRenderer;
 
 private slots:
 	void secondPassed();
