@@ -1,16 +1,16 @@
 #include "World.hpp"
 
+#include "../Scene.hpp"
+#include "../Sky.hpp"
+#include "Landscape.hpp"
+#include "Teapot.hpp"
+
 #include <QPainter>
 #include <GL/glu.h>
 
-#include "GLScene.hpp"
-#include "Landscape.hpp"
-#include "Sky.hpp"
-#include "Teapot.hpp"
 
-
-World::World( GLScene * scene ) :
-	Object3D( scene )
+World::World( Scene * scene ) :
+	AObject( scene )
 {
 	add( QSharedPointer<Teapot>( new Teapot( scene ) ) );
 	mLandscape = QSharedPointer<Landscape>( new Landscape( scene, "test" ) );

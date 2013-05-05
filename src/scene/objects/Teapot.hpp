@@ -1,17 +1,16 @@
 #ifndef TEAPOT_INCLUDED
 #define TEAPOT_INCLUDED
 
-
-#include "Object3D.hpp"
+#include "AObject.hpp"
 
 
 class Material;
 
 
-class Teapot : public Object3D
+class Teapot : public AObject
 {
 public:
-	Teapot( GLScene * scene );
+	Teapot( Scene * scene );
 	virtual ~Teapot();
 	
 	virtual void updateSelf( const float & delta );

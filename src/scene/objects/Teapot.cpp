@@ -1,14 +1,14 @@
 #include "Teapot.hpp"
+#include "../teapot.h"
+#include "../Scene.hpp"
 
 #include <QString>
 
-#include "GLScene.hpp"
-#include "Material.hpp"
-#include "teapot.h"
+#include <resources/Material.hpp>
 
 
-Teapot::Teapot( GLScene * scene ) :
-	Object3D( scene )
+Teapot::Teapot( Scene * scene ) :
+	AObject( scene )
 {
 	mMaterial = new Material( scene->glWidget(), "KirksEntry" );
 }

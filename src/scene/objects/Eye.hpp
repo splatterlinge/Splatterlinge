@@ -1,15 +1,18 @@
 #ifndef EYE_INCLUDED
 #define EYE_INCLUDED
 
+#include "AObject.hpp"
 
-#include "GLWidget.hpp"
-#include "Object3D.hpp"
+#include <GLWidget.hpp>
 
 
-class Eye : public Object3D
+class Scene;
+
+
+class Eye : public AObject
 {
 public:
-	Eye( GLScene * scene );
+	Eye( Scene * scene );
 	Eye( Eye & other );
 	virtual ~Eye();
 

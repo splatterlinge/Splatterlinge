@@ -1,14 +1,15 @@
 #include "Sky.hpp"
 
+#include <GLWidget.hpp>
+#include <util.h>
+#include <resources/Shader.hpp>
+
 #include <QString>
 #include <QImage>
 #include <GL/glu.h>
 #include <math.h>
 #include <QDebug>
 
-#include "GLWidget.hpp"
-#include "Shader.hpp"
-#include "util.h"
 
 
 static GLfloat cubeVertices[] =

@@ -1,13 +1,11 @@
-#ifndef GLSCENE_INCLUDED
-#define GLSCENE_INCLUDED
+#ifndef SCENE_INCLUDED
+#define SCENE_INCLUDED
+
+#include "objects/Eye.hpp"
 
 #include <QGraphicsScene>
 #include <QElapsedTimer>
 #include <QRectF>
-
-
-#include "Object3D.hpp"
-#include "Eye.hpp"
 
 
 class QPainter;
@@ -22,22 +20,21 @@ class GLWidget;
 class MouseListener;
 class KeyListener;
 
-class TextureRenderer;
 
 
-class GLScene : public QGraphicsScene
+class Scene : public QGraphicsScene
 {
 	Q_OBJECT
 public:
-	explicit GLScene( GLWidget * glWidget, QObject * parent = 0 );
-	~GLScene();
+	explicit Scene( GLWidget * glWidget, QObject * parent = 0 );
+	~Scene();
 
 	// Overrides:
 	void drawBackground( QPainter * painter, const QRectF & rect );
 	QGraphicsProxyWidget * addWidget( QWidget * widget, Qt::WindowFlags wFlags = 0 );
 
 	GLWidget * glWidget() { return mGLWidget; }
-	Object3D * root() { return mEye; }
+	AObject * root() { return mEye; }
 	Eye * eye() { return mEye; }
 	void setEye( Eye * eye ) { mEye = eye; }
 	void addKeyListener( KeyListener * listener ) { mKeyListeners.append( listener ); }

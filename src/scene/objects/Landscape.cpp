@@ -1,10 +1,13 @@
 #include "Landscape.hpp"
 
+#include <scene/Scene.hpp>
+#include <scene/Terrain.hpp>
+#include <scene/TextureRenderer.hpp>
+#include <resources/Material.hpp>
+#include <resources/Shader.hpp>
+
 #include <QString>
 #include <QSettings>
-
-#include "GLScene.hpp"
-#include "TextureRenderer.hpp"
 
 
 Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, QVector2D materialScale, QString maskPath )
@@ -52,8 +55,8 @@ void Landscape::Blob::drawPatchMap( const QRect & visible )
 }
 
 
-Landscape::Landscape( GLScene * scene, QString name ) :
-	Object3D( scene )
+Landscape::Landscape( Scene * scene, QString name ) :
+	AObject( scene )
 {
 	mName = name;
 

@@ -1,15 +1,16 @@
 #include "GLView.hpp"
 
+#include <GLWidget.hpp>
+#include <scene/Scene.hpp>
+#include <scene/objects/Eye.hpp>
+#include <scene/objects/World.hpp>
+
 #include <QBoxLayout>
 #include <QLabel>
 #include <QResizeEvent>
 #include <QGraphicsWidget>
 #include <QGraphicsProxyWidget>
 #include <QRect>
-
-#include "GLScene.hpp"
-#include "GLWidget.hpp"
-#include "World.hpp"
 
 
 GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
@@ -20,11 +21,11 @@ GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
 	mGLWidget = new GLWidget( glFormat, this );
 	setViewport( mGLWidget );
 
-	mGLScene = new GLScene( mGLWidget, this );
-	mEye = new Eye( mGLScene );
-	mGLScene->setEye( mEye );
-	mGLScene->eye()->add( QSharedPointer<Object3D>( new World( mGLScene ) ) );
-	setScene( mGLScene );
+	mScene = new Scene( mGLWidget, this );
+	mEye = new Eye( mScene );
+	mScene->setEye( mEye );
+	mScene->eye()->add( QSharedPointer<AObject>( new World( mScene ) ) );
+	setScene( mScene );
 
 	QGraphicsProxyWidget * proxy;
 	QWidget * w = new QWidget();
@@ -42,7 +43,7 @@ GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
 GLView::~GLView()
 {
 	delete mEye;
-	delete mGLScene;
+	delete mScene;
 	delete mGLWidget;
 }
 

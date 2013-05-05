@@ -1,8 +1,8 @@
 #include "MainWindow.hpp"
 
+#include <GLView.hpp>
+
 #include <QtGui>
-#include "GLScene.hpp"
-#include "GLView.hpp"
 
 
 MainWindow::MainWindow( QWidget * parent) : QMainWindow( parent )

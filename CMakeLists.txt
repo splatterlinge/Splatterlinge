@@ -11,6 +11,7 @@ endif( DOXYGEN_FOUND )
 
 find_package( Qt4 COMPONENTS QtCore QtGui QtOpengl REQUIRED )
 find_package( OpenGL )
+find_package( OpenAL )
 
 include( ${QT_USE_FILE} )
 
@@ -24,11 +25,13 @@ file( GLOB_RECURSE Ununoctium_HDRS src/*.h src/*.hpp)
 set( Ununoctium_LIBS
 	${QT_LIBRARIES}
 	${OPENGL_LIBRARIES}
+	${OPENAL_LIBRARIES}
 )
 
 # Additional include directories
 set( Ununoctium_INCS
 	${QT_INCLUDES}
+	./src/
 )
 
 # Additional compiler definitions

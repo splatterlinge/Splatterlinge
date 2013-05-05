@@ -1,16 +1,16 @@
 #include "Shader.hpp"
 
+#include <GLWidget.hpp>
+
 #include <QDebug>
 #include <GL/glu.h>
-
-#include "GLWidget.hpp"
 
 
 RESOURCE_CACHE(ShaderData);
 
 
 ShaderData::ShaderData( GLWidget * glWidget, QString name ) :
-	ResourceData( name ),
+	AResourceData( name ),
 	mGLWidget(glWidget),
 	mName(name),
 	mProgram(0)
@@ -84,11 +84,11 @@ bool ShaderData::load()
 //		qDebug() << "Uniform \"cubeMap\" not found - texture disabled.";
 	}
 
-	return ResourceData::load();
+	return AResourceData::load();
 }
 
 
-Shader::Shader( GLWidget * glWidget, QString name ) : Resource()
+Shader::Shader( GLWidget * glWidget, QString name ) : AResource()
 {
 	QSharedPointer<ShaderData> n( new ShaderData( glWidget, name ) );
 	cache( n );

@@ -1,15 +1,17 @@
 #include "Material.hpp"
 
-#include <unistd.h>
+#include "Shader.hpp"
 
-#include "GLWidget.hpp"
+#include <GLWidget.hpp>
+
+#include <unistd.h>
 
 
 RESOURCE_CACHE(MaterialData);
 
 
 MaterialData::MaterialData( GLWidget * glWidget, QString name ) :
-	ResourceData( name ),
+	AResourceData( name ),
 	mGLWidget(glWidget),
 	mName(name),
 	mDiffuseMap(-1),
@@ -84,14 +86,14 @@ bool MaterialData::load()
 	mSpecularMap =  mGLWidget->bindTexture( specularMap, GL_TEXTURE_2D, GL_RGBA, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
 	mNormalMap =  mGLWidget->bindTexture( normalMap, GL_TEXTURE_2D, GL_RGB, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
 
-	return ResourceData::load();
+	return AResourceData::load();
 }
 
 
 Material::Quality Material::sGlobalMaxQuality = Material::HIGH_QUALITY;
 
 
-Material::Material( GLWidget * glWidget, QString name ) : Resource()
+Material::Material( GLWidget * glWidget, QString name ) : AResource()
 {
 	mGLWidget = glWidget;
 	mMaskMap = -1;

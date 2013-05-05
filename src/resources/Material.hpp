@@ -1,17 +1,16 @@
 #ifndef MATERIAL_INCLUDED
 #define MATERIAL_INCLUDED
 
+#include "AResource.hpp"
 
 #include <QtOpenGL>
 #include <QDebug>
-#include "Resource.hpp"
-#include "Shader.hpp"
 
 
 class GLWidget;
+class Shader;
 
-
-class MaterialData : public ResourceData
+class MaterialData : public AResourceData
 {
 public:
 	MaterialData( GLWidget * glWidget, QString name );
@@ -45,7 +44,7 @@ private:
 };
 
 
-class Material : public Resource<MaterialData>
+class Material : public AResource<MaterialData>
 {
 public:
 	typedef enum { HIGH_QUALITY=2, MEDIUM_QUALITY=1, LOW_QUALITY=0 } Quality;

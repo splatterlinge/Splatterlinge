@@ -7,7 +7,7 @@
 #include <QSize>
 
 #include "GL/glext.h"
-#include "Shader.hpp"
+#include <resources/Shader.hpp>
 
 
 class GLWidget;

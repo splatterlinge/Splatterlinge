@@ -9,16 +9,16 @@
 #include <QSharedPointer>
 
 
-class GLScene;
+class Scene;
 
 
-class Object3D
+class AObject
 {
 public:
-	Object3D( GLScene * scene );
-	Object3D( const Object3D & other );
-	virtual ~Object3D();
-	Object3D & operator=( const Object3D & other );
+	AObject( Scene * scene );
+	AObject( const AObject & other );
+	virtual ~AObject();
+	AObject & operator=( const AObject & other );
 
 	const QMatrix4x4 & matrix() const { validateMatrix(); return mMatrix; }
 	const QVector3D left() const { validateMatrix(); return mMatrix.row(0).toVector3D(); }
@@ -34,11 +34,11 @@ public:
 	const QVector3D & position() const { return mPosition; }
 	const QQuaternion & rotation() const { return mRotation; }
 
-	void add( QSharedPointer<Object3D> other );
-	void remove( QSharedPointer<Object3D> other );
-	Object3D * parent() { return mParent; }
-	GLScene * scene() { return mScene; }
-	QList< QSharedPointer<Object3D> > & subNodes() { return mSubNodes; }
+	void add( QSharedPointer<AObject> other );
+	void remove( QSharedPointer<AObject> other );
+	AObject * parent() { return mParent; }
+	Scene * scene() { return mScene; }
+	QList< QSharedPointer<AObject> > & subNodes() { return mSubNodes; }
 
 	void update( const float & delta );
 	void draw();
@@ -55,16 +55,16 @@ protected:
 	virtual void updateMatrix() const;
 
 private:
-	GLScene * mScene;
-	Object3D * mParent;
+	Scene * mScene;
+	AObject * mParent;
 	QVector3D mPosition;
 	QQuaternion mRotation;
-	QList< QSharedPointer<Object3D> > mSubNodes;
+	QList< QSharedPointer<AObject> > mSubNodes;
 	mutable bool mMatrixNeedsUpdate;
 
 	void validateMatrix() const { if( mMatrixNeedsUpdate ) { updateMatrix(); mMatrixNeedsUpdate = false; } }
 
-	void setParent( Object3D * parent ) { mParent = parent; }
+	void setParent( AObject * parent ) { mParent = parent; }
 };
 
 #endif

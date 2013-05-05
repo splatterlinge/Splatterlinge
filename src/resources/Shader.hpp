@@ -2,16 +2,16 @@
 #define SHADER_INCLUDED
 
 
+#include "AResource.hpp"
+
 #include <QtOpenGL>
 #include <QDebug>
-
-#include "Resource.hpp"
 
 
 class GLWidget;
 
 
-class ShaderData : public ResourceData
+class ShaderData : public AResourceData
 {
 public:
 	ShaderData( GLWidget * glWidget, QString name );
@@ -53,7 +53,7 @@ private:
 };
 
 
-class Shader : public Resource<ShaderData>
+class Shader : public AResource<ShaderData>
 {
 public:
 	Shader( GLWidget * glWidget, QString name );

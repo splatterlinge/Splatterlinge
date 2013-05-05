@@ -1,9 +1,9 @@
-#include "Object3D.hpp"
+#include "AObject.hpp"
 
 #include <GL/gl.h>
 
 
-Object3D::Object3D( GLScene * scene ) :
+AObject::AObject( Scene * scene ) :
 	mScene(scene),
 	mParent(),
 	mPosition(0,0,0),
@@ -14,7 +14,7 @@ Object3D::Object3D( GLScene * scene ) :
 }
 
 
-Object3D::Object3D( const Object3D & other ) :
+AObject::AObject( const AObject & other ) :
 	mMatrix(other.mMatrix),
 	mScene(other.mScene),
 	mParent(other.mParent),
@@ -26,13 +26,13 @@ Object3D::Object3D( const Object3D & other ) :
 }
 
 
-Object3D::~Object3D()
+AObject::~AObject()
 {
 	mSubNodes.clear();
 }
 
 
-Object3D & Object3D::operator=( const Object3D & other )
+AObject & AObject::operator=( const AObject & other )
 {
 	mMatrix = other.mMatrix;
 	mScene =other.mScene;
@@ -45,7 +45,7 @@ Object3D & Object3D::operator=( const Object3D & other )
 }
 
 
-void Object3D::updateMatrix() const
+void AObject::updateMatrix() const
 {
 	mMatrix.setToIdentity();
 	mMatrix.rotate( -rotation() );
@@ -53,10 +53,10 @@ void Object3D::updateMatrix() const
 }
 
 
-void Object3D::update( const float & delta )
+void AObject::update( const float & delta )
 {
 	updateSelf( delta );
-	QList< QSharedPointer<Object3D> >::iterator i;
+	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
 		(*i)->update( delta );
@@ -65,12 +65,12 @@ void Object3D::update( const float & delta )
 }
 
 
-void Object3D::draw()
+void AObject::draw()
 {
 	glPushMatrix();
 	glMultMatrixd( matrix().constData() );
 	drawSelf();
-	QList< QSharedPointer<Object3D> >::iterator i;
+	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
 		(*i)->draw();
@@ -80,12 +80,12 @@ void Object3D::draw()
 }
 
 
-void Object3D::drawPostProc()
+void AObject::drawPostProc()
 {
 	glPushMatrix();
 	glMultMatrixd( matrix().constData() );
 	drawSelfPostProc();
-	QList< QSharedPointer<Object3D> >::iterator i;
+	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
 		(*i)->drawPostProc();
@@ -94,7 +94,7 @@ void Object3D::drawPostProc()
 }
 
 
-void Object3D::add( QSharedPointer<Object3D> other )
+void AObject::add( QSharedPointer<AObject> other )
 {
 	if( other->parent() )
 		other->parent()->remove( other );
@@ -103,7 +103,7 @@ void Object3D::add( QSharedPointer<Object3D> other )
 }
 
 
-void Object3D::remove( QSharedPointer<Object3D> other )
+void AObject::remove( QSharedPointer<AObject> other )
 {
 	other->setParent( 0 );
 	mSubNodes.removeOne( other );

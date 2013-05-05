@@ -1,7 +1,9 @@
 #ifndef TEXRENDERER_INCLUDED
 #define TEXRENDERER_INCLUDED
 
-#include "GLWidget.hpp"
+
+#include <GLWidget.hpp>
+
 
 ///FBO texture renderer.
 class TextureRenderer

@@ -1,5 +1,5 @@
-#ifndef RESOURCE_INCLUDED
-#define RESOURCE_INCLUDED
+#ifndef ARESOURCE_INCLUDED
+#define ARESOURCE_INCLUDED
 
 
 #include <QHash>
@@ -7,27 +7,27 @@
 #include <QString>
 
 
-class ResourceData
+class AResourceData
 {
 private:
 	QString mUID;
 	bool mLoaded;
 
 public:
-	ResourceData( const QString & uid ) : mUID(uid), mLoaded(false) {}
-	virtual ~ResourceData() = 0;
+	AResourceData( const QString & uid ) : mUID(uid), mLoaded(false) {}
+	virtual ~AResourceData() = 0;
 
 	const QString & uid() const { return mUID; }
 	bool loaded() const { return mLoaded; }
 	virtual bool load() { mLoaded = true; return true; }
 
-	virtual bool operator==( const ResourceData & rhs ) const { return mUID==rhs.mUID; }
-	virtual bool operator!=( const ResourceData & rhs ) const { return !(*this==rhs); }
+	virtual bool operator==( const AResourceData & rhs ) const { return mUID==rhs.mUID; }
+	virtual bool operator!=( const AResourceData & rhs ) const { return !(*this==rhs); }
 };
 
 
 template< class T >
-class Resource
+class AResource
 {
 private:
 	static QHash< QString, QWeakPointer<T> > cached;
@@ -48,14 +48,14 @@ protected:
 	}
 
 public:
-	Resource() {};
-	virtual ~Resource() {};
+	AResource() {};
+	virtual ~AResource() {};
 	const QSharedPointer<T> & constData() const { return mData; }
 };
 
 
 #define RESOURCE_CACHE( ResourceDataType ) \
-	template<> QHash< QString, QWeakPointer<ResourceDataType> > Resource<ResourceDataType>::cached \
+	template<> QHash< QString, QWeakPointer<ResourceDataType> > AResource<ResourceDataType>::cached \
 		= QHash< QString, QWeakPointer<ResourceDataType> >()
 
 

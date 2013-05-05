@@ -2,9 +2,9 @@
 #define WORLD_INCLUDED
 
 
-#include "Object3D.hpp"
-#include "KeyListener.hpp"
-#include "MouseListener.hpp"
+#include "../KeyListener.hpp"
+#include "../MouseListener.hpp"
+#include "AObject.hpp"
 
 
 class Sky;
@@ -13,10 +13,10 @@ class Shader;
 class TextureRenderer;
 
 
-class World : public Object3D, public KeyListener
+class World : public AObject, public KeyListener
 {
 public:
-	World( GLScene * scene );
+	World( Scene * scene );
 	virtual ~World();
 	
 	virtual void updateSelf( const float & delta );

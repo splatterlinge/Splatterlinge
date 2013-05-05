@@ -10,7 +10,7 @@ class QWidget;
 class QGraphicsScene;
 class QResizeEvent;
 
-class GLScene;
+class Scene;
 class GLWidget;
 class Eye;
 
@@ -23,7 +23,7 @@ public:
 	virtual ~GLView();
 
 	// Overrides:
-	GLScene * scene() const { return mGLScene; }
+	Scene * scene() const { return mScene; }
 
 	GLWidget * glWidget() const { return mGLWidget; }
 
@@ -34,7 +34,7 @@ protected:
 private:
 	Eye * mEye;
 	GLWidget * mGLWidget;
-	GLScene * mGLScene;
+	Scene * mScene;
 };
 
 #endif

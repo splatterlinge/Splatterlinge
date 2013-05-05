@@ -1,4 +1,9 @@
-#include "GLScene.hpp"
+#include "Scene.hpp"
+
+#include "TextureRenderer.hpp"
+#include "objects/World.hpp"
+#include <GLWidget.hpp>
+#include <resources/Material.hpp>
 
 #include <QPainter>
 #include <QTimer>
@@ -7,13 +12,8 @@
 #include <QGraphicsProxyWidget>
 #include <GL/glu.h>
 
-#include "GLWidget.hpp"
-#include "World.hpp"
-#include "Material.hpp"
-#include "TextureRenderer.hpp"
 
-
-GLScene::GLScene( GLWidget * glWidget, QObject * parent ) :
+Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	QGraphicsScene( parent ),
 	mGLWidget( glWidget ),
 	mEye(0)
@@ -46,12 +46,12 @@ GLScene::GLScene( GLWidget * glWidget, QObject * parent ) :
 }
 
 
-GLScene::~GLScene()
+Scene::~Scene()
 {
 }
 
 
-QGraphicsProxyWidget * GLScene::addWidget( QWidget * widget, Qt::WindowFlags wFlags )
+QGraphicsProxyWidget * Scene::addWidget( QWidget * widget, Qt::WindowFlags wFlags )
 {
 	QGraphicsProxyWidget * proxy = QGraphicsScene::addWidget( widget, wFlags );
 	proxy->setFlag( QGraphicsItem::ItemIsMovable );
@@ -60,7 +60,7 @@ QGraphicsProxyWidget * GLScene::addWidget( QWidget * widget, Qt::WindowFlags wFl
 }
 
 
-void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
+void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 {
 	mDelta = (double)mElapsedTimer.restart()/1000.0;
 
@@ -149,14 +149,14 @@ void GLScene::drawBackground( QPainter * painter, const QRectF & rect )
 }
 
 
-void GLScene::secondPassed()
+void Scene::secondPassed()
 {
 	mFramesPerSecond = mFrameCountSecond;
 	mFrameCountSecond = 0;
 }
 
 
-void GLScene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
+void Scene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 {
 	QGraphicsScene::mouseMoveEvent( event );
 	if( event->isAccepted() )
@@ -173,7 +173,7 @@ void GLScene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 }
 
 
-void GLScene::mousePressEvent( QGraphicsSceneMouseEvent * event )
+void Scene::mousePressEvent( QGraphicsSceneMouseEvent * event )
 {
 	QGraphicsScene::mousePressEvent( event );
 	if( event->isAccepted() )
@@ -186,7 +186,7 @@ void GLScene::mousePressEvent( QGraphicsSceneMouseEvent * event )
 }
 
 
-void GLScene::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
+void Scene::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 	QGraphicsScene::mouseReleaseEvent(event);
 	mDragging = false;
@@ -199,7 +199,7 @@ void GLScene::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 }
 
 
-void GLScene::wheelEvent( QGraphicsSceneWheelEvent * event )
+void Scene::wheelEvent( QGraphicsSceneWheelEvent * event )
 {
 	QGraphicsScene::wheelEvent( event );
 	if( event->isAccepted() )
@@ -211,7 +211,7 @@ void GLScene::wheelEvent( QGraphicsSceneWheelEvent * event )
 }
 
 
-void GLScene::keyPressEvent( QKeyEvent * event )
+void Scene::keyPressEvent( QKeyEvent * event )
 {
 	QGraphicsScene::keyPressEvent( event );
 	if( event->isAccepted() )
@@ -252,7 +252,7 @@ void GLScene::keyPressEvent( QKeyEvent * event )
 }
 
 
-void GLScene::keyReleaseEvent( QKeyEvent * event )
+void Scene::keyReleaseEvent( QKeyEvent * event )
 {
 	QGraphicsScene::keyReleaseEvent( event );
 	if( event->isAccepted() )

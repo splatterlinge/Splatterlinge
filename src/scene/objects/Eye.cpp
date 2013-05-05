@@ -1,12 +1,12 @@
 #include "Eye.hpp"
 
+#include "../Scene.hpp"
 
-#include "GLWidget.hpp"
-#include "GLScene.hpp"
+#include <GLWidget.hpp>
 
 
-Eye::Eye( GLScene * scene ) :
-	Object3D( scene ),
+Eye::Eye( Scene * scene ) :
+	AObject( scene ),
 	mFOV(60.0f),
 	mNearPlane(0.1f),
 	mFarPlane(500.0f)
@@ -15,7 +15,7 @@ Eye::Eye( GLScene * scene ) :
 
 
 Eye::Eye( Eye & other ) :
-	Object3D(other),
+	AObject(other),
 	mFOV(other.mFOV),
 	mNearPlane(other.mNearPlane),
 	mFarPlane(other.mFarPlane)

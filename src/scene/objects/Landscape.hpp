@@ -1,24 +1,23 @@
 #ifndef LANDSCAPE_INCLUDED
 #define LANDSCAPE_INCLUDED
 
+#include "../Terrain.hpp"
+#include "AObject.hpp"
 
 #include <QString>
 #include <QRect>
 #include <QSizeF>
+#include <QVector2D>
 #include <QDebug>
-
-#include "GLWidget.hpp"
-#include "Terrain.hpp"
-#include "Material.hpp"
-#include "Object3D.hpp"
 
 
 class GLWidget;
 class Shader;
 class TextureRenderer;
+class Material;
 
 
-class Landscape : public Object3D
+class Landscape : public AObject
 {
 public:
 	class Blob
@@ -37,7 +36,7 @@ public:
 			{ drawPatchMap( mLandscape->terrain()->toMap(visible) ); }
 	};
 
-	Landscape( GLScene * scene, QString rootDir );
+	Landscape( Scene * scene, QString rootDir );
 	~Landscape();
 
 	virtual void updateSelf( const float & delta );
