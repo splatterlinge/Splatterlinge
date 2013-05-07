@@ -14,18 +14,18 @@ class AObject;
 class AudioSampleData : public AResourceData
 {
 public:
-	AudioSampleData( QString name );
+	AudioSampleData( QString file );
 	virtual ~AudioSampleData();
 	bool load();
 
-	const QString & name() const { return mName; }
+	const QString & file() const { return mFile; }
 
 	ALuint buffer() const { return mBuffer; }
 	ALsizei frequency() const { return mFrequency; }
 	ALenum format() const { return mFormat; }
 
 private:
-	QString mName;
+	QString mFile;
 	ALuint mBuffer;
 	ALsizei mFrequency;
 	ALenum mFormat;
@@ -35,7 +35,7 @@ private:
 class AudioSample : public AResource<AudioSampleData>
 {
 public:
-	AudioSample( QString name );
+	AudioSample( QString file );
 	virtual ~AudioSample();
 
 	float gain() const { return mGain; }

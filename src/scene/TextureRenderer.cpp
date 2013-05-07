@@ -13,8 +13,6 @@ TextureRenderer::TextureRenderer( GLWidget * glWidget, const QSize & size, bool 
 	mHasDepthBuffer(depthBuffer),
 	mSize(size)
 {
-	qDebug() << "TextureRenderer (" << mSize.width() << "x" << mSize.height() << (mHasDepthBuffer?"+depth":"") << ")";
-
 	glGenTextures( 1, &mTex );
 	glBindTexture( GL_TEXTURE_2D, mTex );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -44,7 +42,7 @@ TextureRenderer::TextureRenderer( GLWidget * glWidget, const QSize & size, bool 
 	GLenum status = mGLWidget->glCheckFramebufferStatus( GL_FRAMEBUFFER );
 	if( status != GL_FRAMEBUFFER_COMPLETE )
 	{
-		qFatal( "Could not create FBO\n" );
+		qFatal( "Could not create FBO (%dx%d%s)\n", mSize.width(), mSize.height(), (mHasDepthBuffer?"+depth":"") );
 	}
 	mGLWidget->glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	mGLWidget->glBindRenderbuffer( GL_RENDERBUFFER, 0 );

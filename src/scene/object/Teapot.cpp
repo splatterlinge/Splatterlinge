@@ -14,7 +14,7 @@ Teapot::Teapot( Scene * scene ) :
 	AObject( scene )
 {
 	mMaterial = new Material( scene->glWidget(), "KirksEntry" );
-	mAudioSample = new AudioSample( "test" );
+	mAudioSample = new AudioSample( "data/sound/test.ogg" );
 	mAudioSample->setLooping( true );
 	mAudioSample->setRolloffFactor( 40.0f );
 	mAudioSample->setObjectHook( this );
@@ -25,6 +25,7 @@ Teapot::Teapot( Scene * scene ) :
 Teapot::~Teapot()
 {
 	delete mMaterial;
+	delete mAudioSample;
 }
 
 

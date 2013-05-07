@@ -1,5 +1,5 @@
 #include "AudioSample.hpp"
-#include "audioLoader/wav.h"
+#include "audioLoader/audioLoader.h"
 
 #include <scene/object/AObject.hpp>
 
@@ -12,9 +12,9 @@
 RESOURCE_CACHE(AudioSampleData);
 
 
-AudioSampleData::AudioSampleData( QString name ) :
-	AResourceData( name ),
-	mName(name),
+AudioSampleData::AudioSampleData( QString file ) :
+	AResourceData( file ),
+	mFile(file),
 	mBuffer(0)
 {
 }
@@ -25,6 +25,7 @@ AudioSampleData::~AudioSampleData()
 	if( loaded() )
 	{
 		qDebug() << "-" << this << "AudioSampleData" << uid();
+		alDeleteBuffers( 1, &mBuffer );
 	}
 }
 
@@ -33,16 +34,19 @@ bool AudioSampleData::load()
 {
 	qDebug() << "+" << this << "AudioSampleData" << uid();
 
-	if( audioLoader_WAV( QString("./data/sound/"+mName+".wav").toLocal8Bit().constData(), &mBuffer, &mFrequency, &mFormat ) != 0 )
+	if( audioLoader( mFile.toLocal8Bit().constData(), &mBuffer, &mFrequency, &mFormat ) != 0 )
 		return false;
+
+	if( mFormat == AL_FORMAT_STEREO8 || mFormat == AL_FORMAT_STEREO16 )
+		qWarning() << "!" << this << "AudioSampleData" << uid() << "is a stereo file - positional audio disabled.";
 
 	return AResourceData::load();
 }
 
 
-AudioSample::AudioSample( QString name ) : AResource()
+AudioSample::AudioSample( QString file ) : AResource()
 {
-	QSharedPointer<AudioSampleData> n( new AudioSampleData( name ) );
+	QSharedPointer<AudioSampleData> n( new AudioSampleData( file ) );
 	cache( n );
 
 	mSource = 0;

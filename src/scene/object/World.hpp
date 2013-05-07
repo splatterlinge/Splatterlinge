@@ -19,7 +19,7 @@ class World : public AObject, public KeyListener
 public:
 	World( Scene * scene );
 	virtual ~World();
-	
+
 	virtual void updateSelf( const float & delta );
 	virtual void drawSelf();
 	virtual void drawSelfPost();

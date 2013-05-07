@@ -1,4 +1,4 @@
-#include "wav.h"
+#include "riffWave.h"
 
 #include <AL/al.h>
 #include <stdint.h>
@@ -36,25 +36,25 @@ typedef struct
 } WAVEDataHeader;
 
 
-int audioLoader_WAV( const char * filename, ALuint * buffer, ALsizei * frequency, ALenum * format )
+int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * frequency, ALenum * format )
 {
-	FILE * soundFile = fopen( filename, "rb" );
-	if( !soundFile )
+	FILE * file = fopen( filename, "rb" );
+	if( !file )
 		return -ENOENT;
 
 	////////////////////////////////
 	// RIFF header
 	RIFFHeader riffHeader;
-	fread( &riffHeader, sizeof(RIFFHeader), 1, soundFile );
+	fread( &riffHeader, sizeof(RIFFHeader), 1, file );
 	if( strncmp( riffHeader.chunkID, "RIFF", 4 ) )
 	{
-		fclose( soundFile );
+		fclose( file );
 		fprintf( stderr, "RIFF" );
 		return -EPROTONOSUPPORT;
 	}
 	if( strncmp( riffHeader.format, "WAVE", 4 ) )
 	{
-		fclose( soundFile );
+		fclose( file );
 		return -EPROTONOSUPPORT;
 	}
 	////////////////////////////////
@@ -62,25 +62,25 @@ int audioLoader_WAV( const char * filename, ALuint * buffer, ALsizei * frequency
 	////////////////////////////////
 	// WAVE format header
 	WAVEFormat waveFormat;
-	fread( &waveFormat, sizeof(WAVEFormat), 1, soundFile );
+	fread( &waveFormat, sizeof(WAVEFormat), 1, file );
 	if( strncmp( waveFormat.subChunkID, "fmt ", 4 ) )
 	{
-		fclose( soundFile );
+		fclose( file );
 		return -EPROTONOSUPPORT;
 	}
 	// skip extra parameters
 	size_t extraParameterSize = waveFormat.subChunkSize - 16;
 	if( extraParameterSize > 0 )
-		fseek( soundFile, extraParameterSize, SEEK_CUR );
+		fseek( file, extraParameterSize, SEEK_CUR );
 	////////////////////////////////
 
 	////////////////////////////////
 	// WAVE data header
 	WAVEDataHeader waveDataHeader;
-	fread( &waveDataHeader, sizeof(WAVEDataHeader), 1, soundFile );
+	fread( &waveDataHeader, sizeof(WAVEDataHeader), 1, file );
 	if( strncmp( waveDataHeader.subChunkID, "data", 4 ) )
 	{
-		fclose( soundFile );
+		fclose( file );
 		return -EPROTONOSUPPORT;
 	}
 	////////////////////////////////
@@ -88,13 +88,13 @@ int audioLoader_WAV( const char * filename, ALuint * buffer, ALsizei * frequency
 	////////////////////////////////
 	// data
 	unsigned char * data = malloc( waveDataHeader.subChunkSize );
-	if( !fread( data, waveDataHeader.subChunkSize, 1, soundFile ) )
+	if( !fread( data, waveDataHeader.subChunkSize, 1, file ) )
 	{
-		fclose( soundFile );
+		fclose( file );
 		free( data );
 		return -ENODATA;
 	}
-	fclose( soundFile );
+	fclose( file );
 	////////////////////////////////
 
 	*frequency = waveFormat.sampleRate;

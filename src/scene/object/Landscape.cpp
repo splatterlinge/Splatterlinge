@@ -122,6 +122,7 @@ Landscape::~Landscape()
 	delete mTerrainMaterial;
 	delete mReflectionRenderer;
 	delete mRefractionRenderer;
+	delete mWaterShader;
 }
 
 
@@ -176,8 +177,10 @@ void Landscape::renderReflection()
 	r.setZ( -r.z() );
 	mirroredEye.setRotation( r );
 	mirroredEye.setPositionY( -mirroredEye.position().y() +2* mWaterHeight);
-	mirroredEye.setClippingPlane( 0, QVector4D(0,1,0, -mWaterHeight+mWaterClippingPlaneOffset) );
-
+	if( scene()->eye()->position().y()>mWaterHeight )
+		mirroredEye.setClippingPlane( 0, QVector4D(0,1,0, -mWaterHeight+mWaterClippingPlaneOffset) );
+	else
+		mirroredEye.setClippingPlane( 0, QVector4D(0,-1,0, mWaterHeight+mWaterClippingPlaneOffset) );
 	scene()->setEye( &mirroredEye );
 	glScalef( 1,-1,1 );
 	glCullFace( GL_FRONT );
@@ -197,7 +200,10 @@ void Landscape::renderRefraction()
 	glClear( GL_DEPTH_BUFFER_BIT );
 	glMatrixMode( GL_PROJECTION );	glPushMatrix();	glLoadIdentity();
 	glMatrixMode( GL_MODELVIEW );	glPushMatrix();	glLoadIdentity();
-	scene()->eye()->setClippingPlane( 0, QVector4D(0,-1,0, mWaterHeight+mWaterClippingPlaneOffset) );
+	if( scene()->eye()->position().y()>mWaterHeight )
+		scene()->eye()->setClippingPlane( 0, QVector4D(0,-1,0, mWaterHeight+mWaterClippingPlaneOffset) );
+	else
+		scene()->eye()->setClippingPlane( 0, QVector4D(0,1,0, -mWaterHeight+mWaterClippingPlaneOffset) );
 	scene()->eye()->draw();
 	scene()->eye()->setClippingPlane( 0 );
 	glMatrixMode( GL_PROJECTION );	glPopMatrix();
@@ -216,6 +222,7 @@ void Landscape::drawSelfPostProc()
 
 //	Material::setGlobalMaxQuality( defaultQuality );
 
+	glDisable( GL_CULL_FACE );
 	glPushMatrix();
 	glTranslatef( scene()->eye()->position().x(), mWaterHeight, scene()->eye()->position().z() );
 	mWaterShader->bind();
@@ -231,4 +238,5 @@ void Landscape::drawSelfPostProc()
 	glEnd();
 	mWaterShader->release();
 	glPopMatrix();
+	glEnable( GL_CULL_FACE );
 }

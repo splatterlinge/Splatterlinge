@@ -9,9 +9,12 @@ else( DOXYGEN_FOUND )
 	message( "Doxygen not found - 'doc' can't be generated." )
 endif( DOXYGEN_FOUND )
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
+
 find_package( Qt4 COMPONENTS QtCore QtGui QtOpengl REQUIRED )
 find_package( OpenGL )
 find_package( OpenAL )
+find_package( VorbisFile )
 
 include( ${QT_USE_FILE} )
 
@@ -26,6 +29,7 @@ set( Ununoctium_LIBS
 	${QT_LIBRARIES}
 	${OPENGL_LIBRARIES}
 	${OPENAL_LIBRARY}
+	${VorbisFile_LIBRARY}
 )
 
 # Additional include directories
