@@ -1,5 +1,5 @@
-#ifndef WORLD_INCLUDED
-#define WORLD_INCLUDED
+#ifndef SCENE_OBJECT_WORLD_INCLUDED
+#define SCENE_OBJECT_WORLD_INCLUDED
 
 
 #include "../KeyListener.hpp"
@@ -9,6 +9,7 @@
 
 class Sky;
 class Landscape;
+class Teapot;
 class Shader;
 class TextureRenderer;
 
@@ -31,6 +32,7 @@ private:
 	float mTimeOfDay;
 	Sky * mSky;
 	QSharedPointer<Landscape> mLandscape;
+	QSharedPointer<Teapot> mTeapot;
 };
 
 

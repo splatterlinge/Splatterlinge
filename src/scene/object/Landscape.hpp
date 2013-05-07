@@ -1,8 +1,8 @@
-#ifndef LANDSCAPE_INCLUDED
-#define LANDSCAPE_INCLUDED
+#ifndef SCENE_OBJECT_LANDSCAPE_INCLUDED
+#define SCENE_OBJECT_LANDSCAPE_INCLUDED
 
-#include "../Terrain.hpp"
 #include "AObject.hpp"
+#include "geometry/Terrain.hpp"
 
 #include <QString>
 #include <QRect>

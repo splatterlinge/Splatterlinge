@@ -1,5 +1,5 @@
-#ifndef MATERIAL_INCLUDED
-#define MATERIAL_INCLUDED
+#ifndef RESOURCE_MATERIAL_INCLUDED
+#define RESOURCE_MATERIAL_INCLUDED
 
 #include "AResource.hpp"
 

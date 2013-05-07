@@ -1,5 +1,5 @@
-#ifndef SHADER_INCLUDED
-#define SHADER_INCLUDED
+#ifndef RESOURCE_SHADER_INCLUDED
+#define RESOURCE_SHADER_INCLUDED
 
 
 #include "AResource.hpp"

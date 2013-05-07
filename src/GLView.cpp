@@ -2,8 +2,8 @@
 
 #include <GLWidget.hpp>
 #include <scene/Scene.hpp>
-#include <scene/objects/Eye.hpp>
-#include <scene/objects/World.hpp>
+#include <scene/object/Eye.hpp>
+#include <scene/object/World.hpp>
 
 #include <QBoxLayout>
 #include <QLabel>

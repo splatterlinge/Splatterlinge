@@ -1,5 +1,5 @@
-#ifndef SKY_INCLUDED
-#define SKY_INCLUDED
+#ifndef SCENE_OBJECT_GEOMETRY_SKY_INCLUDED
+#define SCENE_OBJECT_GEOMETRY_SKY_INCLUDED
 
 
 #include <QGLFramebufferObject>
@@ -7,7 +7,7 @@
 #include <QSize>
 
 #include "GL/glext.h"
-#include <resources/Shader.hpp>
+#include <resource/Shader.hpp>
 
 
 class GLWidget;

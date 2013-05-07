@@ -25,7 +25,7 @@ file( GLOB_RECURSE Ununoctium_HDRS src/*.h src/*.hpp)
 set( Ununoctium_LIBS
 	${QT_LIBRARIES}
 	${OPENGL_LIBRARIES}
-	${OPENAL_LIBRARIES}
+	${OPENAL_LIBRARY}
 )
 
 # Additional include directories

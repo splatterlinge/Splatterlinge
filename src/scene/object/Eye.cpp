@@ -38,6 +38,13 @@ void Eye::updateMatrix() const
 
 void Eye::updateSelf( const float & delta )
 {
+	ALfloat listenerPos[]={-(ALfloat)position().x(),-(ALfloat)position().y(),-(ALfloat)position().z()};
+//	ALfloat listenerVel[]={0.0,0.0,0.0};
+	ALfloat listenerOri[]={(ALfloat)direction().x(),(ALfloat)direction().y(),(ALfloat)direction().z(),
+		(ALfloat)up().x(),(ALfloat)up().y(),(ALfloat)up().z()};
+	alListenerfv( AL_POSITION, listenerPos );
+//	alListenerfv( AL_VELOCITY, listenerVel);
+	alListenerfv( AL_ORIENTATION, listenerOri );
 }
 
 

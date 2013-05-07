@@ -1,9 +1,9 @@
 #include "World.hpp"
 
 #include "../Scene.hpp"
-#include "../Sky.hpp"
 #include "Landscape.hpp"
 #include "Teapot.hpp"
+#include "geometry/Sky.hpp"
 
 #include <QPainter>
 #include <GL/glu.h>
@@ -12,7 +12,10 @@
 World::World( Scene * scene ) :
 	AObject( scene )
 {
-	add( QSharedPointer<Teapot>( new Teapot( scene ) ) );
+	mTeapot = QSharedPointer<Teapot>( new Teapot( scene ) );
+	mTeapot->setPositionY( -16.0f );
+	add( mTeapot );
+
 	mLandscape = QSharedPointer<Landscape>( new Landscape( scene, "test" ) );
 	add( mLandscape );
 

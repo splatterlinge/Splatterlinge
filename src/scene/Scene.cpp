@@ -1,16 +1,19 @@
 #include "Scene.hpp"
 
 #include "TextureRenderer.hpp"
-#include "objects/World.hpp"
+#include "object/World.hpp"
 #include <GLWidget.hpp>
-#include <resources/Material.hpp>
+#include <resource/Material.hpp>
 
 #include <QPainter>
 #include <QTimer>
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsProxyWidget>
+
 #include <GL/glu.h>
+#include <AL/alc.h>
+#include <AL/al.h>
 
 
 Scene::Scene( GLWidget * glWidget, QObject * parent ) :
@@ -32,6 +35,13 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
 
+	mALDevice = alcOpenDevice( NULL );
+	if( !mALDevice )
+		qFatal( "Could not open audio device!" );
+	mALContext = alcCreateContext( mALDevice, NULL );
+	alcMakeContextCurrent( mALContext );
+	alGetError();
+
 	QTimer * secondTimer = new QTimer( this );
 	QObject::connect( secondTimer, SIGNAL(timeout()), this, SLOT(secondPassed()) );
 	secondTimer->setInterval( 1000 );
@@ -48,6 +58,9 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 
 Scene::~Scene()
 {
+	alcMakeContextCurrent( NULL );
+	alcDestroyContext( mALContext );
+	alcCloseDevice( mALDevice );
 }
 
 
@@ -141,9 +154,15 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	painter->setFont( mFont );
 	painter->drawText( rect, Qt::AlignTop | Qt::AlignRight, QString( tr("(%2s) %1 FPS") ).arg(mFramesPerSecond).arg(mDelta) );
 
-	GLenum error = glGetError();
-	if( error )
-		qWarning() << QString( reinterpret_cast<const char*>(gluErrorString(error)) );
+	GLenum glError = glGetError();
+	if( glError  != GL_NO_ERROR )
+		qWarning() << "OpenGL error detected:" << QString( reinterpret_cast<const char*>(gluErrorString(glError)) );
+
+	ALCenum alError = alGetError();
+	if( alError != AL_NO_ERROR )
+	{
+		qWarning() << "OpenAL error detected!";
+	}
 
 	emit update();
 }

@@ -1,10 +1,11 @@
-#ifndef TEAPOT_INCLUDED
-#define TEAPOT_INCLUDED
+#ifndef SCENE_OBJECT_TEAPOT_INCLUDED
+#define SCENE_OBJECT_TEAPOT_INCLUDED
 
 #include "AObject.hpp"
 
 
 class Material;
+class AudioSample;
 
 
 class Teapot : public AObject
@@ -18,6 +19,7 @@ public:
 
 private:
 	Material * mMaterial;
+	AudioSample * mAudioSample;
 };
 
 

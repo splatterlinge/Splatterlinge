@@ -1,11 +1,14 @@
 #ifndef SCENE_INCLUDED
 #define SCENE_INCLUDED
 
-#include "objects/Eye.hpp"
+#include "object/Eye.hpp"
 
 #include <QGraphicsScene>
 #include <QElapsedTimer>
 #include <QRectF>
+
+#include <AL/alc.h>
+#include <AL/al.h>
 
 
 class QPainter;
@@ -19,7 +22,6 @@ class QGraphicsSceneWheelEvent;
 class GLWidget;
 class MouseListener;
 class KeyListener;
-
 
 
 class Scene : public QGraphicsScene
@@ -53,6 +55,8 @@ protected:
 
 private:
 	GLWidget * mGLWidget;
+	ALCdevice * mALDevice;
+	ALCcontext * mALContext;
 	QElapsedTimer mElapsedTimer;
 	float mDelta;
 	int mFrameCountSecond;

@@ -1,10 +1,11 @@
 #include "Landscape.hpp"
 
-#include <scene/Scene.hpp>
-#include <scene/Terrain.hpp>
-#include <scene/TextureRenderer.hpp>
-#include <resources/Material.hpp>
-#include <resources/Shader.hpp>
+#include "../Scene.hpp"
+#include "../TextureRenderer.hpp"
+#include "geometry/Terrain.hpp"
+
+#include <resource/Material.hpp>
+#include <resource/Shader.hpp>
 
 #include <QString>
 #include <QSettings>

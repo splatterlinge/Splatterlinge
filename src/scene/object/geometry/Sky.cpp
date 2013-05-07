@@ -2,7 +2,7 @@
 
 #include <GLWidget.hpp>
 #include <util.h>
-#include <resources/Shader.hpp>
+#include <resource/Shader.hpp>
 
 #include <QString>
 #include <QImage>
