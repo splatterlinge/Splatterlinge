@@ -226,5 +226,5 @@ void Material::setMaskMap( QString path )
 		qFatal( "\"%s\" not found!", path.toLocal8Bit().constData() );
 	}
 
-	mMaskMap =  mGLWidget->bindTexture( maskMap, GL_TEXTURE_2D, GL_LUMINANCE, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
+	mMaskMap =  mGLWidget->bindTexture( maskMap, GL_TEXTURE_2D, GL_RED, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
 }
