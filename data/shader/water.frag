@@ -12,7 +12,7 @@ void main()
 	vec3 reflection = vec3( texture2D( reflectionMap, projectCoord ) );
 	vec3 refraction = vec3( texture2D( refractionMap, projectCoord ) );
 	vec3 finalColor = mix( reflection, refraction, 0.5 );
-	vec4 finalFragment = vec4( finalColor, 1 );
 	float fogFactor = clamp( -(length( vVertex )-gl_Fog.start) * gl_Fog.scale, 0.0, 1.0 );
-	gl_FragColor = mix( gl_Fog.color, finalFragment, fogFactor );
+	vec3 finalFragment = mix( gl_Fog.color.rgb, finalColor, fogFactor );
+	gl_FragColor = vec4( finalFragment, 1 );
 }
