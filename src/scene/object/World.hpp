@@ -14,7 +14,7 @@ class Shader;
 class TextureRenderer;
 
 
-class World : public AObject, public KeyListener
+class World : public AObject, public KeyListener, public MouseListener
 {
 public:
 	World( Scene * scene );
@@ -26,6 +26,12 @@ public:
 
 	virtual void keyPressEvent( QKeyEvent * event );
 	virtual void keyReleaseEvent( QKeyEvent * event );
+	virtual void mousePressEvent( QGraphicsSceneMouseEvent * event );
+	virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
+	virtual void mouseMoveEvent( QGraphicsSceneMouseEvent * event );
+	virtual void wheelEvent( QGraphicsSceneWheelEvent * event );
+
+	QSharedPointer<AObject> getLineIntersection( const QVector3D & origin, const QVector3D & direction, float * length );
 
 private:
 	bool mTimeLapse;
@@ -33,6 +39,7 @@ private:
 	Sky * mSky;
 	QSharedPointer<Landscape> mLandscape;
 	QSharedPointer<Teapot> mTeapot;
+	bool mDragTeapot;
 };
 
 

@@ -1,7 +1,7 @@
 #include "Sky.hpp"
 
 #include <GLWidget.hpp>
-#include <util.h>
+#include <utility/interpolate.hpp>
 #include <resource/Shader.hpp>
 
 #include <QString>

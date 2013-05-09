@@ -1,5 +1,5 @@
-#ifndef MATH_INCLUDED
-#define MATH_INCLUDED
+#ifndef UTILITY_INTERPOLATE_INCLUDED
+#define UTILITY_INTERPOLATE_INCLUDED
 
 #include <math.h>
 

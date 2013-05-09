@@ -11,7 +11,7 @@ class AudioSample;
 class Teapot : public AObject
 {
 public:
-	Teapot( Scene * scene );
+	Teapot( Scene * scene, const float & size );
 	virtual ~Teapot();
 	
 	virtual void updateSelf( const float & delta );
@@ -20,6 +20,7 @@ public:
 private:
 	Material * mMaterial;
 	AudioSample * mAudioSample;
+	float mSize;
 };
 
 

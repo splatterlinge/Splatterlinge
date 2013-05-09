@@ -15,10 +15,10 @@ int audioLoader( const char * filename, ALuint * buffer, ALsizei * frequency, AL
 {
 	int ret = 0;
 
-	ret = audioLoader_oggVorbis( filename, buffer, frequency, format );
+	ret = audioLoader_riffWave( filename, buffer, frequency, format );
 	if( ret == 0 )
 		return ret;
 
-	ret = audioLoader_riffWave( filename, buffer, frequency, format );
+	ret = audioLoader_oggVorbis( filename, buffer, frequency, format );
 	return ret;
 }

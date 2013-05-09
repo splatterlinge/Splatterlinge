@@ -49,7 +49,6 @@ int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * freq
 	if( strncmp( riffHeader.chunkID, "RIFF", 4 ) )
 	{
 		fclose( file );
-		fprintf( stderr, "RIFF" );
 		return -EPROTONOSUPPORT;
 	}
 	if( strncmp( riffHeader.format, "WAVE", 4 ) )

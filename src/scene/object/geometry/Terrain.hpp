@@ -103,7 +103,13 @@ public:
 		{ return getVertexNormal( p.x(), p.y() ); }
 
 	/// Calculates the height of the terrain at given position.
-	float getHeight( const QVector3D & position );
+	float getHeight( const QVector3D & position ) const;
+
+	/// Calculates the intersection distance to a single terrain quad. length is used as input and output.
+	bool getLineQuadIntersection( const QVector3D & origin, const QVector3D & direction, const QPoint & quadMapCoord, float * length ) const;
+
+	/// Calculates the intersection distance to the terrain. length is used as input and output.
+	bool getLineIntersection( const QVector3D & origin, const QVector3D & direction, float * length ) const;
 
 protected:
 

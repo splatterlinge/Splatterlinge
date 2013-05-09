@@ -52,6 +52,8 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	updateTimer->setInterval( 10 );
 	updateTimer->start();
 */
+//	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
 	mElapsedTimer.start();
 }
 
@@ -180,6 +182,7 @@ void Scene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 	QGraphicsScene::mouseMoveEvent( event );
 	if( event->isAccepted() )
 		return;
+
 	if( mDragging )
 	{
 		mDrag += event->screenPos() - event->lastScreenPos();
@@ -197,7 +200,9 @@ void Scene::mousePressEvent( QGraphicsSceneMouseEvent * event )
 	QGraphicsScene::mousePressEvent( event );
 	if( event->isAccepted() )
 		return;
-	mDragging = true;
+
+	if( event->button() == Qt::LeftButton )
+		mDragging = true;
 
 	QList< MouseListener* >::iterator i;
 	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
@@ -208,9 +213,11 @@ void Scene::mousePressEvent( QGraphicsSceneMouseEvent * event )
 void Scene::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 	QGraphicsScene::mouseReleaseEvent(event);
-	mDragging = false;
 	if( event->isAccepted() )
 		return;
+
+	if( event->button() == Qt::LeftButton )
+		mDragging = false;
 
 	QList< MouseListener* >::iterator i;
 	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )

@@ -1,7 +1,12 @@
 #include "Terrain.hpp"
 
+#include <utility/Triangle.hpp>
+
 #include <QImage>
 #include <QDebug>
+
+#include <math.h>
+#include <float.h>
 
 
 Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
@@ -161,7 +166,7 @@ QRect Terrain::toMap( const QRectF & rect ) const
 void Terrain::drawPatchMap( const QRect & rect )
 {
 	QRect rectToDraw = rect.intersected( QRect( QPoint(0,0), QSize(mMapSize.width()-1,mMapSize.height()-1) ) );
-	if( rectToDraw.width() <= 1 || rectToDraw.height() <= 1 )
+	if( rectToDraw.width() < 1 || rectToDraw.height() < 1 )
 		return;	// need at least 4 vertices to build triangle strip
 	if( rectToDraw.y() >= mMapSize.height()-1 )
 		return;	// reached the bottom row - there is no next row to build triangle strips with
@@ -202,10 +207,10 @@ void Terrain::draw()
 {
 	mVertexBuffer.bind();
 	mIndexBuffer.bind();
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_INDEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState( GL_VERTEX_ARRAY );
+	glEnableClientState( GL_INDEX_ARRAY );
+	glEnableClientState( GL_NORMAL_ARRAY );
+	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 
 	glVertexPointer( 3, GL_FLOAT, 0, 0 );
 	glNormalPointer( GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)) );
@@ -223,16 +228,16 @@ void Terrain::draw()
 		);
 	}
 
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_INDEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState( GL_VERTEX_ARRAY );
+	glDisableClientState( GL_INDEX_ARRAY );
+	glDisableClientState( GL_NORMAL_ARRAY );
+	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 	mVertexBuffer.release();
 	mIndexBuffer.release();
 }
 
 
-float Terrain::getHeight( const QVector3D & position )
+float Terrain::getHeight( const QVector3D & position ) const
 {
 	QPointF posF = toMapF( position );
 	QPoint pos = QPoint( posF.x(), posF.y() );
@@ -265,4 +270,126 @@ float Terrain::getHeight( const QVector3D & position )
 
 	QVector3D normal = QVector3D::normal( v1, v2, v3 );
 	return ( (normal.x()*(position.x()-v1.x())) + (normal.z()*(position.z()-v1.z())) ) / ( -normal.y() ) + v1.y();
+}
+
+
+bool Terrain::getLineQuadIntersection( const QVector3D & origin, const QVector3D & direction, const QPoint & quadMapCoord, float * length ) const
+{
+	QPoint pos = quadMapCoord;
+	if( pos.x() >= mMapSize.width() )
+		pos.setX( mMapSize.width()-1 );
+	if( pos.y() >= mMapSize.height() )
+		pos.setY( mMapSize.height()-1 );
+	if( pos.x() < 0 )
+		pos.setX( 0 );
+	if( pos.y() < 0 )
+		pos.setY( 0 );
+
+	float intersectionDistance;
+
+	Triangle t1(
+		getVertexPosition( pos.x(), pos.y() ),
+		getVertexPosition( pos.x(), pos.y()+1 ),
+		getVertexPosition( pos.x()+1, pos.y() )
+	);
+
+	if( t1.intersectRay( origin, direction, &intersectionDistance ) )
+	{
+		if( intersectionDistance < *length )
+		{
+			*length = intersectionDistance;
+			return true;
+		}
+	}
+
+	Triangle t2(
+		getVertexPosition( pos.x()+1, pos.y()+1 ),
+		getVertexPosition( pos.x()+1, pos.y() ),
+		getVertexPosition( pos.x(), pos.y()+1 )
+	);
+
+	if( t2.intersectRay( origin, direction, &intersectionDistance ) )
+	{
+		if( intersectionDistance < *length )
+		{
+			*length = intersectionDistance;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float * length ) const
+{
+	QPoint mapFrom = toMap( origin );
+	QPoint mapTo = toMap( origin + direction * (*length) );
+
+	int x = mapFrom.x();
+	int y = mapFrom.y();
+	int dx = abs( mapTo.x() - x );
+	int dy = abs( mapTo.y() - y );
+	int sx = ( x < mapTo.x() ) ? 1 : -1;
+	int sy = ( y < mapTo.y() ) ? 1 : -1;
+	int error = dx - dy;
+
+	int ox = 1;
+	int oy = 1;
+	if( dx < dy )
+		oy = 0;
+	else
+		ox = 0;
+
+	while( true )
+	{
+/*
+		glDisable( GL_TEXTURE_2D );
+		glDisable( GL_LIGHTING );
+		glColor3f( 1,0,0 );
+		const_cast<Terrain*>(this)->drawPatchMap( QRect( x, y, 1, 1 ) );
+		glColor3f( 0,1,0 );
+		const_cast<Terrain*>(this)->drawPatchMap( QRect( x+ox, y+oy, 1, 1 ) );
+		glColor3f( 0,0,1 );
+		const_cast<Terrain*>(this)->drawPatchMap( QRect( x-ox, y-oy, 1, 1 ) );
+*/
+		bool intersects = false;
+		intersects |= getLineQuadIntersection( origin, direction, QPoint(x, y), length );
+		intersects |= getLineQuadIntersection( origin, direction, QPoint(x+ox, y+oy), length );
+		intersects |= getLineQuadIntersection( origin, direction, QPoint(x-ox, y-oy), length );
+		if( intersects )
+		{
+/*
+			QVector3D intersectionPoint = origin+direction*(*length);
+			glBegin( GL_LINES );
+				glColor3f( 0,1,1 );
+				glVertex3f( intersectionPoint.x(), intersectionPoint.y()+1, intersectionPoint.z() );
+				glVertex3f( intersectionPoint.x(), intersectionPoint.y()-1, intersectionPoint.z() );
+				glColor3f( 1,1,0 );
+				glVertex3f( intersectionPoint.x()+1, intersectionPoint.y()+1, intersectionPoint.z() );
+				glVertex3f( intersectionPoint.x()-1, intersectionPoint.y()-1, intersectionPoint.z() );
+				glColor3f( 1,0,1 );
+				glVertex3f( intersectionPoint.x(), intersectionPoint.y()+1, intersectionPoint.z()+1 );
+				glVertex3f( intersectionPoint.x(), intersectionPoint.y()-1, intersectionPoint.z()-1 );
+			glEnd();
+*/
+			return true;
+		}
+
+		if( x == mapTo.x() && y == mapTo.y() )
+			break;
+
+		int error2 = 2 * error;
+		if( error2 > -dy )
+		{
+			error -= dy;
+			x += sx;
+		}
+		if( error2 < dx )
+		{
+			error += dx;
+			y += sy;
+		}
+	}
+	return false;
 }
