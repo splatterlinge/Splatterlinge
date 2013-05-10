@@ -20,10 +20,14 @@ class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 
 class GLWidget;
-class MouseListener;
-class KeyListener;
+class AMouseListener;
+class AKeyListener;
 
 
+/// Scene manager and interface to Qt
+/**
+ * 
+ */
 class Scene : public QGraphicsScene
 {
 	Q_OBJECT
@@ -39,10 +43,10 @@ public:
 	AObject * root() { return mEye; }
 	Eye * eye() { return mEye; }
 	void setEye( Eye * eye ) { mEye = eye; }
-	void addKeyListener( KeyListener * listener ) { mKeyListeners.append( listener ); }
-	void addMouseListener( MouseListener * listener ) { mMouseListeners.append( listener ); }
-	void removeKeyListener( KeyListener * listener ) { mKeyListeners.removeOne( listener ); }
-	void removeMouseListener( MouseListener * listener ) { mMouseListeners.removeOne( listener ); }
+	void addKeyListener( AKeyListener * listener ) { mKeyListeners.append( listener ); }
+	void addMouseListener( AMouseListener * listener ) { mMouseListeners.append( listener ); }
+	void removeKeyListener( AKeyListener * listener ) { mKeyListeners.removeOne( listener ); }
+	void removeMouseListener( AMouseListener * listener ) { mMouseListeners.removeOne( listener ); }
 
 protected:
 	// Overrides:
@@ -73,8 +77,8 @@ private:
 	bool mDownPressed;
 	bool mSpeedPressed;
 
-	QList<MouseListener*> mMouseListeners;
-	QList<KeyListener*> mKeyListeners;
+	QList<AMouseListener*> mMouseListeners;
+	QList<AKeyListener*> mKeyListeners;
 	Eye * mEye;
 
 private slots:

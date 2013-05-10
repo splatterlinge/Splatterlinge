@@ -113,7 +113,7 @@ void World::updateSelf( const float & delta )
 		if( getLineIntersection( scene()->eye()->position(), -scene()->eye()->direction(), &length ) )
 		{
 			mTeapot->setPosition( scene()->eye()->position() - scene()->eye()->direction() * length );
-			mTeapot->setPositionY( mTeapot->position().y() + 3 );
+			mTeapot->moveY( 3 );
 		}
 	}
 }

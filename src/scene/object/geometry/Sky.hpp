@@ -13,6 +13,10 @@
 class GLWidget;
 
 
+/// Sky renderer
+/**
+ * 
+ */
 class Sky
 {
 public:

@@ -1,12 +1,16 @@
-#ifndef SCENE_MOUSELISTENER_INCLUDED
-#define SCENE_MOUSELISTENER_INCLUDED
+#ifndef SCENE_AMOUSELISTENER_INCLUDED
+#define SCENE_AMOUSELISTENER_INCLUDED
 
 
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneWheelEvent>
 
 
-class MouseListener
+/// Abstract mouse listener
+/**
+ * Register at Scene to receive mouse events.
+ */
+class AMouseListener
 {
 public:
 	virtual void mousePressEvent( QGraphicsSceneMouseEvent * event ) = 0;

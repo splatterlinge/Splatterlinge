@@ -12,6 +12,10 @@
 class Scene;
 
 
+/// Abstract object in a scene
+/**
+ * 
+ */
 class AObject
 {
 public:
@@ -25,6 +29,10 @@ public:
 	const QVector3D up() const { validateMatrix(); return mMatrix.row(1).toVector3D(); }
 	const QVector3D direction() const { validateMatrix(); return mMatrix.row(2).toVector3D(); }
 
+	void move( const QVector3D & distance ) { mPosition += distance; mMatrixNeedsUpdate = true; }
+	void moveX( const qreal & x ) { mPosition.setX(mPosition.x()+x); mMatrixNeedsUpdate = true; }
+	void moveY( const qreal & y ) { mPosition.setY(mPosition.y()+y); mMatrixNeedsUpdate = true; }
+	void moveZ( const qreal & z ) { mPosition.setZ(mPosition.z()+z); mMatrixNeedsUpdate = true; }
 	void setPosition( const QVector3D & position ) { mPosition = position; mMatrixNeedsUpdate = true; }
 	void setPositionX( const qreal & x ) { mPosition.setX(x); mMatrixNeedsUpdate = true; }
 	void setPositionY( const qreal & y ) { mPosition.setY(y); mMatrixNeedsUpdate = true; }

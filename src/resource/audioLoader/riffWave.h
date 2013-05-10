@@ -9,7 +9,20 @@ extern "C" {
 #include <AL/al.h>
 
 
+/**
+ * \addtogroup audioLoader
+ *
+ * @{
+ **/
+
+
+/// RIFF/Wave audio loader
 int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * frequency, ALenum * format );
+
+
+/**
+ * @}
+ */
 
 
 #ifdef __cplusplus

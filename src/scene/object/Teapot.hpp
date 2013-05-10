@@ -8,6 +8,10 @@ class Material;
 class AudioSample;
 
 
+/// It's a Teapot
+/**
+ * 
+ */
 class Teapot : public AObject
 {
 public:

@@ -17,6 +17,10 @@ class TextureRenderer;
 class Material;
 
 
+/// A Landscape consisting of terrain and water
+/**
+ * 
+ */
 class Landscape : public AObject
 {
 public:

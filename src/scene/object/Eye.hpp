@@ -9,6 +9,10 @@
 class Scene;
 
 
+/// Special scene object representing the "eye" for observing a scene
+/**
+ * 
+ */
 class Eye : public AObject
 {
 public:

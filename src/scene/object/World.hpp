@@ -2,8 +2,8 @@
 #define SCENE_OBJECT_WORLD_INCLUDED
 
 
-#include "../KeyListener.hpp"
-#include "../MouseListener.hpp"
+#include "../AKeyListener.hpp"
+#include "../AMouseListener.hpp"
 #include "AObject.hpp"
 
 
@@ -14,7 +14,11 @@ class Shader;
 class TextureRenderer;
 
 
-class World : public AObject, public KeyListener, public MouseListener
+/// World object
+/**
+ * 
+ */
+class World : public AObject, public AKeyListener, public AMouseListener
 {
 public:
 	World( Scene * scene );

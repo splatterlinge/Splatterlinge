@@ -5,7 +5,7 @@
 #include <GLWidget.hpp>
 
 
-///FBO texture renderer.
+/// FBO texture renderer.
 class TextureRenderer
 {
 	private:

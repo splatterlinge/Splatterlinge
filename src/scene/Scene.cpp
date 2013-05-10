@@ -189,7 +189,7 @@ void Scene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 		event->accept();
 	}
 	
-	QList< MouseListener* >::iterator i;
+	QList< AMouseListener* >::iterator i;
 	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
 		(*i)->mouseMoveEvent( event );
 }
@@ -204,7 +204,7 @@ void Scene::mousePressEvent( QGraphicsSceneMouseEvent * event )
 	if( event->button() == Qt::LeftButton )
 		mDragging = true;
 
-	QList< MouseListener* >::iterator i;
+	QList< AMouseListener* >::iterator i;
 	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
 		(*i)->mousePressEvent( event );
 }
@@ -219,7 +219,7 @@ void Scene::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 	if( event->button() == Qt::LeftButton )
 		mDragging = false;
 
-	QList< MouseListener* >::iterator i;
+	QList< AMouseListener* >::iterator i;
 	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
 		(*i)->mouseReleaseEvent( event );
 }
@@ -231,7 +231,7 @@ void Scene::wheelEvent( QGraphicsSceneWheelEvent * event )
 	if( event->isAccepted() )
 		return;
 
-	QList< MouseListener* >::iterator i;
+	QList< AMouseListener* >::iterator i;
 	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
 		(*i)->wheelEvent( event );
 }
@@ -243,7 +243,7 @@ void Scene::keyPressEvent( QKeyEvent * event )
 	if( event->isAccepted() )
 		return;
 
-	QList< KeyListener* >::iterator i;
+	QList< AKeyListener* >::iterator i;
 	for( i = mKeyListeners.begin(); i != mKeyListeners.end(); ++i )
 		(*i)->keyPressEvent( event );
 
@@ -284,7 +284,7 @@ void Scene::keyReleaseEvent( QKeyEvent * event )
 	if( event->isAccepted() )
 		return;
 
-	QList< KeyListener* >::iterator i;
+	QList< AKeyListener* >::iterator i;
 	for( i = mKeyListeners.begin(); i != mKeyListeners.end(); ++i )
 		(*i)->keyReleaseEvent( event );
 
