@@ -43,6 +43,7 @@ private:
 	int mDomeShader_sunDir;
 	int mDomeShader_timeOfDay;
 	int mDomeShader_sunSpotPower;
+	int mDomeShader_diffuseMap;
 	float mSunSpotPower;
 	QGLBuffer mCubeIndexBuffer;
 	QGLBuffer mCubeVertexBuffer;

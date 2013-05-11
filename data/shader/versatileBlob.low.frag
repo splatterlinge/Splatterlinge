@@ -7,7 +7,7 @@ varying float vAtt[MAX_LIGHTS];
 
 uniform sampler2D diffuseMap;
 uniform sampler2D specularMap;
-uniform sampler2D maskMap;
+uniform sampler2D blobMap;
 
 
 void main()
@@ -45,5 +45,5 @@ void main()
 
 	float fogFactor = clamp( -(length( vVertex )-gl_Fog.start) * gl_Fog.scale, 0.0, 1.0 );
 	vec3 finalFragment = mix( gl_Fog.color.rgb, finalColor, fogFactor );
-	gl_FragColor = vec4( finalFragment, colorFromMap.a * texture2D( maskMap, gl_TexCoord[1].st ).r );
+	gl_FragColor = vec4( finalFragment, colorFromMap.a * texture2D( blobMap, gl_TexCoord[1].st ).r );
 }

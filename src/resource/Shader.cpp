@@ -42,48 +42,6 @@ bool ShaderData::load()
 		return false;
 	}
 
-	unsigned int texUnit = 0;
-	mUniform_diffuseMap = mProgram->uniformLocation("diffuseMap");
-	if( mUniform_diffuseMap >= 0 )
-	{
-		mTexUnit_diffuseMap = texUnit++;
-		qDebug() << "#" << uid() << "Texture \"diffuseMap\" on Unit" << mTexUnit_diffuseMap;
-	} else {
-//		qDebug() << "#" << uid() << "Uniform \"diffuseMap\" not found - texture disabled.";
-	}
-	mUniform_specularMap = mProgram->uniformLocation("specularMap");
-	if( mUniform_specularMap >= 0 )
-	{
-		mTexUnit_specularMap = texUnit++;
-		qDebug() << "#" << uid() << "Texture \"specularMap\" on Unit" << mTexUnit_specularMap;
-	} else {
-//		qDebug() << "#" << uid() << "Uniform \"specularMap\" not found - texture disabled.";
-	}
-	mUniform_normalMap = mProgram->uniformLocation("normalMap");
-	if( mUniform_normalMap >= 0 )
-	{
-		mTexUnit_normalMap = texUnit++;
-		qDebug() << "#" << uid() << "Texture \"normalMap\" on Unit" << mTexUnit_normalMap;
-	} else {
-//		qDebug() << "#" << uid() << "Uniform \"normalMap\" not found - texture disabled.";
-	}
-	mUniform_maskMap = mProgram->uniformLocation("maskMap");
-	if( mUniform_maskMap >= 0 )
-	{
-		mTexUnit_maskMap = texUnit++;
-		qDebug() << "#" << uid() << "Texture \"maskMap\" on Unit" << mTexUnit_maskMap;
-	} else {
-//		qDebug() << "#" << uid() << "Uniform \"maskMap\" not found - texture disabled.";
-	}
-	mUniform_cubeMap = mProgram->uniformLocation("cubeMap");
-	if( mUniform_cubeMap >= 0 )
-	{
-		mTexUnit_cubeMap = texUnit++;
-		qDebug() << "#" << uid() << "Texture \"cubeMap\" on Unit" << mTexUnit_cubeMap;
-	} else {
-//		qDebug() << "#" << uid() << "Uniform \"cubeMap\" not found - texture disabled.";
-	}
-
 	return AResourceData::load();
 }
 
@@ -103,16 +61,6 @@ Shader::~Shader()
 void Shader::bind()
 {
 	data()->program()->bind();
-	if( data()->uniform_diffuseMap() >= 0 )
-		data()->program()->setUniformValue( data()->uniform_diffuseMap(), data()->texUnit_diffuseMap() );
-	if( data()->uniform_specularMap() >= 0 )
-		data()->program()->setUniformValue( data()->uniform_specularMap(), data()->texUnit_specularMap() );
-	if( data()->uniform_normalMap() >= 0 )
-		data()->program()->setUniformValue( data()->uniform_normalMap(), data()->texUnit_normalMap() );
-	if( data()->uniform_maskMap() >= 0 )
-		data()->program()->setUniformValue( data()->uniform_maskMap(), data()->texUnit_maskMap() );
-	if( data()->uniform_cubeMap() >= 0 )
-		data()->program()->setUniformValue( data()->uniform_cubeMap(), data()->texUnit_cubeMap() );
 }
 
 

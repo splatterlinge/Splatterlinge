@@ -11,15 +11,20 @@
 #include <QSettings>
 
 
-Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, QVector2D materialScale, QString maskPath )
+Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, QVector2D materialScale, QString blobMapPath )
 {
 	mGLWidget = landscape->scene()->glWidget();
 	mLandscape = landscape;
 	mRect = rect;
 	mMaterialScale = materialScale;
-	mMaterial = new Material( mGLWidget, materialName );
-	mMaterial->setShader( "versatileBlob" );
-	mMaterial->setMaskMap( maskPath );
+	mMaterial = new Material( mGLWidget, materialName, Material::BLOBBING_SHADERTYPE );
+	QPixmap blobMap = QPixmap( blobMapPath );
+	if( blobMap.isNull() )
+	{
+		qFatal( "BlobMap from file \"%s\" could not be loaded!", blobMapPath.toLocal8Bit().constData() );
+	}
+	mBlobMap =  mGLWidget->bindTexture( blobMap, GL_TEXTURE_2D, GL_RED, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
+	mMaterial->setBlobMap( mBlobMap );
 }
 
 

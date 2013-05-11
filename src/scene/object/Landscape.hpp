@@ -30,7 +30,8 @@ public:
 		Landscape * mLandscape;
 		Material * mMaterial;
 		QVector2D mMaterialScale;
-		QString mMaskPath;
+		QString mBlobMapPath;
+		GLuint mBlobMap;
 		QRect mRect;
 	public:
 		Blob( Landscape * landscape, QRect rect, QString material, QVector2D materialScale, QString maskPath );

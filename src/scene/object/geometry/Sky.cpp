@@ -100,6 +100,7 @@ Sky::Sky( GLWidget * glWidget, QString name, const float * timeOfDay = 0 ) :
 	mDomeShader_sunDir = mDomeShader->program()->uniformLocation( "sunDir" );
 	mDomeShader_timeOfDay = mDomeShader->program()->uniformLocation( "timeOfDay" );
 	mDomeShader_sunSpotPower = mDomeShader->program()->uniformLocation( "sunSpotPower" );
+	mDomeShader_diffuseMap = mDomeShader->program()->uniformLocation( "diffuseMap" );
 
 	mSkyDomeImage = QImage( skyDomePath );
 	if( mSkyDomeImage.isNull() )
@@ -108,9 +109,9 @@ Sky::Sky( GLWidget * glWidget, QString name, const float * timeOfDay = 0 ) :
 	}
 
 	mDomeMap =  mGLWidget->bindTexture( mSkyDomeImage, GL_TEXTURE_2D, GL_RGBA );
-	if( mDomeMap >= 0 && mDomeShader->hasDiffuseMap() )
+	if( mDomeMap >= 0 )
 	{
-		mGLWidget->glActiveTexture( GL_TEXTURE0+(mDomeShader->texUnit_diffuseMap()) );
+		mGLWidget->glActiveTexture( GL_TEXTURE0 );
 		glBindTexture( GL_TEXTURE_2D, mDomeMap );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
@@ -218,7 +219,8 @@ void Sky::draw( const QVector3D & eye )
 	mDomeShader->program()->setUniformValue( mDomeShader_sunDir, mSunDirection.toVector3D() );
 	mDomeShader->program()->setUniformValue( mDomeShader_timeOfDay, *mTimeOfDay );
 	mDomeShader->program()->setUniformValue( mDomeShader_sunSpotPower, mSunSpotPower );
-	mGLWidget->glActiveTexture( GL_TEXTURE0+(mDomeShader->texUnit_diffuseMap()) );	glBindTexture( GL_TEXTURE_2D, mDomeMap );
+	mDomeShader->program()->setUniformValue( mDomeShader_diffuseMap, 0 );
+	mGLWidget->glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, mDomeMap );
 	mCubeVertexBuffer.bind();
 	mCubeIndexBuffer.bind();
 	glEnableClientState( GL_VERTEX_ARRAY );
