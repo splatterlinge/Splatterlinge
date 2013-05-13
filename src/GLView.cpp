@@ -24,7 +24,7 @@ GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
 	mScene = new Scene( mGLWidget, this );
 	mEye = new Eye( mScene );
 	mScene->setEye( mEye );
-	mScene->eye()->add( QSharedPointer<AObject>( new World( mScene ) ) );
+	mScene->eye()->add( QSharedPointer<AObject>( new World( mScene, "earth" ) ) );
 	setScene( mScene );
 
 	QGraphicsProxyWidget * proxy;

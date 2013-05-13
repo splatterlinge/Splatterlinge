@@ -91,6 +91,7 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 	mVertexBuffer.bind();
 	mVertexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
 	mVertexBuffer.allocate( mVertices.data(), mVertices.size()*sizeof(QVector3D) );
+	mVertexBuffer.release();
 
 	// indices
 	QVector<unsigned int> indices;
@@ -107,6 +108,7 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 	mIndexBuffer.bind();
 	mIndexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
 	mIndexBuffer.allocate( indices.data(), indices.size()*sizeof(unsigned int) );
+	mIndexBuffer.release();
 }
 
 

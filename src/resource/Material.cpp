@@ -2,7 +2,8 @@
 
 #include "Shader.hpp"
 
-#include <GLWidget.hpp>
+#include <QSettings>
+#include <QGLShaderProgram>
 
 #include <unistd.h>
 
@@ -158,14 +159,14 @@ void Material::bind()
 	int texUnit;
 	for( texUnit = 0; texUnit < mShaderSet[mBoundQuality].textureUnits.size(); texUnit++ )
 	{
-		mGLWidget->glActiveTexture( GL_TEXTURE0 + texUnit );
+		glActiveTexture( GL_TEXTURE0 + texUnit );
 		glBindTexture( GL_TEXTURE_2D, mShaderSet[mBoundQuality].textureUnits[texUnit].second );
 		mShaderSet[mBoundQuality].shader->program()->setUniformValue( mShaderSet[mBoundQuality].textureUnits[texUnit].first, texUnit );
 	}
 
 	if( mBlobMap >= 0 && mShaderSet[mBoundQuality].blobMapUniform >= 0 )
 	{
-		mGLWidget->glActiveTexture( GL_TEXTURE0 + texUnit );
+		glActiveTexture( GL_TEXTURE0 + texUnit );
 		glBindTexture( GL_TEXTURE_2D, mBlobMap );
 		mShaderSet[mBoundQuality].shader->program()->setUniformValue( mShaderSet[mBoundQuality].blobMapUniform, texUnit );
 		texUnit++;
@@ -173,7 +174,7 @@ void Material::bind()
 
 	if( mCubeMap >= 0 && mShaderSet[mBoundQuality].cubeMapUniform >= 0 )
 	{
-		mGLWidget->glActiveTexture( GL_TEXTURE0 + texUnit );
+		glActiveTexture( GL_TEXTURE0 + texUnit );
 		glBindTexture( GL_TEXTURE_2D, mCubeMap );
 		mShaderSet[mBoundQuality].shader->program()->setUniformValue( mShaderSet[mBoundQuality].blobMapUniform, texUnit );
 		texUnit++;

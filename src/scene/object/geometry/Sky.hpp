@@ -2,29 +2,33 @@
 #define SCENE_OBJECT_GEOMETRY_SKY_INCLUDED
 
 
+#include <GLWidget.hpp>
+
 #include <QGLFramebufferObject>
+#include <QGLBuffer>
 #include <QString>
 #include <QSize>
 
-#include "GL/glext.h"
 #include <resource/Shader.hpp>
+#include <scene/object/AObject.hpp>
+#include <scene/Scene.hpp>
 
 
-class GLWidget;
+class Scene;
 
 
 /// Sky renderer
 /**
  * 
  */
-class Sky
+class Sky : public AObject
 {
 public:
-	Sky( GLWidget * glWidget, QString name, const float * timeOfDay );
+	Sky( Scene * scene, QString name, const float * timeOfDay );
 	~Sky();
 
-	void update( const float & delta );
-	void draw( const QVector3D & eye );
+	virtual void updateSelf( const float & delta );
+	virtual void drawSelf();
 	const QVector4D & fogColor() const { return mFogColor; }
 	const QVector4D & ambient() const { return mAmbient; }
 	const QVector4D & diffuse() const { return mDiffuse; }
@@ -32,10 +36,7 @@ public:
 	const QVector4D & sunDirection() const { return mSunDirection; }
 	const QVector3D & axis() const { return mAxis; }
 
-	GLWidget * getGLWidget() { return mGLWidget; }
-
 private:
-	GLWidget * mGLWidget;
 	const float * mTimeOfDay;
 	QImage mSkyDomeImage;
 	Shader * mDomeShader;

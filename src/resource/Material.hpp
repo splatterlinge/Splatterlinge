@@ -3,8 +3,9 @@
 
 #include "AResource.hpp"
 
-#include <QtOpenGL>
-#include <QVector>
+#include <GLWidget.hpp>
+
+#include <QVector4D>
 #include <QDebug>
 
 

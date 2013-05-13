@@ -1,9 +1,10 @@
 #include "Sky.hpp"
 
-#include <GLWidget.hpp>
 #include <utility/interpolate.hpp>
 #include <resource/Shader.hpp>
 
+#include <QGLShaderProgram>
+#include <QSettings>
 #include <QString>
 #include <QImage>
 #include <GL/glu.h>
@@ -48,8 +49,8 @@ static void TexImage( QGLWidget * glWidget, GLenum target, QString path )
 }
 
 
-Sky::Sky( GLWidget * glWidget, QString name, const float * timeOfDay = 0 ) :
-	mGLWidget(glWidget),
+Sky::Sky( Scene * scene, QString name, const float * timeOfDay = 0 ) :
+	AObject(scene),
 	mTimeOfDay(timeOfDay)
 {
 	QSettings s( "./data/sky/"+name+"/sky.ini", QSettings::IniFormat );
@@ -96,7 +97,7 @@ Sky::Sky( GLWidget * glWidget, QString name, const float * timeOfDay = 0 ) :
 	mCubeIndexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
 	mCubeIndexBuffer.allocate( cubeIndices, sizeof(cubeIndices) );
 	
-	mDomeShader = new Shader( glWidget, "skydome" );
+	mDomeShader = new Shader( scene->glWidget(), "skydome" );
 	mDomeShader_sunDir = mDomeShader->program()->uniformLocation( "sunDir" );
 	mDomeShader_timeOfDay = mDomeShader->program()->uniformLocation( "timeOfDay" );
 	mDomeShader_sunSpotPower = mDomeShader->program()->uniformLocation( "sunSpotPower" );
@@ -108,16 +109,16 @@ Sky::Sky( GLWidget * glWidget, QString name, const float * timeOfDay = 0 ) :
 		qFatal( "\"%s\" not found!", skyDomePath.toLocal8Bit().constData() );
 	}
 
-	mDomeMap =  mGLWidget->bindTexture( mSkyDomeImage, GL_TEXTURE_2D, GL_RGBA );
+	mDomeMap =  scene->glWidget()->bindTexture( mSkyDomeImage, GL_TEXTURE_2D, GL_RGBA );
 	if( mDomeMap >= 0 )
 	{
-		mGLWidget->glActiveTexture( GL_TEXTURE0 );
+		glActiveTexture( GL_TEXTURE0 );
 		glBindTexture( GL_TEXTURE_2D, mDomeMap );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	}
 
-	mStarCubeShader = new Shader( glWidget, "cube" );
+	mStarCubeShader = new Shader( scene->glWidget(), "cube" );
 
 	glGenTextures( 1, &mStarCubeMap );
 	glBindTexture( GL_TEXTURE_CUBE_MAP, mStarCubeMap );
@@ -126,12 +127,12 @@ Sky::Sky( GLWidget * glWidget, QString name, const float * timeOfDay = 0 ) :
 	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	TexImage( glWidget, GL_TEXTURE_CUBE_MAP_POSITIVE_X, starMapPathPX );
-	TexImage( glWidget, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, starMapPathNX );
-	TexImage( glWidget, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, starMapPathPY );
-	TexImage( glWidget, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, starMapPathNY );
-	TexImage( glWidget, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, starMapPathPZ );
-	TexImage( glWidget, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, starMapPathNZ );
+	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, starMapPathPX );
+	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_X, starMapPathNX );
+	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_POSITIVE_Y, starMapPathPY );
+	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, starMapPathNY );
+	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_POSITIVE_Z, starMapPathPZ );
+	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, starMapPathNZ );
 }
 
 
@@ -144,7 +145,7 @@ Sky::~Sky()
 }
 
 
-void Sky::update( const float & delta )
+void Sky::updateSelf( const float & delta )
 {
 	float angle = (*mTimeOfDay)*(M_PI*2.0f);
 	QMatrix4x4 m;
@@ -188,13 +189,16 @@ void Sky::update( const float & delta )
 }
 
 
-void Sky::draw( const QVector3D & eye )
+void Sky::drawSelf()
 {
+	glPushAttrib( GL_VIEWPORT_BIT | GL_DEPTH_BUFFER_BIT );
 	glDepthMask( GL_FALSE );
+	glDepthFunc( GL_EQUAL );
 	glDisable( GL_CULL_FACE );
+	glDepthRange( 1.0, 1.0 );
 
 	glMatrixMode( GL_MODELVIEW );	glPushMatrix();
-	glTranslatef( eye.x(), eye.y(), eye.z() );
+	glTranslatef( scene()->eye()->position().x(), scene()->eye()->position().y(), scene()->eye()->position().z() );
 
 	glPushMatrix();
 	float angle = (*mTimeOfDay)*(360.0f);
@@ -220,7 +224,7 @@ void Sky::draw( const QVector3D & eye )
 	mDomeShader->program()->setUniformValue( mDomeShader_timeOfDay, *mTimeOfDay );
 	mDomeShader->program()->setUniformValue( mDomeShader_sunSpotPower, mSunSpotPower );
 	mDomeShader->program()->setUniformValue( mDomeShader_diffuseMap, 0 );
-	mGLWidget->glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, mDomeMap );
+	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, mDomeMap );
 	mCubeVertexBuffer.bind();
 	mCubeIndexBuffer.bind();
 	glEnableClientState( GL_VERTEX_ARRAY );
@@ -235,6 +239,11 @@ void Sky::draw( const QVector3D & eye )
 	glDisable( GL_BLEND );
 
 	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
+/*
+	glDepthRange( 0.0, 1.0 );
 	glEnable( GL_CULL_FACE );
 	glDepthMask( GL_TRUE );
+	glDepthFunc( GL_LESS );
+*/
+	glPopAttrib();
 }

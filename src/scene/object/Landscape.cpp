@@ -9,6 +9,7 @@
 
 #include <QString>
 #include <QSettings>
+#include <QGLShaderProgram>
 
 
 Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, QVector2D materialScale, QString blobMapPath )
@@ -43,18 +44,18 @@ void Landscape::Blob::drawPatchMap( const QRect & visible )
 	mMaterial->bind();
 	glMatrixMode( GL_TEXTURE );
 
-	mGLWidget->glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
+	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
 	glScaled( mMaterialScale.x(), mMaterialScale.y(), 1.0 );
 
-	mGLWidget->glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
+	glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
 	glScaled( 1.0/((double)mRect.width()), 1.0/((double)mRect.height()), 1.0 );
 	glTranslated( -mRect.x(), -mRect.y(), 0.0 );
 
 	mLandscape->terrain()->drawPatchMap( rectToDraw );
 
 	glMatrixMode( GL_TEXTURE );
-	mGLWidget->glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
-	mGLWidget->glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
+	glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
+	glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
 
 	glMatrixMode( GL_MODELVIEW );
 	mMaterial->release();
@@ -86,6 +87,7 @@ Landscape::Landscape( Scene * scene, QString name ) :
 			s.value( "materialScaleT", 1.0f ).toFloat()
 		);
 	s.endGroup();
+
 	s.beginGroup( "Water" );
 		mWaterHeight = s.value( "height", 0.0f ).toFloat();
 		mWaterClippingPlaneOffset = s.value( "clippingPlaneOffset", 0.05f ).toFloat();

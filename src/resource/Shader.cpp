@@ -2,8 +2,8 @@
 
 #include <GLWidget.hpp>
 
+#include <QGLShaderProgram>
 #include <QDebug>
-#include <GL/glu.h>
 
 
 RESOURCE_CACHE(ShaderData);

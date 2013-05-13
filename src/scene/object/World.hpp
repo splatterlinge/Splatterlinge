@@ -21,7 +21,7 @@ class TextureRenderer;
 class World : public AObject, public AKeyListener, public AMouseListener
 {
 public:
-	World( Scene * scene );
+	World( Scene * scene, QString name );
 	virtual ~World();
 
 	virtual void updateSelf( const float & delta );
@@ -40,7 +40,7 @@ public:
 private:
 	bool mTimeLapse;
 	float mTimeOfDay;
-	Sky * mSky;
+	QSharedPointer<Sky> mSky;
 	QSharedPointer<Landscape> mLandscape;
 	QSharedPointer<Teapot> mTeapot;
 	bool mDragTeapot;

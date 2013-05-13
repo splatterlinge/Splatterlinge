@@ -6,23 +6,32 @@
 #include "geometry/Sky.hpp"
 
 #include <QPainter>
-#include <GL/glu.h>
+#include <QSettings>
 
 
-World::World( Scene * scene ) :
+World::World( Scene * scene, QString name ) :
 	AObject( scene )
 {
-	mLandscape = QSharedPointer<Landscape>( new Landscape( scene, "test" ) );
-	add( mLandscape );
 
-	mTeapot = QSharedPointer<Teapot>( new Teapot( scene, 4 ) );
-	mTeapot->setPositionY( mLandscape->terrain()->getHeight(QVector3D(0,0,0)) + 3 );
-	add( mTeapot );
-	mDragTeapot = false;
+	QSettings s( "./data/world/"+name+".ini", QSettings::IniFormat );
+	s.beginGroup( "World" );
+		QString skyName = s.value( "skyName", "earth" ).toString();
+		QString landscapeName = s.value( "landscapeName", "earth" ).toString();
+	s.endGroup();
 
 	mTimeLapse = false;
 	mTimeOfDay = 0.0f;
-	mSky = new Sky( scene->glWidget(), "earth", &mTimeOfDay );
+
+	mLandscape = QSharedPointer<Landscape>( new Landscape( scene, landscapeName ) );
+	add( mLandscape );
+
+	mTeapot = QSharedPointer<Teapot>( new Teapot( scene, 4 ) );
+	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QVector3D(0,0,0) ) + 3 );
+	add( mTeapot );
+	mDragTeapot = false;
+
+	mSky = QSharedPointer<Sky>( new Sky( scene, skyName, &mTimeOfDay ) );
+	add( mSky );
 
 	scene->addKeyListener( this );
 	scene->addMouseListener( this );
@@ -32,7 +41,6 @@ World::World( Scene * scene ) :
 World::~World()
 {
 	scene()->removeKeyListener( this );
-	delete mSky;
 }
 
 
@@ -126,9 +134,9 @@ void World::drawSelf()
 	glLightfv( GL_LIGHT0, GL_DIFFUSE, reinterpret_cast<const GLfloat*>(&mSky->diffuse()) );
 	glLightfv( GL_LIGHT0, GL_SPECULAR, reinterpret_cast<const GLfloat*>(&mSky->specular()) );
 	glFogfv( GL_FOG_COLOR, reinterpret_cast<const GLfloat*>(&mSky->fogColor()) );
-	glFogf( GL_FOG_START, scene()->eye()->farPlane()*0.66f );
+	glFogf( GL_FOG_START, scene()->eye()->farPlane()*0.75f );
 	glFogf( GL_FOG_END, scene()->eye()->farPlane()*1.1 );
-	mSky->draw( scene()->eye()->position() );
+//	mSky->draw( scene()->eye()->position() );
 }
 
 

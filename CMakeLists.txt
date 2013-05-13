@@ -13,6 +13,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 
 find_package( Qt4 COMPONENTS QtCore QtGui QtOpengl REQUIRED )
 find_package( OpenGL )
+find_package( GLEW )
 find_package( OpenAL )
 find_package( VorbisFile )
 
@@ -28,6 +29,7 @@ file( GLOB_RECURSE Ununoctium_HDRS src/*.h src/*.hpp)
 set( Ununoctium_LIBS
 	${QT_LIBRARIES}
 	${OPENGL_LIBRARIES}
+	${GLEW_LIBRARY}
 	${OPENAL_LIBRARY}
 	${VorbisFile_LIBRARY}
 )

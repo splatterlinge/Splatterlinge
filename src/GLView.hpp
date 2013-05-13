@@ -1,6 +1,7 @@
 #ifndef GLVIEW_INCLUDED
 #define GLVIEW_INCLUDED
 
+#include <GLWidget.hpp>
 
 #include <QGraphicsView>
 #include <QGLFormat>

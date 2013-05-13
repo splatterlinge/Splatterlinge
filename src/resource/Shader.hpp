@@ -4,11 +4,12 @@
 
 #include "AResource.hpp"
 
-#include <QtOpenGL>
+#include <GLWidget.hpp>
+
 #include <QDebug>
 
 
-class GLWidget;
+class QGLShaderProgram;
 
 
 class ShaderData : public AResourceData
