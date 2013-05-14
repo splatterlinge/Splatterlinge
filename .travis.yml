@@ -2,7 +2,7 @@ language: cpp
 
 before_install:
  - sudo apt-get update -qq
- - sudo apt-get install -qq libopenal-dev libvorbis-dev
+ - sudo apt-get install -qq libopenal-dev libvorbis-dev libglew-dev
 
 script: cmake . && make
 
