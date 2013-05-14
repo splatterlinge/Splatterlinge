@@ -3,7 +3,7 @@
 #include "../Scene.hpp"
 #include "Landscape.hpp"
 #include "Teapot.hpp"
-#include "geometry/Sky.hpp"
+#include "Sky.hpp"
 
 #include <QPainter>
 #include <QSettings>

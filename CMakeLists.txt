@@ -1,6 +1,14 @@
 project( Ununoctium )
 cmake_minimum_required( VERSION 2.8.0 )
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
+
+find_package( Qt4 COMPONENTS QtCore QtGui QtOpengl REQUIRED )
+find_package( OpenGL REQUIRED )
+find_package( GLEW REQUIRED )
+find_package( OpenAL REQUIRED )
+find_package( VorbisFile REQUIRED )
+
 find_package( Doxygen )
 if( DOXYGEN_FOUND )
 	add_custom_target( doc ${DOXYGEN_EXECUTABLE} Doxyfile )
@@ -8,14 +16,6 @@ if( DOXYGEN_FOUND )
 else( DOXYGEN_FOUND )
 	message( "Doxygen not found - 'doc' can't be generated." )
 endif( DOXYGEN_FOUND )
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
-
-find_package( Qt4 COMPONENTS QtCore QtGui QtOpengl REQUIRED )
-find_package( OpenGL )
-find_package( GLEW )
-find_package( OpenAL )
-find_package( VorbisFile )
 
 include( ${QT_USE_FILE} )
 
@@ -37,6 +37,8 @@ set( Ununoctium_LIBS
 # Additional include directories
 set( Ununoctium_INCS
 	${QT_INCLUDES}
+	${GLEW_INCLUDE_DIR}
+	${OPENAL_INCLUDE_DIR}
 	./src/
 )
 
