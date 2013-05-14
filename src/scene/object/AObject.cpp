@@ -1,6 +1,6 @@
 #include "AObject.hpp"
 
-#include <GL/gl.h>
+#include <GLWidget.hpp>
 
 
 AObject::AObject( Scene * scene ) :

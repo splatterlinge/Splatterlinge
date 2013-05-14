@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
 #include <stdlib.h>
 
 
@@ -40,7 +39,7 @@ int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * freq
 {
 	FILE * file = fopen( filename, "rb" );
 	if( !file )
-		return -ENOENT;
+		return -AUDIOLOADER_FILENOTFOUND;
 
 	////////////////////////////////
 	// RIFF header
@@ -49,12 +48,12 @@ int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * freq
 	if( strncmp( riffHeader.chunkID, "RIFF", 4 ) )
 	{
 		fclose( file );
-		return -EPROTONOSUPPORT;
+		return -AUDIOLOADER_INVALIDCONTAINER;
 	}
 	if( strncmp( riffHeader.format, "WAVE", 4 ) )
 	{
 		fclose( file );
-		return -EPROTONOSUPPORT;
+		return -AUDIOLOADER_INVALIDCODEC;
 	}
 	////////////////////////////////
 
@@ -65,7 +64,7 @@ int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * freq
 	if( strncmp( waveFormat.subChunkID, "fmt ", 4 ) )
 	{
 		fclose( file );
-		return -EPROTONOSUPPORT;
+		return -AUDIOLOADER_INVALIDFORMAT;
 	}
 	// skip extra parameters
 	size_t extraParameterSize = waveFormat.subChunkSize - 16;
@@ -80,7 +79,7 @@ int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * freq
 	if( strncmp( waveDataHeader.subChunkID, "data", 4 ) )
 	{
 		fclose( file );
-		return -EPROTONOSUPPORT;
+		return -AUDIOLOADER_INVALIDFORMAT;
 	}
 	////////////////////////////////
 
@@ -91,7 +90,7 @@ int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * freq
 	{
 		fclose( file );
 		free( data );
-		return -ENODATA;
+		return -AUDIOLOADER_INVALIDFORMAT;
 	}
 	fclose( file );
 	////////////////////////////////
@@ -119,7 +118,7 @@ int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * freq
 	if( !*format )
 	{
 		free( data );
-		return -EPROTONOSUPPORT;
+		return -AUDIOLOADER_INVALIDFORMAT;
 	}
 
 	alGenBuffers( 1, buffer );

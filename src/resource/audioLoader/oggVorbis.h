@@ -6,9 +6,9 @@ extern "C" {
 #endif
 
 
-#include <AL/al.h>
+#include "audioLoader.h"
 
-	
+
 /**
  * \addtogroup audioLoader
  *

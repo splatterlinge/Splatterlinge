@@ -16,6 +16,13 @@ extern "C" {
  **/
 
 
+#define AUDIOLOADER_NOERROR		0
+#define AUDIOLOADER_FILENOTFOUND	1
+#define AUDIOLOADER_INVALIDCONTAINER	2
+#define AUDIOLOADER_INVALIDCODEC	3
+#define AUDIOLOADER_INVALIDFORMAT	4
+
+
 /// Loads the given audio file to a new OpenAL buffer and returns its identifier and additional information
 /**
  * The loader tries to load the file with all implemented loaders until one loader succeeds.

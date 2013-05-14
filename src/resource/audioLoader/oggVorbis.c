@@ -5,7 +5,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
 #include <stdlib.h>
 
 
@@ -19,13 +18,13 @@ int audioLoader_oggVorbis( const char * filename, ALuint * buffer, ALsizei * fre
 
 	FILE * file = fopen( filename, "rb" );
 	if( !file )
-		return -ENOENT;
+		return -AUDIOLOADER_FILENOTFOUND;
 
 	OggVorbis_File oggVorbisFile;
 	if( ov_open( file, &oggVorbisFile, NULL, 0 ) < 0 )
 	{
 		ov_clear( &oggVorbisFile );
-		return -EPROTONOSUPPORT;
+		return -AUDIOLOADER_INVALIDCONTAINER;
 	}
 
 	vorbis_info * vorbisInfo = ov_info( &oggVorbisFile, -1 );
@@ -43,7 +42,7 @@ int audioLoader_oggVorbis( const char * filename, ALuint * buffer, ALsizei * fre
 	if( !*format )
 	{
 		ov_clear( &oggVorbisFile );
-		return -EPROTONOSUPPORT;
+		return -AUDIOLOADER_INVALIDFORMAT;
 	}
 
 	*frequency = vorbisInfo->rate;

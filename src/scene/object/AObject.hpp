@@ -3,6 +3,7 @@
 
 
 #include <GLWidget.hpp>
+
 #include <QQuaternion>
 #include <QVector4D>
 #include <QMatrix4x4>
