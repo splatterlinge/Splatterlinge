@@ -1,5 +1,8 @@
 #include "GLView.hpp"
 
+#include "GfxOptionWindow.hpp"
+#include "HelpWindow.hpp"
+
 #include <GLWidget.hpp>
 #include <scene/Scene.hpp>
 #include <scene/object/Eye.hpp>
@@ -27,21 +30,21 @@ GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
 	mScene->eye()->add( QSharedPointer<AObject>( new World( mScene, "earth" ) ) );
 	setScene( mScene );
 
-	QGraphicsProxyWidget * proxy;
-	QWidget * w = new QWidget();
-	w->setGeometry( 0, 0, 10, 10 );
-	w->setWindowTitle( tr("Ununoctium") );
-	w->setWindowOpacity( 0.8 );
-	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, w );
-	layout->addWidget( new QLabel("W\tForward\nA\tLeft\nS\tBackward\nD\tRight\nControl\tDown\nSpace\tUp\nShift\tSpeedup") );
-	w->setLayout( layout );
-	proxy = scene()->addWidget( w, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint );
-	proxy->setPos( 32, 32 );
+	mHelpWindow = new HelpWindow();
+	scene()->addWidget( mHelpWindow, mHelpWindow->windowFlags() );
+	mHelpWindow->move( 32, 32 );
+
+	mGfxOptionWindow = new GfxOptionWindow( mScene );
+	scene()->addWidget( mGfxOptionWindow, mGfxOptionWindow->windowFlags() );
+	mGfxOptionWindow->move( 64, 64 );
+	mGfxOptionWindow->hide();
 }
 
 
 GLView::~GLView()
 {
+	delete mHelpWindow;
+	delete mGfxOptionWindow;
 	delete mEye;
 	delete mScene;
 	delete mGLWidget;
@@ -52,4 +55,28 @@ void GLView::resizeEvent( QResizeEvent * event )
 {
 	scene()->setSceneRect( QRect(QPoint(0, 0), event->size()) );
 	QGraphicsView::resizeEvent( event );
+}
+
+
+void GLView::keyPressEvent( QKeyEvent * event )
+{
+	QGraphicsView::keyPressEvent( event );
+	switch( event->key() )
+	{
+	case Qt::Key_F1:
+		if( mHelpWindow->isHidden() )
+			mHelpWindow->show();
+		else
+			mHelpWindow->hide();
+		break;
+	case Qt::Key_F2:
+		if( mGfxOptionWindow->isHidden() )
+			mGfxOptionWindow->show();
+		else
+			mGfxOptionWindow->hide();
+		break;
+	default:
+		event->ignore();
+		break;
+	}
 }

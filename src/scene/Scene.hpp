@@ -47,6 +47,8 @@ public:
 	void addMouseListener( AMouseListener * listener ) { mMouseListeners.append( listener ); }
 	void removeKeyListener( AKeyListener * listener ) { mKeyListeners.removeOne( listener ); }
 	void removeMouseListener( AMouseListener * listener ) { mMouseListeners.removeOne( listener ); }
+	
+	void setWireFrame( bool enable ) { mWireFrame = enable; }
 
 protected:
 	// Overrides:
@@ -68,6 +70,7 @@ private:
 	QPoint mDrag;
 	bool mDragging;
 	QFont mFont;
+	bool mWireFrame;
 
 	bool mForwardPressed;
 	bool mBackwardPressed;

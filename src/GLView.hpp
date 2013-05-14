@@ -31,11 +31,14 @@ public:
 protected:
 	// Overrides:
 	void resizeEvent( QResizeEvent * event );
+	void keyPressEvent( QKeyEvent * event );
 
 private:
 	Eye * mEye;
 	GLWidget * mGLWidget;
 	Scene * mScene;
+	QWidget * mGfxOptionWindow;
+	QWidget * mHelpWindow;
 };
 
 #endif

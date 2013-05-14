@@ -136,7 +136,6 @@ void World::drawSelf()
 	glFogfv( GL_FOG_COLOR, reinterpret_cast<const GLfloat*>(&mSky->fogColor()) );
 	glFogf( GL_FOG_START, scene()->eye()->farPlane()*0.75f );
 	glFogf( GL_FOG_END, scene()->eye()->farPlane()*1.1 );
-//	mSky->draw( scene()->eye()->position() );
 }
 
 

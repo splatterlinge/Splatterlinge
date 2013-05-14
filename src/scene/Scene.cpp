@@ -24,6 +24,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mFrameCountSecond = 0;
 	mFramesPerSecond = 0;
 	mDragging = false;
+	mWireFrame = false;
 
 	mForwardPressed = false;
 	mLeftPressed = false;
@@ -134,11 +135,14 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	glCullFace( GL_BACK );
 	glFrontFace( GL_CCW );
 	glEnable( GL_CULL_FACE );
-	glClearColor( 0, 0, 0, 0 );
 
 	glClear( GL_DEPTH_BUFFER_BIT );
+
+	if( mWireFrame )
+		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	mEye->draw();
 	mEye->drawPostProc();
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
 	glMatrixMode( GL_PROJECTION );	glPopMatrix();

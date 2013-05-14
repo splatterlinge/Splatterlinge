@@ -120,51 +120,6 @@ Terrain::~Terrain()
 }
 
 
-QPointF Terrain::toMapF( const QVector3D & point ) const
-{
-	return QPointF(
-		(point.x()-(float)mOffset.x()) * ((float)mMapSize.width()/(float)mSize.x()),
-		(point.z()-(float)mOffset.z()) * ((float)mMapSize.height()/(float)mSize.z())
-	);
-}
-
-
-QPoint Terrain::toMap( const QVector3D & point ) const
-{
-	return QPoint(
-		(point.x()-mOffset.x()) * (mMapSize.width()/mSize.x()),
-		(point.z()-mOffset.z()) * (mMapSize.height()/mSize.z())
-	);
-}
-
-
-QPoint Terrain::toMap( const QPointF & point ) const
-{
-	return QPoint(
-		(point.x()-mOffset.x()) * (mMapSize.width()/mSize.x()),
-		(point.y()-mOffset.z()) * (mMapSize.height()/mSize.z())
-	);
-}
-
-
-QSize Terrain::toMap( const QSizeF & size ) const
-{
-	return QSize(
-		size.width() * (mMapSize.width()/mSize.x()),
-		size.height() * (mMapSize.height()/mSize.z())
-	);
-}
-
-
-QRect Terrain::toMap( const QRectF & rect ) const
-{
-	return QRect(
-		toMap(rect.topLeft()),
-		toMap(rect.size())
-	);
-}
-
-
 void Terrain::drawPatchMap( const QRect & rect )
 {
 	QRect rectToDraw = rect.intersected( QRect( QPoint(0,0), QSize(mMapSize.width()-1,mMapSize.height()-1) ) );

@@ -86,24 +86,12 @@ public:
 	const QVector3D & size() const { return mSize; }	///< The size of the terrain.
 	const QVector3D & offset() const { return mOffset; }	///< The offset of the terrain.
 	
-	/// Direct access to the vertex-position at heightmap coordinates.
-	const QVector3D & getVertexPosition( const int & x, const int & y ) const
-		{ return mVertices[x+y*mMapSize.width()]; }
+	const QVector3D & getVertexPosition( const int & x, const int & y ) const;	///< Direct access to the vertex-position at heightmap coordinates.
+	const QVector3D & getVertexPosition( const QPoint & p ) const;		///< Direct access to the vertex-position at heightmap coordinates.
+	const QVector3D & getVertexNormal( const int & x, const int & y ) const;	///< Direct access to the vertex-normal at heightmap coordinates.
+	const QVector3D & getVertexNormal( const QPoint & p ) const;		///< Direct access to the vertex-normal at heightmap coordinates.
 
-	/// Direct access to the vertex-position at heightmap coordinates.
-	const QVector3D & getVertexPosition( const QPoint & p ) const
-		{ return getVertexPosition( p.x(), p.y() ); }
-
-	/// Direct access to the vertex-normal at heightmap coordinates.
-	const QVector3D & getVertexNormal( const int & x, const int & y ) const
-		{ return mVertices[mMapSize.width()*mMapSize.height() + x+y*mMapSize.width()]; }
-
-	/// Direct access to the vertex-normal at heightmap coordinates.
-	const QVector3D & getVertexNormal( const QPoint & p ) const
-		{ return getVertexNormal( p.x(), p.y() ); }
-
-	/// Calculates the height of the terrain at given position.
-	float getHeight( const QVector3D & position ) const;
+	float getHeight( const QVector3D & position ) const;	///< Calculates the height of the terrain at given position.
 
 	/// Calculates the intersection distance to a single terrain quad. length is used as input and output.
 	bool getLineQuadIntersection( const QVector3D & origin, const QVector3D & direction, const QPoint & quadMapCoord, float * length ) const;
@@ -121,6 +109,75 @@ private:
 	QGLBuffer mIndexBuffer;
 	QGLBuffer mVertexBuffer;
 };
+
+
+inline QPointF Terrain::toMapF( const QVector3D & point ) const
+{
+	return QPointF(
+		(point.x()-(float)mOffset.x()) * ((float)mMapSize.width()/(float)mSize.x()),
+		(point.z()-(float)mOffset.z()) * ((float)mMapSize.height()/(float)mSize.z())
+	);
+}
+
+
+inline QPoint Terrain::toMap( const QVector3D & point ) const
+{
+	return QPoint(
+		(point.x()-mOffset.x()) * (mMapSize.width()/mSize.x()),
+		(point.z()-mOffset.z()) * (mMapSize.height()/mSize.z())
+	);
+}
+
+
+inline QPoint Terrain::toMap( const QPointF & point ) const
+{
+	return QPoint(
+		(point.x()-mOffset.x()) * (mMapSize.width()/mSize.x()),
+		(point.y()-mOffset.z()) * (mMapSize.height()/mSize.z())
+	);
+}
+
+
+inline QSize Terrain::toMap( const QSizeF & size ) const
+{
+	return QSize(
+		size.width() * (mMapSize.width()/mSize.x()),
+		size.height() * (mMapSize.height()/mSize.z())
+	);
+}
+
+
+inline QRect Terrain::toMap( const QRectF & rect ) const
+{
+	return QRect(
+		toMap(rect.topLeft()),
+		toMap(rect.size())
+	);
+}
+
+
+inline const QVector3D & Terrain::getVertexPosition( const int & x, const int & y ) const
+{
+	return mVertices[x+y*mMapSize.width()];
+}
+
+
+inline const QVector3D & Terrain::getVertexPosition( const QPoint & p ) const
+{
+	return getVertexPosition( p.x(), p.y() );
+}
+
+
+inline const QVector3D & Terrain::getVertexNormal( const int & x, const int & y ) const
+{
+	return mVertices[mMapSize.width()*mMapSize.height() + x+y*mMapSize.width()];
+}
+
+
+inline const QVector3D & Terrain::getVertexNormal( const QPoint & p ) const
+{
+	return getVertexNormal( p.x(), p.y() );
+}
 
 
 #endif
