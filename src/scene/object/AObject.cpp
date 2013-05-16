@@ -68,7 +68,7 @@ void AObject::update( const float & delta )
 void AObject::draw()
 {
 	glPushMatrix();
-	glMultMatrixd( matrix().constData() );
+    glMultMatrixf( matrix().constData() );
 	drawSelf();
 	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
@@ -83,7 +83,7 @@ void AObject::draw()
 void AObject::drawPostProc()
 {
 	glPushMatrix();
-	glMultMatrixd( matrix().constData() );
+    glMultMatrixf( matrix().constData() );
 	drawSelfPostProc();
 	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )

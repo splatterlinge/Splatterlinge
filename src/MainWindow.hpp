@@ -1,8 +1,9 @@
 #ifndef MAINWINDOW_INCLUDED
 #define MAINWINDOW_INCLUDED
 
+#include <QApplication>
 #include <QMainWindow>
-
+#include <QStyleFactory>
 
 class GLScene;
 class GLView;
