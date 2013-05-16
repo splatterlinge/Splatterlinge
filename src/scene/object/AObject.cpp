@@ -68,7 +68,7 @@ void AObject::update( const float & delta )
 void AObject::draw()
 {
 	glPushMatrix();
-#if QT_VERSION < 0x05
+#if QT_VERSION < 0x050000
     glMultMatrixd( matrix().constData() );
 #else
     glMultMatrixf( matrix().constData() );
