@@ -1,5 +1,5 @@
-#ifndef OBJECT3D_INCLUDED
-#define OBJECT3D_INCLUDED
+#ifndef AOBJECT3D_INCLUDED
+#define AOBJECT3D_INCLUDED
 
 
 #include <GLWidget.hpp>
@@ -100,7 +100,7 @@ public:
 	virtual void updateSelfPost( const float & delta ) {};
 	/// Executed after all sub-objects are drawn
 	virtual void drawSelfPost() {};
-	/// Draw post processing effects
+	///TODO: Find a better name
 	void drawPostProc();
 	/// Executet after the usual drawing functions - e.g. for rendering FBOs
 	virtual void drawSelfPostProc() {};
