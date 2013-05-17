@@ -2,6 +2,7 @@
 #include "audioLoader/audioLoader.h"
 
 #include <scene/object/AObject.hpp>
+#include <utility/qtalwrappers.hpp>
 
 #include <QDebug>
 #include <QVector3D>
@@ -71,12 +72,12 @@ AudioSample::~AudioSample()
 
 void AudioSample::update()
 {
-	alSourcefv( mSource, AL_POSITION, reinterpret_cast<const ALfloat*>(&mObjectHook->position()) );
-	alSourcef( mSource, AL_PITCH, mPitch);
-	alSourcef( mSource, AL_REFERENCE_DISTANCE, mReferenceDistance );
-	alSourcef( mSource, AL_ROLLOFF_FACTOR, mRolloffFactor );
-	alSourcef( mSource, AL_GAIN, mGain);
-	alSourcei( mSource, AL_LOOPING, mLooping);
+	alSource( mSource, AL_POSITION, mObjectHook->position() );
+	alSource( mSource, AL_PITCH, mPitch);
+	alSource( mSource, AL_REFERENCE_DISTANCE, mReferenceDistance );
+	alSource( mSource, AL_ROLLOFF_FACTOR, mRolloffFactor );
+	alSource( mSource, AL_GAIN, mGain);
+	alSource( mSource, AL_LOOPING, mLooping);
 }
 
 

@@ -47,13 +47,6 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	QObject::connect( secondTimer, SIGNAL(timeout()), this, SLOT(secondPassed()) );
 	secondTimer->setInterval( 1000 );
 	secondTimer->start();
-/*
-	QTimer * updateTimer = new QTimer( this );
-	QObject::connect( updateTimer, SIGNAL(timeout()), this, SLOT(update()) );
-	updateTimer->setInterval( 10 );
-	updateTimer->start();
-*/
-//	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
 	mElapsedTimer.start();
 }
@@ -124,11 +117,10 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	glMatrixMode( GL_PROJECTION );	glPushMatrix();	glLoadIdentity();
 	glMatrixMode( GL_MODELVIEW );	glPushMatrix();	glLoadIdentity();
 
-	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 	glDisable( GL_BLEND );
 	glDisable( GL_TEXTURE_2D );
-	glEnable( GL_LIGHTING );
-	glEnable( GL_LIGHT0 );
+	glDisable( GL_LIGHTING );
+	glDisable( GL_LIGHT0 );
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LEQUAL );
 	glShadeModel( GL_SMOOTH );

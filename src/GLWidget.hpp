@@ -6,6 +6,7 @@
 
 #include <QGLWidget>
 
+#include "utility/qtglwrappers.hpp"
 
 
 class GLWidget : public QGLWidget

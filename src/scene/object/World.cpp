@@ -12,7 +12,6 @@
 World::World( Scene * scene, QString name ) :
 	AObject( scene )
 {
-
 	QSettings s( "./data/world/"+name+".ini", QSettings::IniFormat );
 	s.beginGroup( "World" );
 		QString skyName = s.value( "skyName", "earth" ).toString();
@@ -129,13 +128,13 @@ void World::updateSelf( const float & delta )
 
 void World::drawSelf()
 {
-	glLightfv( GL_LIGHT0, GL_POSITION, reinterpret_cast<const GLfloat*>(&mSky->sunDirection()) );
-	glLightfv( GL_LIGHT0, GL_AMBIENT, reinterpret_cast<const GLfloat*>(&mSky->ambient()) );
-	glLightfv( GL_LIGHT0, GL_DIFFUSE, reinterpret_cast<const GLfloat*>(&mSky->diffuse()) );
-	glLightfv( GL_LIGHT0, GL_SPECULAR, reinterpret_cast<const GLfloat*>(&mSky->specular()) );
-	glFogfv( GL_FOG_COLOR, reinterpret_cast<const GLfloat*>(&mSky->fogColor()) );
-	glFogf( GL_FOG_START, scene()->eye()->farPlane()*0.75f );
-	glFogf( GL_FOG_END, scene()->eye()->farPlane()*1.1 );
+	glLight( GL_LIGHT0, GL_POSITION, mSky->sunDirection() );
+	glLight( GL_LIGHT0, GL_AMBIENT, mSky->ambient() );
+	glLight( GL_LIGHT0, GL_DIFFUSE, mSky->diffuse() );
+	glLight( GL_LIGHT0, GL_SPECULAR, mSky->specular() );
+	glFog( GL_FOG_COLOR, mSky->fogColor() );
+	glFog( GL_FOG_START, scene()->eye()->farPlane()*0.75f );
+	glFog( GL_FOG_END, scene()->eye()->farPlane()*1.1f );
 }
 
 
