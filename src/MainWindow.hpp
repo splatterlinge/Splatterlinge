@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QStyleFactory>
+#include <QKeyEvent>
 
 class GLScene;
 class GLView;
