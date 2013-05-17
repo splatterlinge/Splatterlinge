@@ -4,7 +4,7 @@ cmake_minimum_required( VERSION 2.8.0 )
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/" )
 set( QT_VERSION "4.8.0" CACHE STRING "QT Version" )
 
-message( STATUS ${QT_VERSION} )
+message( STATUS "Using QT Version ${QT_VERSION}" )
 if( QT_VERSION LESS "5.0" )
     find_package( Qt4 COMPONENTS QtCore QtGui QtOpengl REQUIRED )
     include( ${QT_USE_FILE} )
