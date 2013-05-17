@@ -5,6 +5,7 @@ CMakeLists.txt.user
 cmake_install.cmake
 Makefile
 moc_*.cxx
+moc_*.cpp
 Ununoctium.cbp
 Ununoctium.kdev4
 .kdev4/
