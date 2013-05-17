@@ -19,9 +19,13 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 
 	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
 
-	wireFrame = new QCheckBox( "WireFrame" );
-	QObject::connect( wireFrame, SIGNAL(stateChanged(int)), this, SLOT(setWireFrame(int)) );
-	layout->addWidget( wireFrame );
+	mWireFrame = new QCheckBox( "WireFrame" );
+	QObject::connect( mWireFrame, SIGNAL(stateChanged(int)), this, SLOT(setWireFrame(int)) );
+	layout->addWidget( mWireFrame );
+
+	mBoundingSpheres = new QCheckBox( "BoundingSpheres" );
+	QObject::connect( mBoundingSpheres, SIGNAL(stateChanged(int)), this, SLOT(setBoundingSpheres(int)) );
+	layout->addWidget( mBoundingSpheres );
 
 	layout->addWidget( new QLabel("Material Quality:") );
 	materialQuality = new QSlider( Qt::Horizontal );
@@ -45,6 +49,12 @@ GfxOptionWindow::~GfxOptionWindow()
 void GfxOptionWindow::setWireFrame( int enable )
 {
 	mScene->setWireFrame( enable );
+}
+
+
+void GfxOptionWindow::setBoundingSpheres( int enable )
+{
+	AObject::setGlobalDebugBoundingSpheres( enable );
 }
 
 

@@ -300,38 +300,12 @@ bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & d
 
 	while( true )
 	{
-/*
-		glDisable( GL_TEXTURE_2D );
-		glDisable( GL_LIGHTING );
-		glColor3f( 1,0,0 );
-		const_cast<Terrain*>(this)->drawPatchMap( QRect( x, y, 1, 1 ) );
-		glColor3f( 0,1,0 );
-		const_cast<Terrain*>(this)->drawPatchMap( QRect( x+ox, y+oy, 1, 1 ) );
-		glColor3f( 0,0,1 );
-		const_cast<Terrain*>(this)->drawPatchMap( QRect( x-ox, y-oy, 1, 1 ) );
-*/
 		bool intersects = false;
 		intersects |= getLineQuadIntersection( origin, direction, QPoint(x, y), length );
 		intersects |= getLineQuadIntersection( origin, direction, QPoint(x+ox, y+oy), length );
 		intersects |= getLineQuadIntersection( origin, direction, QPoint(x-ox, y-oy), length );
 		if( intersects )
-		{
-/*
-			QVector3D intersectionPoint = origin+direction*(*length);
-			glBegin( GL_LINES );
-				glColor3f( 0,1,1 );
-				glVertex3f( intersectionPoint.x(), intersectionPoint.y()+1, intersectionPoint.z() );
-				glVertex3f( intersectionPoint.x(), intersectionPoint.y()-1, intersectionPoint.z() );
-				glColor3f( 1,1,0 );
-				glVertex3f( intersectionPoint.x()+1, intersectionPoint.y()+1, intersectionPoint.z() );
-				glVertex3f( intersectionPoint.x()-1, intersectionPoint.y()-1, intersectionPoint.z() );
-				glColor3f( 1,0,1 );
-				glVertex3f( intersectionPoint.x(), intersectionPoint.y()+1, intersectionPoint.z()+1 );
-				glVertex3f( intersectionPoint.x(), intersectionPoint.y()-1, intersectionPoint.z()-1 );
-			glEnd();
-*/
 			return true;
-		}
 
 		if( x == mapTo.x() && y == mapTo.y() )
 			break;

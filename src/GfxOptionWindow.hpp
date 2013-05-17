@@ -21,12 +21,14 @@ public:
 
 private:
 	Scene * mScene;
-	QCheckBox * wireFrame;
+	QCheckBox * mWireFrame;
+	QCheckBox * mBoundingSpheres;
 	QSlider * materialQuality;
 
 public slots:
 	void setMaterialQuality( int q );
 	void setWireFrame( int enable );
+	void setBoundingSpheres( int enable );
 };
 
 

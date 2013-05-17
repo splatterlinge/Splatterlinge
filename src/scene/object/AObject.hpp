@@ -36,7 +36,7 @@ class AObject
 {
 public:
 	/// Creates an object for the given scene
-	AObject( Scene * scene );
+	AObject( Scene * scene, float boundingSphereRadius=0.0f );
 	/// Copies an object
 	AObject( const AObject & other );
 	/// Frees this object
@@ -105,6 +105,9 @@ public:
 	/// Executet after the usual drawing functions - e.g. for rendering FBOs
 	virtual void drawSelfPostProc() {};
 
+	const float & boundingSphereRadius() const { return mBoundingSphereRadius; }
+	static void setGlobalDebugBoundingSpheres( bool enable ) { sDebugBoundingSpheres = enable; }
+
 protected:
 	/// Precalculated matrix
 	mutable QMatrix4x4 mMatrix;
@@ -112,11 +115,16 @@ protected:
 	/// Updates this object's matrix to match it's position and rotation
 	virtual void updateMatrix() const;
 
+	void setBoundingSphere( const float & radius ) { mBoundingSphereRadius = radius; }
+	void drawBoundingShpere();
+
 private:
+	static bool sDebugBoundingSpheres;
 	Scene * mScene;
 	AObject * mParent;
 	QVector3D mPosition;
 	QQuaternion mRotation;
+	float mBoundingSphereRadius;
 	QList< QSharedPointer<AObject> > mSubNodes;
 	mutable bool mMatrixNeedsUpdate;
 
