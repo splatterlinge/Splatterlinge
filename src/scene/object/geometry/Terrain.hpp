@@ -2,6 +2,7 @@
 #define SCENE_OBJECT_GEOMETRY_TERRAIN_INCLUDED
 
 #include <GLWidget.hpp>
+
 #include <QString>
 #include <QPoint>
 #include <QPointF>
@@ -12,6 +13,8 @@
 #include <QVector>
 #include <QVector3D>
 #include <QGLBuffer>
+
+#include <math.h>
 
 
 /// Generates and draws a mesh based on a heightmap.
@@ -108,14 +111,15 @@ private:
 	QVector<QVector3D> mVertices;
 	QGLBuffer mIndexBuffer;
 	QGLBuffer mVertexBuffer;
+	QSizeF mToMapFactor;
 };
 
 
 inline QPointF Terrain::toMapF( const QVector3D & point ) const
 {
 	return QPointF(
-		(point.x()-(float)mOffset.x()) * ((float)mMapSize.width()/(float)mSize.x()),
-		(point.z()-(float)mOffset.z()) * ((float)mMapSize.height()/(float)mSize.z())
+		(point.x()-(float)mOffset.x()) * mToMapFactor.width(),
+		(point.z()-(float)mOffset.z()) * mToMapFactor.height()
 	);
 }
 
@@ -123,8 +127,8 @@ inline QPointF Terrain::toMapF( const QVector3D & point ) const
 inline QPoint Terrain::toMap( const QVector3D & point ) const
 {
 	return QPoint(
-		(point.x()-mOffset.x()) * (mMapSize.width()/mSize.x()),
-		(point.z()-mOffset.z()) * (mMapSize.height()/mSize.z())
+		floorf( (point.x()-mOffset.x()) * mToMapFactor.width() ),
+		floorf( (point.z()-mOffset.z()) * mToMapFactor.height() )
 	);
 }
 
@@ -132,8 +136,8 @@ inline QPoint Terrain::toMap( const QVector3D & point ) const
 inline QPoint Terrain::toMap( const QPointF & point ) const
 {
 	return QPoint(
-		(point.x()-mOffset.x()) * (mMapSize.width()/mSize.x()),
-		(point.y()-mOffset.z()) * (mMapSize.height()/mSize.z())
+		floorf( (point.x()-mOffset.x()) * mToMapFactor.width() ),
+		floorf( (point.y()-mOffset.z()) * mToMapFactor.height() )
 	);
 }
 
@@ -141,8 +145,8 @@ inline QPoint Terrain::toMap( const QPointF & point ) const
 inline QSize Terrain::toMap( const QSizeF & size ) const
 {
 	return QSize(
-		size.width() * (mMapSize.width()/mSize.x()),
-		size.height() * (mMapSize.height()/mSize.z())
+		ceilf( size.width() * mToMapFactor.width() ),
+		ceilf( size.height() * mToMapFactor.height() )
 	);
 }
 

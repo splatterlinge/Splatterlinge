@@ -9,7 +9,7 @@ Eye::Eye( Scene * scene ) :
 	AObject( scene ),
 	mFOV(60.0f),
 	mNearPlane(0.1f),
-	mFarPlane(500.0f)
+	mFarPlane(200.0f)
 {
 }
 

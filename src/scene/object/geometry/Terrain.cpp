@@ -19,6 +19,8 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 	mMapSize = heightMap.size();
 	mSize = size;
 	mOffset = offset;
+	mToMapFactor = QSizeF( (float)mMapSize.width()/(float)mSize.x(), (float)mMapSize.height()/(float)mSize.z() );
+
 	mVertices.clear();
 
 	// prepare positions

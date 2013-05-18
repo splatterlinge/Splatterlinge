@@ -133,7 +133,7 @@ void World::drawSelf()
 	glLight( GL_LIGHT0, GL_DIFFUSE, mSky->diffuse() );
 	glLight( GL_LIGHT0, GL_SPECULAR, mSky->specular() );
 	glFog( GL_FOG_COLOR, mSky->fogColor() );
-	glFog( GL_FOG_START, scene()->eye()->farPlane()*0.75f );
+	glFog( GL_FOG_START, scene()->eye()->farPlane()*0.9f );
 	glFog( GL_FOG_END, scene()->eye()->farPlane()*1.1f );
 }
 

@@ -185,7 +185,7 @@ void Landscape::drawPatch( const QRectF & rect )
 	mTerrainMaterial->bind();
 	glMatrixMode( GL_TEXTURE );	glPushMatrix();
 	glScalef( mTerrainMaterialScale.x(), mTerrainMaterialScale.y(), 1.0f );
-	mTerrain->drawPatchMap( mTerrain->toMap(rect) );
+	mTerrain->drawPatch( rect );
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
 	glMatrixMode( GL_MODELVIEW );
 	mTerrainMaterial->release();
@@ -195,7 +195,7 @@ void Landscape::drawPatch( const QRectF & rect )
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	for( int i = 0; i < mBlobs.size(); ++i )
 	{
-		mBlobs[i]->drawPatchMap( mTerrain->toMap(rect) );
+		mBlobs[i]->drawPatch( rect );
 	}
 	glDisable( GL_BLEND );
 	glDepthMask( GL_TRUE );
@@ -298,6 +298,12 @@ Landscape::Filter::Filter( Landscape * landscape, QSize filterSize ) :
 	 * from
 	 * '-----far----'
 	 */
+/*
+	QPoint eyeMap( landscape->terrain()->toMap( landscape->scene()->eye()->position() ) );
+	QSizeF size( landscape->scene()->eye()->farPlane()*2.0f, landscape->scene()->eye()->farPlane()*2.0f );
+	QSize sizeMap( landscape->terrain()->toMap( size ) );
+	QPoint from( eyeMap -  );
+*/
 	float far = landscape->scene()->eye()->farPlane();
 	QVector3D from = QVector3D( -far, landscape->terrain()->offset().y(), -far );
 	QVector3D size = QVector3D( 2.0f*far, landscape->terrain()->size().y(), 2.0f*far );
@@ -332,7 +338,7 @@ void Landscape::Filter::draw()
 			Patch & patch = mPatches[z*mFilterSize.width()+x];
 			QVector3D eyePosition = QVector3D( mLandscape->scene()->eye()->position().x(), 0.0f, mLandscape->scene()->eye()->position().z() );
 			QVector3D spherePosition = eyePosition + patch.center();
-/*
+
 			glPushAttrib( GL_POLYGON_BIT );
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 			glColor3f( 1, 1, 1 );
@@ -341,7 +347,7 @@ void Landscape::Filter::draw()
 			gluSphere( q, patch.boundingSphereRadius(), 32, 32 );
 			glPopMatrix();
 			glPopAttrib();
-*/
+
 			if( mLandscape->scene()->eye()->isSphereInFrustum( spherePosition, patch.boundingSphereRadius() ) )
 			{
 				/*
