@@ -12,56 +12,6 @@
 #include <QGLShaderProgram>
 
 
-Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, QVector2D materialScale, QString blobMapPath )
-{
-	mGLWidget = landscape->scene()->glWidget();
-	mLandscape = landscape;
-	mRect = rect;
-	mMaterialScale = materialScale;
-	mMaterial = new Material( mGLWidget, materialName, Material::BLOBBING_SHADERTYPE );
-	QPixmap blobMap = QPixmap( blobMapPath );
-	if( blobMap.isNull() )
-	{
-		qFatal( "BlobMap from file \"%s\" could not be loaded!", blobMapPath.toLocal8Bit().constData() );
-	}
-	mBlobMap =  mGLWidget->bindTexture( blobMap, GL_TEXTURE_2D, GL_RED, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
-	mMaterial->setBlobMap( mBlobMap );
-}
-
-
-Landscape::Blob::~Blob()
-{
-	delete mMaterial;
-}
-
-
-void Landscape::Blob::drawPatchMap( const QRect & visible )
-{
-	QRect rectToDraw = mRect.intersected( visible );
-	if( rectToDraw.width() <= 1 || rectToDraw.height() <= 1 )
-		return;	// nothing to draw
-
-	mMaterial->bind();
-	glMatrixMode( GL_TEXTURE );
-
-	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
-	glScaled( mMaterialScale.x(), mMaterialScale.y(), 1.0 );
-
-	glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
-	glScaled( 1.0/((double)mRect.width()), 1.0/((double)mRect.height()), 1.0 );
-	glTranslated( -mRect.x(), -mRect.y(), 0.0 );
-
-	mLandscape->terrain()->drawPatchMap( rectToDraw );
-
-	glMatrixMode( GL_TEXTURE );
-	glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
-	glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
-
-	glMatrixMode( GL_MODELVIEW );
-	mMaterial->release();
-}
-
-
 Landscape::Landscape( Scene * scene, QString name ) :
 	AObject( scene )
 {
@@ -111,6 +61,7 @@ Landscape::Landscape( Scene * scene, QString name ) :
 	s.endArray();
 
 	mTerrain = new Terrain( "./data/landscape/"+name+"/"+heightMapPath, mTerrainSize, mTerrainOffset );
+	mTerrainFilter = new Filter( this, QSize(3,3) );
 	mTerrainMaterial = new Material( scene->glWidget(), terrainMaterial );
 
 	mWaterShader = new Shader( scene->glWidget(), "water" );
@@ -126,6 +77,7 @@ Landscape::~Landscape()
 		delete mBlobs[i];
 	}
 	delete mTerrain;
+	delete mTerrainFilter;
 	delete mTerrainMaterial;
 	delete mReflectionRenderer;
 	delete mRefractionRenderer;
@@ -145,28 +97,7 @@ void Landscape::drawSelf()
 
 void Landscape::drawSelfPost()
 {
-	QRectF visible( scene()->eye()->position().x() - scene()->eye()->farPlane(),
-			scene()->eye()->position().z() - scene()->eye()->farPlane(),
-			scene()->eye()->farPlane()*2,
-			scene()->eye()->farPlane()*2 );
-
-	mTerrainMaterial->bind();
-	glMatrixMode( GL_TEXTURE );	glPushMatrix();
-	glScalef( mTerrainMaterialScale.x(), mTerrainMaterialScale.y(), 1.0f );
-	mTerrain->drawPatchMap( mTerrain->toMap(visible) );
-	glMatrixMode( GL_TEXTURE );	glPopMatrix();
-	glMatrixMode( GL_MODELVIEW );
-	mTerrainMaterial->release();
-
-	glDepthMask( GL_FALSE );
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	for( int i = 0; i < mBlobs.size(); ++i )
-	{
-		mBlobs[i]->drawPatchMap( mTerrain->toMap(visible) );
-	}
-	glDisable( GL_BLEND );
-	glDepthMask( GL_TRUE );
+	mTerrainFilter->draw();
 }
 
 
@@ -246,4 +177,190 @@ void Landscape::drawSelfPostProc()
 	mWaterShader->release();
 	glPopMatrix();
 	glEnable( GL_CULL_FACE );
+}
+
+
+void Landscape::drawPatch( const QRectF & rect )
+{
+	mTerrainMaterial->bind();
+	glMatrixMode( GL_TEXTURE );	glPushMatrix();
+	glScalef( mTerrainMaterialScale.x(), mTerrainMaterialScale.y(), 1.0f );
+	mTerrain->drawPatchMap( mTerrain->toMap(rect) );
+	glMatrixMode( GL_TEXTURE );	glPopMatrix();
+	glMatrixMode( GL_MODELVIEW );
+	mTerrainMaterial->release();
+
+	glDepthMask( GL_FALSE );
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	for( int i = 0; i < mBlobs.size(); ++i )
+	{
+		mBlobs[i]->drawPatchMap( mTerrain->toMap(rect) );
+	}
+	glDisable( GL_BLEND );
+	glDepthMask( GL_TRUE );
+}
+
+
+
+
+////////////////////////////////////////////////////////////////
+// Blob
+
+
+Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, QVector2D materialScale, QString blobMapPath )
+{
+	mGLWidget = landscape->scene()->glWidget();
+	mLandscape = landscape;
+	mRect = rect;
+	mMaterialScale = materialScale;
+	mMaterial = new Material( mGLWidget, materialName, Material::BLOBBING_SHADERTYPE );
+	QPixmap blobMap = QPixmap( blobMapPath );
+	if( blobMap.isNull() )
+	{
+		qFatal( "BlobMap from file \"%s\" could not be loaded!", blobMapPath.toLocal8Bit().constData() );
+	}
+	mBlobMap =  mGLWidget->bindTexture( blobMap, GL_TEXTURE_2D, GL_RED, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
+	mMaterial->setBlobMap( mBlobMap );
+}
+
+
+Landscape::Blob::~Blob()
+{
+	delete mMaterial;
+}
+
+
+void Landscape::Blob::drawPatchMap( const QRect & visible )
+{
+	QRect rectToDraw = mRect.intersected( visible );
+	if( rectToDraw.width() <= 1 || rectToDraw.height() <= 1 )
+		return;	// nothing to draw
+
+	mMaterial->bind();
+	glMatrixMode( GL_TEXTURE );
+
+	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
+	glScaled( mMaterialScale.x(), mMaterialScale.y(), 1.0 );
+
+	glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
+	glScaled( 1.0/((double)mRect.width()), 1.0/((double)mRect.height()), 1.0 );
+	glTranslated( -mRect.x(), -mRect.y(), 0.0 );
+
+	mLandscape->terrain()->drawPatchMap( rectToDraw );
+
+	glMatrixMode( GL_TEXTURE );
+	glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
+	glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
+
+	glMatrixMode( GL_MODELVIEW );
+	mMaterial->release();
+}
+
+
+
+
+////////////////////////////////////////////////////////////////
+// Filter
+
+
+Landscape::Filter::Patch::Patch( QVector3D position, QVector3D size ) :
+	mPosition(position),
+	mSize(size)
+{
+	mCenter = mPosition + mSize/2.0;
+	mBoundingSphereRadius = size.length()/2.0f;
+}
+
+
+Landscape::Filter::Filter( Landscape * landscape, QSize filterSize ) :
+	mLandscape(landscape),
+	mFilterSize(filterSize)
+{
+	/* example for filterSize 3x3
+	 *
+	 * .---------size.x()---------.
+	 *                   .-stepX--.
+	 * |--------|--------|--------|-    -
+	 * |        |        |        | |    |
+	 * |        |        |        |stepZ |
+	 * |        |        |        | |    |
+	 * |--------|--------|--------|-     |
+	 * |        |        |        |      |
+	 * |        |  Eye   |        |     size.z()
+	 * |        |        |        |      |
+	 * |--------|--------|--------|      |
+	 * |        |        |        |      |
+	 * |        |        |        |      |
+	 * |        |        |        |      |
+	 * |--------|--------|--------|     -
+	 * ^
+	 * from
+	 * '-----far----'
+	 */
+	float far = landscape->scene()->eye()->farPlane();
+	QVector3D from = QVector3D( -far, landscape->terrain()->offset().y(), -far );
+	QVector3D size = QVector3D( 2.0f*far, landscape->terrain()->size().y(), 2.0f*far );
+	float stepX =  size.x()/(float)filterSize.width();
+	float stepZ =  size.z()/(float)filterSize.height();
+	QVector3D patchSize = QVector3D( stepX, landscape->terrain()->size().y(), stepZ );
+	mPatches.clear();
+	for( int z=0; z<mFilterSize.height(); ++z )
+	{
+		for( int x=0; x<mFilterSize.width(); ++x )
+		{
+			QVector3D pos = from + QVector3D( (float)x*stepX, 0.0f, (float)z*stepZ );
+			mPatches.push_back( Patch( pos, patchSize ) );
+		}
+	}
+}
+
+
+Landscape::Filter::~Filter()
+{
+
+}
+
+
+void Landscape::Filter::draw()
+{
+	GLUquadric * q = gluNewQuadric();
+	for( int z=0; z<mFilterSize.height(); ++z )
+	{
+		for( int x=0; x<mFilterSize.width(); ++x )
+		{
+			Patch & patch = mPatches[z*mFilterSize.width()+x];
+			QVector3D eyePosition = QVector3D( mLandscape->scene()->eye()->position().x(), 0.0f, mLandscape->scene()->eye()->position().z() );
+			QVector3D spherePosition = eyePosition + patch.center();
+/*
+			glPushAttrib( GL_POLYGON_BIT );
+			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			glColor3f( 1, 1, 1 );
+			glPushMatrix();
+			glTranslate( spherePosition );
+			gluSphere( q, patch.boundingSphereRadius(), 32, 32 );
+			glPopMatrix();
+			glPopAttrib();
+*/
+			if( mLandscape->scene()->eye()->isSphereInFrustum( spherePosition, patch.boundingSphereRadius() ) )
+			{
+				/*
+				qDebug() << "Patch" << x << "x" << z << ": "
+					<< "from" << patch.position()
+					<< "size" << patch.size()
+					<< "center" << patch.center()
+					<< "radius" << patch.boundingSphereRadius();
+				*/
+				mLandscape->drawPatch(
+					QRectF(
+						eyePosition.x() + patch.position().x(),
+						eyePosition.z() + patch.position().z(),
+						patch.size().x(),
+						patch.size().z()
+					)
+				);
+			}
+		}
+	}
+	gluDeleteQuadric( q );
 }

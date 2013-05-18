@@ -29,6 +29,7 @@ public:
 
 	virtual void updateSelf( const float & delta );
 	virtual void drawSelf();
+
 	const QVector4D & fogColor() const { return mFogColor; }
 	const QVector4D & ambient() const { return mAmbient; }
 	const QVector4D & diffuse() const { return mDiffuse; }

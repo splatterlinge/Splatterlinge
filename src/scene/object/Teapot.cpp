@@ -38,13 +38,6 @@ void Teapot::updateSelf( const float & delta )
 
 void Teapot::drawSelf()
 {
-	char blubber[] = "[........]";
-	static int blubberCount = 0;
-	blubber[blubberCount/8+1] = 'O';
-	blubberCount++;
-	blubberCount %= 8*8;
-	qDebug( "Tea%sPot", blubber );
-
 	mMaterial->bind();
 	glDisable( GL_CULL_FACE );
 	teapot( 8, mSize, GL_FILL );

@@ -24,6 +24,21 @@ class Material;
 class Landscape : public AObject
 {
 public:
+	Landscape( Scene * scene, QString rootDir );
+	~Landscape();
+
+	virtual void updateSelf( const float & delta );
+	virtual void drawSelf();
+	virtual void drawSelfPost();
+	virtual void drawSelfPostProc();
+	
+	void drawPatch( const QRectF & rect );
+
+	Terrain * terrain() { return mTerrain; }
+	const Terrain * terrain() const { return mTerrain; }
+
+private:
+	/// Draws a part of the Terrain using another Material.
 	class Blob
 	{
 		GLWidget * mGLWidget;
@@ -34,28 +49,45 @@ public:
 		GLuint mBlobMap;
 		QRect mRect;
 	public:
-		Blob( Landscape * landscape, QRect rect, QString material, QVector2D materialScale, QString maskPath );
+		Blob( Landscape * landscape, QRect rect, QString material, QVector2D materialScale, QString blobMapPath );
 		~Blob();
 		void drawPatchMap( const QRect & visible );
 		void drawPatch( const QRectF & visible )
 			{ drawPatchMap( mLandscape->terrain()->toMap(visible) ); }
 	};
 
-	Landscape( Scene * scene, QString rootDir );
-	~Landscape();
+	/// Splits the Terrain into a grid of patches and applies frustum culling.
+	class Filter
+	{
+	public:
+		Filter( Landscape * landscape, QSize filterSize );
+		~Filter();
+		void draw();
+	private:
+		class Patch
+		{
+		public:
+			Patch() : mPosition(), mSize(), mCenter(), mBoundingSphereRadius(0.0f) {};
+			Patch( QVector3D position, QVector3D size );
+			const QVector3D & position() { return mPosition; }
+			const QVector3D & size() { return mSize; }
+			const QVector3D & center() { return mCenter; }
+			const float & boundingSphereRadius() { return mBoundingSphereRadius; }
+		private:
+			QVector3D mPosition;
+			QVector3D mSize;
+			QVector3D mCenter;
+			float mBoundingSphereRadius;
+		};
+		Landscape * mLandscape;
+		QSize mFilterSize;
+		QVector<Patch> mPatches;
+	};
 
-	virtual void updateSelf( const float & delta );
-	virtual void drawSelf();
-	virtual void drawSelfPost();
-	virtual void drawSelfPostProc();
-
-	Terrain * terrain() { return mTerrain; }
-	const Terrain * terrain() const { return mTerrain; }
-
-private:
 	QString mName;
 	QVector<Blob*> mBlobs;
 	Terrain * mTerrain;
+	Filter * mTerrainFilter;
 	Material * mTerrainMaterial;
 	QVector3D mTerrainSize;
 	QVector3D mTerrainOffset;

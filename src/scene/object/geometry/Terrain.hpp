@@ -1,7 +1,7 @@
-#ifndef TERRAIN_INCLUDED
-#define TERRAIN_INCLUDED
+#ifndef SCENE_OBJECT_GEOMETRY_TERRAIN_INCLUDED
+#define SCENE_OBJECT_GEOMETRY_TERRAIN_INCLUDED
 
-
+#include <GLWidget.hpp>
 #include <QString>
 #include <QPoint>
 #include <QPointF>
