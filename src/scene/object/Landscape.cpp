@@ -61,7 +61,7 @@ Landscape::Landscape( Scene * scene, QString name ) :
 	s.endArray();
 
 	mTerrain = new Terrain( "./data/landscape/"+name+"/"+heightMapPath, mTerrainSize, mTerrainOffset );
-	mTerrainFilter = new Filter( this, QSize(3,3) );
+	mTerrainFilter = new Filter( this, QSize(5,5) );
 	mTerrainMaterial = new Material( scene->glWidget(), terrainMaterial );
 
 	mWaterShader = new Shader( scene->glWidget(), "water" );
@@ -298,12 +298,6 @@ Landscape::Filter::Filter( Landscape * landscape, QSize filterSize ) :
 	 * from
 	 * '-----far----'
 	 */
-/*
-	QPoint eyeMap( landscape->terrain()->toMap( landscape->scene()->eye()->position() ) );
-	QSizeF size( landscape->scene()->eye()->farPlane()*2.0f, landscape->scene()->eye()->farPlane()*2.0f );
-	QSize sizeMap( landscape->terrain()->toMap( size ) );
-	QPoint from( eyeMap -  );
-*/
 	float far = landscape->scene()->eye()->farPlane();
 	QVector3D from = QVector3D( -far, landscape->terrain()->offset().y(), -far );
 	QVector3D size = QVector3D( 2.0f*far, landscape->terrain()->size().y(), 2.0f*far );
@@ -319,6 +313,12 @@ Landscape::Filter::Filter( Landscape * landscape, QSize filterSize ) :
 			mPatches.push_back( Patch( pos, patchSize ) );
 		}
 	}
+/*TODO: maybe do these calculations in map coordinates ...
+	QPoint eyeMap( landscape->terrain()->toMap( landscape->scene()->eye()->position() ) );
+	QSizeF size( landscape->scene()->eye()->farPlane()*2.0f, landscape->scene()->eye()->farPlane()*2.0f );
+	QSize sizeMap( landscape->terrain()->toMap( size ) );
+	QPoint from( eyeMap -  );
+*/
 }
 
 
@@ -330,15 +330,16 @@ Landscape::Filter::~Filter()
 
 void Landscape::Filter::draw()
 {
-	GLUquadric * q = gluNewQuadric();
 	for( int z=0; z<mFilterSize.height(); ++z )
 	{
+		QRectF mergedRect;
 		for( int x=0; x<mFilterSize.width(); ++x )
 		{
 			Patch & patch = mPatches[z*mFilterSize.width()+x];
 			QVector3D eyePosition = QVector3D( mLandscape->scene()->eye()->position().x(), 0.0f, mLandscape->scene()->eye()->position().z() );
 			QVector3D spherePosition = eyePosition + patch.center();
-
+/*
+			GLUquadric * q = gluNewQuadric();
 			glPushAttrib( GL_POLYGON_BIT );
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 			glColor3f( 1, 1, 1 );
@@ -347,17 +348,21 @@ void Landscape::Filter::draw()
 			gluSphere( q, patch.boundingSphereRadius(), 32, 32 );
 			glPopMatrix();
 			glPopAttrib();
-
+			gluDeleteQuadric( q );
+*/
 			if( mLandscape->scene()->eye()->isSphereInFrustum( spherePosition, patch.boundingSphereRadius() ) )
 			{
 				/*
-				qDebug() << "Patch" << x << "x" << z << ": "
-					<< "from" << patch.position()
-					<< "size" << patch.size()
-					<< "center" << patch.center()
-					<< "radius" << patch.boundingSphereRadius();
-				*/
 				mLandscape->drawPatch(
+					QRectF(
+						eyePosition.x() + patch.position().x(),
+						eyePosition.z() + patch.position().z(),
+						patch.size().x(),
+						patch.size().z()
+					)
+				);
+				*/
+				mergedRect = mergedRect.united(
 					QRectF(
 						eyePosition.x() + patch.position().x(),
 						eyePosition.z() + patch.position().z(),
@@ -367,6 +372,9 @@ void Landscape::Filter::draw()
 				);
 			}
 		}
+		if( !mergedRect.isNull() )
+		{
+			mLandscape->drawPatch( mergedRect );
+		}
 	}
-	gluDeleteQuadric( q );
 }

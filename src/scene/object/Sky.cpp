@@ -197,7 +197,7 @@ void Sky::drawSelf()
 	glDisable( GL_CULL_FACE );
 	glDepthRange( 1.0, 1.0 );
 
-	glMatrixMode( GL_MODELVIEW );	glPushMatrix();
+	glPushMatrix();
 	glTranslatef( scene()->eye()->position().x(), scene()->eye()->position().y(), scene()->eye()->position().z() );
 
 	glPushMatrix();
@@ -238,12 +238,6 @@ void Sky::drawSelf()
 	mDomeShader->release();
 	glDisable( GL_BLEND );
 
-	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
-/*
-	glDepthRange( 0.0, 1.0 );
-	glEnable( GL_CULL_FACE );
-	glDepthMask( GL_TRUE );
-	glDepthFunc( GL_LESS );
-*/
+	glPopMatrix();
 	glPopAttrib();
 }
