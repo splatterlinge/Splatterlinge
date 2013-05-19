@@ -298,9 +298,9 @@ Landscape::Filter::Filter( Landscape * landscape, QSize filterSize ) :
 	 * from
 	 * '-----far----'
 	 */
-	float far = landscape->scene()->eye()->farPlane();
-	QVector3D from = QVector3D( -far, landscape->terrain()->offset().y(), -far );
-	QVector3D size = QVector3D( 2.0f*far, landscape->terrain()->size().y(), 2.0f*far );
+	float farPlane = landscape->scene()->eye()->farPlane();
+	QVector3D from = QVector3D( -farPlane, landscape->terrain()->offset().y(), -farPlane );
+	QVector3D size = QVector3D( 2.0f*farPlane, landscape->terrain()->size().y(), 2.0f*farPlane );
 	float stepX =  size.x()/(float)filterSize.width();
 	float stepZ =  size.z()/(float)filterSize.height();
 	QVector3D patchSize = QVector3D( stepX, landscape->terrain()->size().y(), stepZ );
