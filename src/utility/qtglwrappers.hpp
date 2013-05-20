@@ -111,5 +111,11 @@ inline void glFogv( const GLenum & pname, const GLfloat * params )	{ glFogfv( pn
 inline void glFogv( const GLenum & pname, const GLint * params )	{ glFogiv( pname, params ); }
 inline void glFog( const GLenum & pname, const QVector4D & v )		{ glFogv( pname, reinterpret_cast<const float*>(&v) ); }
 
+inline void glMaterial( const GLenum & face, const GLenum & pname, const GLfloat & param )	{ glMaterialf( face, pname, param ); }
+inline void glMaterial( const GLenum & face, const GLenum & pname, const GLint & param )	{ glMateriali( face, pname, param ); }
+inline void glMaterialv( const GLenum & face, const GLenum & pname, const GLfloat * param )	{ glMaterialfv( face, pname, param ); }
+inline void glMaterialv( const GLenum & face, const GLenum & pname, const GLint * param )	{ glMaterialiv( face, pname, param ); }
+inline void glMaterial( const GLenum & face, const GLenum & pname, const QVector4D & v )	{ glMaterialv( face, pname, reinterpret_cast<const float*>(&v) ); }
+
 
 #endif

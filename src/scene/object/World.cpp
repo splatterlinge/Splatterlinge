@@ -155,6 +155,9 @@ void World::drawSelfPost()
 			glColor3f( 1,0,1 );
 			glVertex3f( intersectionPoint.x(), intersectionPoint.y(), intersectionPoint.z()+1 );
 			glVertex3f( intersectionPoint.x(), intersectionPoint.y(), intersectionPoint.z()-1 );
+			glColor3f( 1,0,0 );
+			glVertex3f( intersectionPoint.x(), intersectionPoint.y(), intersectionPoint.z() );
+			glVertex3f( intersectionPoint.x()+1, intersectionPoint.y()+1, intersectionPoint.z()+1 );
 		glEnd();
 	}
 }
