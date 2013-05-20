@@ -10,6 +10,7 @@
 class Sky;
 class Landscape;
 class Teapot;
+class WavefrontObject;
 class Shader;
 class TextureRenderer;
 
@@ -43,6 +44,7 @@ private:
 	QSharedPointer<Sky> mSky;
 	QSharedPointer<Landscape> mLandscape;
 	QSharedPointer<Teapot> mTeapot;
+    QSharedPointer<WavefrontObject> mTable;
 	bool mDragTeapot;
 };
 

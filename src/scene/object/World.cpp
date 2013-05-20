@@ -3,6 +3,7 @@
 #include "../Scene.hpp"
 #include "Landscape.hpp"
 #include "Teapot.hpp"
+#include "WavefrontObject.hpp"
 #include "Sky.hpp"
 
 #include <QPainter>
@@ -28,6 +29,10 @@ World::World( Scene * scene, QString name ) :
 	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QVector3D(0,0,0) ) + 3 );
 	add( mTeapot );
 	mDragTeapot = false;
+
+    mTable = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, 4, "/home/michael/Downloads/table01/table01.obj" ) );
+    mTable->setPositionY( mLandscape->terrain()->getHeight( QVector3D(0,0,0) ) + 3 );
+    add( mTable );
 
 	mSky = QSharedPointer<Sky>( new Sky( scene, skyName, &mTimeOfDay ) );
 	add( mSky );
