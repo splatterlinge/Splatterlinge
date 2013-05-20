@@ -1,11 +1,23 @@
 #include "WavefrontObject.hpp"
 
-WavefrontObject::WavefrontObject()
+WavefrontObject::WavefrontObject( Scene * scene, const float & size, QString filename ) :
+    AObject( scene, size ),
+    mSize( size )
 {
-    vertices = new QList<QVector4D>();
-    verticies_textures = new QList<QVector3D>();
-    normals = new QList<QVector3D>();
-    faces = new QList<FacePoint>();
+    mVertices = new QList<QVector4D>();
+    mTextureVertices = new QList<QVector3D>();
+    mNormals = new QList<QVector3D>();
+    mFaces = new QList<FacePoint>();
+
+    load( filename );
+}
+
+WavefrontObject::~WavefrontObject()
+{
+    delete mVertices;
+    delete mTextureVertices;
+    delete mNormals;
+    delete mFaces;
 }
 
 bool WavefrontObject::load( QString filename )
@@ -40,7 +52,7 @@ bool WavefrontObject::load( QString filename )
                 v.setW( 1.0f );
             }
 
-            vertices->append( v );
+            mVertices->append( v );
         }
         else if( fields[0] == "vt" )
         {
@@ -58,7 +70,7 @@ bool WavefrontObject::load( QString filename )
                 v.setZ( fields[2].toFloat() );
             }
 
-            verticies_textures->append( v );
+            mTextureVertices->append( v );
         }
         else if( fields[0] == "vn" )
         {
@@ -70,7 +82,7 @@ bool WavefrontObject::load( QString filename )
             v.setY( fields[1].toFloat() );
             v.setZ( fields[2].toFloat() );
 
-            normals->append( v );
+            mNormals->append( v );
         }
         else if( fields[0] == "f" )
         {
@@ -89,21 +101,32 @@ bool WavefrontObject::load( QString filename )
                     p.normal = fp[2].toInt();
                 }
 
-                faces->append( p );
+                mFaces->append( p );
             }
         }
     }
 
     qDebug() << "VERTICES";
-    qDebug() << vertices->toVector();
+    qDebug() << mVertices->toVector();
 
     qDebug() << "TEXTURE VERTICES";
-    qDebug() << verticies_textures->toVector();
+    qDebug() << mTextureVertices->toVector();
 
     qDebug() << "NORMALS";
-    qDebug() << normals->toVector();
+    qDebug() << mNormals->toVector();
 
     file.close();
 
     return true;
+}
+
+void WavefrontObject::updateSelf( const float & delta )
+{
+    // TODO
+}
+
+
+void WavefrontObject::drawSelf()
+{
+    // TODO
 }
