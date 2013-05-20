@@ -52,7 +52,8 @@ inline void glVertex( const QPointF & v )	{ glVertex2v( reinterpret_cast<const q
 
 inline void glRotate( const GLfloat & angle, const GLfloat & x, const GLfloat & y, const GLfloat & z )		{ glRotatef( angle, x, y, z ); }
 inline void glRotate( const GLdouble & angle, const GLdouble & x, const GLdouble & y, const GLdouble & z )	{ glRotated( angle, x, y, z ); }
-inline void glRotate( const GLdouble & angle, const QVector3D & axis )	{ glRotate( angle, axis.x(), axis.y(), axis.z() ); }
+inline void glRotate( const GLfloat & angle, const QVector3D & axis )	{ glRotate( angle, static_cast<GLfloat>(axis.x()), static_cast<GLfloat>(axis.y()), static_cast<GLfloat>(axis.z()) ); }
+inline void glRotate( const GLdouble & angle, const QVector3D & axis )	{ glRotate( angle, static_cast<GLdouble>(axis.x()), static_cast<GLdouble>(axis.y()), static_cast<GLdouble>(axis.z()) ); }
 
 inline void glTranslate( const GLfloat & x, const GLfloat & y, const GLfloat & z )	{ glTranslatef( x, y, z ); }
 inline void glTranslate( const GLdouble & x, const GLdouble & y, const GLdouble & z )	{ glTranslated( x, y, z ); }
