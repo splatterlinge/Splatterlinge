@@ -4,12 +4,13 @@ WavefrontObject::WavefrontObject( Scene * scene, const float & size, QString fil
 	AObject( scene, size ),
 	mSize( size )
 {
+	mScale = 1.0;
 	mVertices = new QList<QVector4D>();
 	mTextureVertices = new QList<QVector3D>();
 	mNormals = new QList<QVector3D>();
 	mFaces = new QList<QList<FacePoint> >();
 
-	load( filename );
+	parseObj( filename );
 }
 
 WavefrontObject::~WavefrontObject()
@@ -20,7 +21,7 @@ WavefrontObject::~WavefrontObject()
 	delete mFaces;
 }
 
-bool WavefrontObject::load( QString filename )
+bool WavefrontObject::parseObj( QString filename )
 {
 	QFile file( filename );
 	if( !file.open( QIODevice::ReadOnly ) ) {
@@ -141,7 +142,7 @@ void WavefrontObject::drawSelf()
 
 	glPushMatrix();
 
-	glScalef( 0.1*mSize, 0.1*mSize, 0.1*mSize );
+	glScalef( 0.1*mScale, 0.1*mScale, 0.1*mScale );
 
 	foreach( QList<FacePoint> fl, * mFaces )
 	{
