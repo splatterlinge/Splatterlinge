@@ -34,10 +34,11 @@ public:
 
 private:
     float mSize;
+    QString mMtllib;
     QList<QVector4D> * mVertices;
     QList<QVector3D> * mTextureVertices;
     QList<QVector3D> * mNormals;
-    QList<FacePoint> * mFaces;
+    QList<QList<FacePoint> > * mFaces;
 };
 
 #endif // WAVEFRONTOBJECT_HPP
