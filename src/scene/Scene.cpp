@@ -119,8 +119,8 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	glDisable( GL_BLEND );
 	glDisable( GL_TEXTURE_2D );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_LIGHT0 );
+	glEnable( GL_LIGHTING );
+	glEnable( GL_LIGHT0 );
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LEQUAL );
 	glShadeModel( GL_SMOOTH );

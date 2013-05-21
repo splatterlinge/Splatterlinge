@@ -121,7 +121,7 @@ void World::updateSelf( const float & delta )
 
 	if( mDragTeapot )
 	{
-		float length = 100.0f;
+		float length = 300.0f;
 		if( getLineIntersection( scene()->eye()->position(), -scene()->eye()->direction(), &length ) )
 		{
 			mTeapot->setPosition( scene()->eye()->position() - scene()->eye()->direction() * length );
@@ -137,6 +137,22 @@ void World::drawSelf()
 	glLight( GL_LIGHT0, GL_AMBIENT, mSky->ambient() );
 	glLight( GL_LIGHT0, GL_DIFFUSE, mSky->diffuse() );
 	glLight( GL_LIGHT0, GL_SPECULAR, mSky->specular() );
+
+	static float cycle = 0.0f;
+	QColor color = QColor::fromHsvF( cycle, 0.5f, 0.5f, 1.0f );
+	cycle+=0.0005f;
+	QVector4D colorVec( color.redF(), color.greenF(), color.blueF(), 1.0f );
+	if( cycle>=1.0f )
+		cycle-=1.0f;
+
+	glLight( GL_LIGHT1, GL_POSITION, QVector4D(	mTeapot->position(),	1	) );
+	glLight( GL_LIGHT1, GL_AMBIENT, QVector4D(	0,	0,	0,	1	) );
+	glLight( GL_LIGHT1, GL_DIFFUSE, QVector4D(	colorVec	) );
+	glLight( GL_LIGHT1, GL_SPECULAR, QVector4D(	colorVec	) );
+	glLight( GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.0f );
+	glLight( GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.02f );
+	glLight( GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.0f );
+
 	glFog( GL_FOG_COLOR, mSky->fogColor() );
 	glFog( GL_FOG_START, scene()->eye()->farPlane()*0.9f );
 	glFog( GL_FOG_END, scene()->eye()->farPlane()*1.1f );
@@ -146,7 +162,7 @@ void World::drawSelf()
 void World::drawSelfPost()
 {
 	glDisable( GL_LIGHTING );
-	float length = 100.0f;
+	float length = 300.0f;
 	if( getLineIntersection( scene()->eye()->position(), -scene()->eye()->direction(), &length ) )
 	{
 		QVector3D intersectionPoint = scene()->eye()->position() - scene()->eye()->direction() * length;

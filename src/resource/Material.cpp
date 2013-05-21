@@ -167,6 +167,8 @@ void Material::bind()
 	
 	mShaderSet[mBoundQuality].shader->bind();
 
+	glPushAttrib( GL_LIGHTING_BIT | GL_ENABLE_BIT );
+
 	glMaterial( GL_FRONT_AND_BACK, GL_AMBIENT, data()->ambient() );
 	glMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE, data()->diffuse() );
 	glMaterial( GL_FRONT_AND_BACK, GL_SPECULAR, data()->specular() );
@@ -212,6 +214,8 @@ void Material::release()
 {
 	if( !mShaderSet[mBoundQuality].shader )
 		return;
+
+	glPopAttrib();
 
 	mShaderSet[mBoundQuality].shader->release();
 }
@@ -285,4 +289,3 @@ void Material::setShader( ShaderType type )
 			break;
 	}
 }
-

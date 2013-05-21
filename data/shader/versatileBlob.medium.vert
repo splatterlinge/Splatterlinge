@@ -15,7 +15,6 @@ void main()
 	gl_TexCoord[1] = gl_TextureMatrix[1] * gl_MultiTexCoord0;
 	vNormal = gl_NormalMatrix * gl_Normal;
 
-	vec3 viewDir = normalize( -vVertex );
 	for( int i=0; i<MAX_LIGHTS; ++i )
 	{
 		
@@ -26,8 +25,9 @@ void main()
 		}
 		else
 		{
-			vLightDir[i] = normalize( gl_LightSource[i].position.xyz - viewDir );
-			float d = length( gl_LightSource[i].position.xyz - viewDir );
+			vec3 relPos = gl_LightSource[i].position.xyz - vVertex;
+			vLightDir[i] = normalize( relPos );
+			float d = length( relPos );
 			vAtt[i] = 1.0 / (
 				gl_LightSource[i].constantAttenuation +
 				gl_LightSource[i].linearAttenuation * d +
