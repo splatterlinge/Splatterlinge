@@ -39,8 +39,6 @@ void Teapot::updateSelf( const float & delta )
 void Teapot::drawSelf()
 {
 	mMaterial->bind();
-	glDisable( GL_CULL_FACE );
 	teapot( 8, mSize, GL_FILL );
-	glEnable( GL_CULL_FACE );
 	mMaterial->release();
 }
