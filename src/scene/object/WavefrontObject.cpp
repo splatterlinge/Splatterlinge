@@ -134,8 +134,10 @@ void WavefrontObject::updateSelf( const float & delta )
 void WavefrontObject::drawSelf()
 {
     glPushAttrib(GL_ENABLE_BIT | GL_EVAL_BIT);
-    glEnable(GL_AUTO_NORMAL);
-    glEnable(GL_NORMALIZE);
+    glEnable( GL_AUTO_NORMAL );
+    glEnable( GL_NORMALIZE );
+    glEnable( GL_LIGHTING );
+    glEnable( GL_LIGHT0 );
 
     glPushMatrix();
 
