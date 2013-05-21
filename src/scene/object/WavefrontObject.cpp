@@ -24,7 +24,7 @@ bool WavefrontObject::load( QString filename )
 {
     QFile file( filename );
     if( !file.open( QIODevice::ReadOnly ) ) {
-        QMessageBox::information( 0, "Error", file.errorString() );
+        qDebug() << file.errorString();
         return false;
     }
 
