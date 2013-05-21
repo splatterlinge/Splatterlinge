@@ -29,6 +29,7 @@ public:
 	virtual void drawSelf();
 
 	bool parseObj( QString filename );
+	bool parseMtl( QString filename );
 	void draw();
 
 private:

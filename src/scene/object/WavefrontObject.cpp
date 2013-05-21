@@ -126,6 +126,11 @@ bool WavefrontObject::parseObj( QString filename )
 	return true;
 }
 
+bool WavefrontObject::parseMtl( QString filename )
+{
+	return true;
+}
+
 void WavefrontObject::updateSelf( const float & delta )
 {
 	// TODO
