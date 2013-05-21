@@ -233,7 +233,7 @@ void Scene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 		mDrag += event->screenPos() - event->lastScreenPos();
 		event->accept();
 	}
-	
+
 	QList< AMouseListener* >::iterator i;
 	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
 		(*i)->mouseMoveEvent( event );
