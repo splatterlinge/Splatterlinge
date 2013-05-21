@@ -4,11 +4,14 @@ WavefrontObject::WavefrontObject( Scene * scene, const float & size, QString fil
 	AObject( scene, size ),
 	mSize( size )
 {
+	mScene = scene;
 	mScale = 1.0;
 	mVertices = new QList<QVector4D>();
 	mTextureVertices = new QList<QVector3D>();
 	mNormals = new QList<QVector3D>();
 	mFaces = new QList<QList<FacePoint> >();
+
+	mMaterials = new QMap<QString, Material>();
 
 	parseObj( filename );
 }
@@ -24,6 +27,7 @@ WavefrontObject::~WavefrontObject()
 bool WavefrontObject::parseObj( QString filename )
 {
 	QFile file( filename );
+	qDebug() << "Load Object: " << filename;
 	if( !file.open( QIODevice::ReadOnly ) ) {
 		qDebug() << file.errorString();
 		return false;
@@ -34,82 +38,91 @@ bool WavefrontObject::parseObj( QString filename )
 	while( !in.atEnd() ) {
 		QString line = in.readLine();
 		QStringList fields = line.split( " ", QString::SkipEmptyParts );
-		QString type = fields[0];
-		fields.removeFirst();
 
-		if( type == "mtllib" )
+		if( fields.length() > 0 )
 		{
-			mMtllib = fields[0];
-		}
-		else if( type == "v" )
-		{
-			QVector4D v;
-			v.setX( fields[0].toFloat() );
-			v.setY( fields[1].toFloat() );
-			v.setZ( fields[2].toFloat() );
+			QString type = fields[0];
+			fields.removeFirst();
 
-			if( fields.length() == 4 )
+			if( type == "mtllib" )
 			{
-				v.setW( fields[3].toFloat() );
+				mMtllib = fields[0];
+
+				QFileInfo fileinfo( file );
+
+				parseMtl( fileinfo.absolutePath() + "/" + mMtllib );
 			}
-			else
+			else if( type == "v" )
 			{
-				v.setW( 1.0f );
-			}
-
-			mVertices->append( v );
-		}
-		else if( type == "vt" )
-		{
-			QVector3D v;
-			v.setX( fields[0].toFloat() );
-
-			if( fields.length() >= 2 )
-			{
+				QVector4D v;
+				v.setX( fields[0].toFloat() );
 				v.setY( fields[1].toFloat() );
-			}
-			if( fields.length() == 3 )
-			{
 				v.setZ( fields[2].toFloat() );
+
+				if( fields.length() == 4 )
+				{
+					v.setW( fields[3].toFloat() );
+				}
+				else
+				{
+					v.setW( 1.0f );
+				}
+
+				mVertices->append( v );
 			}
-
-			mTextureVertices->append( v );
-		}
-		else if( type == "vn" )
-		{
-			QVector3D v;
-
-			v.setX( fields[0].toFloat() );
-			v.setY( fields[1].toFloat() );
-			v.setZ( fields[2].toFloat() );
-
-			mNormals->append( v );
-		}
-		else if( type == "f" )
-		{
-			QList<FacePoint> list;
-
-			foreach( QString s, fields)
+			else if( type == "vt" )
 			{
-				QStringList fp = s.split( "/" );
-				FacePoint p;
-				p.vertex = fp[0].toInt();
-				if( fp.length() >= 2)
+				QVector3D v;
+				v.setX( fields[0].toFloat() );
+
+				if( fields.length() >= 2 )
 				{
-					p.texture = fp[1].toInt();
+					v.setY( fields[1].toFloat() );
 				}
-				if( fp.length() == 3)
+				if( fields.length() == 3 )
 				{
-					p.normal = fp[2].toInt();
+					v.setZ( fields[2].toFloat() );
 				}
 
-				list.append( p );
+				mTextureVertices->append( v );
 			}
+			else if( type == "vn" )
+			{
+				QVector3D v;
 
-			mFaces->append( list );
+				v.setX( fields[0].toFloat() );
+				v.setY( fields[1].toFloat() );
+				v.setZ( fields[2].toFloat() );
+
+				mNormals->append( v );
+			}
+			else if( type == "f" )
+			{
+				QList<FacePoint> list;
+
+				foreach( QString s, fields)
+				{
+					QStringList fp = s.split( "/" );
+					FacePoint p;
+					p.vertex = fp[0].toInt();
+					if( fp.length() >= 2)
+					{
+						p.texture = fp[1].toInt();
+					}
+					if( fp.length() == 3)
+					{
+						p.normal = fp[2].toInt();
+					}
+
+					list.append( p );
+				}
+
+				mFaces->append( list );
+			}
 		}
 	}
 
+	/*
 	foreach( QList<FacePoint> fl, * mFaces )
 	{
 		qDebug() << "TRIANGLE";
@@ -120,6 +133,7 @@ bool WavefrontObject::parseObj( QString filename )
 			qDebug() << "Normal:  " << mNormals->at( fp.normal-1 );
 		}
 	}
+	*/
 
 	file.close();
 
@@ -128,6 +142,28 @@ bool WavefrontObject::parseObj( QString filename )
 
 bool WavefrontObject::parseMtl( QString filename )
 {
+	QFile file( filename );
+	qDebug() << "Load Object Material: " << filename;
+	if( !file.open( QIODevice::ReadOnly ) ) {
+		qDebug() << file.errorString();
+		return false;
+	}
+
+	QTextStream in( &file );
+
+	while( !in.atEnd() ) {
+		QString line = in.readLine();
+		QStringList fields = line.split( " ", QString::SkipEmptyParts );
+
+		if( fields.length() > 0 )
+		{
+			QString type = fields[0];
+			fields.removeFirst();
+		}
+
+		Material current( mScene->glWidget(), "" );
+	}
+
 	return true;
 }
 

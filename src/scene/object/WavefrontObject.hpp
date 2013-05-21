@@ -2,6 +2,7 @@
 #define WAVEFRONTOBJECT_HPP
 
 #include "../Scene.hpp"
+#include "resource/Material.hpp"
 
 #include <QString>
 #include <QMessageBox>
@@ -12,6 +13,8 @@
 #include <QList>
 #include <QVector3D>
 #include <QVector4D>
+#include <QRgb>
+#include <QMap>
 
 struct FacePoint {
 	int vertex;
@@ -33,6 +36,7 @@ public:
 	void draw();
 
 private:
+	Scene * mScene;
 	float mSize;
 	float mScale;
 	QString mMtllib;
@@ -40,6 +44,7 @@ private:
 	QList<QVector3D> * mTextureVertices;
 	QList<QVector3D> * mNormals;
 	QList<QList<FacePoint> > * mFaces;
+	QMap<QString, Material> * mMaterials;
 };
 
 #endif // WAVEFRONTOBJECT_HPP
