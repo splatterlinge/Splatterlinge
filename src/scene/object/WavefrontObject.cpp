@@ -142,7 +142,7 @@ void WavefrontObject::drawSelf()
 
 	glPushMatrix();
 
-	glScalef( 0.1*mScale, 0.1*mScale, 0.1*mScale );
+	glScalef( 1.0*mScale, 1.0*mScale, 1.0*mScale );
 
 	foreach( QList<FacePoint> fl, * mFaces )
 	{
