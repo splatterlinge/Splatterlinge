@@ -30,9 +30,9 @@ World::World( Scene * scene, QString name ) :
 	add( mTeapot );
 	mDragTeapot = false;
 
-    mTable = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, 4, "./data/object/table01/table01.obj" ) );
-    mTable->setPositionY( mLandscape->terrain()->getHeight( QVector3D(0,0,0) ) + 3 );
-    add( mTable );
+	mTable = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, 4, "./data/object/table01/table01.obj" ) );
+	mTable->setPositionY( mLandscape->terrain()->getHeight( QVector3D(0,0,0) ) + 3 );
+	add( mTable );
 
 	mSky = QSharedPointer<Sky>( new Sky( scene, skyName, &mTimeOfDay ) );
 	add( mSky );
@@ -118,7 +118,7 @@ void World::updateSelf( const float & delta )
 	float landscapeHeight = mLandscape->terrain()->getHeight( scene()->eye()->position() );
 	if( scene()->eye()->position().y() < landscapeHeight + 2 )
 		scene()->eye()->setPositionY( landscapeHeight + 2 );
-	
+
 	if( mDragTeapot )
 	{
 		float length = 100.0f;
