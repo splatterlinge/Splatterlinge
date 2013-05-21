@@ -2,6 +2,7 @@
 
 #include <GLView.hpp>
 
+
 MainWindow::MainWindow( QWidget * parent) : QMainWindow( parent )
 {
 	QGLFormat glFormat( QGL::DoubleBuffer | QGL::DepthBuffer | QGL::Rgba | QGL::AlphaChannel | QGL::DirectRendering | QGL::SampleBuffers | QGL::NoAccumBuffer );

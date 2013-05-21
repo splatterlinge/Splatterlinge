@@ -36,11 +36,44 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
 
-	mALDevice = alcOpenDevice( NULL );
+	const GLubyte * vendorGL = glGetString( GL_VENDOR );
+	qDebug() << "OpenGL: Vendor:\t" << QString((const char*)vendorGL);
+	const GLubyte * rendererGL = glGetString( GL_RENDERER );
+	qDebug() << "OpenGL: Renderer:\t" << QString((const char*)rendererGL);
+	const GLubyte * versionGL = glGetString( GL_VERSION );
+	qDebug() << "OpenGL: Version:\t" << QString((const char*)versionGL);
+	const GLubyte * glslVersionGL = glGetString( GL_SHADING_LANGUAGE_VERSION );
+	qDebug() << "OpenGL: GLSL version:\t" << QString((const char*)glslVersionGL);
+//	const GLubyte * extensionsGL = glGetString( GL_EXTENSIONS );
+//	qDebug() << "OpenGL: Supported extensions:" << QString((const char*)extensionsGL);
+
+//	const ALCchar * extensionsALC = alcGetString( NULL, ALC_EXTENSIONS );
+//	qDebug() << "OpenAL: Supported context extensions:" << extensionsALC;
+	if( alcIsExtensionPresent( NULL, "ALC_ENUMERATE_ALL_EXT") == AL_TRUE )
+	{
+		const ALCchar * devicesAL = alcGetString( NULL, ALC_ALL_DEVICES_SPECIFIER );
+		qDebug() << "OpenAL: Available devices:";
+		for( const ALchar * d = devicesAL; *d; d += strlen(d)+1 )
+		{
+			qDebug() << " *" << d;
+		}
+	}
+	const ALCchar * defaultDeviceNameAL = NULL;
+	defaultDeviceNameAL = alcGetString( NULL, ALC_DEFAULT_ALL_DEVICES_SPECIFIER );
+	qDebug() << "OpenAL: Opening default device:\t" << QString(defaultDeviceNameAL);
+	mALDevice = alcOpenDevice( defaultDeviceNameAL );
 	if( !mALDevice )
-		qFatal( "Could not open audio device!" );
+		qFatal( "OpenAL: Could not open audio device!" );
 	mALContext = alcCreateContext( mALDevice, NULL );
 	alcMakeContextCurrent( mALContext );
+	const ALCchar * vendorAL = alGetString( AL_VENDOR );
+	qDebug() << "OpenAL: Vendor:\t" << QString(vendorAL);
+	const ALCchar * rendererAL = alGetString( AL_RENDERER );
+	qDebug() << "OpenAL: Renderer:\t" << QString(rendererAL);
+	const ALCchar * versionAL = alGetString( AL_VERSION );
+	qDebug() << "OpenAL: Version:\t" << QString(versionAL);
+//	const ALCchar * extensionsAL = alcGetString( NULL, AL_EXTENSIONS );
+//	qDebug() << "OpenAL: Supported extensions:" << extensionsAL;
 	alGetError();
 
 	QTimer * secondTimer = new QTimer( this );
