@@ -26,6 +26,7 @@ public:
 	const QVector4D & emission() const { return mEmission; }
 	const GLfloat & shininess() const { return mShininess; }
 	const QMap<QString,GLuint> & textures() const { return mTextures; }
+	const QMap<QString,GLfloat> & constants() const { return mConstants; }
 	const QString & defaultShaderName() const { return mDefaultShaderName; }
 	const QString & blobbingShaderName() const { return mBlobbingShaderName; }
 
@@ -41,6 +42,7 @@ private:
 	QVector4D mEmission;
 	GLfloat mShininess;
 	QMap<QString,GLuint> mTextures;
+	QMap<QString,GLfloat> mConstants;
 };
 
 
@@ -71,6 +73,7 @@ private:
 	{
 		Shader * shader;
 		QVector< QPair<int,GLuint> > textureUnits;
+		QVector< QPair<int,GLfloat> > constants;
 		int blobMapUniform;
 		int cubeMapUniform;
 	} ShaderSet;

@@ -33,6 +33,7 @@ bool MaterialData::load()
 	QSettings s( "./data/material/"+mName+"/material.ini", QSettings::IniFormat );
 
 	s.beginGroup( "Textures" );
+	{
 		QStringList textures = s.allKeys();
 		QStringList::const_iterator i;
 		for( i = textures.constBegin(); i != textures.constEnd(); ++i )
@@ -50,9 +51,22 @@ bool MaterialData::load()
 			GLuint texture =  mGLWidget->bindTexture( map, GL_TEXTURE_2D, GL_RGBA, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
 			mTextures[(*i)] = texture;
 		}
+	}
+	s.endGroup();
+
+	s.beginGroup( "Constants" );
+	{
+		QStringList constants = s.allKeys();
+		QStringList::const_iterator i;
+		for( i = constants.constBegin(); i != constants.constEnd(); ++i )
+		{
+			mConstants[(*i)] = s.value( (*i) ).toFloat();
+		}
+	}
 	s.endGroup();
 
 	s.beginGroup( "Model" );
+	{
 		mAmbient = QVector4D(
 			s.value( "ambientRed", 0.2f ).toFloat(),
 			s.value( "ambientGreen", 0.2f ).toFloat(),
@@ -78,11 +92,14 @@ bool MaterialData::load()
 			s.value( "emissionAlpha", 1.0f ).toFloat()
 		);
 		mShininess = s.value( "shininess", 0 ).toFloat();
+	}
 	s.endGroup();
 
 	s.beginGroup( "Shader" );
+	{
 		mDefaultShaderName = s.value( "defaultShader", "versatile" ).toString();
 		mBlobbingShaderName = s.value( "blobbingShader", "versatileBlob" ).toString();
+	}
 	s.endGroup();
 
 	return AResourceData::load();
@@ -150,11 +167,19 @@ void Material::bind()
 	
 	mShaderSet[mBoundQuality].shader->bind();
 
-	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, reinterpret_cast<const GLfloat*>( &(data()->ambient()) ) );
-	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, reinterpret_cast<const GLfloat*>( &(data()->diffuse()) ) );
-	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, reinterpret_cast<const GLfloat*>( &(data()->specular()) ) );
-	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, reinterpret_cast<const GLfloat*>( &(data()->emission()) ) );
-	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, data()->shininess() );
+	glMaterial( GL_FRONT_AND_BACK, GL_AMBIENT, data()->ambient() );
+	glMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE, data()->diffuse() );
+	glMaterial( GL_FRONT_AND_BACK, GL_SPECULAR, data()->specular() );
+	glMaterial( GL_FRONT_AND_BACK, GL_EMISSION, data()->emission() );
+	glMaterial( GL_FRONT_AND_BACK, GL_SHININESS, data()->shininess() );
+
+	for( int i = 0; i < mShaderSet[mBoundQuality].constants.size(); i++ )
+	{
+		mShaderSet[mBoundQuality].shader->program()->setUniformValue(
+			mShaderSet[mBoundQuality].constants[i].first,
+			mShaderSet[mBoundQuality].constants[i].second
+		);
+	}
 
 	int texUnit;
 	for( texUnit = 0; texUnit < mShaderSet[mBoundQuality].textureUnits.size(); texUnit++ )
@@ -203,24 +228,37 @@ void Material::setShader( Quality quality, QString shaderFullName )
 	mShaderSet[quality].shader = new Shader( mGLWidget, shaderFullName );
 
 	mShaderSet[quality].textureUnits.clear();
-	QMap<QString, GLuint>::const_iterator i = data()->textures().constBegin();
-	while( i != data()->textures().constEnd() )
 	{
-		const QString & uniformName = i.key();
-		const GLuint & texID = i.value();
-		int uniform = mShaderSet[quality].shader->program()->uniformLocation( uniformName );
-		if( uniform >=0 )
+		QMap<QString, GLuint>::const_iterator i = data()->textures().constBegin();
+		while( i != data()->textures().constEnd() )
 		{
-			mShaderSet[quality].textureUnits.push_back( QPair<int,GLuint>( uniform, texID ) );
-			/*
-			qDebug() << "#" << this << "Material" << mName
-				<< "Bound" << uniformName << "(" << uniform << ")"
-				<< "to texUnit" << mTextureUnits[quality].size()-1
-				<< "using texID" << texID;
-			*/
+			const QString & uniformName = i.key();
+			const GLuint & texID = i.value();
+			int uniform = mShaderSet[quality].shader->program()->uniformLocation( uniformName );
+			if( uniform >=0 )
+			{
+				mShaderSet[quality].textureUnits.push_back( QPair<int,GLuint>( uniform, texID ) );
+			}
+			++i;
 		}
-		++i;
 	}
+
+	mShaderSet[quality].constants.clear();
+	{
+		QMap<QString, GLfloat>::const_iterator i = data()->constants().constBegin();
+		while( i != data()->constants().constEnd() )
+		{
+			const QString & uniformName = i.key();
+			const GLfloat & value = i.value();
+			int uniform = mShaderSet[quality].shader->program()->uniformLocation( uniformName );
+			if( uniform >=0 )
+			{
+				mShaderSet[quality].constants.push_back( QPair<int,GLfloat>( uniform, value ) );
+			}
+			++i;
+		}
+	}
+
 	mShaderSet[quality].blobMapUniform = mShaderSet[quality].shader->program()->uniformLocation( "blobMap" );
 	mShaderSet[quality].cubeMapUniform = mShaderSet[quality].shader->program()->uniformLocation( "cubeMap" );
 }

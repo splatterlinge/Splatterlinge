@@ -8,35 +8,25 @@ varying float vAtt[MAX_LIGHTS];
 uniform sampler2D diffuseMap;
 uniform sampler2D specularMap;
 uniform sampler2D normalMap;
-uniform sampler2D depthMap;
-
-uniform float depthScale;
-uniform float depthOffset;
 
 
 void main()
 {
+	vec4 colorFromMap = texture2D( diffuseMap, gl_TexCoord[0].st );
+	vec4 specularFromMap = texture2D( specularMap, gl_TexCoord[0].st );
 	vec3 finalColor = gl_FrontMaterial.emission.rgb;
-	vec3 normal = normalize( vNormal );
 	vec3 viewDir = normalize( -vVertex );
+	vec3 normal = normalize( vNormal );
 
-	// calculate tangent space matrix
+	// recalculate normal based on normalmap
+	vec3 normalFromMap = normalize( texture2D( normalMap, gl_TexCoord[0].st ).rgb * 2.0 - 1.0 );
 	vec3 dpx = dFdx( vVertex );
 	vec3 dpy = dFdy( vVertex );
 	vec2 dtx = dFdx( gl_TexCoord[0].st );
 	vec2 dty = dFdy( gl_TexCoord[0].st );
-	vec3 tangent = normalize( dpx * dty.t - dpy * dtx.t );
+	vec3 tangent = -normalize( dpx * dty.t - dpy * dtx.t );
 	vec3 binormal = normalize( -dpx * dty.s + dpy * dtx.s );
 	mat3 TBN = mat3( tangent, binormal, normal );	// the transpose of texture-to-eye space matrix
-
-	vec3 eyeDir = normalize( vVertex * TBN );
-	float depth = texture2D( depthMap, gl_TexCoord[0].st ).r * depthScale - depthOffset;
-	vec2 parallaxCoord = gl_TexCoord[0].st + eyeDir.xy * depth;
-
-	vec4 colorFromMap = texture2D( diffuseMap, parallaxCoord );
-	vec4 specularFromMap = texture2D( specularMap, parallaxCoord );
-	vec3 normalFromMap = normalize( texture2D( normalMap, parallaxCoord ).rgb * 2.0 - 1.0 );
-	normalFromMap.x=-normalFromMap.x;
 	normal = normalize( TBN * normalFromMap );	// transform the normal to eye space
 
 	for( int i=0; i<MAX_LIGHTS; ++i )

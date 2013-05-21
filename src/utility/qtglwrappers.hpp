@@ -52,7 +52,8 @@ inline void glVertex( const QPointF & v )	{ glVertex2v( reinterpret_cast<const q
 
 inline void glRotate( const GLfloat & angle, const GLfloat & x, const GLfloat & y, const GLfloat & z )		{ glRotatef( angle, x, y, z ); }
 inline void glRotate( const GLdouble & angle, const GLdouble & x, const GLdouble & y, const GLdouble & z )	{ glRotated( angle, x, y, z ); }
-inline void glRotate( const GLdouble & angle, const QVector3D & axis )	{ glRotate( angle, axis.x(), axis.y(), axis.z() ); }
+inline void glRotate( const GLfloat & angle, const QVector3D & axis )	{ glRotate( angle, static_cast<GLfloat>(axis.x()), static_cast<GLfloat>(axis.y()), static_cast<GLfloat>(axis.z()) ); }
+inline void glRotate( const GLdouble & angle, const QVector3D & axis )	{ glRotate( angle, static_cast<GLdouble>(axis.x()), static_cast<GLdouble>(axis.y()), static_cast<GLdouble>(axis.z()) ); }
 
 inline void glTranslate( const GLfloat & x, const GLfloat & y, const GLfloat & z )	{ glTranslatef( x, y, z ); }
 inline void glTranslate( const GLdouble & x, const GLdouble & y, const GLdouble & z )	{ glTranslated( x, y, z ); }
@@ -110,6 +111,12 @@ inline void glFog( const GLenum & pname, const GLint & param )		{ glFogi( pname,
 inline void glFogv( const GLenum & pname, const GLfloat * params )	{ glFogfv( pname, params ); }
 inline void glFogv( const GLenum & pname, const GLint * params )	{ glFogiv( pname, params ); }
 inline void glFog( const GLenum & pname, const QVector4D & v )		{ glFogv( pname, reinterpret_cast<const float*>(&v) ); }
+
+inline void glMaterial( const GLenum & face, const GLenum & pname, const GLfloat & param )	{ glMaterialf( face, pname, param ); }
+inline void glMaterial( const GLenum & face, const GLenum & pname, const GLint & param )	{ glMateriali( face, pname, param ); }
+inline void glMaterialv( const GLenum & face, const GLenum & pname, const GLfloat * param )	{ glMaterialfv( face, pname, param ); }
+inline void glMaterialv( const GLenum & face, const GLenum & pname, const GLint * param )	{ glMaterialiv( face, pname, param ); }
+inline void glMaterial( const GLenum & face, const GLenum & pname, const QVector4D & v )	{ glMaterialv( face, pname, reinterpret_cast<const float*>(&v) ); }
 
 
 #endif
