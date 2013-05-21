@@ -49,6 +49,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 
 //	const ALCchar * extensionsALC = alcGetString( NULL, ALC_EXTENSIONS );
 //	qDebug() << "OpenAL: Supported context extensions:" << extensionsALC;
+#ifdef ALC_ALL_DEVICES_SPECIFIER
 	if( alcIsExtensionPresent( NULL, "ALC_ENUMERATE_ALL_EXT") == AL_TRUE )
 	{
 		const ALCchar * devicesAL = alcGetString( NULL, ALC_ALL_DEVICES_SPECIFIER );
@@ -58,8 +59,23 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 			qDebug() << " *" << d;
 		}
 	}
+#else
+	if( alcIsExtensionPresent( NULL, "ALC_ENUMERATE_EXT") == AL_TRUE )
+	{
+		const ALCchar * devicesAL = alcGetString( NULL, ALC_DEVICE_SPECIFIER );
+		qDebug() << "OpenAL: Available devices:";
+		for( const ALchar * d = devicesAL; *d; d += strlen(d)+1 )
+		{
+			qDebug() << " *" << d;
+		}
+	}
+#endif
 	const ALCchar * defaultDeviceNameAL = NULL;
+#ifdef ALC_DEFAULT_ALL_DEVICES_SPECIFIER
 	defaultDeviceNameAL = alcGetString( NULL, ALC_DEFAULT_ALL_DEVICES_SPECIFIER );
+#else
+	defaultDeviceNameAL = alcGetString( NULL, ALC_DEFAULT_DEVICE_SPECIFIER );
+#endif
 	qDebug() << "OpenAL: Opening default device:\t" << QString(defaultDeviceNameAL);
 	mALDevice = alcOpenDevice( defaultDeviceNameAL );
 	if( !mALDevice )
