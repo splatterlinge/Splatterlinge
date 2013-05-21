@@ -136,14 +136,11 @@ void WavefrontObject::drawSelf()
 	glPushAttrib(GL_ENABLE_BIT | GL_EVAL_BIT);
 	glEnable( GL_AUTO_NORMAL );
 	glEnable( GL_NORMALIZE );
-	/*
 	glEnable( GL_LIGHTING );
 	glEnable( GL_LIGHT0 );
-	*/
 
 	glPushMatrix();
 
-	glColor3f( 1.0, 0.0, 0.0 );
 	glScalef( 0.1*mSize, 0.1*mSize, 0.1*mSize );
 
 	foreach( QList<FacePoint> fl, * mFaces )
@@ -151,18 +148,22 @@ void WavefrontObject::drawSelf()
 		glBegin( GL_TRIANGLES );
 		foreach( FacePoint fp, fl )
 		{
-			QVector4D vertex = mVertices->at( fp.vertex-1 );
-			glVertex4f( vertex.x(), vertex.y(), vertex.z(), vertex.w() );
+			QVector3D normal = mNormals->at( fp.normal-1 );
+			glNormal3f( normal.x(), normal.y(), normal.z() );
 
 			QVector3D texture = mTextureVertices->at( fp.texture-1 );
 			glTexCoord3f( texture.x(), texture.y(), texture.z() );
 
-			QVector3D normal = mNormals->at( fp.normal-1 );
-			glNormal3f( normal.x(), normal.y(), normal.z() );
+			QVector4D vertex = mVertices->at( fp.vertex-1 );
+			glVertex4f( vertex.x(), vertex.y(), vertex.z(), vertex.w() );
 		}
 		glEnd();
 	}
 
+	glDisable( GL_LIGHTING );
+	glDisable( GL_LIGHT0 );
+
+	glColor3f( 1.0, 0.0, 0.0 );
 	foreach( QList<FacePoint> fl, * mFaces )
 	{
 		foreach( FacePoint fp, fl )
@@ -170,9 +171,9 @@ void WavefrontObject::drawSelf()
 			QVector4D vertex = mVertices->at( fp.vertex-1 );
 			QVector3D normal = mNormals->at( fp.normal-1 );
 
-			glBegin( GL_LINE );
+			glBegin( GL_LINES );
 			glVertex3f( vertex.x(), vertex.y(), vertex.z() );
-			glVertex3f( vertex.x()+normal.x(), vertex.y()+normal.y(), vertex.z()+normal.z() );
+			glVertex3f( vertex.x()+normal.x()*3, vertex.y()+normal.y()*3, vertex.z()+normal.z()*3 );
 			glEnd();
 		}
 	}
