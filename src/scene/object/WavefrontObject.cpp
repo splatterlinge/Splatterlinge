@@ -9,9 +9,9 @@ WavefrontObject::WavefrontObject( Scene * scene, const float & size, QString fil
 	mVertices = new QList<QVector3D>();
 	mTextureVertices = new QList<QVector3D>();
 	mNormals = new QList<QVector3D>();
-	mFaces = new QList<QList<FacePoint> >();
+	mFaces = new QList<Face>();
 
-	mMaterials = new QMap<QString, Material>();
+	mMaterials = new QList<Material>();
 
 	parseObj( filename );
 
@@ -86,21 +86,24 @@ bool WavefrontObject::parseObj( QString filename )
 		}
 		else if( keyword == "f" )
 		{
-			QStringList points;
+			Face face;
 			FacePoint point;
-			QList<FacePoint> list;
+			QStringList points;
+
 			while( !fields.isEmpty() )
 			{
 				points = fields.takeFirst().split( "/" );
 				while( !points.isEmpty() )
 				{
 					point.vertex = &mVertices->at( points.takeFirst().toInt()-1 );
-					point.texture = &mTextureVertices->at( points.takeFirst().toInt()-1 );
+					point.texCoord = &mTextureVertices->at( points.takeFirst().toInt()-1 );
 					point.normal = &mNormals->at( points.takeFirst().toInt()-1 );
-					list.append( point );
+
+					face.points->append( point );
+					face.material = new Material( mScene->glWidget(), "KirksEntry" );
 				}
 			}
-			mFaces->append( list );
+			mFaces->append( face );
 		}
 	}
 
@@ -127,13 +130,18 @@ void WavefrontObject::drawSelf()
 
 	glScalef( 1.0*mScale, 1.0*mScale, 1.0*mScale );
 	glColor3f( 1.0f, 1.0f, 0.0f );
-	foreach( QList<FacePoint> fl, * mFaces )
+
+	foreach( Face face, *mFaces )
 	{
+		if( face.material != 0 )
+		{
+			face.material->bind();
+		}
 		glBegin( GL_TRIANGLES );
-		foreach( FacePoint fp, fl )
+		foreach( FacePoint fp, *face.points )
 		{
 			QVector3D normal = *fp.normal;
-			QVector3D texture = *fp.texture;
+			QVector3D texture = *fp.texCoord;
 			QVector3D vertex = *fp.vertex;
 
 			glNormal3f( normal.x(), normal.y(), normal.z() );
@@ -141,15 +149,19 @@ void WavefrontObject::drawSelf()
 			glVertex3f( vertex.x(), vertex.y(), vertex.z() );
 		}
 		glEnd();
+		if( face.material != 0 )
+		{
+			face.material->release();
+		}
 	}
 
 	glDisable( GL_LIGHTING );
 	glDisable( GL_LIGHT0 );
 
 	glColor3f( 1.0, 0.0, 0.0 );
-	foreach( QList<FacePoint> fl, * mFaces )
+	foreach( Face face, *mFaces )
 	{
-		foreach( FacePoint fp, fl )
+		foreach( FacePoint fp, *face.points )
 		{
 			QVector3D normal = *fp.normal;
 			QVector3D vertex = *fp.vertex;
