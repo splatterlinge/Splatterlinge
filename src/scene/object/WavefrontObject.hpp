@@ -55,7 +55,7 @@ private:
 	QList<QVector3D> * mTextureVertices;
 	QList<QVector3D> * mNormals;
 	QList<Face> * mFaces;
-	QList<Material> * mMaterials;
+	QMap<QString, Material> * mMaterials;
 };
 
 #endif // WAVEFRONTOBJECT_HPP

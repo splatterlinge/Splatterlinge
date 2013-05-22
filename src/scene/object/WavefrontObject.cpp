@@ -5,13 +5,13 @@ WavefrontObject::WavefrontObject( Scene * scene, const float & size, QString fil
 	mSize( size )
 {
 	mScene = scene;
-	mScale = 0.2;
+	mScale = 0.4;
 	mVertices = new QList<QVector3D>();
 	mTextureVertices = new QList<QVector3D>();
 	mNormals = new QList<QVector3D>();
 	mFaces = new QList<Face>();
 
-	mMaterials = new QList<Material>();
+	mMaterials = new QMap<QString, Material>();
 
 	parseObj( filename );
 
@@ -105,6 +105,14 @@ bool WavefrontObject::parseObj( QString filename )
 			}
 			mFaces->append( face );
 		}
+		else if( keyword == "mtllib" )
+		{
+
+		}
+		else if( keyword == "usemtl" )
+		{
+
+		}
 	}
 
 	file.close();
@@ -129,7 +137,7 @@ void WavefrontObject::drawSelf()
 	glPushMatrix();
 
 	glScalef( 1.0*mScale, 1.0*mScale, 1.0*mScale );
-	glColor3f( 1.0f, 1.0f, 0.0f );
+	glColor3f( 1.0f, 1.0f, 1.0f );
 
 	foreach( Face face, *mFaces )
 	{
