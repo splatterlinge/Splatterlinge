@@ -107,15 +107,24 @@ bool WavefrontObject::parseObj( QString filename )
 		}
 		else if( keyword == "mtllib" )
 		{
-
+			QFileInfo fileinfo( file );
+			parseMtl( fileinfo.absolutePath() + "/" + fields.takeFirst() );
 		}
 		else if( keyword == "usemtl" )
 		{
-
+			// TODO
 		}
 	}
 
 	file.close();
+
+	return true;
+}
+
+bool WavefrontObject::parseMtl( QString filename )
+{
+	qDebug() << filename;
+	// TODO
 
 	return true;
 }
