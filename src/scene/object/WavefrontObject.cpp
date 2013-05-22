@@ -5,8 +5,8 @@ WavefrontObject::WavefrontObject( Scene * scene, const float & size, QString fil
 	mSize( size )
 {
 	mScene = scene;
-	mScale = 1.0;
-	mVertices = new QList<QVector4D>();
+	mScale = 0.2;
+	mVertices = new QList<QVector3D>();
 	mTextureVertices = new QList<QVector3D>();
 	mNormals = new QList<QVector3D>();
 	mFaces = new QList<QList<FacePoint> >();
@@ -14,6 +14,8 @@ WavefrontObject::WavefrontObject( Scene * scene, const float & size, QString fil
 	mMaterials = new QMap<QString, Material>();
 
 	parseObj( filename );
+
+	qDebug() << "+" << this << "WavefrontData:" << filename;
 }
 
 WavefrontObject::~WavefrontObject()
@@ -27,7 +29,12 @@ WavefrontObject::~WavefrontObject()
 bool WavefrontObject::parseObj( QString filename )
 {
 	QFile file( filename );
-	qDebug() << "Load Object: " << filename;
+	QString line;
+	QString keyword;
+	QStringList fields;
+	float x, y, z;
+	float u, v, w;
+
 	if( !file.open( QIODevice::ReadOnly ) ) {
 		qDebug() << file.errorString();
 		return false;
@@ -36,133 +43,68 @@ bool WavefrontObject::parseObj( QString filename )
 	QTextStream in( &file );
 
 	while( !in.atEnd() ) {
-		QString line = in.readLine();
-		QStringList fields = line.split( " ", QString::SkipEmptyParts );
+		line = in.readLine().trimmed();
 
-		if( fields.length() > 0 )
+		while( line.endsWith( "\\" ) )
 		{
-			QString type = fields[0];
-			fields.removeFirst();
-
-			if( type == "mtllib" )
+			line.truncate( line.size()-1 );
+			if( in.atEnd() )
 			{
-				mMtllib = fields[0];
-
-				QFileInfo fileinfo( file );
-
-				parseMtl( fileinfo.absolutePath() + "/" + mMtllib );
+				break;
 			}
-			else if( type == "v" )
+			line += in.readLine().trimmed();
+		}
+
+		if( line.startsWith( "#" ) || line.isEmpty() )
+		{
+			continue;
+		}
+
+		fields = line.split( " ", QString::SkipEmptyParts );
+		keyword = fields.takeFirst();
+
+		if( keyword == "v" )
+		{
+			x = fields.takeFirst().toFloat();
+			y = fields.takeFirst().toFloat();
+			z = fields.takeFirst().toFloat();
+			mVertices->append( QVector3D( x, y, z ) );
+		}
+		else if( keyword == "vt" )
+		{
+			u = fields.takeFirst().toFloat();
+			v = fields.takeFirst().toFloat();
+			w = 1.0f;
+			mTextureVertices->append( QVector3D( u, v, w ) );
+		}
+		else if( keyword == "vn" )
+		{
+			x = fields.takeFirst().toFloat();
+			y = fields.takeFirst().toFloat();
+			z = fields.takeFirst().toFloat();
+			mNormals->append( QVector3D( x, y, z ) );
+		}
+		else if( keyword == "f" )
+		{
+			QStringList points;
+			FacePoint point;
+			QList<FacePoint> list;
+			while( !fields.isEmpty() )
 			{
-				QVector4D v;
-				v.setX( fields[0].toFloat() );
-				v.setY( fields[1].toFloat() );
-				v.setZ( fields[2].toFloat() );
-
-				if( fields.length() == 4 )
+				points = fields.takeFirst().split( "/" );
+				while( !points.isEmpty() )
 				{
-					v.setW( fields[3].toFloat() );
+					point.vertex = &mVertices->at( points.takeFirst().toInt()-1 );
+					point.texture = &mTextureVertices->at( points.takeFirst().toInt()-1 );
+					point.normal = &mNormals->at( points.takeFirst().toInt()-1 );
+					list.append( point );
 				}
-				else
-				{
-					v.setW( 1.0f );
-				}
-
-				mVertices->append( v );
 			}
-			else if( type == "vt" )
-			{
-				QVector3D v;
-				v.setX( fields[0].toFloat() );
-
-				if( fields.length() >= 2 )
-				{
-					v.setY( fields[1].toFloat() );
-				}
-				if( fields.length() == 3 )
-				{
-					v.setZ( fields[2].toFloat() );
-				}
-
-				mTextureVertices->append( v );
-			}
-			else if( type == "vn" )
-			{
-				QVector3D v;
-
-				v.setX( fields[0].toFloat() );
-				v.setY( fields[1].toFloat() );
-				v.setZ( fields[2].toFloat() );
-
-				mNormals->append( v );
-			}
-			else if( type == "f" )
-			{
-				QList<FacePoint> list;
-
-				foreach( QString s, fields)
-				{
-					QStringList fp = s.split( "/" );
-					FacePoint p;
-					p.vertex = fp[0].toInt();
-					if( fp.length() >= 2)
-					{
-						p.texture = fp[1].toInt();
-					}
-					if( fp.length() == 3)
-					{
-						p.normal = fp[2].toInt();
-					}
-
-					list.append( p );
-				}
-
-				mFaces->append( list );
-			}
+			mFaces->append( list );
 		}
 	}
-
-	/*
-	foreach( QList<FacePoint> fl, * mFaces )
-	{
-		qDebug() << "TRIANGLE";
-		foreach( FacePoint fp, fl )
-		{
-			qDebug() << "Vertice: " << mVertices->at( fp.vertex-1 );
-			qDebug() << "Texture: " << mTextureVertices->at( fp.texture-1 );
-			qDebug() << "Normal:  " << mNormals->at( fp.normal-1 );
-		}
-	}
-	*/
 
 	file.close();
-
-	return true;
-}
-
-bool WavefrontObject::parseMtl( QString filename )
-{
-	QFile file( filename );
-	qDebug() << "Load Object Material: " << filename;
-	if( !file.open( QIODevice::ReadOnly ) ) {
-		qDebug() << file.errorString();
-		return false;
-	}
-
-	QTextStream in( &file );
-
-	while( !in.atEnd() ) {
-		QString line = in.readLine();
-		QStringList fields = line.split( " ", QString::SkipEmptyParts );
-
-		if( fields.length() > 0 )
-		{
-			QString type = fields[0];
-			fields.removeFirst();
-		}
-
-		Material current( mScene->glWidget(), "" );
-	}
 
 	return true;
 }
@@ -184,20 +126,19 @@ void WavefrontObject::drawSelf()
 	glPushMatrix();
 
 	glScalef( 1.0*mScale, 1.0*mScale, 1.0*mScale );
-
+	glColor3f( 1.0f, 1.0f, 0.0f );
 	foreach( QList<FacePoint> fl, * mFaces )
 	{
 		glBegin( GL_TRIANGLES );
 		foreach( FacePoint fp, fl )
 		{
-			QVector3D normal = mNormals->at( fp.normal-1 );
+			QVector3D normal = *fp.normal;
+			QVector3D texture = *fp.texture;
+			QVector3D vertex = *fp.vertex;
+
 			glNormal3f( normal.x(), normal.y(), normal.z() );
-
-			QVector3D texture = mTextureVertices->at( fp.texture-1 );
 			glTexCoord3f( texture.x(), texture.y(), texture.z() );
-
-			QVector4D vertex = mVertices->at( fp.vertex-1 );
-			glVertex4f( vertex.x(), vertex.y(), vertex.z(), vertex.w() );
+			glVertex3f( vertex.x(), vertex.y(), vertex.z() );
 		}
 		glEnd();
 	}
@@ -210,8 +151,8 @@ void WavefrontObject::drawSelf()
 	{
 		foreach( FacePoint fp, fl )
 		{
-			QVector4D vertex = mVertices->at( fp.vertex-1 );
-			QVector3D normal = mNormals->at( fp.normal-1 );
+			QVector3D normal = *fp.normal;
+			QVector3D vertex = *fp.vertex;
 
 			glBegin( GL_LINES );
 			glVertex3f( vertex.x(), vertex.y(), vertex.z() );

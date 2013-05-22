@@ -30,7 +30,7 @@ World::World( Scene * scene, QString name ) :
 	add( mTeapot );
 	mDragTeapot = false;
 
-	mTable = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, 4, "./data/object/table01/table01.obj" ) );
+	mTable = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, 4, "data/object/table01/table01.obj" ) );
 	mTable->setPositionY( mLandscape->terrain()->getHeight( QVector3D(0,0,0) ) + 3 );
 	add( mTable );
 

@@ -17,9 +17,9 @@
 #include <QMap>
 
 struct FacePoint {
-	int vertex;
-	int texture;
-	int normal;
+	const QVector3D * vertex;
+	const QVector3D * texture;
+	const QVector3D * normal;
 };
 
 class WavefrontObject : public AObject
@@ -40,7 +40,7 @@ private:
 	float mSize;
 	float mScale;
 	QString mMtllib;
-	QList<QVector4D> * mVertices;
+	QList<QVector3D> * mVertices;
 	QList<QVector3D> * mTextureVertices;
 	QList<QVector3D> * mNormals;
 	QList<QList<FacePoint> > * mFaces;
