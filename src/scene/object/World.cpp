@@ -34,6 +34,11 @@ World::World( Scene * scene, QString name ) :
 	mTable->setPositionY( mLandscape->terrain()->getHeight( QVector3D(0,0,0) ) + 3 );
 	add( mTable );
 
+	mTree = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, 4, "data/object/tree/tree.obj" ) );
+	mTree->setPositionX( 100 );
+	mTree->setPositionY( mLandscape->terrain()->getHeight( QVector3D(100,0,0) ) - 1 );
+	add( mTree );
+
 	mSky = QSharedPointer<Sky>( new Sky( scene, skyName, &mTimeOfDay ) );
 	add( mSky );
 

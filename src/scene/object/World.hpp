@@ -17,7 +17,7 @@ class TextureRenderer;
 
 /// World object
 /**
- * 
+ *
  */
 class World : public AObject, public AKeyListener, public AMouseListener
 {
@@ -44,7 +44,8 @@ private:
 	QSharedPointer<Sky> mSky;
 	QSharedPointer<Landscape> mLandscape;
 	QSharedPointer<Teapot> mTeapot;
-    QSharedPointer<WavefrontObject> mTable;
+	QSharedPointer<WavefrontObject> mTable;
+	QSharedPointer<WavefrontObject> mTree;
 	bool mDragTeapot;
 };
 
