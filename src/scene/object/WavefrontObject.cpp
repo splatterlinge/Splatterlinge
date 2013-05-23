@@ -11,7 +11,7 @@ WavefrontObject::WavefrontObject( Scene * scene, const float & size, QString fil
 	mNormals = new QList<QVector3D>();
 	mFaces = new QList<Face>();
 
-	mMaterials = new QMap<QString, Material>();
+	mMaterials = new QMap<QString, Material *>();
 
 	parseObj( filename );
 
@@ -113,7 +113,7 @@ bool WavefrontObject::parseObj( QString filename )
 		}
 		else if( keyword == "usemtl" )
 		{
-			// TODO
+			mMaterial = mMaterials->value( fields.takeFirst() );
 		}
 	}
 
@@ -128,8 +128,6 @@ bool WavefrontObject::parseMtl( QString filename )
 	QString line;
 	QString keyword;
 	QStringList fields;
-	float x, y, z;
-	float u, v, w;
 
 	if( !file.open( QIODevice::ReadOnly ) ) {
 		qDebug() << file.errorString();
@@ -162,6 +160,7 @@ bool WavefrontObject::parseMtl( QString filename )
 		if( keyword == "newmtl" )
 		{
 			// TODO
+			mMaterials->insert( fields.takeFirst(), new Material( mScene->glWidget(), "KirksEntry" ) );
 		}
 		else if( keyword == "Ka" )
 		{
