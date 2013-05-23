@@ -53,20 +53,26 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	if( alcIsExtensionPresent( NULL, "ALC_ENUMERATE_ALL_EXT") == AL_TRUE )
 	{
 		const ALCchar * devicesAL = alcGetString( NULL, ALC_ALL_DEVICES_SPECIFIER );
-		qDebug() << "OpenAL: Available devices:";
-		for( const ALchar * d = devicesAL; *d; d += strlen(d)+1 )
+		if( devicesAL )
 		{
-			qDebug() << " *" << d;
+			qDebug() << "OpenAL: Available devices:";
+			for( const ALchar * d = devicesAL; *d; d += strlen(d)+1 )
+			{
+				qDebug() << " *" << d;
+			}
 		}
 	}
 #else
 	if( alcIsExtensionPresent( NULL, "ALC_ENUMERATE_EXT") == AL_TRUE )
 	{
 		const ALCchar * devicesAL = alcGetString( NULL, ALC_DEVICE_SPECIFIER );
-		qDebug() << "OpenAL: Available devices:";
-		for( const ALchar * d = devicesAL; *d; d += strlen(d)+1 )
+		if( devicesAL )
 		{
-			qDebug() << " *" << d;
+			qDebug() << "OpenAL: Available devices:";
+			for( const ALchar * d = devicesAL; *d; d += strlen(d)+1 )
+			{
+				qDebug() << " *" << d;
+			}
 		}
 	}
 #endif
