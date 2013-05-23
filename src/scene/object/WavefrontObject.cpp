@@ -32,8 +32,7 @@ bool WavefrontObject::parseObj( QString filename )
 	QString line;
 	QString keyword;
 	QStringList fields;
-	float x, y, z;qDebug() << filename;
-	// TODO
+	float x, y, z;
 	float u, v, w;
 
 	if( !file.open( QIODevice::ReadOnly ) ) {
@@ -101,7 +100,7 @@ bool WavefrontObject::parseObj( QString filename )
 					point.normal = &mNormals->at( points.takeFirst().toInt()-1 );
 
 					face.points->append( point );
-					face.material = new Material( mScene->glWidget(), "KirksEntry" );
+					face.material = mMaterial;
 				}
 			}
 			mFaces->append( face );
@@ -113,7 +112,7 @@ bool WavefrontObject::parseObj( QString filename )
 		}
 		else if( keyword == "usemtl" )
 		{
-			mMaterial = mMaterials->value( fields.takeFirst() );
+			mMaterial = new Material( mScene->glWidget(), "table01_tt" );
 		}
 	}
 
@@ -160,7 +159,6 @@ bool WavefrontObject::parseMtl( QString filename )
 		if( keyword == "newmtl" )
 		{
 			// TODO
-			mMaterials->insert( fields.takeFirst(), new Material( mScene->glWidget(), "KirksEntry" ) );
 		}
 		else if( keyword == "Ka" )
 		{
