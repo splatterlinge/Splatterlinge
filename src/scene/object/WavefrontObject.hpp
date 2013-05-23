@@ -37,7 +37,7 @@ public:
 class WavefrontObject : public AObject
 {
 public:
-	WavefrontObject( Scene * scene, const float & size, QString filename );
+	WavefrontObject( Scene * scene, QString filename );
 	virtual ~WavefrontObject();
 
 	virtual void updateSelf( const float & delta );
@@ -47,7 +47,6 @@ public:
 
 private:
 	Scene * mScene;
-	float mSize;
 	float mScale;
 	QString mMtllib;
 	QList<QVector3D> * mVertices;

@@ -1,8 +1,7 @@
 #include "WavefrontObject.hpp"
 
-WavefrontObject::WavefrontObject( Scene * scene, const float & size, QString filename ) :
-	AObject( scene, size ),
-	mSize( size )
+WavefrontObject::WavefrontObject( Scene * scene, QString filename ) :
+	AObject( scene )
 {
 	mScene = scene;
 	mScale = 0.4;
@@ -26,6 +25,7 @@ WavefrontObject::~WavefrontObject()
 
 bool WavefrontObject::parseObj( QString filename )
 {
+	//TODO: calculate model radius and use setBoundingSphere() to enable frustum culling
 	QFile file( filename );
 	QString line;
 	QString keyword;
@@ -122,14 +122,11 @@ void WavefrontObject::updateSelf( const float & delta )
 
 void WavefrontObject::drawSelf()
 {
-	glPushAttrib(GL_ENABLE_BIT | GL_EVAL_BIT);
+	glPushAttrib( GL_ENABLE_BIT );
 	glDisable( GL_CULL_FACE );
 	glEnable( GL_AUTO_NORMAL );
 	glEnable( GL_NORMALIZE );
 	glEnable( GL_LIGHTING );
-	glEnable( GL_LIGHT0 );
-	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 	glPushMatrix();
 
@@ -160,9 +157,7 @@ void WavefrontObject::drawSelf()
 		}
 	}
 
-	glDisable( GL_BLEND );
 	glDisable( GL_LIGHTING );
-	glDisable( GL_LIGHT0 );
 
 	glColor3f( 1.0, 0.0, 0.0 );
 	foreach( Face face, *mFaces )

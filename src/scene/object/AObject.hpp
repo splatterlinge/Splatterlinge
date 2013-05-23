@@ -106,6 +106,7 @@ public:
 	virtual void drawSelfPostProc() {};
 
 	const float & boundingSphereRadius() const { return mBoundingSphereRadius; }
+
 	static void setGlobalDebugBoundingSpheres( bool enable ) { sDebugBoundingSpheres = enable; }
 
 protected:

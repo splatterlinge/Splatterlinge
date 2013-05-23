@@ -11,6 +11,20 @@
 RESOURCE_CACHE(MaterialData);
 
 
+GLenum MaterialData::alphaTestFunctionFromString( QString name )
+{
+	if( name == "GL_NEVER" ) return GL_NEVER;
+	else if( name == "GL_LESS" ) return GL_LESS;
+	else if( name == "GL_EQUAL" ) return GL_EQUAL;
+	else if( name == "GL_LEQUAL" ) return GL_LEQUAL;
+	else if( name == "GL_GREATER" ) return GL_GREATER;
+	else if( name == "GL_NOTEQUAL" ) return GL_NOTEQUAL;
+	else if( name == "GL_GEQUAL" ) return GL_GEQUAL;
+	else if( name == "GL_ALWAYS" ) return GL_ALWAYS;
+	else return GL_ALWAYS;
+}
+
+
 MaterialData::MaterialData( GLWidget * glWidget, QString name ) :
 	AResourceData( name ),
 	mGLWidget(glWidget),
@@ -95,6 +109,14 @@ bool MaterialData::load()
 	}
 	s.endGroup();
 
+	s.beginGroup( "AlphaTest" );
+	{
+		mAlphaTestEnabled = s.value( "enable", false ).toBool();
+		mAlphaTestFunction = alphaTestFunctionFromString( s.value( "function", GL_ONE ).toString() );
+		mAlphaTestReferenceValue = s.value( "referenceValue", GL_ZERO ).toFloat();
+	}
+	s.endGroup();
+
 	s.beginGroup( "Shader" );
 	{
 		mDefaultShaderName = s.value( "defaultShader", "versatile" ).toString();
@@ -127,6 +149,7 @@ Material::Material( GLWidget * glWidget, QString name, ShaderType type ) : AReso
 	mShaderSet[HIGH_QUALITY].blobMapUniform = -1;
 	mShaderSet[HIGH_QUALITY].cubeMapUniform = -1;
 	mBlobMap = mCubeMap = -1;
+	unsetAlphaTestReferenceValueOverride();
 
 	QSharedPointer<MaterialData> n( new MaterialData( glWidget, name ) );
 	cache( n );
@@ -168,6 +191,12 @@ void Material::bind()
 	mShaderSet[mBoundQuality].shader->bind();
 
 	glPushAttrib( GL_LIGHTING_BIT | GL_ENABLE_BIT );
+	
+	if( data()->alphaTestEnabled() )
+	{
+		glAlphaFunc( data()->alphaTestFunction(), data()->alphaTestReferenceValue() );
+		glEnable( GL_ALPHA_TEST );
+	}
 
 	glMaterial( GL_FRONT_AND_BACK, GL_AMBIENT, data()->ambient() );
 	glMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE, data()->diffuse() );

@@ -12,6 +12,7 @@
 class GLWidget;
 class Shader;
 
+
 class MaterialData : public AResourceData
 {
 public:
@@ -29,13 +30,15 @@ public:
 	const QMap<QString,GLfloat> & constants() const { return mConstants; }
 	const QString & defaultShaderName() const { return mDefaultShaderName; }
 	const QString & blobbingShaderName() const { return mBlobbingShaderName; }
+	const GLclampf & alphaTestReferenceValue() const { return mAlphaTestReferenceValue; }
+	const GLenum & alphaTestFunction() const { return mAlphaTestFunction; }
+	const bool & alphaTestEnabled() const { return mAlphaTestEnabled; }
 
 private:
 	GLWidget * mGLWidget;
 	QString mName;
 	QString mDefaultShaderName;
 	QString mBlobbingShaderName;
-
 	QVector4D mAmbient;
 	QVector4D mDiffuse;
 	QVector4D mSpecular;
@@ -43,6 +46,11 @@ private:
 	GLfloat mShininess;
 	QMap<QString,GLuint> mTextures;
 	QMap<QString,GLfloat> mConstants;
+	bool mAlphaTestEnabled;
+	GLclampf mAlphaTestReferenceValue;
+	GLenum mAlphaTestFunction;
+
+	static GLenum alphaTestFunctionFromString( QString name );
 };
 
 
@@ -50,7 +58,7 @@ class Material : public AResource<MaterialData>
 {
 public:
 	typedef enum { LOW_QUALITY=0, MEDIUM_QUALITY=1, HIGH_QUALITY=2 } Quality;
-	typedef enum { DEFAULT_SHADERTYPE, BLOBBING_SHADERTYPE } ShaderType;
+	typedef enum { DEFAULT_SHADERTYPE=0, BLOBBING_SHADERTYPE=1 } ShaderType;
 	static void setGlobalMaxQuality( Quality q ) { sGlobalMaxQuality = q; }
 	static Quality globalMaxQuality() { return sGlobalMaxQuality; }
 
@@ -63,9 +71,14 @@ public:
 	void setBlobMap( GLuint blobMap ) { mBlobMap = blobMap; }
 	void setCubeMap( GLuint cubeMap ) { mCubeMap = cubeMap; }
 
+	void unsetAlphaTestReferenceValueOverride()
+		{ mUsedAlphaTestReferenceValue = &data()->alphaTestReferenceValue(); }
+	void setAlphaTestReferenceValueOverride( GLclampf referenceValue )
+		{ mAlphaTestReferenceValueOverride = referenceValue; mUsedAlphaTestReferenceValue = &mAlphaTestReferenceValueOverride; }
+
 	void bind();
 	void release();
-	
+
 	void setDefaultQuality( Quality q ) { mDefaultQuality = q; }
 
 private:
@@ -78,7 +91,6 @@ private:
 		int cubeMapUniform;
 	} ShaderSet;
 
-
 	static Quality sGlobalMaxQuality;
 
 	GLWidget * mGLWidget;
@@ -88,6 +100,9 @@ private:
 
 	GLuint mBlobMap;
 	GLuint mCubeMap;
+	
+	GLclampf mAlphaTestReferenceValueOverride;
+	const GLclampf * mUsedAlphaTestReferenceValue;
 
 	Quality mDefaultQuality;
 	Quality mBoundQuality;
