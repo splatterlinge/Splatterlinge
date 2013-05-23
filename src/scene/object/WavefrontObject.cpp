@@ -123,10 +123,13 @@ void WavefrontObject::updateSelf( const float & delta )
 void WavefrontObject::drawSelf()
 {
 	glPushAttrib(GL_ENABLE_BIT | GL_EVAL_BIT);
+	glDisable( GL_CULL_FACE );
 	glEnable( GL_AUTO_NORMAL );
 	glEnable( GL_NORMALIZE );
 	glEnable( GL_LIGHTING );
 	glEnable( GL_LIGHT0 );
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 	glPushMatrix();
 
@@ -157,6 +160,7 @@ void WavefrontObject::drawSelf()
 		}
 	}
 
+	glDisable( GL_BLEND );
 	glDisable( GL_LIGHTING );
 	glDisable( GL_LIGHT0 );
 
