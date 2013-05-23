@@ -11,8 +11,6 @@ WavefrontObject::WavefrontObject( Scene * scene, const float & size, QString fil
 	mNormals = new QList<QVector3D>();
 	mFaces = new QList<Face>();
 
-	mMaterials = new QMap<QString, Material *>();
-
 	parseObj( filename );
 
 	qDebug() << "+" << this << "WavefrontData:" << filename;
@@ -105,14 +103,10 @@ bool WavefrontObject::parseObj( QString filename )
 			}
 			mFaces->append( face );
 		}
-		else if( keyword == "mtllib" )
-		{
-			QFileInfo fileinfo( file );
-			parseMtl( fileinfo.absolutePath() + "/" + fields.takeFirst() );
-		}
 		else if( keyword == "usemtl" )
 		{
-			mMaterial = new Material( mScene->glWidget(), "table01_tt" );
+			QFileInfo fileinfo( file );
+			mMaterial = new Material( mScene->glWidget(), fileinfo.baseName()+"_"+fields.takeFirst() );
 		}
 	}
 
@@ -121,84 +115,10 @@ bool WavefrontObject::parseObj( QString filename )
 	return true;
 }
 
-bool WavefrontObject::parseMtl( QString filename )
-{
-	QFile file( filename );
-	QString line;
-	QString keyword;
-	QStringList fields;
-
-	if( !file.open( QIODevice::ReadOnly ) ) {
-		qDebug() << file.errorString();
-		return false;
-	}
-
-	QTextStream in( &file );
-
-	while( !in.atEnd() ) {
-		line = in.readLine().trimmed();
-
-		while( line.endsWith( "\\" ) )
-		{
-			line.truncate( line.size()-1 );
-			if( in.atEnd() )
-			{
-				break;
-			}
-			line += in.readLine().trimmed();
-		}
-
-		if( line.startsWith( "#" ) || line.isEmpty() )
-		{
-			continue;
-		}
-
-		fields = line.split( " ", QString::SkipEmptyParts );
-		keyword = fields.takeFirst();
-
-		if( keyword == "newmtl" )
-		{
-			// TODO
-		}
-		else if( keyword == "Ka" )
-		{
-			// TODO
-		}
-		else if( keyword == "Kd" )
-		{
-			// TODO
-		}
-		else if( keyword == "Ks" )
-		{
-			// TODO
-		}
-		else if( keyword == "map_Kd" )
-		{
-			// TODO
-		}
-		else if( keyword == "d" )
-		{
-			// TODO
-		}
-		else if( keyword == "illum" )
-		{
-			// TODO
-		}
-		else if( keyword == "Ns" )
-		{
-			// TODO
-		}
-
-	}
-
-	return true;
-}
-
 void WavefrontObject::updateSelf( const float & delta )
 {
 	// TODO
 }
-
 
 void WavefrontObject::drawSelf()
 {

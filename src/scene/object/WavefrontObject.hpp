@@ -44,7 +44,6 @@ public:
 	virtual void drawSelf();
 
 	bool parseObj( QString filename );
-	bool parseMtl( QString filename );
 
 private:
 	Scene * mScene;
@@ -56,7 +55,6 @@ private:
 	QList<QVector3D> * mNormals;
 	QList<Face> * mFaces;
 	Material * mMaterial;
-	QMap<QString, Material *> * mMaterials;
 };
 
 #endif // WAVEFRONTOBJECT_HPP
