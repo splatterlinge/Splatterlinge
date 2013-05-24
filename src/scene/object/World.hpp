@@ -5,6 +5,7 @@
 #include "../AKeyListener.hpp"
 #include "../AMouseListener.hpp"
 #include "AObject.hpp"
+#include "geometry/ParticleSystem.hpp"
 
 
 class Sky;
@@ -46,7 +47,9 @@ private:
 	QSharedPointer<Teapot> mTeapot;
 	QSharedPointer<WavefrontObject> mTable;
 	QSharedPointer<WavefrontObject> mTree;
+	QVector3D mTarget;
 	bool mDragTeapot;
+	ParticleSystem mParticleSystem;
 };
 
 
