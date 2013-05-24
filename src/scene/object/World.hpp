@@ -5,7 +5,6 @@
 #include "../AKeyListener.hpp"
 #include "../AMouseListener.hpp"
 #include "AObject.hpp"
-#include "geometry/ParticleSystem.hpp"
 
 
 class Sky;
@@ -14,6 +13,8 @@ class Teapot;
 class WavefrontObject;
 class Shader;
 class TextureRenderer;
+class Material;
+class ParticleSystem;
 
 
 /// World object
@@ -49,7 +50,8 @@ private:
 	QSharedPointer<WavefrontObject> mTree;
 	QVector3D mTarget;
 	bool mDragTeapot;
-	ParticleSystem mParticleSystem;
+	Material * mParticleMaterial;
+	ParticleSystem * mParticleSystem;
 };
 
 

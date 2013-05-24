@@ -5,6 +5,7 @@
 #include "Teapot.hpp"
 #include "WavefrontObject.hpp"
 #include "Sky.hpp"
+#include "geometry/ParticleSystem.hpp"
 
 #include <QPainter>
 #include <QSettings>
@@ -45,6 +46,9 @@ World::World( Scene * scene, QString name ) :
 	scene->addKeyListener( this );
 	scene->addMouseListener( this );
 	
+	mParticleSystem = new ParticleSystem( 500 );
+	mParticleSystem->setSize( 6.0f );
+	mParticleMaterial = new Material( scene->glWidget(), "Splatter" );
 	mTarget = QVector3D(0,0,0);
 }
 
@@ -107,7 +111,7 @@ void World::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 
 void World::wheelEvent( QGraphicsSceneWheelEvent * event )
 {
-	mParticleSystem.emitSpherical( mTarget+QVector3D(0,2,0), 100, 100.0f, 200.0f );
+	mParticleSystem->emitSpherical( mTarget+QVector3D(0,2,0), 30, 70.0f, 80.0f );
 }
 
 
@@ -135,7 +139,7 @@ void World::updateSelf( const float & delta )
 		mTeapot->setPosition( mTarget );
 		mTeapot->moveY( 3 );
 	}
-	mParticleSystem.update( delta );
+	mParticleSystem->update( delta );
 }
 
 
@@ -171,8 +175,9 @@ void World::drawSelf()
 
 void World::drawSelfPost()
 {
-	glEnable( GL_LIGHTING );
-	mParticleSystem.draw();
+	mParticleMaterial->bind();
+	mParticleSystem->draw();
+	mParticleMaterial->release();
 	glDisable( GL_LIGHTING );
 	glBegin( GL_LINES );
 		glColor3f( 0,1,1 );

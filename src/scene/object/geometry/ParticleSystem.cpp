@@ -43,15 +43,16 @@ void ParticleSystem::draw()
 	QVector3D vC(  (right.x()   -up.x()) * mSize,  (right.y()   -up.y()) * mSize,  (right.z()   -up.z()) * mSize );
 	QVector3D vD(  (  -up.x()-right.x()) * mSize,  (  -up.y()-right.y()) * mSize,  (  -up.z()-right.z()) * mSize );
 	glBegin( GL_QUADS );
-	glNormal( dir );
 	for( int i=0; i<mParticles.size(); ++i )
 	{
 		if( mParticles[i].life <= 0.0f )
 			continue;
-		glTexCoord2i(0,0);	glVertex( mParticles[i].position + vA );
+		glNormal( QVector3D(0,1,0) );
 		glTexCoord2i(0,1);	glVertex( mParticles[i].position + vD );
 		glTexCoord2i(1,1);	glVertex( mParticles[i].position + vC );
+		glNormal( dir );
 		glTexCoord2i(1,0);	glVertex( mParticles[i].position + vB );
+		glTexCoord2i(0,0);	glVertex( mParticles[i].position + vA );
 	}
 	glEnd();
 }
