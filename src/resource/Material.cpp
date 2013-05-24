@@ -53,7 +53,7 @@ bool MaterialData::load()
 		for( i = textures.constBegin(); i != textures.constEnd(); ++i )
 		{
 			QString mapPath = "./data/material/"+mName+"/" + s.value( (*i) ).toString();
-			QPixmap map = QPixmap( mapPath );
+			QImage map = QImage( mapPath );
 			if( map.isNull() )
 			{
 				qFatal(
@@ -62,7 +62,7 @@ bool MaterialData::load()
 					mapPath.toLocal8Bit().constData()
 				);
 			}
-			GLuint texture =  mGLWidget->bindTexture( map, GL_TEXTURE_2D, GL_RGBA, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
+			GLuint texture =  mGLWidget->bindTexture( map );
 			mTextures[(*i)] = texture;
 		}
 	}
@@ -112,8 +112,8 @@ bool MaterialData::load()
 	s.beginGroup( "AlphaTest" );
 	{
 		mAlphaTestEnabled = s.value( "enable", false ).toBool();
-		mAlphaTestFunction = alphaTestFunctionFromString( s.value( "function", GL_ONE ).toString() );
-		mAlphaTestReferenceValue = s.value( "referenceValue", GL_ZERO ).toFloat();
+		mAlphaTestFunction = alphaTestFunctionFromString( s.value( "function", "GL_ALWAYS" ).toString() );
+		mAlphaTestReferenceValue = s.value( "referenceValue", 0.0f ).toFloat();
 	}
 	s.endGroup();
 

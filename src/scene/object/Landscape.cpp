@@ -183,11 +183,10 @@ void Landscape::drawSelfPostProc()
 void Landscape::drawPatch( const QRectF & rect )
 {
 	mTerrainMaterial->bind();
-	glMatrixMode( GL_TEXTURE );	glPushMatrix();
-	glScalef( mTerrainMaterialScale.x(), mTerrainMaterialScale.y(), 1.0f );
-	mTerrain->drawPatch( rect );
-	glMatrixMode( GL_TEXTURE );	glPopMatrix();
-	glMatrixMode( GL_MODELVIEW );
+	glMatrixMode( GL_TEXTURE );	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
+		glScalef( mTerrainMaterialScale.x(), mTerrainMaterialScale.y(), 1.0f );
+		mTerrain->drawPatch( rect );
+	glMatrixMode( GL_TEXTURE );	glPopMatrix();	glMatrixMode( GL_MODELVIEW );
 	mTerrainMaterial->release();
 
 	glDepthMask( GL_FALSE );
@@ -215,12 +214,12 @@ Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, 
 	mRect = rect;
 	mMaterialScale = materialScale;
 	mMaterial = new Material( mGLWidget, materialName, Material::BLOBBING_SHADERTYPE );
-	QPixmap blobMap = QPixmap( blobMapPath );
+	QImage blobMap = QImage( blobMapPath );
 	if( blobMap.isNull() )
 	{
 		qFatal( "BlobMap from file \"%s\" could not be loaded!", blobMapPath.toLocal8Bit().constData() );
 	}
-	mBlobMap =  mGLWidget->bindTexture( blobMap, GL_TEXTURE_2D, GL_RED, QGLContext::MipmapBindOption | QGLContext::LinearFilteringBindOption );
+	mBlobMap =  mGLWidget->bindTexture( blobMap );
 	mMaterial->setBlobMap( mBlobMap );
 }
 
