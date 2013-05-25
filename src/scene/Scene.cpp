@@ -126,7 +126,13 @@ QGraphicsProxyWidget * Scene::addWidget( QWidget * widget, Qt::WindowFlags wFlag
 
 void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 {
-	mDelta = (double)mElapsedTimer.restart()/1000.0;
+	qint64 delta = mElapsedTimer.restart();
+	if( delta == 0 )
+	{
+		qWarning() << "Rendering too fast - cannot compute delta t!";
+		delta = 1;
+	}
+	mDelta = (double)delta/1000.0;
 
 	glPushAttrib( GL_ALL_ATTRIB_BITS );
 
@@ -156,13 +162,13 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 		moveY -= 1.0f;
 	if( mSpeedPressed )
 	{
-		moveX *= 3.0;
-		moveY *= 3.0;
-		moveZ *= 3.0;
+		moveX *= 300.0*mDelta;
+		moveY *= 300.0*mDelta;
+		moveZ *= 300.0*mDelta;
 	} else {
-		moveX *= 0.5;
-		moveY *= 0.5;
-		moveZ *= 0.5;
+		moveX *= 50.0*mDelta;
+		moveY *= 50.0*mDelta;
+		moveZ *= 50.0*mDelta;
 	}
 	mEye->setPosition( mEye->position() + moveX*mEye->left() + moveY*mEye->up() + moveZ*mEye->direction() );
 
@@ -198,7 +204,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	glPopAttrib();
 
 //	glFlush();
-	glFinish();
+//	glFinish();
 
 
 	mFrameCountSecond++;

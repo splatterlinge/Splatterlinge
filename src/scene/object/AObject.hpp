@@ -89,11 +89,11 @@ public:
 	QList< QSharedPointer<AObject> > & subNodes() { return mSubNodes; }
 
 	/// Updates this object and all of it's sub-objects
-	void update( const float & delta );
+	void update( const double & delta );
 	/// Draws this object and all of it's sub-objects
 	void draw();
 	/// Abstract method for updating this object
-	virtual void updateSelf( const float & delta ) = 0;
+	virtual void updateSelf( const double & delta ) = 0;
 	/// Abstract method for drawing this object
 	virtual void drawSelf() = 0;
 	/// Executed after all sub-objects are updated

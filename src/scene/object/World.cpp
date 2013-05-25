@@ -47,7 +47,9 @@ World::World( Scene * scene, QString name ) :
 	scene->addMouseListener( this );
 	
 	mParticleSystem = new ParticleSystem( 500 );
-	mParticleSystem->setSize( 6.0f );
+	mParticleSystem->setSize( 4.0f );
+	mParticleSystem->setMass( 0.05f );
+	mParticleSystem->setDrag( 0.9f );
 	mParticleMaterial = new Material( scene->glWidget(), "Splatter" );
 	mTarget = QVector3D(0,0,0);
 }
@@ -111,16 +113,16 @@ void World::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 
 void World::wheelEvent( QGraphicsSceneWheelEvent * event )
 {
-	mParticleSystem->emitSpherical( mTarget+QVector3D(0,2,0), 30, 70.0f, 80.0f );
+	mParticleSystem->emitSpherical( mTarget+QVector3D(0,2,0), 30, 40.0f, 60.0f );
 }
 
 
-void World::updateSelf( const float & delta )
+void World::updateSelf( const double & delta )
 {
 	if( mTimeLapse )
-		mTimeOfDay += 0.002f;
+		mTimeOfDay += 0.2f * delta;
 	else
-		mTimeOfDay += 0.0001f;
+		mTimeOfDay += 0.01f * delta;
 	if( mTimeOfDay > 1.0f )
 		mTimeOfDay -= 1.0f;
 
@@ -139,6 +141,7 @@ void World::updateSelf( const float & delta )
 		mTeapot->setPosition( mTarget );
 		mTeapot->moveY( 3 );
 	}
+
 	mParticleSystem->update( delta );
 }
 

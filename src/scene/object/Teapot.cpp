@@ -30,7 +30,7 @@ Teapot::~Teapot()
 }
 
 
-void Teapot::updateSelf( const float & delta )
+void Teapot::updateSelf( const double & delta )
 {
 	mAudioSample->update();
 }
@@ -39,6 +39,6 @@ void Teapot::updateSelf( const float & delta )
 void Teapot::drawSelf()
 {
 	mMaterial->bind();
-	teapot( 8, mSize, GL_FILL );
+	teapot( 6, mSize, GL_FILL );
 	mMaterial->release();
 }

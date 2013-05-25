@@ -3,6 +3,8 @@
 #include <GLWidget.hpp>
 #include <utility/random.hpp>
 
+#include <math.h>
+
 
 ParticleSystem::ParticleSystem( int capacity ) :
 	mParticles(QVector<Particle>(capacity))
@@ -10,6 +12,7 @@ ParticleSystem::ParticleSystem( int capacity ) :
 	mMinLife = 1.0f;
 	mMaxLife = 2.0f;
 	mMass = 1.0f;
+	mDrag = 1.0f;
 	mSize = 1.0f;
 	mForce = QVector3D( 0.0f, -9.81f, 0.0f );
 	for( int i=0; i<mParticles.size(); ++i )
@@ -19,13 +22,15 @@ ParticleSystem::ParticleSystem( int capacity ) :
 }
 
 
-void ParticleSystem::update( const float & delta )
+void ParticleSystem::update( const double & delta )
 {
-	QVector3D deltaVelocity = mForce/mMass;
+	QVector3D deltaVelocity = ( mForce / mMass ) * delta;
+	double powDragDelta = pow( mDrag, delta );
 	for( int i=0; i<mParticles.size(); ++i )
 	{
-		mParticles[i].velocity += deltaVelocity;
 		mParticles[i].position += mParticles[i].velocity * delta;
+		mParticles[i].velocity *= powDragDelta;
+		mParticles[i].velocity += deltaVelocity;
 		mParticles[i].life -= delta;
 	}
 }
@@ -47,6 +52,7 @@ void ParticleSystem::draw()
 	{
 		if( mParticles[i].life <= 0.0f )
 			continue;
+
 		glNormal( QVector3D(0,1,0) );
 		glTexCoord2i(0,1);	glVertex( mParticles[i].position + vD );
 		glTexCoord2i(1,1);	glVertex( mParticles[i].position + vC );
@@ -64,6 +70,7 @@ void ParticleSystem::emitSpherical( const QVector3D & source, int toEmit, const 
 	{
 		if( mParticles[i].life>0.0f )
 			continue;
+
 		--toEmit;
 		QVector3D direction;
 		do {

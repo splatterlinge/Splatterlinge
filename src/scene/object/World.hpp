@@ -27,7 +27,7 @@ public:
 	World( Scene * scene, QString name );
 	virtual ~World();
 
-	virtual void updateSelf( const float & delta );
+	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 	virtual void drawSelfPost();
 

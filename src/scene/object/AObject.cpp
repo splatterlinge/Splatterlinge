@@ -59,7 +59,7 @@ void AObject::updateMatrix() const
 }
 
 
-void AObject::update( const float & delta )
+void AObject::update( const double & delta )
 {
 	updateSelf( delta );
 	QList< QSharedPointer<AObject> >::iterator i;

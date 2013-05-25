@@ -27,7 +27,7 @@ public:
 	Sky( Scene * scene, QString name, const float * timeOfDay );
 	~Sky();
 
-	virtual void updateSelf( const float & delta );
+	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
 	const QVector4D & fogColor() const { return mFogColor; }

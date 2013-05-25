@@ -65,7 +65,7 @@ private:
 	ALCdevice * mALDevice;
 	ALCcontext * mALContext;
 	QElapsedTimer mElapsedTimer;
-	float mDelta;
+	double mDelta;
 	int mFrameCountSecond;
 	int mFramesPerSecond;
 	QPoint mDrag;

@@ -85,7 +85,7 @@ Landscape::~Landscape()
 }
 
 
-void Landscape::updateSelf( const float & delta )
+void Landscape::updateSelf( const double & delta )
 {
 }
 

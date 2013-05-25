@@ -115,7 +115,7 @@ bool WavefrontObject::parseObj( QString filename )
 	return true;
 }
 
-void WavefrontObject::updateSelf( const float & delta )
+void WavefrontObject::updateSelf( const double & delta )
 {
 	// TODO
 }

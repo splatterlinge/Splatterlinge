@@ -10,12 +10,13 @@ class ParticleSystem
 public:
 	ParticleSystem( int capacity=1000 );
 	~ParticleSystem() {}
-	void update( const float & delta );
+	void update( const double & delta );
 	void draw();
 	void emitSpherical( const QVector3D & source, int toEmit, const float & minVel, const float & maxVel );
 	void setMinLife( float minLife ) { mMinLife = minLife; }
 	void setMaxLife( float maxLife ) { mMaxLife = maxLife; }
 	void setMass( float mass ) { mMass = mass; }
+	void setDrag( float drag ) { mDrag = drag; }
 	void setSize( float size ) { mSize = size; }
 	void setForce( QVector3D force ) { mForce = force; }
 
@@ -36,6 +37,7 @@ private:
 	float mMinLife;
 	float mMaxLife;
 	float mMass;
+	float mDrag;
 	float mSize;
 	QVector<Particle> mParticles;
 	QVector3D mForce;

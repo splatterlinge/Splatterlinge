@@ -27,7 +27,7 @@ public:
 	Landscape( Scene * scene, QString rootDir );
 	~Landscape();
 
-	virtual void updateSelf( const float & delta );
+	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 	virtual void drawSelfPost();
 	virtual void drawSelfPostProc();

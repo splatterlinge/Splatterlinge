@@ -40,7 +40,7 @@ public:
 	WavefrontObject( Scene * scene, QString filename );
 	virtual ~WavefrontObject();
 
-	virtual void updateSelf( const float & delta );
+	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
 	bool parseObj( QString filename );
