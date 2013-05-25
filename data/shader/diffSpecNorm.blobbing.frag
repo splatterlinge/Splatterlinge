@@ -7,10 +7,7 @@ varying vec3 vLightPos[MAX_LIGHTS];
 uniform sampler2D diffuseMap;
 uniform sampler2D specularMap;
 uniform sampler2D normalMap;
-uniform sampler2D depthMap;
-
-uniform float depthScale;
-uniform float depthOffset;
+uniform sampler2D blobMap;
 
 
 void main()
@@ -28,15 +25,11 @@ void main()
 	vec3 binormal = normalize( -dpx * dty.s + dpy * dtx.s );
 	mat3 TBN = mat3( tangent, binormal, normal );	// the transpose of texture-to-eye space matrix
 
-	vec3 eyeDir = normalize( vVertex * TBN );
-	float depth = texture2D( depthMap, gl_TexCoord[0].st ).r * depthScale - depthOffset;
-	vec2 parallaxCoord = gl_TexCoord[0].st + eyeDir.xy * depth;
-
-	vec4 colorFromMap = texture2D( diffuseMap, parallaxCoord );
-	vec4 specularFromMap = texture2D( specularMap, parallaxCoord );
-	vec3 normalFromMap = normalize( texture2D( normalMap, parallaxCoord ).rgb * 2.0 - 1.0 );
+	vec4 colorFromMap = texture2D( diffuseMap, gl_TexCoord[0].st );
+	vec4 specularFromMap = texture2D( specularMap, gl_TexCoord[0].st );
+	vec3 normalFromMap = normalize( texture2D( normalMap, gl_TexCoord[0].st ).rgb * 2.0 - 1.0 );
 	normalFromMap.x=-normalFromMap.x;
-	normalFromMap.y=-normalFromMap.y;
+//	normalFromMap.y=-normalFromMap.y;
 	normal = normalize( TBN * normalFromMap );	// transform the normal to eye space
 
 	for( int i=0; i<MAX_LIGHTS; ++i )
@@ -68,5 +61,5 @@ void main()
 
 	float fogFactor = clamp( -(length( vVertex )-gl_Fog.start) * gl_Fog.scale, 0.0, 1.0 );
 	vec3 finalFragment = mix( gl_Fog.color.rgb, finalColor, fogFactor );
-	gl_FragColor = vec4( finalFragment, colorFromMap.a );
+	gl_FragColor = vec4( finalFragment, colorFromMap.a * texture2D( blobMap, gl_TexCoord[1].st ).r );
 }

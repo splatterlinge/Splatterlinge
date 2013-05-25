@@ -1,8 +1,8 @@
 #include "Landscape.hpp"
 
-#include "../Scene.hpp"
-#include "../TextureRenderer.hpp"
-#include "geometry/Terrain.hpp"
+#include <scene/Scene.hpp>
+#include <scene/TextureRenderer.hpp>
+#include <geometry/Terrain.hpp>
 
 #include <resource/Material.hpp>
 #include <resource/Shader.hpp>
@@ -213,7 +213,7 @@ Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, 
 	mLandscape = landscape;
 	mRect = rect;
 	mMaterialScale = materialScale;
-	mMaterial = new Material( mGLWidget, materialName, Material::BLOBBING_SHADERTYPE );
+	mMaterial = new Material( mGLWidget, materialName, MaterialShaderVariant::BLOBBING );
 	QImage blobMap = QImage( blobMapPath );
 	if( blobMap.isNull() )
 	{

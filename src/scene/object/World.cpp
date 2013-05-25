@@ -1,11 +1,11 @@
 #include "World.hpp"
 
-#include "../Scene.hpp"
+#include <scene/Scene.hpp>
+#include <geometry/ParticleSystem.hpp>
 #include "Landscape.hpp"
 #include "Teapot.hpp"
 #include "WavefrontObject.hpp"
 #include "Sky.hpp"
-#include "geometry/ParticleSystem.hpp"
 
 #include <QPainter>
 #include <QSettings>
@@ -58,6 +58,8 @@ World::World( Scene * scene, QString name ) :
 World::~World()
 {
 	scene()->removeKeyListener( this );
+	delete mParticleSystem;
+	delete mParticleMaterial;
 }
 
 

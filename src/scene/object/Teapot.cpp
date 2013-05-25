@@ -1,6 +1,7 @@
 #include "Teapot.hpp"
-#include "../Scene.hpp"
-#include "geometry/teapot.h"
+
+#include <scene/Scene.hpp>
+#include <geometry/teapot.h>
 
 #include <QString>
 

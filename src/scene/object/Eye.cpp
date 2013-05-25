@@ -1,6 +1,6 @@
 #include "Eye.hpp"
 
-#include "../Scene.hpp"
+#include <scene/Scene.hpp>
 
 #include <GLWidget.hpp>
 

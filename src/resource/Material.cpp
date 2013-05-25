@@ -35,6 +35,9 @@ MaterialData::MaterialData( GLWidget * glWidget, QString name ) :
 
 MaterialData::~MaterialData()
 {
+	mTextures.clear();
+	mConstants.clear();
+	mShaderNames.clear();
 	if( loaded() )
 		qDebug() << "-" << this << "MaterialData" << uid();
 }
@@ -53,7 +56,7 @@ bool MaterialData::load()
 		for( i = textures.constBegin(); i != textures.constEnd(); ++i )
 		{
 			QString mapPath = "./data/material/"+mName+"/" + s.value( (*i) ).toString();
-			QImage map = QImage( mapPath );
+			QImage map = QImage( mapPath ).mirrored(false,true);
 			if( map.isNull() )
 			{
 				qFatal(
@@ -119,8 +122,9 @@ bool MaterialData::load()
 
 	s.beginGroup( "Shader" );
 	{
-		mDefaultShaderName = s.value( "defaultShader", "versatile" ).toString();
-		mBlobbingShaderName = s.value( "blobbingShader", "versatileBlob" ).toString();
+		mShaderNames[MaterialQuality::LOW] = s.value( "low", "simple" ).toString();
+		mShaderNames[MaterialQuality::MEDIUM] = s.value( "medium", "simple" ).toString();
+		mShaderNames[MaterialQuality::HIGH] = s.value( "high", "simple" ).toString();
 	}
 	s.endGroup();
 
@@ -128,26 +132,26 @@ bool MaterialData::load()
 }
 
 
-Material::Quality Material::sGlobalMaxQuality = Material::HIGH_QUALITY;
+MaterialQuality::type Material::sGlobalMaxQuality = MaterialQuality::HIGH;
 
 
-Material::Material( GLWidget * glWidget, QString name, ShaderType type ) : AResource()
+Material::Material( GLWidget * glWidget, QString name, MaterialShaderVariant::type type ) : AResource()
 {
 	mGLWidget = glWidget;
 	mName = name;
 	mDefaultQuality = sGlobalMaxQuality;
-	mShaderSet[LOW_QUALITY].textureUnits.clear();
-	mShaderSet[LOW_QUALITY].shader = 0;
-	mShaderSet[LOW_QUALITY].blobMapUniform = -1;
-	mShaderSet[LOW_QUALITY].cubeMapUniform = -1;
-	mShaderSet[MEDIUM_QUALITY].textureUnits.clear();
-	mShaderSet[MEDIUM_QUALITY].shader = 0;
-	mShaderSet[MEDIUM_QUALITY].blobMapUniform = -1;
-	mShaderSet[MEDIUM_QUALITY].cubeMapUniform = -1;
-	mShaderSet[HIGH_QUALITY].textureUnits.clear();
-	mShaderSet[HIGH_QUALITY].shader = 0;
-	mShaderSet[HIGH_QUALITY].blobMapUniform = -1;
-	mShaderSet[HIGH_QUALITY].cubeMapUniform = -1;
+	mShaderSet[MaterialQuality::LOW].textureUnits.clear();
+	mShaderSet[MaterialQuality::LOW].shader = 0;
+	mShaderSet[MaterialQuality::LOW].blobMapUniform = -1;
+	mShaderSet[MaterialQuality::LOW].cubeMapUniform = -1;
+	mShaderSet[MaterialQuality::MEDIUM].textureUnits.clear();
+	mShaderSet[MaterialQuality::MEDIUM].shader = 0;
+	mShaderSet[MaterialQuality::MEDIUM].blobMapUniform = -1;
+	mShaderSet[MaterialQuality::MEDIUM].cubeMapUniform = -1;
+	mShaderSet[MaterialQuality::HIGH].textureUnits.clear();
+	mShaderSet[MaterialQuality::HIGH].shader = 0;
+	mShaderSet[MaterialQuality::HIGH].blobMapUniform = -1;
+	mShaderSet[MaterialQuality::HIGH].cubeMapUniform = -1;
 	mBlobMap = mCubeMap = -1;
 	unsetAlphaTestReferenceValueOverride();
 
@@ -160,22 +164,22 @@ Material::Material( GLWidget * glWidget, QString name, ShaderType type ) : AReso
 
 Material::~Material()
 {
-	delete mShaderSet[HIGH_QUALITY].shader;
-	delete mShaderSet[MEDIUM_QUALITY].shader;
-	delete mShaderSet[LOW_QUALITY].shader;
+	delete mShaderSet[MaterialQuality::HIGH].shader;
+	delete mShaderSet[MaterialQuality::MEDIUM].shader;
+	delete mShaderSet[MaterialQuality::LOW].shader;
 }
 
 
-Material::Quality Material::getBindingQuality()
+MaterialQuality::type Material::getBindingQuality()
 {
-	Quality q = mDefaultQuality;
+	MaterialQuality::type q = mDefaultQuality;
 	if( mDefaultQuality > sGlobalMaxQuality )
 		q = sGlobalMaxQuality;
 
-	if( !mShaderSet[q].shader && q==HIGH_QUALITY )
-		q = MEDIUM_QUALITY;
-	if( !mShaderSet[q].shader && q==MEDIUM_QUALITY )
-		q = LOW_QUALITY;
+	if( !mShaderSet[q].shader && q==MaterialQuality::HIGH )
+		q = MaterialQuality::MEDIUM;
+	if( !mShaderSet[q].shader && q==MaterialQuality::MEDIUM )
+		q = MaterialQuality::LOW;
 
 	return q;
 }
@@ -250,7 +254,7 @@ void Material::release()
 }
 
 
-void Material::setShader( Quality quality, QString shaderFullName )
+void Material::setShader( MaterialQuality::type quality, QString shaderFullName )
 {
 	delete mShaderSet[quality].shader;
 	mShaderSet[quality].shader = 0;
@@ -297,24 +301,20 @@ void Material::setShader( Quality quality, QString shaderFullName )
 }
 
 
-void Material::setShader( QString shaderName )
+void Material::setShader( MaterialShaderVariant::type variant )
 {
-	setShader( LOW_QUALITY, shaderName+".low" );
-	setShader( MEDIUM_QUALITY, shaderName+".medium" );
-	setShader( HIGH_QUALITY, shaderName+".high" );
-}
-
-
-void Material::setShader( ShaderType type )
-{
-	switch( type )
+	switch( variant )
 	{
-		case BLOBBING_SHADERTYPE:
-			setShader( data()->blobbingShaderName() );
+		case MaterialShaderVariant::BLOBBING:
+			setShader( MaterialQuality::LOW, data()->shaderNames()[MaterialQuality::LOW]+".blobbing" );
+			setShader( MaterialQuality::MEDIUM, data()->shaderNames()[MaterialQuality::MEDIUM]+".blobbing" );
+			setShader( MaterialQuality::HIGH, data()->shaderNames()[MaterialQuality::HIGH]+".blobbing" );
 			break;
 		default:
-		case DEFAULT_SHADERTYPE:
-			setShader( data()->defaultShaderName() );
+		case MaterialShaderVariant::DEFAULT:
+			setShader( MaterialQuality::LOW, data()->shaderNames()[MaterialQuality::LOW]+".default" );
+			setShader( MaterialQuality::MEDIUM, data()->shaderNames()[MaterialQuality::MEDIUM]+".default" );
+			setShader( MaterialQuality::HIGH, data()->shaderNames()[MaterialQuality::HIGH]+".default" );
 			break;
 	}
 }

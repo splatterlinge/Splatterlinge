@@ -2,7 +2,7 @@
 #define SCENE_OBJECT_LANDSCAPE_INCLUDED
 
 #include "AObject.hpp"
-#include "geometry/Terrain.hpp"
+#include <geometry/Terrain.hpp>
 
 #include <QString>
 #include <QRect>

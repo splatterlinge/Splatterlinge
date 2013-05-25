@@ -1,8 +1,8 @@
 #ifndef WAVEFRONTOBJECT_HPP
 #define WAVEFRONTOBJECT_HPP
 
-#include "../Scene.hpp"
-#include "resource/Material.hpp"
+#include <scene/Scene.hpp>
+#include <resource/Material.hpp>
 
 #include <QString>
 #include <QMessageBox>

@@ -13,6 +13,26 @@ class GLWidget;
 class Shader;
 
 
+namespace MaterialQuality
+{
+	enum type
+	{
+		LOW=0,
+		MEDIUM=1,
+		HIGH=2
+	};
+}
+
+namespace MaterialShaderVariant
+{
+	enum type
+	{
+		DEFAULT=0,
+		BLOBBING=1
+	};
+}
+
+
 class MaterialData : public AResourceData
 {
 public:
@@ -28,8 +48,12 @@ public:
 	const GLfloat & shininess() const { return mShininess; }
 	const QMap<QString,GLuint> & textures() const { return mTextures; }
 	const QMap<QString,GLfloat> & constants() const { return mConstants; }
+/*
 	const QString & defaultShaderName() const { return mDefaultShaderName; }
 	const QString & blobbingShaderName() const { return mBlobbingShaderName; }
+*/
+	const QMap<MaterialQuality::type,QString> shaderNames() const { return mShaderNames; }
+
 	const GLclampf & alphaTestReferenceValue() const { return mAlphaTestReferenceValue; }
 	const GLenum & alphaTestFunction() const { return mAlphaTestFunction; }
 	const bool & alphaTestEnabled() const { return mAlphaTestEnabled; }
@@ -37,8 +61,12 @@ public:
 private:
 	GLWidget * mGLWidget;
 	QString mName;
+/*
 	QString mDefaultShaderName;
 	QString mBlobbingShaderName;
+*/
+	QMap<MaterialQuality::type,QString> mShaderNames;
+
 	QVector4D mAmbient;
 	QVector4D mDiffuse;
 	QVector4D mSpecular;
@@ -57,16 +85,13 @@ private:
 class Material : public AResource<MaterialData>
 {
 public:
-	typedef enum { LOW_QUALITY=0, MEDIUM_QUALITY=1, HIGH_QUALITY=2 } Quality;
-	typedef enum { DEFAULT_SHADERTYPE=0, BLOBBING_SHADERTYPE=1 } ShaderType;
-	static void setGlobalMaxQuality( Quality q ) { sGlobalMaxQuality = q; }
-	static Quality globalMaxQuality() { return sGlobalMaxQuality; }
+	static void setGlobalMaxQuality( MaterialQuality::type q ) { sGlobalMaxQuality = q; }
+	static MaterialQuality::type globalMaxQuality() { return sGlobalMaxQuality; }
 
-	Material( GLWidget * glWidget, QString name, ShaderType type = DEFAULT_SHADERTYPE );
+	Material( GLWidget * glWidget, QString name, MaterialShaderVariant::type type = MaterialShaderVariant::DEFAULT );
 	virtual ~Material();
 
-	void setShader( QString shaderName );
-	void setShader( ShaderType type );
+	void setShader( MaterialShaderVariant::type variant );
 
 	void setBlobMap( GLuint blobMap ) { mBlobMap = blobMap; }
 	void setCubeMap( GLuint cubeMap ) { mCubeMap = cubeMap; }
@@ -79,7 +104,7 @@ public:
 	void bind();
 	void release();
 
-	void setDefaultQuality( Quality q ) { mDefaultQuality = q; }
+	void setDefaultQuality( MaterialQuality::type q ) { mDefaultQuality = q; }
 
 private:
 	typedef struct
@@ -91,7 +116,7 @@ private:
 		int cubeMapUniform;
 	} ShaderSet;
 
-	static Quality sGlobalMaxQuality;
+	static MaterialQuality::type sGlobalMaxQuality;
 
 	GLWidget * mGLWidget;
 	QString mName;
@@ -104,11 +129,11 @@ private:
 	GLclampf mAlphaTestReferenceValueOverride;
 	const GLclampf * mUsedAlphaTestReferenceValue;
 
-	Quality mDefaultQuality;
-	Quality mBoundQuality;
+	MaterialQuality::type mDefaultQuality;
+	MaterialQuality::type mBoundQuality;
 
-	Quality getBindingQuality();
-	void setShader( Quality quality, QString shaderFullName );
+	MaterialQuality::type getBindingQuality();
+	void setShader( MaterialQuality::type quality, QString shaderFullName );
 };
 
 
