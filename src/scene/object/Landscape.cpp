@@ -152,13 +152,11 @@ void Landscape::renderRefraction()
 
 void Landscape::drawSelfPostProc()
 {
-//	Material::Quality defaultQuality = Material::globalMaxQuality();
-//	Material::setGlobalMaxQuality( Material::LOW_QUALITY );
-
+	MaterialQuality::type defaultQuality = MaterialQuality::maximum();
+	MaterialQuality::setMaximum( MaterialQuality::LOW );
 	renderReflection();
 	renderRefraction();
-
-//	Material::setGlobalMaxQuality( defaultQuality );
+	MaterialQuality::setMaximum( defaultQuality );
 
 	glDisable( GL_CULL_FACE );
 	glPushMatrix();

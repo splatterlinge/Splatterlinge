@@ -30,7 +30,7 @@ void main()
 
 	vec3 eyeDir = normalize( vVertex * TBN );
 	float depth = texture2D( depthMap, gl_TexCoord[0].st ).r * depthScale - depthOffset;
-	vec2 parallaxCoord = gl_TexCoord[0].st + eyeDir.xy * depth;
+	vec2 parallaxCoord = gl_TexCoord[0].st - eyeDir.xy * depth;
 
 	vec4 colorFromMap = texture2D( diffuseMap, parallaxCoord );
 	vec4 specularFromMap = texture2D( specularMap, parallaxCoord );
