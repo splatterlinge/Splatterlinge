@@ -18,7 +18,7 @@ public:
 	Teapot( Scene * scene, const float & size );
 	virtual ~Teapot();
 	
-	virtual void updateSelf( const float & delta );
+	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
 private:

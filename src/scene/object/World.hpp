@@ -13,6 +13,8 @@ class Teapot;
 class WavefrontObject;
 class Shader;
 class TextureRenderer;
+class Material;
+class ParticleSystem;
 
 
 /// World object
@@ -25,7 +27,7 @@ public:
 	World( Scene * scene, QString name );
 	virtual ~World();
 
-	virtual void updateSelf( const float & delta );
+	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 	virtual void drawSelfPost();
 
@@ -46,7 +48,10 @@ private:
 	QSharedPointer<Teapot> mTeapot;
 	QSharedPointer<WavefrontObject> mTable;
 	QSharedPointer<WavefrontObject> mTree;
+	QVector3D mTarget;
 	bool mDragTeapot;
+	Material * mParticleMaterial;
+	ParticleSystem * mParticleSystem;
 };
 
 

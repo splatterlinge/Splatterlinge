@@ -1,8 +1,8 @@
 #ifndef WAVEFRONTOBJECT_HPP
 #define WAVEFRONTOBJECT_HPP
 
-#include "../Scene.hpp"
-#include "resource/Material.hpp"
+#include <scene/Scene.hpp>
+#include <resource/Material.hpp>
 
 #include <QString>
 #include <QMessageBox>
@@ -40,7 +40,7 @@ public:
 	WavefrontObject( Scene * scene, QString filename );
 	virtual ~WavefrontObject();
 
-	virtual void updateSelf( const float & delta );
+	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
 	bool parseObj( QString filename );

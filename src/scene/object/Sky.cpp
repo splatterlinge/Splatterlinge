@@ -145,7 +145,7 @@ Sky::~Sky()
 }
 
 
-void Sky::updateSelf( const float & delta )
+void Sky::updateSelf( const double & delta )
 {
 	float angle = (*mTimeOfDay)*(M_PI*2.0f);
 	QMatrix4x4 m;

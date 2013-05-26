@@ -1,6 +1,7 @@
 #include "World.hpp"
 
-#include "../Scene.hpp"
+#include <scene/Scene.hpp>
+#include <geometry/ParticleSystem.hpp>
 #include "Landscape.hpp"
 #include "Teapot.hpp"
 #include "WavefrontObject.hpp"
@@ -44,12 +45,21 @@ World::World( Scene * scene, QString name ) :
 
 	scene->addKeyListener( this );
 	scene->addMouseListener( this );
+	
+	mParticleSystem = new ParticleSystem( 500 );
+	mParticleSystem->setSize( 4.0f );
+	mParticleSystem->setMass( 0.05f );
+	mParticleSystem->setDrag( 0.9f );
+	mParticleMaterial = new Material( scene->glWidget(), "Splatter" );
+	mTarget = QVector3D(0,0,0);
 }
 
 
 World::~World()
 {
 	scene()->removeKeyListener( this );
+	delete mParticleSystem;
+	delete mParticleMaterial;
 }
 
 
@@ -105,16 +115,16 @@ void World::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 
 void World::wheelEvent( QGraphicsSceneWheelEvent * event )
 {
-
+	mParticleSystem->emitSpherical( mTarget+QVector3D(0,2,0), 30, 40.0f, 60.0f );
 }
 
 
-void World::updateSelf( const float & delta )
+void World::updateSelf( const double & delta )
 {
 	if( mTimeLapse )
-		mTimeOfDay += 0.002f;
+		mTimeOfDay += 0.2f * delta;
 	else
-		mTimeOfDay += 0.0001f;
+		mTimeOfDay += 0.01f * delta;
 	if( mTimeOfDay > 1.0f )
 		mTimeOfDay -= 1.0f;
 
@@ -124,15 +134,17 @@ void World::updateSelf( const float & delta )
 	if( scene()->eye()->position().y() < landscapeHeight + 2 )
 		scene()->eye()->setPositionY( landscapeHeight + 2 );
 
+	float length = 300.0f;
+	if( getLineIntersection( scene()->eye()->position(), -scene()->eye()->direction(), &length ) )
+		mTarget = scene()->eye()->position() - scene()->eye()->direction() * length;
+
 	if( mDragTeapot )
 	{
-		float length = 300.0f;
-		if( getLineIntersection( scene()->eye()->position(), -scene()->eye()->direction(), &length ) )
-		{
-			mTeapot->setPosition( scene()->eye()->position() - scene()->eye()->direction() * length );
-			mTeapot->moveY( 3 );
-		}
+		mTeapot->setPosition( mTarget );
+		mTeapot->moveY( 3 );
 	}
+
+	mParticleSystem->update( delta );
 }
 
 
@@ -142,6 +154,7 @@ void World::drawSelf()
 	glLight( GL_LIGHT0, GL_AMBIENT, mSky->ambient() );
 	glLight( GL_LIGHT0, GL_DIFFUSE, mSky->diffuse() );
 	glLight( GL_LIGHT0, GL_SPECULAR, mSky->specular() );
+	glEnable( GL_LIGHT0 );
 
 	static float cycle = 0.0f;
 	QColor color = QColor::fromHsvF( cycle, 0.5f, 0.5f, 1.0f );
@@ -157,6 +170,7 @@ void World::drawSelf()
 	glLight( GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.0f );
 	glLight( GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.02f );
 	glLight( GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.0f );
+	glEnable( GL_LIGHT1 );
 
 	glFog( GL_FOG_COLOR, mSky->fogColor() );
 	glFog( GL_FOG_START, scene()->eye()->farPlane()*0.9f );
@@ -166,26 +180,24 @@ void World::drawSelf()
 
 void World::drawSelfPost()
 {
+	mParticleMaterial->bind();
+	mParticleSystem->draw();
+	mParticleMaterial->release();
 	glDisable( GL_LIGHTING );
-	float length = 300.0f;
-	if( getLineIntersection( scene()->eye()->position(), -scene()->eye()->direction(), &length ) )
-	{
-		QVector3D intersectionPoint = scene()->eye()->position() - scene()->eye()->direction() * length;
-		glBegin( GL_LINES );
-			glColor3f( 0,1,1 );
-			glVertex3f( intersectionPoint.x(), intersectionPoint.y()+1, intersectionPoint.z() );
-			glVertex3f( intersectionPoint.x(), intersectionPoint.y()-1, intersectionPoint.z() );
-			glColor3f( 1,1,0 );
-			glVertex3f( intersectionPoint.x()+1, intersectionPoint.y(), intersectionPoint.z() );
-			glVertex3f( intersectionPoint.x()-1, intersectionPoint.y(), intersectionPoint.z() );
-			glColor3f( 1,0,1 );
-			glVertex3f( intersectionPoint.x(), intersectionPoint.y(), intersectionPoint.z()+1 );
-			glVertex3f( intersectionPoint.x(), intersectionPoint.y(), intersectionPoint.z()-1 );
-			glColor3f( 1,0,0 );
-			glVertex3f( intersectionPoint.x(), intersectionPoint.y(), intersectionPoint.z() );
-			glVertex3f( intersectionPoint.x()+1, intersectionPoint.y()+1, intersectionPoint.z()+1 );
-		glEnd();
-	}
+	glBegin( GL_LINES );
+		glColor3f( 0,1,1 );
+		glVertex3f( mTarget.x(), mTarget.y()+1, mTarget.z() );
+		glVertex3f( mTarget.x(), mTarget.y()-1, mTarget.z() );
+		glColor3f( 1,1,0 );
+		glVertex3f( mTarget.x()+1, mTarget.y(), mTarget.z() );
+		glVertex3f( mTarget.x()-1, mTarget.y(), mTarget.z() );
+		glColor3f( 1,0,1 );
+		glVertex3f( mTarget.x(), mTarget.y(), mTarget.z()+1 );
+		glVertex3f( mTarget.x(), mTarget.y(), mTarget.z()-1 );
+		glColor3f( 1,0,0 );
+		glVertex3f( mTarget.x(), mTarget.y(), mTarget.z() );
+		glVertex3f( mTarget.x()+1, mTarget.y()+1, mTarget.z()+1 );
+	glEnd();
 }
 
 

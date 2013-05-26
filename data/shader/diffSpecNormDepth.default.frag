@@ -8,7 +8,6 @@ uniform sampler2D diffuseMap;
 uniform sampler2D specularMap;
 uniform sampler2D normalMap;
 uniform sampler2D depthMap;
-uniform sampler2D blobMap;
 
 uniform float depthScale;
 uniform float depthOffset;
@@ -37,7 +36,7 @@ void main()
 	vec4 specularFromMap = texture2D( specularMap, parallaxCoord );
 	vec3 normalFromMap = normalize( texture2D( normalMap, parallaxCoord ).rgb * 2.0 - 1.0 );
 	normalFromMap.x=-normalFromMap.x;
-	normalFromMap.y=-normalFromMap.y;
+//	normalFromMap.y=-normalFromMap.y;
 	normal = normalize( TBN * normalFromMap );	// transform the normal to eye space
 
 	for( int i=0; i<MAX_LIGHTS; ++i )
@@ -69,5 +68,5 @@ void main()
 
 	float fogFactor = clamp( -(length( vVertex )-gl_Fog.start) * gl_Fog.scale, 0.0, 1.0 );
 	vec3 finalFragment = mix( gl_Fog.color.rgb, finalColor, fogFactor );
-	gl_FragColor = vec4( finalFragment, colorFromMap.a * texture2D( blobMap, gl_TexCoord[1].st ).r );
+	gl_FragColor = vec4( finalFragment, colorFromMap.a );
 }

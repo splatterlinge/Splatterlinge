@@ -1,8 +1,8 @@
 #include "Landscape.hpp"
 
-#include "../Scene.hpp"
-#include "../TextureRenderer.hpp"
-#include "geometry/Terrain.hpp"
+#include <scene/Scene.hpp>
+#include <scene/TextureRenderer.hpp>
+#include <geometry/Terrain.hpp>
 
 #include <resource/Material.hpp>
 #include <resource/Shader.hpp>
@@ -61,7 +61,7 @@ Landscape::Landscape( Scene * scene, QString name ) :
 	s.endArray();
 
 	mTerrain = new Terrain( "./data/landscape/"+name+"/"+heightMapPath, mTerrainSize, mTerrainOffset );
-	mTerrainFilter = new Filter( this, QSize(5,5) );
+	mTerrainFilter = new Filter( this, QSize( 3, 3 ) );
 	mTerrainMaterial = new Material( scene->glWidget(), terrainMaterial );
 
 	mWaterShader = new Shader( scene->glWidget(), "water" );
@@ -85,7 +85,7 @@ Landscape::~Landscape()
 }
 
 
-void Landscape::updateSelf( const float & delta )
+void Landscape::updateSelf( const double & delta )
 {
 }
 
@@ -213,7 +213,7 @@ Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, 
 	mLandscape = landscape;
 	mRect = rect;
 	mMaterialScale = materialScale;
-	mMaterial = new Material( mGLWidget, materialName, Material::BLOBBING_SHADERTYPE );
+	mMaterial = new Material( mGLWidget, materialName, MaterialShaderVariant::BLOBBING );
 	QImage blobMap = QImage( blobMapPath );
 	if( blobMap.isNull() )
 	{
@@ -297,6 +297,7 @@ Landscape::Filter::Filter( Landscape * landscape, QSize filterSize ) :
 	 * from
 	 * '-----far----'
 	 */
+	//TODO: maybe do these calculations in map coordinates ...
 	float farPlane = landscape->scene()->eye()->farPlane();
 	QVector3D from = QVector3D( -farPlane, landscape->terrain()->offset().y(), -farPlane );
 	QVector3D size = QVector3D( 2.0f*farPlane, landscape->terrain()->size().y(), 2.0f*farPlane );
@@ -312,12 +313,6 @@ Landscape::Filter::Filter( Landscape * landscape, QSize filterSize ) :
 			mPatches.push_back( Patch( pos, patchSize ) );
 		}
 	}
-/*TODO: maybe do these calculations in map coordinates ...
-	QPoint eyeMap( landscape->terrain()->toMap( landscape->scene()->eye()->position() ) );
-	QSizeF size( landscape->scene()->eye()->farPlane()*2.0f, landscape->scene()->eye()->farPlane()*2.0f );
-	QSize sizeMap( landscape->terrain()->toMap( size ) );
-	QPoint from( eyeMap -  );
-*/
 }
 
 
@@ -331,7 +326,7 @@ void Landscape::Filter::draw()
 {
 	for( int z=0; z<mFilterSize.height(); ++z )
 	{
-		QRectF mergedRect;
+		QRectF mergedRect;	// we will merge patches along the x axis as this is optimal for the terrain mesh VBO
 		for( int x=0; x<mFilterSize.width(); ++x )
 		{
 			Patch & patch = mPatches[z*mFilterSize.width()+x];

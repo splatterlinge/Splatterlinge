@@ -50,6 +50,18 @@ inline void glVertex( const QVector3D & v )	{ glVertex3v( reinterpret_cast<const
 inline void glVertex( const QVector4D & v )	{ glVertex4v( reinterpret_cast<const float*>(&v) ); }
 inline void glVertex( const QPointF & v )	{ glVertex2v( reinterpret_cast<const qreal*>(&v) ); }
 
+inline void glNormal( const GLbyte & x, const GLbyte & y, const GLbyte & z )		{ glNormal3b( x, y, z ); }
+inline void glNormal( const GLdouble & x, const GLdouble & y, const GLdouble & z )	{ glNormal3d( x, y, z ); }
+inline void glNormal( const GLfloat & x, const GLfloat & y, const GLfloat & z )		{ glNormal3f( x, y, z ); }
+inline void glNormal( const GLint & x, const GLint & y, const GLint & z )		{ glNormal3i( x, y, z ); }
+inline void glNormal( const GLshort & x, const GLshort & y, const GLshort & z )		{ glNormal3s( x, y, z ); }
+inline void glNormal3v( const GLbyte * v )	{ glNormal3bv( v ); }
+inline void glNormal3v( const GLdouble * v )	{ glNormal3dv( v ); }
+inline void glNormal3v( const GLfloat * v )	{ glNormal3fv( v ); }
+inline void glNormal3v( const GLint * v )	{ glNormal3iv( v ); }
+inline void glNormal3v( const GLshort * v )	{ glNormal3sv( v ); }
+inline void glNormal( const QVector3D & v )	{ glNormal3v( reinterpret_cast<const float*>(&v) ); }
+
 inline void glRotate( const GLfloat & angle, const GLfloat & x, const GLfloat & y, const GLfloat & z )		{ glRotatef( angle, x, y, z ); }
 inline void glRotate( const GLdouble & angle, const GLdouble & x, const GLdouble & y, const GLdouble & z )	{ glRotated( angle, x, y, z ); }
 inline void glRotate( const GLfloat & angle, const QVector3D & axis )	{ glRotate( angle, static_cast<GLfloat>(axis.x()), static_cast<GLfloat>(axis.y()), static_cast<GLfloat>(axis.z()) ); }

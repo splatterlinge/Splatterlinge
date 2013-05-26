@@ -1,6 +1,6 @@
 #include "Eye.hpp"
 
-#include "../Scene.hpp"
+#include <scene/Scene.hpp>
 
 #include <GLWidget.hpp>
 
@@ -36,7 +36,7 @@ void Eye::updateMatrix() const
 }
 
 
-void Eye::updateSelf( const float & delta )
+void Eye::updateSelf( const double & delta )
 {
 	ALfloat listenerOri[]={(ALfloat)-direction().x(),(ALfloat)-direction().y(),(ALfloat)-direction().z(),
 		(ALfloat)up().x(),(ALfloat)up().y(),(ALfloat)up().z()};

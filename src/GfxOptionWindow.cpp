@@ -62,14 +62,14 @@ void GfxOptionWindow::setMaterialQuality( int q )
 {
 	switch( q )
 	{
-		case Material::HIGH_QUALITY:
-			Material::setGlobalMaxQuality( Material::HIGH_QUALITY );
+		case MaterialQuality::HIGH:
+			Material::setGlobalMaxQuality( MaterialQuality::HIGH );
 			break;
-		case Material::MEDIUM_QUALITY:
-			Material::setGlobalMaxQuality( Material::MEDIUM_QUALITY );
+		case MaterialQuality::MEDIUM:
+			Material::setGlobalMaxQuality( MaterialQuality::MEDIUM );
 			break;
-		case Material::LOW_QUALITY:
-			Material::setGlobalMaxQuality( Material::LOW_QUALITY );
+		case MaterialQuality::LOW:
+			Material::setGlobalMaxQuality( MaterialQuality::LOW );
 			break;
 	}
 }
