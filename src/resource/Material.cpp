@@ -10,6 +10,17 @@
 
 RESOURCE_CACHE(MaterialData);
 
+/*
+void MaterialQuality::setMaximum( MaterialQuality::type max )
+{
+	sMaximum = max;
+	QHash< QString, QWeakPointer<MaterialData> >::const_iterator i = Material::cache().constBegin();
+	while( i != Material::cache().constEnd() )
+	{
+		++i;
+	}
+}
+*/
 
 GLenum MaterialData::alphaTestFunctionFromString( QString name )
 {
@@ -35,16 +46,31 @@ MaterialData::MaterialData( GLWidget * glWidget, QString name ) :
 
 MaterialData::~MaterialData()
 {
+	unload();
+}
+
+
+void MaterialData::unload()
+{
+	if( !loaded() )
+		return;
+	qDebug() << "-" << this << "MaterialData" << uid();
+
+	QMap<QString, GLuint>::const_iterator i = mTextures.constBegin();
+	while( i != mTextures.constEnd() )
+	{
+		mGLWidget->deleteTexture( i.value() );
+		++i;
+	}
 	mTextures.clear();
 	mConstants.clear();
-	mShaderNames.clear();
-	if( loaded() )
-		qDebug() << "-" << this << "MaterialData" << uid();
+	AResourceData::unload();
 }
 
 
 bool MaterialData::load()
 {
+	unload();
 	qDebug() << "+" << this << "MaterialData" << uid();
 
 	QSettings s( "./data/material/"+mName+"/material.ini", QSettings::IniFormat );
@@ -52,11 +78,10 @@ bool MaterialData::load()
 	s.beginGroup( "Textures" );
 	{
 		QStringList textures = s.allKeys();
-		QStringList::const_iterator i;
-		for( i = textures.constBegin(); i != textures.constEnd(); ++i )
+		for( QStringList::const_iterator i = textures.constBegin(); i != textures.constEnd(); ++i )
 		{
 			QString mapPath = "./data/material/"+mName+"/" + s.value( (*i) ).toString();
-			QImage map = QImage( mapPath ).mirrored(false,true);
+			QImage map = QImage( mapPath );
 			if( map.isNull() )
 			{
 				qFatal(
@@ -132,14 +157,14 @@ bool MaterialData::load()
 }
 
 
-MaterialQuality::type Material::sGlobalMaxQuality = MaterialQuality::HIGH;
+MaterialQuality::type MaterialQuality::sMaximum = MaterialQuality::HIGH;
 
 
 Material::Material( GLWidget * glWidget, QString name, MaterialShaderVariant::type type ) : AResource()
 {
 	mGLWidget = glWidget;
 	mName = name;
-	mDefaultQuality = sGlobalMaxQuality;
+	mDefaultQuality = MaterialQuality::maximum();
 	mShaderSet[MaterialQuality::LOW].textureUnits.clear();
 	mShaderSet[MaterialQuality::LOW].shader = 0;
 	mShaderSet[MaterialQuality::LOW].blobMapUniform = -1;
@@ -173,8 +198,8 @@ Material::~Material()
 MaterialQuality::type Material::getBindingQuality()
 {
 	MaterialQuality::type q = mDefaultQuality;
-	if( mDefaultQuality > sGlobalMaxQuality )
-		q = sGlobalMaxQuality;
+	if( mDefaultQuality > MaterialQuality::maximum() )
+		q = MaterialQuality::maximum();
 
 	if( !mShaderSet[q].shader && q==MaterialQuality::HIGH )
 		q = MaterialQuality::MEDIUM;
@@ -306,15 +331,15 @@ void Material::setShader( MaterialShaderVariant::type variant )
 	switch( variant )
 	{
 		case MaterialShaderVariant::BLOBBING:
-			setShader( MaterialQuality::LOW, data()->shaderNames()[MaterialQuality::LOW]+".blobbing" );
-			setShader( MaterialQuality::MEDIUM, data()->shaderNames()[MaterialQuality::MEDIUM]+".blobbing" );
-			setShader( MaterialQuality::HIGH, data()->shaderNames()[MaterialQuality::HIGH]+".blobbing" );
+			setShader( MaterialQuality::LOW, data()->shaderName(MaterialQuality::LOW)+".blobbing" );
+			setShader( MaterialQuality::MEDIUM, data()->shaderName(MaterialQuality::MEDIUM)+".blobbing" );
+			setShader( MaterialQuality::HIGH, data()->shaderName(MaterialQuality::HIGH)+".blobbing" );
 			break;
 		default:
 		case MaterialShaderVariant::DEFAULT:
-			setShader( MaterialQuality::LOW, data()->shaderNames()[MaterialQuality::LOW]+".default" );
-			setShader( MaterialQuality::MEDIUM, data()->shaderNames()[MaterialQuality::MEDIUM]+".default" );
-			setShader( MaterialQuality::HIGH, data()->shaderNames()[MaterialQuality::HIGH]+".default" );
+			setShader( MaterialQuality::LOW, data()->shaderName(MaterialQuality::LOW)+".default" );
+			setShader( MaterialQuality::MEDIUM, data()->shaderName(MaterialQuality::MEDIUM)+".default" );
+			setShader( MaterialQuality::HIGH, data()->shaderName(MaterialQuality::HIGH)+".default" );
 			break;
 	}
 }

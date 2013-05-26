@@ -32,6 +32,8 @@ public:
 	/// Loads the data to memory
 	virtual bool load() { mLoaded = true; return true; }
 
+	virtual void unload() { mLoaded = false; }
+
 	virtual bool operator==( const AResourceData & rhs ) const { return mUID==rhs.mUID; }
 	virtual bool operator!=( const AResourceData & rhs ) const { return !(*this==rhs); }
 };
@@ -48,7 +50,7 @@ template< class T >
 class AResource
 {
 private:
-	static QHash< QString, QWeakPointer<T> > cached;
+	static QHash< QString, QWeakPointer<T> > sCache;
 	QSharedPointer<T> mData;
 
 protected:
@@ -66,11 +68,11 @@ protected:
 	 */
 	void cache( QSharedPointer<T> data )
 	{
-		if( cached.contains(data->uid()) && !(cached[data->uid()].isNull()) )
+		if( sCache.contains(data->uid()) && !(sCache[data->uid()].isNull()) )
 		{
-			mData = cached[data->uid()];
+			mData = sCache[data->uid()];
 		} else {
-			cached[data->uid()] = data;
+			sCache[data->uid()] = data;
 			mData = data;
 			mData->load();
 		}
@@ -82,11 +84,13 @@ public:
 
 	/// Returns the pointer to this resource's data.
 	const QSharedPointer<T> & constData() const { return mData; }
+
+	static const QHash< QString, QWeakPointer<T> > & cache() { return sCache; }
 };
 
 
 #define RESOURCE_CACHE( ResourceDataType ) \
-	template<> QHash< QString, QWeakPointer<ResourceDataType> > AResource<ResourceDataType>::cached \
+	template<> QHash< QString, QWeakPointer<ResourceDataType> > AResource<ResourceDataType>::sCache \
 		= QHash< QString, QWeakPointer<ResourceDataType> >()
 
 

@@ -17,7 +17,8 @@ class ShaderData : public AResourceData
 public:
 	ShaderData( GLWidget * glWidget, QString name );
 	virtual ~ShaderData();
-	bool load();
+	virtual bool load();
+	virtual void unload();
 	
 	QGLShaderProgram * program() { return mProgram; }
 	const QGLShaderProgram * program() const { return mProgram; }

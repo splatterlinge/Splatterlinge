@@ -31,7 +31,7 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	materialQuality = new QSlider( Qt::Horizontal );
 	materialQuality->setMinimum( 0 );
 	materialQuality->setMaximum( 2 );
-	materialQuality->setValue( Material::globalMaxQuality() );
+	materialQuality->setValue( MaterialQuality::maximum() );
 	QObject::connect( materialQuality, SIGNAL(valueChanged(int)), this, SLOT(setMaterialQuality(int)) );
 	layout->addWidget( materialQuality );
 
@@ -63,13 +63,13 @@ void GfxOptionWindow::setMaterialQuality( int q )
 	switch( q )
 	{
 		case MaterialQuality::HIGH:
-			Material::setGlobalMaxQuality( MaterialQuality::HIGH );
+			MaterialQuality::setMaximum( MaterialQuality::HIGH );
 			break;
 		case MaterialQuality::MEDIUM:
-			Material::setGlobalMaxQuality( MaterialQuality::MEDIUM );
+			MaterialQuality::setMaximum( MaterialQuality::MEDIUM );
 			break;
 		case MaterialQuality::LOW:
-			Material::setGlobalMaxQuality( MaterialQuality::LOW );
+			MaterialQuality::setMaximum( MaterialQuality::LOW );
 			break;
 	}
 }

@@ -16,7 +16,8 @@ class AudioSampleData : public AResourceData
 public:
 	AudioSampleData( QString file );
 	virtual ~AudioSampleData();
-	bool load();
+	virtual bool load();
+	virtual void unload();
 
 	const QString & file() const { return mFile; }
 

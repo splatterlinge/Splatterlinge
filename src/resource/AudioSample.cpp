@@ -23,16 +23,25 @@ AudioSampleData::AudioSampleData( QString file ) :
 
 AudioSampleData::~AudioSampleData()
 {
-	if( loaded() )
-	{
-		qDebug() << "-" << this << "AudioSampleData" << uid();
-		alDeleteBuffers( 1, &mBuffer );
-	}
+	unload();
+}
+
+
+void AudioSampleData::unload()
+{
+	if( !loaded() )
+		return;
+	qDebug() << "-" << this << "AudioSampleData" << uid();
+
+	alDeleteBuffers( 1, &mBuffer );
+
+	AResourceData::unload();
 }
 
 
 bool AudioSampleData::load()
 {
+	unload();
 	qDebug() << "+" << this << "AudioSampleData" << uid();
 
 	if( audioLoader( mFile.toLocal8Bit().constData(), &mBuffer, &mFrequency, &mFormat ) != 0 )

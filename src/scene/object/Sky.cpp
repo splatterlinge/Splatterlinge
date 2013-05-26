@@ -109,7 +109,7 @@ Sky::Sky( Scene * scene, QString name, const float * timeOfDay = 0 ) :
 		qFatal( "\"%s\" not found!", skyDomePath.toLocal8Bit().constData() );
 	}
 
-	mDomeMap =  scene->glWidget()->bindTexture( mSkyDomeImage, GL_TEXTURE_2D, GL_RGBA );
+	mDomeMap =  scene->glWidget()->bindTexture( mSkyDomeImage );
 	if( mDomeMap >= 0 )
 	{
 		glActiveTexture( GL_TEXTURE0 );
@@ -138,6 +138,8 @@ Sky::Sky( Scene * scene, QString name, const float * timeOfDay = 0 ) :
 
 Sky::~Sky()
 {
+	scene()->glWidget()->deleteTexture( mDomeMap );
+	scene()->glWidget()->deleteTexture( mStarCubeMap );
 	delete mDomeShader;
 	delete mStarCubeShader;
 	mCubeVertexBuffer.destroy();

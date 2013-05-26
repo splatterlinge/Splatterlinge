@@ -184,7 +184,7 @@ void Landscape::drawPatch( const QRectF & rect )
 {
 	mTerrainMaterial->bind();
 	glMatrixMode( GL_TEXTURE );	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
-		glScalef( mTerrainMaterialScale.x(), mTerrainMaterialScale.y(), 1.0f );
+		glScalef( mTerrainMaterialScale.x(), -mTerrainMaterialScale.y(), 1.0f );
 		mTerrain->drawPatch( rect );
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();	glMatrixMode( GL_MODELVIEW );
 	mTerrainMaterial->release();
@@ -240,10 +240,10 @@ void Landscape::Blob::drawPatchMap( const QRect & visible )
 	glMatrixMode( GL_TEXTURE );
 
 	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
-	glScaled( mMaterialScale.x(), mMaterialScale.y(), 1.0 );
+	glScaled( mMaterialScale.x(), -mMaterialScale.y(), 1.0 );
 
 	glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
-	glScaled( 1.0/((double)mRect.width()), 1.0/((double)mRect.height()), 1.0 );
+	glScaled( 1.0/((double)mRect.width()), -1.0/((double)mRect.height()), 1.0 );
 	glTranslated( -mRect.x(), -mRect.y(), 0.0 );
 
 	mLandscape->terrain()->drawPatchMap( rectToDraw );

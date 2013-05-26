@@ -36,8 +36,6 @@ void main()
 	vec4 colorFromMap = texture2D( diffuseMap, parallaxCoord );
 	vec4 specularFromMap = texture2D( specularMap, parallaxCoord );
 	vec3 normalFromMap = normalize( texture2D( normalMap, parallaxCoord ).rgb * 2.0 - 1.0 );
-	normalFromMap.x=-normalFromMap.x;
-//	normalFromMap.y=-normalFromMap.y;
 	normal = normalize( TBN * normalFromMap );	// transform the normal to eye space
 
 	for( int i=0; i<MAX_LIGHTS; ++i )

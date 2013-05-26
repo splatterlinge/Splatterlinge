@@ -20,20 +20,29 @@ ShaderData::ShaderData( GLWidget * glWidget, QString name ) :
 
 ShaderData::~ShaderData()
 {
-	if( loaded() )
-	{
-		qDebug() << "-" << this << "ShaderData" << uid();
-		delete mProgram;
-		mProgram = 0;
-	}
+	unload();
+}
+
+
+void ShaderData::unload()
+{
+	if( !loaded() )
+		return;
+	qDebug() << "-" << this << "ShaderData" << uid();
+
+	delete mProgram;
+	mProgram = 0;
+
+	AResourceData::unload();
 }
 
 
 bool ShaderData::load()
 {
-	delete mProgram;
-	mProgram = new QGLShaderProgram( mGLWidget );
+	unload();
 	qDebug() << "+" << this << "ShaderData" << uid();
+
+	mProgram = new QGLShaderProgram( mGLWidget );
 	mProgram->addShaderFromSourceFile( QGLShader::Vertex, "./data/shader/"+mName+".vert" );
 	mProgram->addShaderFromSourceFile( QGLShader::Fragment, "./data/shader/"+mName+".frag" );
 	if( !mProgram->link() )
