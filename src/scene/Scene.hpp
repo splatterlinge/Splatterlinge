@@ -48,7 +48,10 @@ public:
 	void addMouseListener( AMouseListener * listener ) { mMouseListeners.append( listener ); }
 	void removeKeyListener( AKeyListener * listener ) { mKeyListeners.removeOne( listener ); }
 	void removeMouseListener( AMouseListener * listener ) { mMouseListeners.removeOne( listener ); }
-	
+
+	void setMouseGrabbing( bool enable );
+	bool isMouseGrabbing() const { return mMouseGrabbing; }
+
 	void setWireFrame( bool enable ) { mWireFrame = enable; }
 
 protected:
@@ -69,11 +72,10 @@ private:
 	int mFrameCountSecond;
 	int mFramesPerSecond;
 	QPointF mDrag;
-	bool mDragging;
 	QFont mFont;
 	bool mWireFrame;
 
-	bool mGrabMouse;
+	bool mMouseGrabbing;
 	bool mForwardPressed;
 	bool mBackwardPressed;
 	bool mLeftPressed;

@@ -2,6 +2,7 @@
 #define GEOMETRY_PARTICLESYSTEM_INCLUDED
 
 #include <QVector>
+#include <QVector2D>
 #include <QVector3D>
 
 
@@ -19,6 +20,7 @@ public:
 	void setDrag( float drag ) { mDrag = drag; }
 	void setSize( float size ) { mSize = size; }
 	void setForce( QVector3D force ) { mForce = force; }
+	void setCapacity( int capacity ) { mParticles.resize( capacity ); mParticleVertices.resize( capacity*4 ); }
 
 protected:
 
@@ -33,14 +35,21 @@ private:
 		QVector3D position;
 		float life;
 	};
-
+	class ParticleVertex
+	{
+	public:
+		QVector3D position;
+		QVector3D normal;
+		QVector2D coord;
+	};
 	float mMinLife;
 	float mMaxLife;
 	float mMass;
 	float mDrag;
 	float mSize;
-	QVector<Particle> mParticles;
 	QVector3D mForce;
+	QVector<Particle> mParticles;
+	QVector<ParticleVertex> mParticleVertices;
 };
 
 

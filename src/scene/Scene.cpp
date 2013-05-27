@@ -23,7 +23,6 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 {
 	mFrameCountSecond = 0;
 	mFramesPerSecond = 0;
-	mDragging = false;
 	mWireFrame = false;
 
 	mForwardPressed = false;
@@ -105,7 +104,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 
 	mElapsedTimer.start();
 	
-	mGrabMouse = false;
+	setMouseGrabbing( true );
 }
 
 
@@ -236,21 +235,33 @@ void Scene::secondPassed()
 }
 
 
+void Scene::setMouseGrabbing( bool enable )
+{
+	mMouseGrabbing = enable;
+	if( mMouseGrabbing )
+		mGLWidget->setCursor( Qt::BlankCursor );
+	else
+		mGLWidget->setCursor( Qt::ArrowCursor );
+}
+
+
 void Scene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 {
 	QGraphicsScene::mouseMoveEvent( event );
 	if( event->isAccepted() )
 		return;
 
-	if( mGrabMouse ) {
+	if( isMouseGrabbing() )
+	{
 		mDrag += event->scenePos() - QPointF( width()/2, height()/2 );
-		event->accept();
 		QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
-	}
 
-	QList< AMouseListener* >::iterator i;
-	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
-		(*i)->mouseMoveEvent( event );
+		QList< AMouseListener* >::iterator i;
+		for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
+			(*i)->mouseMoveEvent( event );
+		event->accept();
+	}
+	event->ignore();
 }
 
 
@@ -259,9 +270,6 @@ void Scene::mousePressEvent( QGraphicsSceneMouseEvent * event )
 	QGraphicsScene::mousePressEvent( event );
 	if( event->isAccepted() )
 		return;
-
-	if( event->button() == Qt::LeftButton )
-		mDragging = true;
 
 	QList< AMouseListener* >::iterator i;
 	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
@@ -274,9 +282,6 @@ void Scene::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 	QGraphicsScene::mouseReleaseEvent(event);
 	if( event->isAccepted() )
 		return;
-
-	if( event->button() == Qt::LeftButton )
-		mDragging = false;
 
 	QList< AMouseListener* >::iterator i;
 	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
@@ -329,12 +334,8 @@ void Scene::keyPressEvent( QKeyEvent * event )
 	case Qt::Key_Control:
 		mDownPressed = true;
 		break;
-	case Qt::Key_F5:
-		mGrabMouse = !mGrabMouse;
-		if( mGrabMouse )
-			mGLWidget->setCursor( Qt::BlankCursor );
-		else
-			mGLWidget->setCursor( Qt::ArrowCursor );
+	case Qt::Key_Escape:
+		setMouseGrabbing( !isMouseGrabbing() );
 		break;
 	default:
 		event->ignore();
