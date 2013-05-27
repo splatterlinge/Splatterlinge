@@ -104,6 +104,8 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	secondTimer->start();
 
 	mElapsedTimer.start();
+	
+	mGrabMouse = false;
 }
 
 
@@ -240,10 +242,10 @@ void Scene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 	if( event->isAccepted() )
 		return;
 
-	if( mDragging )
-	{
-		mDrag += event->screenPos() - event->lastScreenPos();
+	if( mGrabMouse ) {
+		mDrag += event->scenePos() - QPointF( width()/2, height()/2 );
 		event->accept();
+		QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
 	}
 
 	QList< AMouseListener* >::iterator i;
@@ -326,6 +328,13 @@ void Scene::keyPressEvent( QKeyEvent * event )
 		break;
 	case Qt::Key_Control:
 		mDownPressed = true;
+		break;
+	case Qt::Key_F5:
+		mGrabMouse = !mGrabMouse;
+		if( mGrabMouse )
+			mGLWidget->setCursor( Qt::BlankCursor );
+		else
+			mGLWidget->setCursor( Qt::ArrowCursor );
 		break;
 	default:
 		event->ignore();

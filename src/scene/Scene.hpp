@@ -68,11 +68,12 @@ private:
 	double mDelta;
 	int mFrameCountSecond;
 	int mFramesPerSecond;
-	QPoint mDrag;
+	QPointF mDrag;
 	bool mDragging;
 	QFont mFont;
 	bool mWireFrame;
 
+	bool mGrabMouse;
 	bool mForwardPressed;
 	bool mBackwardPressed;
 	bool mLeftPressed;
