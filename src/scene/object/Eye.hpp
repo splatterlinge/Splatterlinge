@@ -33,6 +33,8 @@ public:
 	void setFarPlane( float farPlane ) { mFarPlane = farPlane; }
 
 	void setClippingPlane( int n, QVector4D plane = QVector4D(0,0,0,0) );
+	void enableClippingPlanes();
+	void disableClippingPlanes();
 
 	bool isPointInFrustum( QVector3D point ) const ;
 	bool isSphereInFrustum( QVector3D center, float radius ) const;

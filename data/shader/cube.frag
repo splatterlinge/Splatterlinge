@@ -1,6 +1,5 @@
 #version 120
 
-
 uniform samplerCube cubeMap;
 
 

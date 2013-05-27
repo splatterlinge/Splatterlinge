@@ -193,11 +193,14 @@ void Sky::updateSelf( const double & delta )
 
 void Sky::drawSelf()
 {
+	scene()->eye()->disableClippingPlanes();
 	glPushAttrib( GL_VIEWPORT_BIT | GL_DEPTH_BUFFER_BIT );
 	glDepthMask( GL_FALSE );
 	glDepthFunc( GL_EQUAL );
 	glDisable( GL_CULL_FACE );
 	glDepthRange( 1.0, 1.0 );
+
+	glMatrixMode( GL_MODELVIEW );
 
 	glPushMatrix();
 	glTranslatef( scene()->eye()->position().x(), scene()->eye()->position().y(), scene()->eye()->position().z() );
@@ -242,4 +245,5 @@ void Sky::drawSelf()
 
 	glPopMatrix();
 	glPopAttrib();
+	scene()->eye()->enableClippingPlanes();
 }

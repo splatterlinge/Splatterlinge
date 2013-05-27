@@ -53,9 +53,30 @@ void Eye::drawSelf()
 	glLoadIdentity();
 	gluPerspective( mFOV, (float)scene()->width()/scene()->height(), mNearPlane, mFarPlane );
 	glMatrixMode( GL_MODELVIEW );
-
 	prepareFrustum();
+	enableClippingPlanes();
+}
 
+
+void Eye::drawSelfPost()
+{
+	disableClippingPlanes();
+}
+
+
+void Eye::setClippingPlane( int n, QVector4D plane )
+{
+	if( plane.isNull() )
+	{
+		mClippingPlanes.remove( n );
+	} else {
+		mClippingPlanes[n] = plane;
+	}
+}
+
+
+void Eye::enableClippingPlanes()
+{
 	QMap<int,QVector4D>::const_iterator i = mClippingPlanes.constBegin();
 	while( i != mClippingPlanes.constEnd() )
 	{
@@ -67,24 +88,13 @@ void Eye::drawSelf()
 }
 
 
-void Eye::drawSelfPost()
+void Eye::disableClippingPlanes()
 {
 	QMap<int,QVector4D>::const_iterator i = mClippingPlanes.constBegin();
 	while( i != mClippingPlanes.constEnd() )
 	{
 		glDisable( GL_CLIP_PLANE0 + i.key() );
 		++i;
-	}
-}
-
-
-void Eye::setClippingPlane( int n, QVector4D plane )
-{
-	if( plane.isNull() )
-	{
-		mClippingPlanes.remove( n );
-	} else {
-		mClippingPlanes[n] = plane;
 	}
 }
 
