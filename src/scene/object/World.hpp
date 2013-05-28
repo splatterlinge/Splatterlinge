@@ -14,7 +14,7 @@ class WavefrontObject;
 class Shader;
 class TextureRenderer;
 class Material;
-class ParticleSystem;
+class SplatterSystem;
 
 
 /// World object
@@ -50,8 +50,7 @@ private:
 	QSharedPointer<WavefrontObject> mTree;
 	QVector3D mTarget;
 	bool mDragTeapot;
-	Material * mParticleMaterial;
-	ParticleSystem * mParticleSystem;
+	SplatterSystem * mSplatterSystem;
 };
 
 

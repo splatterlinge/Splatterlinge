@@ -178,7 +178,6 @@ Material::Material( GLWidget * glWidget, QString name, MaterialShaderVariant::ty
 	mShaderSet[MaterialQuality::HIGH].blobMapUniform = -1;
 	mShaderSet[MaterialQuality::HIGH].cubeMapUniform = -1;
 	mBlobMap = mCubeMap = -1;
-	unsetAlphaTestReferenceValueOverride();
 
 	QSharedPointer<MaterialData> n( new MaterialData( glWidget, name ) );
 	cache( n );

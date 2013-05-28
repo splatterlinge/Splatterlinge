@@ -6,7 +6,6 @@
 #include <GLWidget.hpp>
 
 #include <QVector4D>
-#include <QDebug>
 
 
 class GLWidget;
@@ -96,13 +95,14 @@ public:
 
 	void setShader( MaterialShaderVariant::type variant );
 
+	void overrideAmbient( const QVector4D & ambient ) { glMaterial( GL_FRONT_AND_BACK, GL_AMBIENT, ambient ); }
+	void overrideDiffuse( const QVector4D & diffuse ) { glMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse ); }
+	void overrideSpecular( const QVector4D & specular ) { glMaterial( GL_FRONT_AND_BACK, GL_SPECULAR, specular ); }
+	void overrideEmission( const QVector4D & emission ) { glMaterial( GL_FRONT_AND_BACK, GL_EMISSION, emission ); }
+	void overrideAlphaTestReferenceValue( const float & referenceValue ) { glAlphaFunc( data()->alphaTestFunction(), referenceValue ); }
+
 	void setBlobMap( GLuint blobMap ) { mBlobMap = blobMap; }
 	void setCubeMap( GLuint cubeMap ) { mCubeMap = cubeMap; }
-
-	void unsetAlphaTestReferenceValueOverride()
-		{ mUsedAlphaTestReferenceValue = &data()->alphaTestReferenceValue(); }
-	void setAlphaTestReferenceValueOverride( GLclampf referenceValue )
-		{ mAlphaTestReferenceValueOverride = referenceValue; mUsedAlphaTestReferenceValue = &mAlphaTestReferenceValueOverride; }
 
 	void bind();
 	void release();
@@ -122,7 +122,7 @@ private:
 	GLWidget * mGLWidget;
 	QString mName;
 
-	ShaderSet mShaderSet[MaterialQuality::num];
+	float mOpacity;
 
 	GLuint mBlobMap;
 	GLuint mCubeMap;
@@ -130,6 +130,7 @@ private:
 	GLclampf mAlphaTestReferenceValueOverride;
 	const GLclampf * mUsedAlphaTestReferenceValue;
 
+	ShaderSet mShaderSet[MaterialQuality::num];
 	MaterialQuality::type mDefaultQuality;
 	MaterialQuality::type mBoundQuality;
 

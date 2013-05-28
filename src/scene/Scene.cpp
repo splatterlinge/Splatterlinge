@@ -128,7 +128,7 @@ QGraphicsProxyWidget * Scene::addWidget( QWidget * widget, Qt::WindowFlags wFlag
 
 void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 {
-	QCoreApplication::processEvents();
+	mGLWidget->setUpdatesEnabled( false );
 	qint64 delta = mElapsedTimer.restart();
 	if( delta == 0 )
 	{
@@ -226,7 +226,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 		qWarning() << "OpenAL error detected!";
 	}
 
-	emit update();
+	mGLWidget->setUpdatesEnabled( true );
 }
 
 

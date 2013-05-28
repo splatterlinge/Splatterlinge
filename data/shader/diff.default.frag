@@ -44,5 +44,5 @@ void main()
 
 	float fogFactor = clamp( -(length( vVertex )-gl_Fog.start) * gl_Fog.scale, 0.0, 1.0 );
 	vec3 finalFragment = mix( gl_Fog.color.rgb, finalColor, fogFactor );
-	gl_FragColor = vec4( finalFragment, colorFromMap.a );
+	gl_FragColor = vec4( finalFragment, colorFromMap.a * gl_FrontMaterial.diffuse.a );
 }

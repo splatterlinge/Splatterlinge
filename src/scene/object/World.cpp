@@ -2,6 +2,7 @@
 
 #include <scene/Scene.hpp>
 #include <geometry/ParticleSystem.hpp>
+#include <geometry/SplatterSystem.hpp>
 #include "Landscape.hpp"
 #include "Teapot.hpp"
 #include "WavefrontObject.hpp"
@@ -46,11 +47,7 @@ World::World( Scene * scene, QString name ) :
 	scene->addKeyListener( this );
 	scene->addMouseListener( this );
 	
-	mParticleSystem = new ParticleSystem( 500 );
-	mParticleSystem->setSize( 4.0f );
-	mParticleSystem->setMass( 0.05f );
-	mParticleSystem->setDrag( 0.9f );
-	mParticleMaterial = new Material( scene->glWidget(), "Splatter" );
+	mSplatterSystem = new SplatterSystem( scene->glWidget(), mLandscape->terrain() );
 	mTarget = QVector3D(0,0,0);
 }
 
@@ -58,8 +55,7 @@ World::World( Scene * scene, QString name ) :
 World::~World()
 {
 	scene()->removeKeyListener( this );
-	delete mParticleSystem;
-	delete mParticleMaterial;
+	delete mSplatterSystem;
 }
 
 
@@ -115,7 +111,7 @@ void World::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 
 void World::wheelEvent( QGraphicsSceneWheelEvent * event )
 {
-	mParticleSystem->emitSpherical( mTarget+QVector3D(0,2,0), 30, 40.0f, 60.0f );
+	mSplatterSystem->spray( mTarget+QVector3D(0,2,0), 20.0f );
 }
 
 
@@ -144,7 +140,7 @@ void World::updateSelf( const double & delta )
 		mTeapot->moveY( 3 );
 	}
 
-	mParticleSystem->update( delta );
+	mSplatterSystem->update( delta );
 }
 
 
@@ -180,9 +176,7 @@ void World::drawSelf()
 
 void World::drawSelfPost()
 {
-	mParticleMaterial->bind();
-	mParticleSystem->draw();
-	mParticleMaterial->release();
+	mSplatterSystem->draw();
 	glDisable( GL_LIGHTING );
 	glBegin( GL_LINES );
 		glColor3f( 0,1,1 );

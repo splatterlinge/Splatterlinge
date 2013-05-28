@@ -2,7 +2,7 @@
 #define SCENE_INCLUDED
 
 #include "object/Eye.hpp"
-#include <utility/qtalwrappers.hpp>
+#include <utility/alWrappers.hpp>
 
 #include <QGraphicsScene>
 #include <QElapsedTimer>

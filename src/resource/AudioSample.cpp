@@ -2,7 +2,7 @@
 #include "audioLoader/audioLoader.h"
 
 #include <scene/object/AObject.hpp>
-#include <utility/qtalwrappers.hpp>
+#include <utility/alWrappers.hpp>
 
 #include <QDebug>
 #include <QVector3D>
