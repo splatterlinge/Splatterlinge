@@ -10,6 +10,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsProxyWidget>
+#include <QCoreApplication>
 
 #include <GL/glu.h>
 #include <AL/alc.h>
@@ -127,6 +128,7 @@ QGraphicsProxyWidget * Scene::addWidget( QWidget * widget, Qt::WindowFlags wFlag
 
 void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 {
+	QCoreApplication::processEvents();
 	qint64 delta = mElapsedTimer.restart();
 	if( delta == 0 )
 	{
