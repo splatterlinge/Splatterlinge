@@ -16,11 +16,14 @@ class ParticleSystem;
 class SplatterSystem
 {
 public:
-	SplatterSystem( GLWidget * glWidget, Terrain * terrain, int maxSplatters = 100, int maxParticles = 500 );
+	SplatterSystem( GLWidget * glWidget, Terrain * terrain, int maxSplatters = 50, int maxParticles = 500 );
 	~SplatterSystem();
 	void update( const double & delta );
 	void draw();
 	void spray( const QVector3D & source, const float & size );
+
+	float splatterFadeSpeed() { return mSplatterFadeSpeed; }
+	void setSplatterFadeSpeed( float speed ) { mSplatterFadeSpeed = speed; }
 
 protected:
 
@@ -37,6 +40,7 @@ private:
 	ParticleSystem * mParticleSystem;
 	Material * mSplatterMaterial;
 	Material * mParticleMaterial;
+	float mSplatterFadeSpeed;
 };
 
 

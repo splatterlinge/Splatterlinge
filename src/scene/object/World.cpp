@@ -111,7 +111,7 @@ void World::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 
 void World::wheelEvent( QGraphicsSceneWheelEvent * event )
 {
-	mSplatterSystem->spray( mTarget+QVector3D(0,2,0), 20.0f );
+	mSplatterSystem->spray( mTarget+QVector3D(0,3,0), 30.0f );
 }
 
 

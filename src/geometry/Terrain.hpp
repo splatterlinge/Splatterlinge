@@ -80,6 +80,9 @@ public:
 	void drawPatchMap( const QRect & rect );
 
 	QPointF toMapF( const QVector3D & point ) const;	///< Converts a vector in world coordinates to heightmap coordinates.
+	QPointF toMapF( const QPointF & point ) const;	///< Converts a point in world coordinates to heightmap coordinates.
+	QSizeF toMapF( const QSizeF & size ) const;	///< Converts a size in world coordinates to heightmap coordinates.
+	QRectF toMapF( const QRectF & rect ) const;	///< Converts a point in world coordinates to heightmap coordinates.
 	QPoint toMap( const QVector3D & point ) const;	///< Converts a vector in world coordinates to heightmap coordinates.
 	QPoint toMap( const QPointF & point ) const;	///< Converts a point in world coordinates to heightmap coordinates.
 	QSize toMap( const QSizeF & size ) const;	///< Converts a size in world coordinates to heightmap coordinates.
@@ -120,6 +123,33 @@ inline QPointF Terrain::toMapF( const QVector3D & point ) const
 	return QPointF(
 		(point.x()-(float)mOffset.x()) * mToMapFactor.width(),
 		(point.z()-(float)mOffset.z()) * mToMapFactor.height()
+	);
+}
+
+
+inline QPointF Terrain::toMapF( const QPointF & point ) const
+{
+	return QPointF(
+		(point.x()-(float)mOffset.x()) * mToMapFactor.width(),
+		(point.y()-(float)mOffset.z()) * mToMapFactor.height()
+	);
+}
+
+
+inline QSizeF Terrain::toMapF( const QSizeF & size ) const
+{
+	return QSizeF(
+		size.width() * mToMapFactor.width(),
+		size.height() * mToMapFactor.height()
+	);
+}
+
+
+inline QRectF Terrain::toMapF( const QRectF & rect ) const
+{
+	return QRectF(
+		toMapF(rect.topLeft()),
+		toMapF(rect.size())
 	);
 }
 
