@@ -9,6 +9,8 @@
 
 #include "Terrain.hpp"
 
+
+class AudioSample;
 class Material;
 class ParticleSystem;
 
@@ -31,6 +33,7 @@ private:
 	class Splatter
 	{
 	public:
+		Splatter( const QRectF & _rect = QRectF(0,0,0,0) ) : rect(_rect), fade(0.0f) {}
 		QRectF rect;
 		float fade;
 	};
@@ -41,6 +44,7 @@ private:
 	Material * mSplatterMaterial;
 	Material * mParticleMaterial;
 	float mSplatterFadeSpeed;
+	QVector< AudioSample * > mBurstSampleSources;
 };
 
 

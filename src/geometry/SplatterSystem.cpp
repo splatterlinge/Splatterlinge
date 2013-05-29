@@ -7,8 +7,10 @@
 #include <utility/random.hpp>
 #include <utility/qHashKeys.hpp>
 #include <resource/Material.hpp>
+#include <resource/AudioSample.hpp>
 
 #include <math.h>
+#include <float.h>
 
 
 SplatterSystem::SplatterSystem( GLWidget * glWidget, Terrain * terrain, int maxSplatters, int maxParticles ) :
@@ -25,6 +27,14 @@ SplatterSystem::SplatterSystem( GLWidget * glWidget, Terrain * terrain, int maxS
 
 	mSplatterMaterial = new Material( glWidget, "SplatterBig" );
 	mParticleMaterial = new Material( glWidget, "Splatter" );
+
+	mBurstSampleSources.resize( 4 );
+	for( int i=0; i<mBurstSampleSources.size(); ++i )
+	{
+		mBurstSampleSources[i] = new AudioSample( "./data/sound/splatter.ogg" );
+		mBurstSampleSources[i]->setLooping( false );
+		mBurstSampleSources[i]->setRolloffFactor( 0.05f );
+	}
 }
 
 
@@ -33,6 +43,10 @@ SplatterSystem::~SplatterSystem()
 	delete mParticleSystem;
 	delete mParticleMaterial;
 	delete mSplatterMaterial;
+	for( int i=0; i<mBurstSampleSources.size(); ++i )
+	{
+		delete mBurstSampleSources[i];
+	}
 }
 
 
@@ -86,13 +100,33 @@ void SplatterSystem::spray( const QVector3D & source, const float & size )
 	int minFadeSplatter = 0;
 	for( int i = 0; i < mSplatters.size(); ++i )
 	{
+		if( mSplatters[i].fade <= 0.0f )
+		{
+			minFadeSplatter = i;
+			break;
+		}
 		if( mSplatters[i].fade < mSplatters[minFadeSplatter].fade )
 		{
 			minFadeSplatter = i;
-			if( mSplatters[i].fade <= 0.0f )
-				break;
 		}
 	}
 	mSplatters[minFadeSplatter].fade = 1.0f;
 	mSplatters[minFadeSplatter].rect = QRectF( source.x()-size*0.5f, source.z()-size*0.5f, size, size );
+
+	int maxSecOffset = 0;
+	for( int i=0; i<mBurstSampleSources.size(); ++i )
+	{
+		if( !mBurstSampleSources[i]->isPlaying() )
+		{
+			maxSecOffset = i;
+			break;
+		}
+		if( mBurstSampleSources[i]->secOffset() > mBurstSampleSources[maxSecOffset]->secOffset() )
+		{
+			maxSecOffset = i;
+		}
+	}
+	mBurstSampleSources[maxSecOffset]->setPosition( source );
+	mBurstSampleSources[maxSecOffset]->rewind();
+	mBurstSampleSources[maxSecOffset]->play();
 }

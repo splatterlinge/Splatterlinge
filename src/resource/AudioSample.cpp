@@ -2,7 +2,6 @@
 #include "audioLoader/audioLoader.h"
 
 #include <scene/object/AObject.hpp>
-#include <utility/alWrappers.hpp>
 
 #include <QDebug>
 #include <QVector3D>
@@ -60,43 +59,25 @@ AudioSample::AudioSample( QString file ) : AResource()
 	cache( n );
 
 	mSource = 0;
-	mLooping = false;
-	mGain = 1.0f;
-	mPitch = 1.0f;
-	mReferenceDistance = 1.0f;
-	mMaxDistance = FLT_MAX;
-	mRolloffFactor = 1.0f;
 
 	alGenSources( 1, &mSource );
-	alSourcei( mSource, AL_SOURCE_RELATIVE, AL_FALSE);
+	if( !mSource )
+		return;
+	alSourcei( mSource, AL_SOURCE_RELATIVE, AL_FALSE );
 	alSourcei( mSource, AL_BUFFER, data()->buffer() );
+
+	setLooping( true );
+	setGain( 1.0f );
+	setPitch( 1.0f );
+	setReferenceDistance( 1.0f );
+	setMaxDistance( FLT_MAX );
+	setRolloffFactor( 1.0f );
 }
 
 
 AudioSample::~AudioSample()
 {
+	if( !mSource )
+		return;
 	alDeleteSources( 1, &mSource );
-}
-
-
-void AudioSample::update()
-{
-	alSource( mSource, AL_POSITION, mObjectHook->position() );
-	alSource( mSource, AL_PITCH, mPitch);
-	alSource( mSource, AL_REFERENCE_DISTANCE, mReferenceDistance );
-	alSource( mSource, AL_ROLLOFF_FACTOR, mRolloffFactor );
-	alSource( mSource, AL_GAIN, mGain);
-	alSource( mSource, AL_LOOPING, mLooping);
-}
-
-
-void AudioSample::play()
-{
-	alSourcePlay( mSource );
-}
-
-
-void AudioSample::stop()
-{
-	alSourceStop( mSource );
 }

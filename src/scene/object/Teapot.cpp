@@ -2,11 +2,6 @@
 
 #include <scene/Scene.hpp>
 #include <geometry/teapot.h>
-
-#include <QString>
-
-#include <stdio.h>
-
 #include <resource/Material.hpp>
 #include <resource/AudioSample.hpp>
 
@@ -18,8 +13,7 @@ Teapot::Teapot( Scene * scene, const float & size ) :
 	mMaterial = new Material( scene->glWidget(), "KirksEntry" );
 	mAudioSample = new AudioSample( "data/sound/test.ogg" );
 	mAudioSample->setLooping( true );
-	mAudioSample->setRolloffFactor( 10.0f );
-	mAudioSample->setObjectHook( this );
+	mAudioSample->setRolloffFactor( 0.1f );
 	mAudioSample->play();
 }
 
@@ -33,7 +27,7 @@ Teapot::~Teapot()
 
 void Teapot::updateSelf( const double & delta )
 {
-	mAudioSample->update();
+	mAudioSample->setPosition( this->position() );
 }
 
 
