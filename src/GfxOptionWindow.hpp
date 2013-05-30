@@ -7,6 +7,7 @@
 
 class Scene;
 
+class QLabel;
 class QSlider;
 class QCheckBox;
 
@@ -21,14 +22,14 @@ public:
 
 private:
 	Scene * mScene;
-	QCheckBox * mWireFrame;
-	QCheckBox * mBoundingSpheres;
+	QLabel * materialQualityLabel;
 	QSlider * materialQuality;
+	QLabel * farPlaneLabel;
+	QSlider * farPlane;
 
 public slots:
 	void setMaterialQuality( int q );
-	void setWireFrame( int enable );
-	void setBoundingSpheres( int enable );
+	void setFarPlane( int distance );
 };
 
 

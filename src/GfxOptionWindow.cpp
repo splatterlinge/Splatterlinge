@@ -19,21 +19,29 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 
 	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
 
-	mWireFrame = new QCheckBox( "WireFrame" );
-	QObject::connect( mWireFrame, SIGNAL(stateChanged(int)), this, SLOT(setWireFrame(int)) );
-	layout->addWidget( mWireFrame );
-
-	mBoundingSpheres = new QCheckBox( "BoundingSpheres" );
-	QObject::connect( mBoundingSpheres, SIGNAL(stateChanged(int)), this, SLOT(setBoundingSpheres(int)) );
-	layout->addWidget( mBoundingSpheres );
-
-	layout->addWidget( new QLabel("Material Quality:") );
+	materialQualityLabel = new QLabel();
 	materialQuality = new QSlider( Qt::Horizontal );
-	materialQuality->setMinimum( 0 );
-	materialQuality->setMaximum( 2 );
+	materialQuality->setRange( 0, 2 );
+	materialQuality->setSingleStep( 1 );
+	materialQuality->setPageStep( 1 );
+	materialQuality->setTickPosition( QSlider::TicksAbove );
 	materialQuality->setValue( MaterialQuality::maximum() );
+	setMaterialQuality( materialQuality->value() );
 	QObject::connect( materialQuality, SIGNAL(valueChanged(int)), this, SLOT(setMaterialQuality(int)) );
+	layout->addWidget( materialQualityLabel );
 	layout->addWidget( materialQuality );
+
+	farPlaneLabel = new QLabel();
+	farPlane = new QSlider( Qt::Horizontal );
+	farPlane->setRange( 50, 1000 );
+	farPlane->setSingleStep( 10 );
+	farPlane->setPageStep( 50 );
+	farPlane->setTickPosition( QSlider::TicksAbove );
+	farPlane->setValue( mScene->eye()->farPlane() );
+	setFarPlane( farPlane->value() );
+	QObject::connect( farPlane, SIGNAL(valueChanged(int)), this, SLOT(setFarPlane(int)) );
+	layout->addWidget( farPlaneLabel );
+	layout->addWidget( farPlane );
 
 	setLayout( layout );
 
@@ -46,30 +54,30 @@ GfxOptionWindow::~GfxOptionWindow()
 }
 
 
-void GfxOptionWindow::setWireFrame( int enable )
-{
-	mScene->setWireFrame( enable );
-}
-
-
-void GfxOptionWindow::setBoundingSpheres( int enable )
-{
-	AObject::setGlobalDebugBoundingSpheres( enable );
-}
-
-
 void GfxOptionWindow::setMaterialQuality( int q )
 {
+	QString quality="";
 	switch( q )
 	{
 		case MaterialQuality::HIGH:
 			MaterialQuality::setMaximum( MaterialQuality::HIGH );
+			quality = "High";
 			break;
 		case MaterialQuality::MEDIUM:
 			MaterialQuality::setMaximum( MaterialQuality::MEDIUM );
+			quality = "Medium";
 			break;
 		case MaterialQuality::LOW:
 			MaterialQuality::setMaximum( MaterialQuality::LOW );
+			quality = "Low";
 			break;
 	}
+	materialQualityLabel->setText(tr("Material Quality (%1):").arg(quality));
+}
+
+
+void GfxOptionWindow::setFarPlane( int distance )
+{
+	mScene->eye()->setFarPlane( distance );
+	farPlaneLabel->setText(tr("Viewing Distance (%1m):").arg(distance));
 }

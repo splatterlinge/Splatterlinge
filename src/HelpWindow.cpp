@@ -17,7 +17,7 @@ HelpWindow::HelpWindow( QWidget * parent, Qt::WindowFlags f ) :
 	setWindowOpacity( 0.8 );
 
 	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
-	layout->addWidget( new QLabel("F1\tThis Window\nF2\tGraphics Options") );
+	layout->addWidget( new QLabel("F1\tThis Window\nF2\tGraphics Options\nF3\tDebug Options") );
 	setLayout( layout );
 
 	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint );

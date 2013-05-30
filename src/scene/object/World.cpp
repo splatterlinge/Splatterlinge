@@ -124,8 +124,6 @@ void World::updateSelf( const double & delta )
 	if( mTimeOfDay > 1.0f )
 		mTimeOfDay -= 1.0f;
 
-	mSky->update( delta );
-
 	float landscapeHeight = mLandscape->terrain()->getHeight( scene()->eye()->position() );
 	if( scene()->eye()->position().y() < landscapeHeight + 2 )
 		scene()->eye()->setPositionY( landscapeHeight + 2 );

@@ -141,8 +141,9 @@ void AObject::drawBoundingShpere()
 	if( mBoundingSphereRadius <= FLT_EPSILON )
 		return;
 	GLUquadric * q = gluNewQuadric();
-	glPushAttrib( GL_POLYGON_BIT );
+	glPushAttrib( GL_POLYGON_BIT | GL_LIGHTING_BIT | GL_ENABLE_BIT );
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	glDisable( GL_LIGHTING );
 	glColor3f( 1, 1, 1 );
 	gluSphere( q, mBoundingSphereRadius, 16, 16 );
 	glPopAttrib();

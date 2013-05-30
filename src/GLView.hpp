@@ -37,6 +37,7 @@ private:
 	Eye * mEye;
 	GLWidget * mGLWidget;
 	Scene * mScene;
+	QWidget * mDebugOptionWindow;
 	QWidget * mGfxOptionWindow;
 	QWidget * mHelpWindow;
 };

@@ -62,6 +62,7 @@ private:
 	public:
 		Filter( Landscape * landscape, QSize filterSize );
 		~Filter();
+		void update();
 		void draw();
 	private:
 		class Patch
@@ -83,6 +84,7 @@ private:
 		QSize mFilterSize;
 		QVector<Patch> mPatches;
 	};
+
 
 	QString mName;
 	QVector<Blob*> mBlobs;

@@ -87,6 +87,7 @@ Landscape::~Landscape()
 
 void Landscape::updateSelf( const double & delta )
 {
+	mTerrainFilter->update();
 }
 
 
@@ -271,8 +272,19 @@ Landscape::Filter::Patch::Patch( QVector3D position, QVector3D size ) :
 
 
 Landscape::Filter::Filter( Landscape * landscape, QSize filterSize ) :
-	mLandscape(landscape),
-	mFilterSize(filterSize)
+	mLandscape( landscape ),
+	mFilterSize( filterSize )
+{
+	mPatches.resize( filterSize.width() * filterSize.height() );
+}
+
+
+Landscape::Filter::~Filter()
+{
+}
+
+
+void Landscape::Filter::update()
 {
 	/* example for filterSize 3x3
 	 *
@@ -291,32 +303,24 @@ Landscape::Filter::Filter( Landscape * landscape, QSize filterSize ) :
 	 * |        |        |        |      |
 	 * |        |        |        |      |
 	 * |--------|--------|--------|     -
-	 * ^
+	 * ^             '--farPlane--'
 	 * from
-	 * '-----far----'
 	 */
 	//TODO: maybe do these calculations in map coordinates ...
-	float farPlane = landscape->scene()->eye()->farPlane();
-	QVector3D from = QVector3D( -farPlane, landscape->terrain()->offset().y(), -farPlane );
-	QVector3D size = QVector3D( 2.0f*farPlane, landscape->terrain()->size().y(), 2.0f*farPlane );
-	float stepX =  size.x()/(float)filterSize.width();
-	float stepZ =  size.z()/(float)filterSize.height();
-	QVector3D patchSize = QVector3D( stepX, landscape->terrain()->size().y(), stepZ );
-	mPatches.clear();
+	float farPlane = mLandscape->scene()->eye()->farPlane();
+	QVector3D from = QVector3D( -farPlane, mLandscape->terrain()->offset().y(), -farPlane );
+	QVector3D size = QVector3D( 2.0f*farPlane, mLandscape->terrain()->size().y(), 2.0f*farPlane );
+	float stepX =  size.x()/(float)mFilterSize.width();
+	float stepZ =  size.z()/(float)mFilterSize.height();
+	QVector3D patchSize = QVector3D( stepX, mLandscape->terrain()->size().y(), stepZ );
 	for( int z=0; z<mFilterSize.height(); ++z )
 	{
 		for( int x=0; x<mFilterSize.width(); ++x )
 		{
 			QVector3D pos = from + QVector3D( (float)x*stepX, 0.0f, (float)z*stepZ );
-			mPatches.push_back( Patch( pos, patchSize ) );
+			mPatches[z*mFilterSize.width()+x] = Patch( pos, patchSize );
 		}
 	}
-}
-
-
-Landscape::Filter::~Filter()
-{
-
 }
 
 
@@ -330,10 +334,11 @@ void Landscape::Filter::draw()
 			Patch & patch = mPatches[z*mFilterSize.width()+x];
 			QVector3D eyePosition = QVector3D( mLandscape->scene()->eye()->position().x(), 0.0f, mLandscape->scene()->eye()->position().z() );
 			QVector3D spherePosition = eyePosition + patch.center();
-/*
+			/*
 			GLUquadric * q = gluNewQuadric();
-			glPushAttrib( GL_POLYGON_BIT );
+			glPushAttrib( GL_POLYGON_BIT | GL_LIGHTING_BIT | GL_ENABLE_BIT );
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			glDisable( GL_LIGHTING );
 			glColor3f( 1, 1, 1 );
 			glPushMatrix();
 			glTranslate( spherePosition );
@@ -341,19 +346,9 @@ void Landscape::Filter::draw()
 			glPopMatrix();
 			glPopAttrib();
 			gluDeleteQuadric( q );
-*/
+			*/
 			if( mLandscape->scene()->eye()->isSphereInFrustum( spherePosition, patch.boundingSphereRadius() ) )
 			{
-				/*
-				mLandscape->drawPatch(
-					QRectF(
-						eyePosition.x() + patch.position().x(),
-						eyePosition.z() + patch.position().z(),
-						patch.size().x(),
-						patch.size().z()
-					)
-				);
-				*/
 				mergedRect = mergedRect.united(
 					QRectF(
 						eyePosition.x() + patch.position().x(),

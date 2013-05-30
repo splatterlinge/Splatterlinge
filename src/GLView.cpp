@@ -1,5 +1,6 @@
 #include "GLView.hpp"
 
+#include "DebugOptionWindow.hpp"
 #include "GfxOptionWindow.hpp"
 #include "HelpWindow.hpp"
 
@@ -38,6 +39,11 @@ GLView::GLView( QGLFormat glFormat, QWidget * parent ) : QGraphicsView( parent )
 	scene()->addWidget( mGfxOptionWindow, mGfxOptionWindow->windowFlags() );
 	mGfxOptionWindow->move( 64, 64 );
 	mGfxOptionWindow->hide();
+
+	mDebugOptionWindow = new DebugOptionWindow( mScene );
+	scene()->addWidget( mDebugOptionWindow, mDebugOptionWindow->windowFlags() );
+	mDebugOptionWindow->move( 128, 64 );
+	mDebugOptionWindow->hide();
 }
 
 
@@ -45,6 +51,7 @@ GLView::~GLView()
 {
 	delete mHelpWindow;
 	delete mGfxOptionWindow;
+	delete mDebugOptionWindow;
 	delete mEye;
 	delete mScene;
 	delete mGLWidget;
@@ -74,6 +81,12 @@ void GLView::keyPressEvent( QKeyEvent * event )
 			mGfxOptionWindow->show();
 		else
 			mGfxOptionWindow->hide();
+		break;
+	case Qt::Key_F3:
+		if( mDebugOptionWindow->isHidden() )
+			mDebugOptionWindow->show();
+		else
+			mDebugOptionWindow->hide();
 		break;
 	default:
 		event->ignore();
