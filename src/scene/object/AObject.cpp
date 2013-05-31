@@ -73,8 +73,11 @@ void AObject::update( const double & delta )
 
 void AObject::draw()
 {
-	glPushMatrix();
-	glMultMatrix( matrix() );
+	if( !matrix().isIdentity() )
+	{
+		glPushMatrix();
+		glMultMatrix( matrix() );
+	}
 
 	drawSelf();
 	QList< QSharedPointer<AObject> >::iterator i;
@@ -93,14 +96,21 @@ void AObject::draw()
 	drawSelfPost();
 	if( sDebugBoundingSpheres )
 		drawBoundingShpere();
-	glPopMatrix();
+
+	if( !matrix().isIdentity() )
+	{
+		glPopMatrix();
+	}
 }
 
 
 void AObject::drawPostProc()
 {
-	glPushMatrix();
-	glMultMatrix( matrix() );
+	if( !matrix().isIdentity() )
+	{
+		glPushMatrix();
+		glMultMatrix( matrix() );
+	}
 
 	drawSelfPostProc();
 	QList< QSharedPointer<AObject> >::iterator i;
@@ -116,7 +126,11 @@ void AObject::drawPostProc()
 			(*i)->drawPostProc();
 		}
 	}
-	glPopMatrix();
+
+	if( !matrix().isIdentity() )
+	{
+		glPopMatrix();
+	}
 }
 
 

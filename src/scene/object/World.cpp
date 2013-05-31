@@ -22,6 +22,7 @@ World::World( Scene * scene, QString name ) :
 	s.endGroup();
 
 	mTimeLapse = false;
+	mTimeReverse = false;
 	mTimeOfDay = 0.0f;
 
 	mLandscape = QSharedPointer<Landscape>( new Landscape( scene, landscapeName ) );
@@ -41,7 +42,7 @@ World::World( Scene * scene, QString name ) :
 	mTree->setPositionY( mLandscape->terrain()->getHeight( QVector3D(100,0,0) ) - 1 );
 	add( mTree );
 
-	mSky = QSharedPointer<Sky>( new Sky( scene, skyName, &mTimeOfDay ) );
+	mSky = QSharedPointer<Sky>( new Sky( scene, skyName ) );
 	add( mSky );
 
 	scene->addKeyListener( this );
@@ -63,8 +64,11 @@ void World::keyPressEvent( QKeyEvent * event )
 {
 	switch( event->key() )
 	{
-	case Qt::Key_Shift:
+	case Qt::Key_PageDown:
 		mTimeLapse = true;
+		break;
+	case Qt::Key_PageUp:
+		mTimeReverse = true;
 		break;
 	default:
 		break;
@@ -76,8 +80,11 @@ void World::keyReleaseEvent( QKeyEvent * event )
 {
 	switch( event->key() )
 	{
-	case Qt::Key_Shift:
+	case Qt::Key_PageDown:
 		mTimeLapse = false;
+		break;
+	case Qt::Key_PageUp:
+		mTimeReverse = false;
 		break;
 	default:
 		break;
@@ -117,12 +124,17 @@ void World::wheelEvent( QGraphicsSceneWheelEvent * event )
 
 void World::updateSelf( const double & delta )
 {
+	mTimeOfDay += 0.01f * delta;
+
 	if( mTimeLapse )
 		mTimeOfDay += 0.2f * delta;
-	else
-		mTimeOfDay += 0.01f * delta;
+	if( mTimeReverse )
+		mTimeOfDay -= 0.2f * delta;
+
 	if( mTimeOfDay > 1.0f )
 		mTimeOfDay -= 1.0f;
+
+	mSky->setTimeOfDay( mTimeOfDay );
 
 	float landscapeHeight = mLandscape->terrain()->getHeight( scene()->eye()->position() );
 	if( scene()->eye()->position().y() < landscapeHeight + 2 )
@@ -175,6 +187,7 @@ void World::drawSelf()
 void World::drawSelfPost()
 {
 	mSplatterSystem->draw();
+
 	glDisable( GL_LIGHTING );
 	glBegin( GL_LINES );
 		glColor3f( 0,1,1 );

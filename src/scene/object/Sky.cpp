@@ -49,9 +49,9 @@ static void TexImage( QGLWidget * glWidget, GLenum target, QString path )
 }
 
 
-Sky::Sky( Scene * scene, QString name, const float * timeOfDay = 0 ) :
+Sky::Sky( Scene * scene, QString name ) :
 	AObject(scene),
-	mTimeOfDay(timeOfDay)
+	mTimeOfDay(0)
 {
 	QSettings s( "./data/sky/"+name+"/sky.ini", QSettings::IniFormat );
 
@@ -147,22 +147,34 @@ Sky::~Sky()
 }
 
 
+void Sky::setTimeOfDay( const float & timeOfDay )
+{
+	mTimeOfDay = timeOfDay;
+	if( mTimeOfDay > 1.0f )
+		mTimeOfDay -= floorf( mTimeOfDay );
+	else if( mTimeOfDay < 0.0f )
+		mTimeOfDay -= floorf( mTimeOfDay );
+}
+
+
 void Sky::updateSelf( const double & delta )
 {
-	float angle = (*mTimeOfDay)*(M_PI*2.0f);
+	float angle = mTimeOfDay*(M_PI*2.0f);
 	QMatrix4x4 m;
 	m.setToIdentity();
 	m.rotate( angle*(180.0/M_PI), mAxis );
 	mSunDirection = m.map( mSunInitialDir );
-	
-	float xA=(*mTimeOfDay)*(float)mSkyDomeImage.width()-0.5f;
-	if( xA < 0.0f )
-		xA = (float)mSkyDomeImage.width()+xA;
+
+	float skyMapTime = mTimeOfDay * (float)mSkyDomeImage.width() - 0.5f;
+
+	int xA = (int)floorf( skyMapTime );
+	if( xA < 0 )
+		xA += mSkyDomeImage.width();
 	QRgb colorA = mSkyDomeImage.pixel( xA, mSkyDomeImage.height()-1 );
 
-	float xB = xA + 1.0f;
-	if( xB >= (float)mSkyDomeImage.width() )
-		xB -= (float)mSkyDomeImage.width();
+	int xB = xA + 1;
+	if( xB >= mSkyDomeImage.width() )
+		xB -= mSkyDomeImage.width();
 	QRgb colorB = mSkyDomeImage.pixel( xB, mSkyDomeImage.height()-1 );
 
 	QVector4D colorAF( qRed(colorA), qGreen(colorA), qBlue(colorA), qAlpha(colorA) );
@@ -170,7 +182,8 @@ void Sky::updateSelf( const double & delta )
 	QVector4D colorBF( qRed(colorB), qGreen(colorB), qBlue(colorB), qAlpha(colorB) );
 	colorBF /= 255.0f;
 
-	QVector4D baseColor = colorAF + (colorBF-colorAF) * (xA-floorf(xA));
+	QVector4D baseColor = interpolateLinear( colorAF, colorBF, skyMapTime-floorf( skyMapTime ) );
+
 	mFogColor = baseColor;
 
 	float diffuseFactor = interpolateLinear( mDiffuseFactorDay, mDiffuseFactorNight, (float)((sunDirection().y()+1.0f)*0.5f) );
@@ -206,7 +219,7 @@ void Sky::drawSelf()
 	glTranslatef( scene()->eye()->position().x(), scene()->eye()->position().y(), scene()->eye()->position().z() );
 
 	glPushMatrix();
-	float angle = (*mTimeOfDay)*(360.0f);
+	float angle = mTimeOfDay*(360.0f);
 	glRotatef( angle, mAxis.x(), mAxis.y(), mAxis.z() );
 	mStarCubeShader->bind();
 	mCubeVertexBuffer.bind();
@@ -226,7 +239,7 @@ void Sky::drawSelf()
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	mDomeShader->bind();
 	mDomeShader->program()->setUniformValue( mDomeShader_sunDir, mSunDirection.toVector3D() );
-	mDomeShader->program()->setUniformValue( mDomeShader_timeOfDay, *mTimeOfDay );
+	mDomeShader->program()->setUniformValue( mDomeShader_timeOfDay, mTimeOfDay );
 	mDomeShader->program()->setUniformValue( mDomeShader_sunSpotPower, mSunSpotPower );
 	mDomeShader->program()->setUniformValue( mDomeShader_diffuseMap, 0 );
 	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, mDomeMap );

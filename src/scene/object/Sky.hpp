@@ -24,11 +24,13 @@ class Scene;
 class Sky : public AObject
 {
 public:
-	Sky( Scene * scene, QString name, const float * timeOfDay );
+	Sky( Scene * scene, QString name );
 	~Sky();
 
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
+	
+	void setTimeOfDay( const float & timeOfDay );
 
 	const QVector4D & fogColor() const { return mFogColor; }
 	const QVector4D & ambient() const { return mAmbient; }
@@ -38,7 +40,7 @@ public:
 	const QVector3D & axis() const { return mAxis; }
 
 private:
-	const float * mTimeOfDay;
+	float mTimeOfDay;
 	QImage mSkyDomeImage;
 	Shader * mDomeShader;
 	Shader * mStarCubeShader;

@@ -42,6 +42,7 @@ public:
 
 private:
 	bool mTimeLapse;
+	bool mTimeReverse;
 	float mTimeOfDay;
 	QSharedPointer<Sky> mSky;
 	QSharedPointer<Landscape> mLandscape;
