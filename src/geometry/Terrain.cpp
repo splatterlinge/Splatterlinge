@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <float.h>
+#include <stddef.h>
 
 
 Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
@@ -21,7 +22,7 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 	mOffset = offset;
 	mToMapFactor = QSizeF( (float)mMapSize.width()/(float)mSize.x(), (float)mMapSize.height()/(float)mSize.z() );
 
-	mVertices.clear();
+	mVertices.resize( mMapSize.width() * mMapSize.height() );
 
 	// prepare positions
 	QVector<QVector3D> rawPositions;
@@ -39,10 +40,10 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 	// smoothed positions
 #define rawPosition(x,y) (rawPositions[(x)+(y)*mMapSize.width()])
 	for( int w=0; w<mMapSize.width(); w++ )
-		mVertices.push_back( rawPosition( w, 0 ) );
+		vertex( w, 0 ).position = rawPosition( w, 0 );
 	for( int h=1; h<mMapSize.height()-1; h++ )
 	{
-		mVertices.push_back( rawPosition( 0, h ) );
+		vertex( 0, h ).position = rawPosition( 0, h );
 		for( int w=1; w<mMapSize.width()-1; w++ )
 		{
 			QVector3D smoothed = QVector3D(0,0,0);
@@ -56,53 +57,53 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 			smoothed += rawPosition( w  , h+1 );
 			smoothed += rawPosition( w+1, h+1 );
 			smoothed /= 9.0f;
-			mVertices.push_back( smoothed );
+			vertex( w, h ).position = smoothed;
 		}
-		mVertices.push_back( rawPosition( mMapSize.width()-1, h ) );
+		vertex( mMapSize.width()-1, h ).position = rawPosition( mMapSize.width()-1, h );
 	}
 	for( int w=0; w<mMapSize.width(); w++ )
-		mVertices.push_back( rawPosition( w, mMapSize.height()-1 ) );
+		vertex( w, mMapSize.height()-1 ).position = rawPosition( w,  mMapSize.height()-1 );
 #undef rawPosition
 	// normals
 	for( int h=0; h<mMapSize.height()-1; h++ )
 	{
 		for( int w=0; w<mMapSize.width()-1; w++ )
 		{
-			mVertices.push_back( QVector3D::normal(
-				getVertexPosition(w,h),
-				getVertexPosition(w,h+1),
-				getVertexPosition(w+1,h)
-			) );
+			vertex( w, h ).normal = QVector3D::normal(
+				getVertexPosition( w,   h ),
+				getVertexPosition( w,   h+1 ),
+				getVertexPosition( w+1, h )
+			);
 		}
-		mVertices.push_back( QVector3D(0,1,0) );	// last vertex in row
+		vertex( mMapSize.width()-1, h ).normal = QVector3D(0,1,0);	// last vertex in row
 	}
-	for( int w=0; w<mMapSize.width(); w++ )	// last row
+	for( int w=0; w<mMapSize.width(); w++ )
 	{
-		mVertices.push_back( QVector3D(0,1,0) );
+		vertex( w, mMapSize.height()-1 ).normal = QVector3D(0,1,0);	// last row
 	}
 	// texture coordinates
 	for( int h=0; h<mMapSize.height(); h++ )
 	{
 		for( int w=0; w<mMapSize.width(); w++ )
 		{
-			mVertices.push_back( QVector3D( w, h, 0 ) );
+			vertex( w, h ).texCoord = QVector2D( w, h );
 		}
 	}
 	mVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
 	mVertexBuffer.create();
 	mVertexBuffer.bind();
 	mVertexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
-	mVertexBuffer.allocate( mVertices.data(), mVertices.size()*sizeof(QVector3D) );
+	mVertexBuffer.allocate( mVertices.data(), mVertices.size()*sizeof(Vertex) );
 	mVertexBuffer.release();
 
 	// indices
 	QVector<unsigned int> indices;
-	for( int h=0; h<mMapSize.height()-1; h++ )
+	for( int h=0; h<mMapSize.height()-1; ++h )
 	{
-		for( int w=0; w<mMapSize.width(); w++ )
+		for( int w=0; w<mMapSize.width(); ++w )
 		{
-			indices.push_back( w + h*mMapSize.width() );
-			indices.push_back( w + (h+1)*mMapSize.width() );
+			indices.push_back( w + h*(unsigned int)mMapSize.width() );
+			indices.push_back( w + (h+1)*(unsigned int)mMapSize.width() );
 		}
 	}
 	mIndexBuffer = QGLBuffer( QGLBuffer::IndexBuffer );
@@ -136,10 +137,10 @@ void Terrain::drawPatchMap( const QRect & rect )
 	glEnableClientState( GL_INDEX_ARRAY );
 	glEnableClientState( GL_NORMAL_ARRAY );
 	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	
-	glVertexPointer( 3, GL_FLOAT, 0, 0 );
-	glNormalPointer( GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)) );
-	glTexCoordPointer( 3, GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)*2) );
+
+	glVertexPointer( 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,position) );
+	glNormalPointer( GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,normal) );
+	glTexCoordPointer( 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,texCoord) );
 
 	for( int slice=rectToDraw.y(); slice<rectToDraw.y()+rectToDraw.height(); slice++ )
 	{
@@ -171,9 +172,9 @@ void Terrain::draw()
 	glEnableClientState( GL_NORMAL_ARRAY );
 	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 
-	glVertexPointer( 3, GL_FLOAT, 0, 0 );
-	glNormalPointer( GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)) );
-	glTexCoordPointer( 3, GL_FLOAT, 0, (void*)((size_t)mMapSize.width()*mMapSize.height()*sizeof(QVector3D)*2) );
+	glVertexPointer( 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,position) );
+	glNormalPointer( GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,normal) );
+	glTexCoordPointer( 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,texCoord) );
 
 	for( int slice=0; slice<mMapSize.height()-1; slice++ )
 	{
@@ -196,10 +197,33 @@ void Terrain::draw()
 }
 
 
-float Terrain::getHeight( const QVector3D & position ) const
+bool Terrain::getTriangle( const QPointF & position, Triangle & t ) const
 {
-	QPointF posF = toMapF( position );
-	QPoint pos = QPoint( posF.x(), posF.y() );
+	QPoint pos = QPoint( position.x(), position.y() );
+
+	if( pos.x() >= mMapSize.width()-1 || pos.y() >= mMapSize.height()-1 || pos.x() < 0 || pos.y() < 0 )
+		return false;
+
+	QPointF fraction = QPointF( position.x()-(float)pos.x(), position.y()-(float)pos.y() );
+
+	if( fraction.x() + fraction.y() < 1.0f )
+	{
+		t.setP( getVertexPosition( pos.x(), pos.y() ) );
+		t.setQ( getVertexPosition( pos.x(), pos.y()+1 ) );
+		t.setR( getVertexPosition( pos.x()+1, pos.y() ) );
+	} else {
+		t.setP( getVertexPosition( pos.x()+1, pos.y()+1 ) );
+		t.setQ( getVertexPosition( pos.x()+1, pos.y() ) );
+		t.setR( getVertexPosition( pos.x(), pos.y()+1 ) );
+	}
+
+	return true;
+}
+
+
+Triangle Terrain::getTriangle( const QPointF & position ) const
+{
+	QPoint pos = QPoint( position.x(), position.y() );
 
 	if( pos.x() >= mMapSize.width()-1 )
 		pos.setX( mMapSize.width()-2 );
@@ -210,35 +234,66 @@ float Terrain::getHeight( const QVector3D & position ) const
 	if( pos.y() < 0 )
 		pos.setY( 0 );
 
-	posF = QPointF( posF.x()-(float)pos.x(), posF.y()-(float)pos.y() );
-
-	QVector3D v1;
-	QVector3D v2;
-	QVector3D v3;
-
-	if( posF.x() + posF.y() < 1.0f )
+	QPointF fraction = QPointF( position.x()-(float)pos.x(), position.y()-(float)pos.y() );
+	if( fraction.x() + fraction.y() < 1.0f )
 	{
-		v1 = getVertexPosition( pos.x(), pos.y() );
-		v2 = getVertexPosition( pos.x(), pos.y()+1 );
-		v3 = getVertexPosition( pos.x()+1, pos.y() );
-	} else {
-		v1 = getVertexPosition( pos.x()+1, pos.y()+1 );
-		v2 = getVertexPosition( pos.x()+1, pos.y() );
-		v3 = getVertexPosition( pos.x(), pos.y()+1 );
+		return Triangle(
+			getVertexPosition( pos.x(), pos.y() ),
+			getVertexPosition( pos.x(), pos.y()+1 ),
+			getVertexPosition( pos.x()+1, pos.y() )
+		);
 	}
-
-	QVector3D normal = QVector3D::normal( v1, v2, v3 );
-	return ( (normal.x()*(position.x()-v1.x())) + (normal.z()*(position.z()-v1.z())) ) / ( -normal.y() ) + v1.y();
+	return Triangle(
+		getVertexPosition( pos.x()+1, pos.y()+1 ),
+		getVertexPosition( pos.x()+1, pos.y() ),
+		getVertexPosition( pos.x(), pos.y()+1 )
+	);
 }
 
 
-bool Terrain::getLineQuadIntersection( const QVector3D & origin, const QVector3D & direction, const QPoint & quadMapCoord, float * length ) const
+bool Terrain::getHeight( const QPointF & position, float & height ) const
+{
+	Triangle t;
+	if( !getTriangle( toMapF(position), t ) )
+		return false;
+	QVector3D normal = t.normal();
+	height = ( (normal.x()*(position.x()-t.p().x())) + (normal.z()*(position.y()-t.p().z())) ) / ( -normal.y() ) + t.p().y();
+	return true;
+}
+
+
+float Terrain::getHeight( const QPointF & position ) const
+{
+	Triangle t = getTriangle( toMapF(position) );
+	QVector3D normal = t.normal();
+	return ( (normal.x()*(position.x()-t.p().x())) + (normal.z()*(position.y()-t.p().z())) ) / ( -normal.y() ) + t.p().y();
+}
+
+
+bool Terrain::getNormal( const QPointF & position, QVector3D & normal ) const
+{
+	Triangle t;
+	if( !getTriangle( toMapF(position), t ) )
+		return false;
+	normal = t.normal();
+	return true;
+}
+
+
+QVector3D Terrain::getNormal( const QPointF & position ) const
+{
+	Triangle t = getTriangle( toMapF(position) );
+	return t.normal();
+}
+
+
+bool Terrain::getLineQuadIntersection( const QVector3D & origin, const QVector3D & direction, const QPoint & quadMapCoord, float & length ) const
 {
 	QPoint pos = quadMapCoord;
-	if( pos.x() >= mMapSize.width() )
-		pos.setX( mMapSize.width()-1 );
-	if( pos.y() >= mMapSize.height() )
-		pos.setY( mMapSize.height()-1 );
+	if( pos.x() >= mMapSize.width()-1 )
+		pos.setX( mMapSize.width()-2 );
+	if( pos.y() >= mMapSize.height()-1 )
+		pos.setY( mMapSize.height()-2 );
 	if( pos.x() < 0 )
 		pos.setX( 0 );
 	if( pos.y() < 0 )
@@ -254,9 +309,9 @@ bool Terrain::getLineQuadIntersection( const QVector3D & origin, const QVector3D
 
 	if( t1.intersectRay( origin, direction, &intersectionDistance ) )
 	{
-		if( intersectionDistance < *length )
+		if( intersectionDistance < length )
 		{
-			*length = intersectionDistance;
+			length = intersectionDistance;
 			return true;
 		}
 	}
@@ -269,9 +324,9 @@ bool Terrain::getLineQuadIntersection( const QVector3D & origin, const QVector3D
 
 	if( t2.intersectRay( origin, direction, &intersectionDistance ) )
 	{
-		if( intersectionDistance < *length )
+		if( intersectionDistance < length )
 		{
-			*length = intersectionDistance;
+			length = intersectionDistance;
 			return true;
 		}
 	}
@@ -280,10 +335,10 @@ bool Terrain::getLineQuadIntersection( const QVector3D & origin, const QVector3D
 }
 
 
-bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float * length ) const
+bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length ) const
 {
 	QPoint mapFrom = toMap( origin );
-	QPoint mapTo = toMap( origin + direction * (*length) );
+	QPoint mapTo = toMap( origin + direction * length );
 
 	int x = mapFrom.x();
 	int y = mapFrom.y();
@@ -307,7 +362,9 @@ bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & d
 		intersects |= getLineQuadIntersection( origin, direction, QPoint(x+ox, y+oy), length );
 		intersects |= getLineQuadIntersection( origin, direction, QPoint(x-ox, y-oy), length );
 		if( intersects )
+		{
 			return true;
+		}
 
 		if( x == mapTo.x() && y == mapTo.y() )
 			break;
@@ -325,4 +382,13 @@ bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & d
 		}
 	}
 	return false;
+}
+
+
+bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D & normal ) const
+{
+	if( !getLineIntersection( origin, direction, length ) )
+		return false;
+	normal = getNormal( origin + direction*length );
+	return true;
 }

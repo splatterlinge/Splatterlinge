@@ -2,6 +2,7 @@
 #define GEOMETRY_TERRAIN_INCLUDED
 
 #include <GLWidget.hpp>
+#include <utility/Triangle.hpp>
 
 #include <QString>
 #include <QPoint>
@@ -92,26 +93,50 @@ public:
 	const QVector3D & size() const { return mSize; }	///< The size of the terrain.
 	const QVector3D & offset() const { return mOffset; }	///< The offset of the terrain.
 	
-	const QVector3D & getVertexPosition( const int & x, const int & y ) const;	///< Direct access to the vertex-position at heightmap coordinates.
-	const QVector3D & getVertexPosition( const QPoint & p ) const;		///< Direct access to the vertex-position at heightmap coordinates.
-	const QVector3D & getVertexNormal( const int & x, const int & y ) const;	///< Direct access to the vertex-normal at heightmap coordinates.
-	const QVector3D & getVertexNormal( const QPoint & p ) const;		///< Direct access to the vertex-normal at heightmap coordinates.
+	const QVector3D & getVertexPosition( const int & x, const int & y ) const;	///< The vertex at heightmap coordinates.
+	const QVector3D & getVertexPosition( const QPoint & p ) const;			///< The vertex at heightmap coordinates.
+	const QVector3D & getVertexNormal( const int & x, const int & y ) const;	///< The normal at heightmap coordinates.
+	const QVector3D & getVertexNormal( const QPoint & p ) const;			///< The normal at heightmap coordinates.
 
-	float getHeight( const QVector3D & position ) const;	///< Calculates the height of the terrain at given position.
-
-	/// Calculates the intersection distance to a single terrain quad. length is used as input and output.
-	bool getLineQuadIntersection( const QVector3D & origin, const QVector3D & direction, const QPoint & quadMapCoord, float * length ) const;
+	bool getTriangle( const QVector3D & position, Triangle & t ) const;
+	bool getTriangle( const QPointF & position, Triangle & t ) const;
+	Triangle getTriangle( const QVector3D & position ) const;
+	Triangle getTriangle( const QPointF & position ) const;
+	bool getNormal( const QVector3D & position, QVector3D & normal ) const;
+	bool getNormal( const QPointF & position, QVector3D & normal ) const;
+	QVector3D getNormal( const QVector3D & position ) const;
+	QVector3D getNormal( const QPointF & position ) const;
+	bool getHeight( const QVector3D & position, float & height ) const;
+	bool getHeight( const QPointF & position, float & height ) const;
+	float getHeight( const QVector3D & position ) const;
+	float getHeight( const QPointF & position ) const;
 
 	/// Calculates the intersection distance to the terrain. length is used as input and output.
-	bool getLineIntersection( const QVector3D & origin, const QVector3D & direction, float * length ) const;
+	bool getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & lengthl ) const;
+
+	/// Calculates the intersection distance to the terrain. length is used as input and output.
+	bool getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D & normal ) const;
 
 protected:
 
 private:
+	class Vertex
+	{
+	public:
+		Vertex() : position(), normal(0,1,0), texCoord() {}
+		QVector3D position;
+		QVector3D normal;
+		QVector2D texCoord;
+	};
+	Vertex & vertex( const int & x, const int & y );
+	Vertex & vertex( const QPoint & p );
+
+	bool getLineQuadIntersection( const QVector3D & origin, const QVector3D & direction, const QPoint & quadMapCoord, float & length ) const;
+
 	QSize mMapSize;
 	QVector3D mOffset;
 	QVector3D mSize;
-	QVector<QVector3D> mVertices;
+	QVector<Vertex> mVertices;
 	QGLBuffer mIndexBuffer;
 	QGLBuffer mVertexBuffer;
 	QSizeF mToMapFactor;
@@ -190,9 +215,45 @@ inline QRect Terrain::toMap( const QRectF & rect ) const
 }
 
 
+inline bool Terrain::getTriangle( const QVector3D & position, Triangle & t ) const
+{
+	return getTriangle( QPointF(position.x(),position.z()), t );
+}
+
+
+inline Triangle Terrain::getTriangle( const QVector3D & position ) const
+{
+	return getTriangle( QPointF(position.x(),position.z()) );
+}
+
+
+inline bool Terrain::getNormal( const QVector3D & position, QVector3D & normal ) const
+{
+	return getNormal( QPointF(position.x(),position.z()), normal );
+}
+
+
+inline QVector3D Terrain::getNormal( const QVector3D & position ) const
+{
+	return getNormal( QPointF(position.x(),position.z()) );
+}
+
+
+inline bool Terrain::getHeight( const QVector3D & position, float & height ) const
+{
+	return getHeight( QPointF(position.x(),position.z()), height );
+}
+
+
+inline float Terrain::getHeight( const QVector3D & position ) const
+{
+	return getHeight( QPointF(position.x(),position.z()) );
+}
+
+
 inline const QVector3D & Terrain::getVertexPosition( const int & x, const int & y ) const
 {
-	return mVertices[x+y*mMapSize.width()];
+	return mVertices[x+y*mMapSize.width()].position;
 }
 
 
@@ -204,13 +265,25 @@ inline const QVector3D & Terrain::getVertexPosition( const QPoint & p ) const
 
 inline const QVector3D & Terrain::getVertexNormal( const int & x, const int & y ) const
 {
-	return mVertices[mMapSize.width()*mMapSize.height() + x+y*mMapSize.width()];
+	return mVertices[x+y*mMapSize.width()].normal;
 }
 
 
 inline const QVector3D & Terrain::getVertexNormal( const QPoint & p ) const
 {
 	return getVertexNormal( p.x(), p.y() );
+}
+
+
+inline Terrain::Vertex & Terrain::vertex( const int & x, const int & y )
+{
+	return mVertices[x+y*mMapSize.width()];
+}
+
+
+inline Terrain::Vertex & Terrain::vertex( const QPoint & p )
+{
+	return vertex( p.x(), p.y() );
 }
 
 

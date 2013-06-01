@@ -136,12 +136,15 @@ void World::updateSelf( const double & delta )
 
 	mSky->setTimeOfDay( mTimeOfDay );
 
-	float landscapeHeight = mLandscape->terrain()->getHeight( scene()->eye()->position() );
-	if( scene()->eye()->position().y() < landscapeHeight + 2 )
-		scene()->eye()->setPositionY( landscapeHeight + 2 );
+	float landscapeHeight;
+	if( mLandscape->terrain()->getHeight( scene()->eye()->position(), landscapeHeight ) )
+	{
+		if( scene()->eye()->position().y() < landscapeHeight + 2 )
+			scene()->eye()->setPositionY( landscapeHeight + 2 );
+	}
 
 	float length = 300.0f;
-	if( getLineIntersection( scene()->eye()->position(), -scene()->eye()->direction(), &length ) )
+	if( getLineIntersection( scene()->eye()->position(), -scene()->eye()->direction(), length, mTargetNormal ) )
 		mTarget = scene()->eye()->position() - scene()->eye()->direction() * length;
 
 	if( mDragTeapot )
@@ -178,7 +181,7 @@ void World::drawSelf()
 	glLight( GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.0f );
 	glEnable( GL_LIGHT1 );
 
-	glFog( GL_FOG_COLOR, mSky->fogColor() );
+	glFog( GL_FOG_COLOR, mSky->baseColor() );
 	glFog( GL_FOG_START, scene()->eye()->farPlane()*0.9f );
 	glFog( GL_FOG_END, scene()->eye()->farPlane()*1.1f );
 }
@@ -202,15 +205,18 @@ void World::drawSelfPost()
 		glColor3f( 1,0,0 );
 		glVertex3f( mTarget.x(), mTarget.y(), mTarget.z() );
 		glVertex3f( mTarget.x()+1, mTarget.y()+1, mTarget.z()+1 );
+		glColor3f( 1,1,1 );
+		glVertex3f( mTarget.x(), mTarget.y(), mTarget.z() );
+		glVertex3f( mTarget.x()+mTargetNormal.x(), mTarget.y()+mTargetNormal.y(), mTarget.z()+mTargetNormal.z() );
 	glEnd();
 }
 
 
-QSharedPointer<AObject> World::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float * length )
+QSharedPointer<AObject> World::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D & normal )
 {
 	QSharedPointer<AObject> target;
 
-	if( mLandscape->terrain()->getLineIntersection( origin, direction, length ) )
+	if( mLandscape->terrain()->getLineIntersection( origin, direction, length, normal ) )
 		target = mLandscape;
 
 	// Add checks to other objects here, if they are closer set target accordingly

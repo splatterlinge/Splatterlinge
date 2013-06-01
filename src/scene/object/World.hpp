@@ -38,7 +38,7 @@ public:
 	virtual void mouseMoveEvent( QGraphicsSceneMouseEvent * event );
 	virtual void wheelEvent( QGraphicsSceneWheelEvent * event );
 
-	QSharedPointer<AObject> getLineIntersection( const QVector3D & origin, const QVector3D & direction, float * length );
+	QSharedPointer<AObject> getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D & normal );
 
 private:
 	bool mTimeLapse;
@@ -50,6 +50,7 @@ private:
 	QSharedPointer<WavefrontObject> mTable;
 	QSharedPointer<WavefrontObject> mTree;
 	QVector3D mTarget;
+	QVector3D mTargetNormal;
 	bool mDragTeapot;
 	SplatterSystem * mSplatterSystem;
 };
