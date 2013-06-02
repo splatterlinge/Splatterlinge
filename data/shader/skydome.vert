@@ -5,7 +5,7 @@ varying vec3 vViewDir;
 
 void main()
 {
-	vViewDir = normalize( gl_Vertex.xyz );
+	vViewDir = gl_Vertex.xyz;
 	gl_Position = ftransform();
 	gl_ClipVertex = gl_ModelViewMatrix * gl_Vertex;
 }

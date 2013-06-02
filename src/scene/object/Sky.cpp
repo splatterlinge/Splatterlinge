@@ -92,6 +92,73 @@ Sky::Sky( Scene * scene, QString name ) :
 		QString starMapPathNZ = "./data/sky/"+name+"/"+s.value( "negativeZ", "star.nz.png").toString();
 	s.endGroup();
 
+	s.beginGroup( "CloudPlane" );
+		QString cloudMapPath = "./data/sky/"+name+"/"+s.value( "map", "clouds.png").toString();
+		float cloudScale = s.value( "scale", 10.0f ).toFloat();
+		float cloudCurvature = s.value( "curvature", 1.5f ).toFloat();
+		float cloudOffset = s.value( "offset", 1.0f ).toFloat();
+		mCloudCloudiness = s.value( "cloudiness", 0.1f ).toFloat();
+		mCloudSmoothness = s.value( "smoothness", 0.6f ).toFloat();
+		mCloudHorizonFade = s.value( "horizonFade", 8.0f ).toFloat();
+	s.endGroup();
+
+	QImage image( cloudMapPath );
+	if( image.isNull() )
+	{
+		qFatal( "\"%s\" not found!", cloudMapPath.toLocal8Bit().constData() );
+	}
+	mCloudMap = scene->glWidget()->bindTexture( image );
+
+	mCloudPlaneRes = 10;
+	mCloudPlaneVertices.resize( mCloudPlaneRes * mCloudPlaneRes );
+	for( int z = 0; z < mCloudPlaneRes; ++z )
+	{
+		for( int x = 0; x < mCloudPlaneRes; ++x )
+		{
+			float divX = ((float)x/(float)(mCloudPlaneRes-1))*2.0f-1.0f;
+			float divZ = ((float)z/(float)(mCloudPlaneRes-1))*2.0f-1.0f;
+			float a = divX*((float)M_PI/2.0f);
+			float b = divZ*((float)M_PI/2.0f);
+			mCloudPlaneVertices[x+z*mCloudPlaneRes].position = QVector3D(
+				cloudScale * divX,
+				cloudOffset - (2.0f-(cosf(a)+cosf(b)))*cloudCurvature,
+				cloudScale * divZ
+			);
+			mCloudPlaneVertices[x+z*mCloudPlaneRes].texCoord = QVector2D(
+				divX/2.0f,
+				divZ/2.0f
+			);
+		}
+	}
+	mCloudPlaneVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
+	mCloudPlaneVertexBuffer.create();
+	mCloudPlaneVertexBuffer.bind();
+	mCloudPlaneVertexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
+	mCloudPlaneVertexBuffer.allocate( mCloudPlaneVertices.constData(), mCloudPlaneVertices.size()*sizeof(Vertex) );
+	mCloudPlaneVertexBuffer.release();
+
+	mCloudPlaneIndex.resize( 2 * (mCloudPlaneRes-1) * mCloudPlaneRes );
+	for( int z = 0; z < mCloudPlaneRes-1; ++z )
+	{
+		for( int x=0; x<mCloudPlaneRes; ++x )
+		{
+			mCloudPlaneIndex[2*(x+mCloudPlaneRes*z)] = x + z*mCloudPlaneRes;
+			mCloudPlaneIndex[2*(x+mCloudPlaneRes*z)+1] = x + (z+1)*mCloudPlaneRes;
+		}
+	}
+	mCloudPlaneIndexBuffer = QGLBuffer( QGLBuffer::IndexBuffer );
+	mCloudPlaneIndexBuffer.create();
+	mCloudPlaneIndexBuffer.bind();
+	mCloudPlaneIndexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
+	mCloudPlaneIndexBuffer.allocate( mCloudPlaneIndex.constData(), mCloudPlaneIndex.size()*sizeof(unsigned short) );
+	mCloudPlaneIndexBuffer.release();
+	
+	mCloudShader = new Shader( scene->glWidget(), "cloud" );
+	mCloudShader_cloudMap = mCloudShader->program()->uniformLocation( "cloudMap" );
+	mCloudShader_cloudiness = mCloudShader->program()->uniformLocation( "cloudiness" );
+	mCloudShader_smoothness = mCloudShader->program()->uniformLocation( "smoothness" );
+	mCloudShader_horizonFade = mCloudShader->program()->uniformLocation( "horizonFade" );
+
 	if( !sCubeVertexBuffer.isCreated() )
 	{
 		sCubeVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
@@ -99,6 +166,7 @@ Sky::Sky( Scene * scene, QString name ) :
 		sCubeVertexBuffer.bind();
 		sCubeVertexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
 		sCubeVertexBuffer.allocate( sCubeVertices, sizeof(sCubeVertices) );
+		sCubeVertexBuffer.release();
 	}
 
 	if( !sCubeIndexBuffer.isCreated() )
@@ -108,6 +176,7 @@ Sky::Sky( Scene * scene, QString name ) :
 		sCubeIndexBuffer.bind();
 		sCubeIndexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
 		sCubeIndexBuffer.allocate( sCubeIndices, sizeof(sCubeIndices) );
+		sCubeIndexBuffer.release();
 	}
 	
 	mDomeShader = new Shader( scene->glWidget(), "skydome" );
@@ -132,6 +201,7 @@ Sky::Sky( Scene * scene, QString name ) :
 	}
 
 	mStarCubeShader = new Shader( scene->glWidget(), "cube" );
+	mStarCubeShader_cubeMap = mDomeShader->program()->uniformLocation( "cubeMap" );
 
 	glGenTextures( 1, &mStarCubeMap );
 	glBindTexture( GL_TEXTURE_CUBE_MAP, mStarCubeMap );
@@ -229,6 +299,7 @@ void Sky::drawSelf()
 
 	drawStarCube();
 	drawSky();
+	drawCloudPlane();
 
 	glPopMatrix();
 	glPopAttrib();
@@ -241,7 +312,9 @@ void Sky::drawStarCube()
 	glPushMatrix();
 	float angle = mTimeOfDay*(360.0f);
 	glRotatef( angle, mAxis.x(), mAxis.y(), mAxis.z() );
+	glBindTexture( GL_TEXTURE_CUBE_MAP, mStarCubeMap );
 	mStarCubeShader->bind();
+	mStarCubeShader->program()->setUniformValue( mStarCubeShader_cubeMap, 0 );
 	sCubeVertexBuffer.bind();
 	sCubeIndexBuffer.bind();
 	glEnableClientState( GL_VERTEX_ARRAY );
@@ -266,7 +339,7 @@ void Sky::drawSky()
 	mDomeShader->program()->setUniformValue( mDomeShader_timeOfDay, mTimeOfDay );
 	mDomeShader->program()->setUniformValue( mDomeShader_sunSpotPower, mSunSpotPower );
 	mDomeShader->program()->setUniformValue( mDomeShader_diffuseMap, 0 );
-	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, mDomeMap );
+	glBindTexture( GL_TEXTURE_2D, mDomeMap );
 	sCubeVertexBuffer.bind();
 	sCubeIndexBuffer.bind();
 	glEnableClientState( GL_VERTEX_ARRAY );
@@ -280,3 +353,56 @@ void Sky::drawSky()
 	mDomeShader->release();
 	glDisable( GL_BLEND );
 }
+
+
+void Sky::drawCloudPlane()
+{
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_ONE, GL_ONE_MINUS_SRC_ALPHA );
+
+	glBindTexture( GL_TEXTURE_2D, mCloudMap );
+
+	glMatrixMode( GL_TEXTURE );
+	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
+	glTranslatef( mTimeOfDay, 0.0f, 0.0f );
+	glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
+	glTranslatef( mTimeOfDay, mTimeOfDay, 0.0f );
+	glScalef( 0.5, 0.5, 1.0f );
+
+	mCloudShader->bind();
+	mCloudShader->program()->setUniformValue( mCloudShader_cloudMap, 0 );
+	mCloudShader->program()->setUniformValue( mCloudShader_cloudiness, mCloudCloudiness );
+	mCloudShader->program()->setUniformValue( mCloudShader_smoothness, mCloudSmoothness );
+	mCloudShader->program()->setUniformValue( mCloudShader_horizonFade, mCloudHorizonFade );
+	mCloudPlaneVertexBuffer.bind();
+	mCloudPlaneIndexBuffer.bind();
+	glEnableClientState( GL_VERTEX_ARRAY );
+	glEnableClientState( GL_INDEX_ARRAY );
+	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	glVertexPointer( 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,position) );
+	glTexCoordPointer( 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,texCoord) );
+	for( int slice=0; slice<mCloudPlaneRes-1; slice++ )
+	{
+		glDrawElements(
+			GL_TRIANGLE_STRIP,
+			mCloudPlaneRes*2,
+			GL_UNSIGNED_SHORT,
+			(void*)((size_t)(2*sizeof(unsigned short)*(	// convert index to pointer
+				mCloudPlaneRes*slice			// index to start
+			) ) )
+		);
+	}
+	glDisableClientState( GL_VERTEX_ARRAY );
+	glDisableClientState( GL_INDEX_ARRAY );
+	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	mCloudPlaneIndexBuffer.release();
+	mCloudPlaneVertexBuffer.release();
+	mCloudShader->release();
+
+	glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
+	glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
+	glMatrixMode( GL_MODELVIEW );
+
+	glDisable( GL_BLEND );
+}
+

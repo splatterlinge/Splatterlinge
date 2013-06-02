@@ -62,9 +62,27 @@ private:
 	static QGLBuffer sCubeIndexBuffer;
 	static QGLBuffer sCubeVertexBuffer;
 
-	QGLBuffer sCloudPlaneIndexBuffer;
-	QGLBuffer sCloudPlaneVertexBuffer;
+	class Vertex
+	{
+	public:
+		Vertex() : position(), texCoord() {}
+		QVector3D position;
+		QVector2D texCoord;
+	};
+	Shader * mCloudShader;
+	int mCloudShader_cloudMap;
+	int mCloudShader_cloudiness;
+	int mCloudShader_smoothness;
+	int mCloudShader_horizonFade;
+	float mCloudSmoothness;
+	float mCloudCloudiness;
+	float mCloudHorizonFade;
+	QVector<unsigned short> mCloudPlaneIndex;
+	QVector<Vertex> mCloudPlaneVertices;
+	QGLBuffer mCloudPlaneIndexBuffer;
+	QGLBuffer mCloudPlaneVertexBuffer;
 	int mCloudPlaneRes;
+	GLuint mCloudMap;
 
 	QVector4D mBaseColor;
 	QVector4D mAmbient;
@@ -75,6 +93,7 @@ private:
 	QVector3D mAxis;
 
 	Shader * mStarCubeShader;
+	int mStarCubeShader_cubeMap;
 	GLuint mStarCubeMap;
 
 	Shader * mDomeShader;
@@ -100,6 +119,7 @@ private:
 
 	void drawStarCube();
 	void drawSky();
+	void drawCloudPlane();
 };
 
 
