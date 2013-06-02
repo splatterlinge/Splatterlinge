@@ -17,8 +17,8 @@ void main()
 	vec3 sunDir = normalize( vSunDir );
 
 	float depth = cloudiness;
-	depth += texture2D( cloudMap, gl_TexCoord[0].xy );
-	depth -= texture2D( cloudMap, gl_TexCoord[1].xy );
+	depth += texture2D( cloudMap, gl_TexCoord[0].xy ).r;
+	depth -= texture2D( cloudMap, gl_TexCoord[1].xy ).r;
 	depth = max( 0.0, depth );
 
 	float density = pow( depth, smoothness );
