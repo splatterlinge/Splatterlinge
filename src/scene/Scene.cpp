@@ -22,6 +22,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mGLWidget( glWidget ),
 	mEye(0)
 {
+	mPlayer = new Player( this );
 	mFrameCountSecond = 0;
 	mFramesPerSecond = 0;
 	mWireFrame = false;
@@ -104,7 +105,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	secondTimer->start();
 
 	mElapsedTimer.start();
-	
+
 	setMouseGrabbing( true );
 }
 
@@ -198,6 +199,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	mEye->draw();
 	mEye->drawPostProc();
+	mPlayer->draw();
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
