@@ -47,7 +47,7 @@ World::World( Scene * scene, QString name ) :
 
 	scene->addKeyListener( this );
 	scene->addMouseListener( this );
-	
+
 	mSplatterSystem = new SplatterSystem( scene->glWidget(), mLandscape->terrain() );
 	mTarget = QVector3D(0,0,0);
 }
@@ -103,6 +103,11 @@ void World::mousePressEvent( QGraphicsSceneMouseEvent * event )
 	if( event->button() == Qt::RightButton )
 	{
 		mDragTeapot = true;
+	}
+
+	if( event->button() == Qt::LeftButton )
+	{
+		mSplatterSystem->spray( mTarget+QVector3D(0,3,0), 30.0f );
 	}
 }
 
