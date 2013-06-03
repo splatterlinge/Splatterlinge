@@ -21,8 +21,11 @@ public:
 	virtual ~Eye();
 
 	virtual void updateSelf( const double & delta );
+	virtual void updateSelfPost( const double & delta );
 	virtual void drawSelf();
 	virtual void drawSelfPost();
+
+	void attach( QWeakPointer<AObject> object );
 
 	float fov() const { return mFOV; }
 	float nearPlane() const { return mNearPlane; }
@@ -43,6 +46,7 @@ protected:
 	void updateMatrix() const;
 
 private:
+	QWeakPointer<AObject> mAttached;
 	QMap<int,QVector4D> mClippingPlanes;
 	float mFOV;
 	float mNearPlane;

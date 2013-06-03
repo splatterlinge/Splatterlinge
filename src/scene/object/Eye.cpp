@@ -31,6 +31,7 @@ Eye::~Eye()
 void Eye::updateMatrix() const
 {
 	mMatrix.setToIdentity();
+	mMatrix.rotate( 180.0f, QVector3D( 0, 1, 0 ) );
 	mMatrix.rotate( -rotation() );
 	mMatrix.translate( -position() );
 }
@@ -44,6 +45,16 @@ void Eye::updateSelf( const double & delta )
 	alListenerv( AL_ORIENTATION, listenerOri );
 //	ALfloat listenerVel[]={0.0,0.0,0.0};
 //	alListenerfv( AL_VELOCITY, listenerVel);
+}
+
+
+void Eye::updateSelfPost( const double & delta )
+{
+	if( !mAttached.isNull() )
+	{
+		setPosition( mAttached.data()->position() );
+		setRotation( mAttached.data()->rotation() );
+	}
 }
 
 
@@ -200,4 +211,10 @@ bool Eye::isSphereInFrustum( QVector3D center, float radius ) const
 	if( mFrustum[p].x() * center.x() + mFrustum[p].y() * center.y() + mFrustum[p].z() * center.z() + mFrustum[p].w() <= -radius )
 		return false;
 	return true;
+}
+
+
+void Eye::attach( QWeakPointer< AObject > object )
+{
+	mAttached = object;
 }

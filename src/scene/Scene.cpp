@@ -22,18 +22,9 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mGLWidget( glWidget ),
 	mEye(0)
 {
-	mPlayer = new Player( this );
 	mFrameCountSecond = 0;
 	mFramesPerSecond = 0;
 	mWireFrame = false;
-
-	mForwardPressed = false;
-	mLeftPressed = false;
-	mBackwardPressed = false;
-	mRightPressed = false;
-	mUpPressed = false;
-	mDownPressed = false;
-	mSpeedPressed = false;
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
 
@@ -140,42 +131,6 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	glPushAttrib( GL_ALL_ATTRIB_BITS );
 
-	static float rotateX = 0.0f;
-	static float rotateY = 0.0f;
-	rotateY += mDrag.x()/5.0f;
-	rotateX += mDrag.y()/5.0f;
-	mDrag = QPoint( 0, 0 );
-	QQuaternion qX = QQuaternion::fromAxisAndAngle( 1,0,0, rotateX );
-	QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, rotateY );
-	mEye->setRotation( qX * qY );
-
-	float moveX = 0.0f;
-	float moveY = 0.0f;
-	float moveZ = 0.0f;
-	if( mForwardPressed )
-		moveZ -= 1.0f;
-	if( mBackwardPressed )
-		moveZ += 1.0f;
-	if( mLeftPressed )
-		moveX -= 1.0f;
-	if( mRightPressed )
-		moveX += 1.0f;
-	if( mUpPressed )
-		moveY += 1.0f;
-	if( mDownPressed )
-		moveY -= 1.0f;
-	if( mSpeedPressed )
-	{
-		moveX *= 300.0*mDelta;
-		moveY *= 300.0*mDelta;
-		moveZ *= 300.0*mDelta;
-	} else {
-		moveX *= 50.0*mDelta;
-		moveY *= 50.0*mDelta;
-		moveZ *= 50.0*mDelta;
-	}
-	mEye->setPosition( mEye->position() + moveX*mEye->left() + moveY*mEye->up() + moveZ*mEye->direction() );
-
 	mEye->update( mDelta );
 
 	glMatrixMode( GL_TEXTURE );	glPushMatrix();	glLoadIdentity();
@@ -199,7 +154,6 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	mEye->draw();
 	mEye->drawPostProc();
-	mPlayer->draw();
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
@@ -257,15 +211,12 @@ void Scene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 
 	if( isMouseGrabbing() )
 	{
-		mDrag += event->scenePos() - QPointF( width()/2, height()/2 );
-		QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
-
+		MouseMoveEvent mouseMoveEvent( event->scenePos() - QPointF( width()/2, height()/2 ) );
 		QList< AMouseListener* >::iterator i;
 		for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
-			(*i)->mouseMoveEvent( event );
-		event->accept();
+			(*i)->mouseMoveEvent( &mouseMoveEvent );
+		QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
 	}
-	event->ignore();
 }
 
 
@@ -301,7 +252,7 @@ void Scene::wheelEvent( QGraphicsSceneWheelEvent * event )
 
 	QList< AMouseListener* >::iterator i;
 	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
-		(*i)->wheelEvent( event );
+		(*i)->mouseWheelEvent( event );
 }
 
 
@@ -317,35 +268,14 @@ void Scene::keyPressEvent( QKeyEvent * event )
 
 	switch( event->key() )
 	{
-	case Qt::Key_W:
-		mForwardPressed = true;
-		break;
-	case Qt::Key_A:
-		mLeftPressed = true;
-		break;
-	case Qt::Key_S:
-		mBackwardPressed = true;
-		break;
-	case Qt::Key_D:
-		mRightPressed = true;
-		break;
-	case Qt::Key_Space:
-		mUpPressed = true;
-		break;
-	case Qt::Key_Shift:
-		mSpeedPressed = true;
-		break;
-	case Qt::Key_Control:
-		mDownPressed = true;
-		break;
 	case Qt::Key_Escape:
 		setMouseGrabbing( !isMouseGrabbing() );
 		break;
 	default:
-		event->ignore();
 		return;
 	}
 	event->accept();
+
 }
 
 
@@ -358,33 +288,4 @@ void Scene::keyReleaseEvent( QKeyEvent * event )
 	QList< AKeyListener* >::iterator i;
 	for( i = mKeyListeners.begin(); i != mKeyListeners.end(); ++i )
 		(*i)->keyReleaseEvent( event );
-
-	switch( event->key() )
-	{
-	case Qt::Key_W:
-		mForwardPressed = false;
-		break;
-	case Qt::Key_A:
-		mLeftPressed = false;
-		break;
-	case Qt::Key_S:
-		mBackwardPressed = false;
-		break;
-	case Qt::Key_D:
-		mRightPressed = false;
-		break;
-	case Qt::Key_Space:
-		mUpPressed = false;
-		break;
-	case Qt::Key_Shift:
-		mSpeedPressed = false;
-		break;
-	case Qt::Key_Control:
-		mDownPressed = false;
-		break;
-	default:
-		event->ignore();
-		return;
-	}
-	event->accept();
 }

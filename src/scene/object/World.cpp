@@ -7,6 +7,7 @@
 #include "Teapot.hpp"
 #include "WavefrontObject.hpp"
 #include "Sky.hpp"
+#include "Player.hpp"
 
 #include <QPainter>
 #include <QSettings>
@@ -28,6 +29,10 @@ World::World( Scene * scene, QString name ) :
 	mLandscape = QSharedPointer<Landscape>( new Landscape( scene, landscapeName ) );
 	add( mLandscape );
 
+	mPlayer = QSharedPointer<Player>( new Player( scene, this ) );
+	add( mPlayer );
+	scene->eye()->attach( mPlayer );
+
 	mTeapot = QSharedPointer<Teapot>( new Teapot( scene, 4 ) );
 	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QVector3D(0,0,0) ) + 3 );
 	add( mTeapot );
@@ -48,14 +53,16 @@ World::World( Scene * scene, QString name ) :
 	scene->addKeyListener( this );
 	scene->addMouseListener( this );
 
-	mSplatterSystem = new SplatterSystem( scene->glWidget(), mLandscape->terrain() );
 	mTarget = QVector3D(0,0,0);
+
+	mSplatterSystem = new SplatterSystem( scene->glWidget(), mLandscape->terrain() );
 }
 
 
 World::~World()
 {
 	scene()->removeKeyListener( this );
+	scene()->removeMouseListener( this );
 	delete mSplatterSystem;
 }
 
@@ -92,7 +99,7 @@ void World::keyReleaseEvent( QKeyEvent * event )
 }
 
 
-void World::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
+void World::mouseMoveEvent( MouseMoveEvent * event )
 {
 
 }
@@ -103,11 +110,6 @@ void World::mousePressEvent( QGraphicsSceneMouseEvent * event )
 	if( event->button() == Qt::RightButton )
 	{
 		mDragTeapot = true;
-	}
-
-	if( event->button() == Qt::LeftButton )
-	{
-		mSplatterSystem->spray( mTarget+QVector3D(0,3,0), 30.0f );
 	}
 }
 
@@ -121,9 +123,8 @@ void World::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 }
 
 
-void World::wheelEvent( QGraphicsSceneWheelEvent * event )
+void World::mouseWheelEvent( QGraphicsSceneWheelEvent * event )
 {
-	mSplatterSystem->spray( mTarget+QVector3D(0,3,0), 30.0f );
 }
 
 
@@ -141,24 +142,21 @@ void World::updateSelf( const double & delta )
 
 	mSky->setTimeOfDay( mTimeOfDay );
 
-	float landscapeHeight;
-	if( mLandscape->terrain()->getHeight( scene()->eye()->position(), landscapeHeight ) )
-	{
-		if( scene()->eye()->position().y() < landscapeHeight + 2 )
-			scene()->eye()->setPositionY( landscapeHeight + 2 );
-	}
+	mSplatterSystem->update( delta );
+}
 
+
+void World::updateSelfPost( const double & delta )
+{
 	float length = 300.0f;
-	if( getLineIntersection( scene()->eye()->position(), -scene()->eye()->direction(), length, mTargetNormal ) )
-		mTarget = scene()->eye()->position() - scene()->eye()->direction() * length;
+	if( getLineIntersection( mPlayer->position(),mPlayer->direction(), length, mTargetNormal ) )
+		mTarget = mPlayer->position() + mPlayer->direction() * length;
 
 	if( mDragTeapot )
 	{
 		mTeapot->setPosition( mTarget );
 		mTeapot->moveY( 3 );
 	}
-
-	mSplatterSystem->update( delta );
 }
 
 
@@ -195,25 +193,6 @@ void World::drawSelf()
 void World::drawSelfPost()
 {
 	mSplatterSystem->draw();
-
-	glDisable( GL_LIGHTING );
-	glBegin( GL_LINES );
-		glColor3f( 0,1,1 );
-		glVertex3f( mTarget.x(), mTarget.y()+1, mTarget.z() );
-		glVertex3f( mTarget.x(), mTarget.y()-1, mTarget.z() );
-		glColor3f( 1,1,0 );
-		glVertex3f( mTarget.x()+1, mTarget.y(), mTarget.z() );
-		glVertex3f( mTarget.x()-1, mTarget.y(), mTarget.z() );
-		glColor3f( 1,0,1 );
-		glVertex3f( mTarget.x(), mTarget.y(), mTarget.z()+1 );
-		glVertex3f( mTarget.x(), mTarget.y(), mTarget.z()-1 );
-		glColor3f( 1,0,0 );
-		glVertex3f( mTarget.x(), mTarget.y(), mTarget.z() );
-		glVertex3f( mTarget.x()+1, mTarget.y()+1, mTarget.z()+1 );
-		glColor3f( 1,1,1 );
-		glVertex3f( mTarget.x(), mTarget.y(), mTarget.z() );
-		glVertex3f( mTarget.x()+mTargetNormal.x(), mTarget.y()+mTargetNormal.y(), mTarget.z()+mTargetNormal.z() );
-	glEnd();
 }
 
 

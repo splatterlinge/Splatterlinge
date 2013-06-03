@@ -97,7 +97,7 @@ public:
 	/// Abstract method for drawing this object
 	virtual void drawSelf() = 0;
 	/// Executed after all sub-objects are updated
-	virtual void updateSelfPost( const float & delta ) {};
+	virtual void updateSelfPost( const double & delta ) {};
 	/// Executed after all sub-objects are drawn
 	virtual void drawSelfPost() {};
 	///TODO: Find a better name

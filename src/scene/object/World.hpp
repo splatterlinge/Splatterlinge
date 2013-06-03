@@ -7,6 +7,7 @@
 #include "AObject.hpp"
 
 
+class Player;
 class Sky;
 class Landscape;
 class Teapot;
@@ -28,6 +29,7 @@ public:
 	virtual ~World();
 
 	virtual void updateSelf( const double & delta );
+	virtual void updateSelfPost( const double & delta );
 	virtual void drawSelf();
 	virtual void drawSelfPost();
 
@@ -35,8 +37,13 @@ public:
 	virtual void keyReleaseEvent( QKeyEvent * event );
 	virtual void mousePressEvent( QGraphicsSceneMouseEvent * event );
 	virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
-	virtual void mouseMoveEvent( QGraphicsSceneMouseEvent * event );
-	virtual void wheelEvent( QGraphicsSceneWheelEvent * event );
+	virtual void mouseMoveEvent( MouseMoveEvent * event );
+	virtual void mouseWheelEvent( QGraphicsSceneWheelEvent * event );
+
+	SplatterSystem * splatterSystem() { return mSplatterSystem; }
+
+	QSharedPointer<Landscape> landscape() { return mLandscape; }
+	QSharedPointer<Sky> sky() { return mSky; }
 
 	QSharedPointer<AObject> getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D & normal );
 
@@ -46,6 +53,7 @@ private:
 	float mTimeOfDay;
 	QSharedPointer<Sky> mSky;
 	QSharedPointer<Landscape> mLandscape;
+	QSharedPointer<Player> mPlayer;
 	QSharedPointer<Teapot> mTeapot;
 	QSharedPointer<WavefrontObject> mTable;
 	QSharedPointer<WavefrontObject> mTree;

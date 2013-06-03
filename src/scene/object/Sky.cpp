@@ -225,6 +225,7 @@ Sky::~Sky()
 	scene()->glWidget()->deleteTexture( mStarCubeMap );
 	delete mDomeShader;
 	delete mStarCubeShader;
+	delete mCloudShader;
 	sCubeVertexBuffer.destroy();
 	sCubeIndexBuffer.destroy();
 }

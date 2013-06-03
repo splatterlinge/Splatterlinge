@@ -2,7 +2,6 @@
 #define SCENE_INCLUDED
 
 #include "object/Eye.hpp"
-#include "object/Player.hpp"
 #include <utility/alWrappers.hpp>
 
 #include <QGraphicsScene>
@@ -44,9 +43,7 @@ public:
 	GLWidget * glWidget() { return mGLWidget; }
 	AObject * root() { return mEye; }
 	Eye * eye() { return mEye; }
-	Player * player() { return mPlayer; }
 	void setEye( Eye * eye ) { mEye = eye; }
-	void setPlayer( Player * player) { mPlayer = player; }
 	void addKeyListener( AKeyListener * listener ) { mKeyListeners.append( listener ); }
 	void addMouseListener( AMouseListener * listener ) { mMouseListeners.append( listener ); }
 	void removeKeyListener( AKeyListener * listener ) { mKeyListeners.removeOne( listener ); }
@@ -74,23 +71,14 @@ private:
 	double mDelta;
 	int mFrameCountSecond;
 	int mFramesPerSecond;
-	QPointF mDrag;
 	QFont mFont;
 	bool mWireFrame;
 
 	bool mMouseGrabbing;
-	bool mForwardPressed;
-	bool mBackwardPressed;
-	bool mLeftPressed;
-	bool mRightPressed;
-	bool mUpPressed;
-	bool mDownPressed;
-	bool mSpeedPressed;
 
 	QList<AMouseListener*> mMouseListeners;
 	QList<AKeyListener*> mKeyListeners;
 	Eye * mEye;
-	Player * mPlayer;
 
 private slots:
 	void secondPassed();
