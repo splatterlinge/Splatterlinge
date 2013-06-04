@@ -44,7 +44,11 @@ int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * freq
 	////////////////////////////////
 	// RIFF header
 	RIFFHeader riffHeader;
-	fread( &riffHeader, sizeof(RIFFHeader), 1, file );
+	if( !fread( &riffHeader, sizeof(RIFFHeader), 1, file ) )
+	{
+		fclose( file );
+		return -AUDIOLOADER_INVALIDFORMAT;
+	}
 	if( strncmp( riffHeader.chunkID, "RIFF", 4 ) )
 	{
 		fclose( file );
@@ -60,7 +64,11 @@ int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * freq
 	////////////////////////////////
 	// WAVE format header
 	WAVEFormat waveFormat;
-	fread( &waveFormat, sizeof(WAVEFormat), 1, file );
+	if( !fread( &waveFormat, sizeof(WAVEFormat), 1, file ) )
+	{
+		fclose( file );
+		return -AUDIOLOADER_INVALIDFORMAT;
+	}
 	if( strncmp( waveFormat.subChunkID, "fmt ", 4 ) )
 	{
 		fclose( file );
@@ -75,7 +83,11 @@ int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * freq
 	////////////////////////////////
 	// WAVE data header
 	WAVEDataHeader waveDataHeader;
-	fread( &waveDataHeader, sizeof(WAVEDataHeader), 1, file );
+	if( !fread( &waveDataHeader, sizeof(WAVEDataHeader), 1, file ) )
+	{
+		fclose( file );
+		return -AUDIOLOADER_INVALIDFORMAT;
+	}
 	if( strncmp( waveDataHeader.subChunkID, "data", 4 ) )
 	{
 		fclose( file );
@@ -123,8 +135,6 @@ int audioLoader_riffWave( const char * filename, ALuint * buffer, ALsizei * freq
 
 	alGenBuffers( 1, buffer );
 	alBufferData( *buffer, *format, (void*)data, waveDataHeader.subChunkSize, *frequency );
-
 	free( data );
-
 	return 0;
 }

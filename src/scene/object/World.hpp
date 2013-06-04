@@ -2,16 +2,17 @@
 #define SCENE_OBJECT_WORLD_INCLUDED
 
 
-#include "../AKeyListener.hpp"
-#include "../AMouseListener.hpp"
+#include <scene/AKeyListener.hpp>
+#include <scene/AMouseListener.hpp>
+
 #include "AObject.hpp"
+#include "Player.hpp"
+#include "Sky.hpp"
+#include "Landscape.hpp"
+#include "Teapot.hpp"
+#include "WavefrontObject.hpp"
 
 
-class Player;
-class Sky;
-class Landscape;
-class Teapot;
-class WavefrontObject;
 class Shader;
 class TextureRenderer;
 class Material;

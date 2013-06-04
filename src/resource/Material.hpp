@@ -25,7 +25,6 @@ public:
 
 	static type maximum() { return sMaximum; }
 	static void setMaximum( type max ) { sMaximum = max; }
-//	static void setMaximum( type max );
 
 private:
 	static type sMaximum;

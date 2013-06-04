@@ -10,17 +10,6 @@
 
 RESOURCE_CACHE(MaterialData);
 
-/*
-void MaterialQuality::setMaximum( MaterialQuality::type max )
-{
-	sMaximum = max;
-	QHash< QString, QWeakPointer<MaterialData> >::const_iterator i = Material::cache().constBegin();
-	while( i != Material::cache().constEnd() )
-	{
-		++i;
-	}
-}
-*/
 
 GLenum MaterialData::alphaTestFunctionFromString( QString name )
 {
