@@ -211,11 +211,15 @@ void Scene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 
 	if( isMouseGrabbing() )
 	{
-		MouseMoveEvent mouseMoveEvent( event->scenePos() - QPointF( width()/2, height()/2 ) );
-		QList< AMouseListener* >::iterator i;
-		for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
-			(*i)->mouseMoveEvent( &mouseMoveEvent );
-		QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
+		QPointF delta = event->scenePos() - QPoint( width()/2, height()/2 );
+		if( !delta.isNull() )
+		{
+			MouseMoveEvent mouseMoveEvent( delta );
+			QList< AMouseListener* >::iterator i;
+			for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
+				(*i)->mouseMoveEvent( &mouseMoveEvent );
+			QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
+		}
 	}
 }
 

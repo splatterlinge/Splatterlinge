@@ -5,7 +5,8 @@
 
 MainWindow::MainWindow( QWidget * parent) : QMainWindow( parent )
 {
-	QGLFormat glFormat( QGL::DoubleBuffer | QGL::DepthBuffer | QGL::Rgba | QGL::AlphaChannel | QGL::DirectRendering | QGL::SampleBuffers | QGL::NoAccumBuffer );
+//	QGLFormat glFormat( QGL::DoubleBuffer | QGL::DepthBuffer | QGL::Rgba | QGL::AlphaChannel | QGL::DirectRendering | QGL::SampleBuffers | QGL::NoAccumBuffer );
+	QGLFormat glFormat( QGL::DoubleBuffer | QGL::DepthBuffer | QGL::Rgba | QGL::DirectRendering | QGL::NoAccumBuffer );
 	glFormat.setVersion( 2, 1 );
 //	glFormat.setSwapInterval( 1 );
 
