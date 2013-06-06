@@ -4,6 +4,8 @@
 #include "object/World.hpp"
 #include <GLWidget.hpp>
 #include <resource/Material.hpp>
+#include <utility/glWrappers.hpp>
+#include <utility/alWrappers.hpp>
 
 #include <QPainter>
 #include <QTimer>
@@ -11,10 +13,6 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsProxyWidget>
 #include <QCoreApplication>
-
-#include <GL/glu.h>
-#include <AL/alc.h>
-#include <AL/al.h>
 
 
 Scene::Scene( GLWidget * glWidget, QObject * parent ) :
@@ -26,69 +24,9 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mFramesPerSecond = 0;
 	mWireFrame = false;
 
+	mEye = new Eye( this );
+
 	mFont = QFont( "Sans", 12, QFont::Normal );
-
-	const GLubyte * vendorGL = glGetString( GL_VENDOR );
-	qDebug() << "OpenGL: Vendor:\t" << QString((const char*)vendorGL);
-	const GLubyte * rendererGL = glGetString( GL_RENDERER );
-	qDebug() << "OpenGL: Renderer:\t" << QString((const char*)rendererGL);
-	const GLubyte * versionGL = glGetString( GL_VERSION );
-	qDebug() << "OpenGL: Version:\t" << QString((const char*)versionGL);
-	const GLubyte * glslVersionGL = glGetString( GL_SHADING_LANGUAGE_VERSION );
-	qDebug() << "OpenGL: GLSL version:\t" << QString((const char*)glslVersionGL);
-//	const GLubyte * extensionsGL = glGetString( GL_EXTENSIONS );
-//	qDebug() << "OpenGL: Supported extensions:" << QString((const char*)extensionsGL);
-
-//	const ALCchar * extensionsALC = alcGetString( NULL, ALC_EXTENSIONS );
-//	qDebug() << "OpenAL: Supported context extensions:" << extensionsALC;
-#ifdef ALC_ALL_DEVICES_SPECIFIER
-	if( alcIsExtensionPresent( NULL, "ALC_ENUMERATE_ALL_EXT") == AL_TRUE )
-	{
-		const ALCchar * devicesAL = alcGetString( NULL, ALC_ALL_DEVICES_SPECIFIER );
-		if( devicesAL )
-		{
-			qDebug() << "OpenAL: Available devices:";
-			for( const ALchar * d = devicesAL; *d; d += strlen(d)+1 )
-			{
-				qDebug() << " *" << d;
-			}
-		}
-	}
-#else
-	if( alcIsExtensionPresent( NULL, "ALC_ENUMERATE_EXT") == AL_TRUE )
-	{
-		const ALCchar * devicesAL = alcGetString( NULL, ALC_DEVICE_SPECIFIER );
-		if( devicesAL )
-		{
-			qDebug() << "OpenAL: Available devices:";
-			for( const ALchar * d = devicesAL; *d; d += strlen(d)+1 )
-			{
-				qDebug() << " *" << d;
-			}
-		}
-	}
-#endif
-	const ALCchar * defaultDeviceNameAL = NULL;
-#ifdef ALC_DEFAULT_ALL_DEVICES_SPECIFIER
-	defaultDeviceNameAL = alcGetString( NULL, ALC_DEFAULT_ALL_DEVICES_SPECIFIER );
-#else
-	defaultDeviceNameAL = alcGetString( NULL, ALC_DEFAULT_DEVICE_SPECIFIER );
-#endif
-	qDebug() << "OpenAL: Opening default device:\t" << QString(defaultDeviceNameAL);
-	mALDevice = alcOpenDevice( defaultDeviceNameAL );
-	if( !mALDevice )
-		qFatal( "OpenAL: Could not open audio device!" );
-	mALContext = alcCreateContext( mALDevice, NULL );
-	alcMakeContextCurrent( mALContext );
-	const ALCchar * vendorAL = alGetString( AL_VENDOR );
-	qDebug() << "OpenAL: Vendor:\t" << QString(vendorAL);
-	const ALCchar * rendererAL = alGetString( AL_RENDERER );
-	qDebug() << "OpenAL: Renderer:\t" << QString(rendererAL);
-	const ALCchar * versionAL = alGetString( AL_VERSION );
-	qDebug() << "OpenAL: Version:\t" << QString(versionAL);
-//	const ALCchar * extensionsAL = alcGetString( NULL, AL_EXTENSIONS );
-//	qDebug() << "OpenAL: Supported extensions:" << extensionsAL;
-	alGetError();
 
 	QTimer * secondTimer = new QTimer( this );
 	QObject::connect( secondTimer, SIGNAL(timeout()), this, SLOT(secondPassed()) );
@@ -103,9 +41,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 
 Scene::~Scene()
 {
-	alcMakeContextCurrent( NULL );
-	alcDestroyContext( mALContext );
-	alcCloseDevice( mALDevice );
+	delete mEye;
 }
 
 
@@ -139,8 +75,6 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	glDisable( GL_BLEND );
 	glDisable( GL_TEXTURE_2D );
-	glEnable( GL_LIGHTING );
-	glEnable( GL_LIGHT0 );
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LEQUAL );
 	glShadeModel( GL_SMOOTH );
@@ -174,13 +108,11 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	GLenum glError = glGetError();
 	if( glError  != GL_NO_ERROR )
-		qWarning() << "OpenGL error detected:" << QString( reinterpret_cast<const char*>(gluErrorString(glError)) );
+		qWarning() << "OpenGL error detected:" << glGetErrorString( glError );
 
 	ALCenum alError = alGetError();
 	if( alError != AL_NO_ERROR )
-	{
-		qWarning() << "OpenAL error detected!";
-	}
+		qWarning() << "OpenAL error detected:" << alGetErrorString( alError );
 
 	mGLWidget->setUpdatesEnabled( true );
 }

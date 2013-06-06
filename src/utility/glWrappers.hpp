@@ -131,4 +131,7 @@ inline void glMaterialv( const GLenum & face, const GLenum & pname, const GLint 
 inline void glMaterial( const GLenum & face, const GLenum & pname, const QVector4D & v )	{ glMaterialv( face, pname, reinterpret_cast<const float*>(&v) ); }
 
 
+QString glGetErrorString( GLenum error );
+
+
 #endif

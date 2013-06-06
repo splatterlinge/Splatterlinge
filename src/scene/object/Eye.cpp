@@ -2,7 +2,8 @@
 
 #include <scene/Scene.hpp>
 
-#include <GLWidget.hpp>
+#include <utility/glWrappers.hpp>
+#include <utility/alWrappers.hpp>
 
 
 Eye::Eye( Scene * scene ) :

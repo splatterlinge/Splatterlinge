@@ -6,8 +6,8 @@
 #include <QStyleFactory>
 #include <QKeyEvent>
 
-class GLScene;
-class GLView;
+
+class View;
 
 
 class MainWindow : public QMainWindow
@@ -23,7 +23,7 @@ protected:
 	void keyPressEvent( QKeyEvent * event );
 
 private:
-	GLView * mGLView;
+	View * mView;
 };
 
 

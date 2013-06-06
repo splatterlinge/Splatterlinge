@@ -2,6 +2,7 @@
 #define UTILITY_ALWRAPPERS_INCLUDED
 
 #include <AL/al.h>
+#include <AL/alc.h>
 
 #include <QVector2D>
 #include <QVector3D>
@@ -32,6 +33,9 @@ inline void alListenerv( const ALenum & param, const ALint * values )	{ alListen
 inline void alListenerv( const ALenum & param, const ALfloat * values )	{ alListenerfv( param, values ); }
 inline void alListener( const ALenum & param, const QVector3D & v )	{ alListenerv( param, reinterpret_cast<const float*>(&v) ); }
 inline void alListener( const ALenum & param, const QVector4D & v )	{ alListenerv( param, reinterpret_cast<const float*>(&v) ); }
+
+
+QString alGetErrorString( ALenum error );
 
 
 #endif

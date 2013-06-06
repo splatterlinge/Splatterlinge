@@ -2,14 +2,10 @@
 #define SCENE_INCLUDED
 
 #include "object/Eye.hpp"
-#include <utility/alWrappers.hpp>
 
 #include <QGraphicsScene>
 #include <QElapsedTimer>
 #include <QRectF>
-
-#include <AL/alc.h>
-#include <AL/al.h>
 
 
 class QPainter;
@@ -66,8 +62,7 @@ protected:
 
 private:
 	GLWidget * mGLWidget;
-	ALCdevice * mALDevice;
-	ALCcontext * mALContext;
+
 	QElapsedTimer mElapsedTimer;
 	double mDelta;
 	int mFrameCountSecond;

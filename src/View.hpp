@@ -1,10 +1,10 @@
 #ifndef GLVIEW_INCLUDED
 #define GLVIEW_INCLUDED
 
-#include <GLWidget.hpp>
+#include <utility/glWrappers.hpp>
+#include <utility/alWrappers.hpp>
 
 #include <QGraphicsView>
-#include <QGLFormat>
 
 
 class QWidget;
@@ -16,12 +16,12 @@ class GLWidget;
 class Eye;
 
 
-class GLView : public QGraphicsView
+class View : public QGraphicsView
 {
 	Q_OBJECT
 public:
-	GLView( QGLFormat glFormat, QWidget * parent = 0 );
-	virtual ~GLView();
+	View( QWidget * parent = 0 );
+	virtual ~View();
 
 	// Overrides:
 	Scene * scene() const { return mScene; }
@@ -34,12 +34,19 @@ protected:
 	void keyPressEvent( QKeyEvent * event );
 
 private:
-	Eye * mEye;
 	GLWidget * mGLWidget;
 	Scene * mScene;
 	QWidget * mDebugOptionWindow;
 	QWidget * mGfxOptionWindow;
 	QWidget * mHelpWindow;
+
+	ALCdevice * mALDevice;
+	ALCcontext * mALContext;
+
+	void initGL();
+	void initAL();
+	void initScene();
 };
+
 
 #endif
