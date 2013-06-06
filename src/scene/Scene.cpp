@@ -236,6 +236,18 @@ void Scene::mousePressEvent( QGraphicsSceneMouseEvent * event )
 }
 
 
+void Scene::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event )
+{
+	QGraphicsScene::mouseDoubleClickEvent( event );
+	if( event->isAccepted() )
+		return;
+
+	QList< AMouseListener* >::iterator i;
+	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
+		(*i)->mousePressEvent( event );
+}
+
+
 void Scene::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 	QGraphicsScene::mouseReleaseEvent(event);
