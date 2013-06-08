@@ -21,9 +21,12 @@ SplatterSystem::SplatterSystem( GLWidget * glWidget, Terrain * terrain, int maxS
 	mParticleSystem = new ParticleSystem( maxParticles );
 	mParticleSystem->setSize( 4.0f );
 	mParticleSystem->setMass( 0.05f );
-	mParticleSystem->setDrag( 0.1f );
+	mParticleSystem->setDrag( 0.25f );
 	
 	mSplatterFadeSpeed = 0.3f;
+	mSplatterDriftFactor = 100.0f;
+	
+	mBurstPitchRange = 0.3;
 
 	mSplatterMaterial = new Material( glWidget, "SplatterBig" );
 	mParticleMaterial = new Material( glWidget, "Splatter" );
@@ -83,8 +86,18 @@ void SplatterSystem::draw()
 
 		glPushMatrix();
 		QRectF mapRect = mTerrain->toMapF( s.rect );
-		glScale( 1.0/mapRect.size().width(), 1.0/mapRect.size().height(), 1.0 );
-		glTranslated( -mapRect.x(), -mapRect.y(), 0.0 );
+
+		// rotate around center of texture in 90 deg. steps
+		glTranslate( 0.5f, 0.5f, 0.0f );
+		glRotate( s.rotate*90.0f, 0.0f, 0.0f, 1.0f );
+		glTranslate( -0.5f, -0.5f, 0.0f );
+
+		// transform texture coordinates to terrain patch
+		float sizeFactor = powf(s.fade,mSplatterDriftFactor);
+		QSizeF border = ( sizeFactor * mapRect.size() ) / 2.0f;
+		glScale( 1.0/(mapRect.size().width()*(1.0f-sizeFactor)), 1.0/(mapRect.size().height()*(1.0f-sizeFactor)), 1.0 );
+		glTranslate( -mapRect.x()-border.width(), -mapRect.y()-border.height(), 0.0 );
+
 		mTerrain->drawPatchMap( mTerrain->toMap( s.rect ) );
 		glPopMatrix();
 	}
@@ -111,6 +124,7 @@ void SplatterSystem::spray( const QVector3D & source, const float & size )
 		}
 	}
 	mSplatters[minFadeSplatter].fade = 1.0f;
+	mSplatters[minFadeSplatter].rotate = rand()%4;	// for some variation
 	mSplatters[minFadeSplatter].rect = QRectF( source.x()-size*0.5f, source.z()-size*0.5f, size, size );
 
 	int maxSecOffset = 0;
@@ -128,5 +142,6 @@ void SplatterSystem::spray( const QVector3D & source, const float & size )
 	}
 	mBurstSampleSources[maxSecOffset]->setPosition( source );
 	mBurstSampleSources[maxSecOffset]->rewind();
+	mBurstSampleSources[maxSecOffset]->setPitch( randomMinMax( 1.0f-mBurstPitchRange*0.5, 1.0+mBurstPitchRange*0.5 ) );
 	mBurstSampleSources[maxSecOffset]->play();
 }

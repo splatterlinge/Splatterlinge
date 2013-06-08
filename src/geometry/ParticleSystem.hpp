@@ -34,6 +34,7 @@ private:
 		QVector3D velocity;
 		QVector3D position;
 		float life;
+		int rotate;
 	};
 	class ParticleVertex
 	{

@@ -53,42 +53,49 @@ void ParticleSystem::draw()
 	QVector3D nB = (vB+dir).normalized();
 	QVector3D nC = (vC+dir).normalized();
 	QVector3D nD = (vD+dir).normalized();
-/*
-	glBegin( GL_QUADS );
-	for( int i=0; i<mParticles.size(); ++i )
-	{
-		if( mParticles[i].life <= 0.0f )
-			continue;
 
-		glTexCoord2i(0,0);	glNormal( nD );	glVertex( mParticles[i].position + vD );
-		glTexCoord2i(1,0);	glNormal( nC );	glVertex( mParticles[i].position + vC );
-		glTexCoord2i(1,1);	glNormal( nB );	glVertex( mParticles[i].position + vB );
-		glTexCoord2i(0,1);	glNormal( nA );	glVertex( mParticles[i].position + vA );
-	}
-	glEnd();
-*/
 	int activeVertices = 0;
 	for( int i=0; i<mParticles.size(); ++i )
 	{
 		if( mParticles[i].life <= 0.0f )
 			continue;
 
-		mParticleVertices[activeVertices].position = mParticles[i].position + vD;
-		mParticleVertices[activeVertices].normal = nD;
-		mParticleVertices[activeVertices].coord = QVector2D(0,0);
-		++activeVertices;
-		mParticleVertices[activeVertices].position = mParticles[i].position + vC;
-		mParticleVertices[activeVertices].normal = nC;
-		mParticleVertices[activeVertices].coord = QVector2D(1,0);
-		++activeVertices;
-		mParticleVertices[activeVertices].position = mParticles[i].position + vB;
-		mParticleVertices[activeVertices].normal = nB;
-		mParticleVertices[activeVertices].coord = QVector2D(1,1);
-		++activeVertices;
-		mParticleVertices[activeVertices].position = mParticles[i].position + vA;
-		mParticleVertices[activeVertices].normal = nA;
-		mParticleVertices[activeVertices].coord = QVector2D(0,1);
-		++activeVertices;
+		int current = activeVertices;
+		mParticleVertices[current].position = mParticles[i].position + vD;
+		mParticleVertices[current].normal = nD;
+		++current;
+		mParticleVertices[current].position = mParticles[i].position + vC;
+		mParticleVertices[current].normal = nC;
+		++current;
+		mParticleVertices[current].position = mParticles[i].position + vB;
+		mParticleVertices[current].normal = nB;
+		++current;
+		mParticleVertices[current].position = mParticles[i].position + vA;
+		mParticleVertices[current].normal = nA;
+
+		current = activeVertices;
+		int nextCoord = mParticles[i].rotate;
+		for( int j = 0; j < 4; ++j )
+		{
+			switch( nextCoord & 0x03 )	// modulo 4
+			{
+			case 0:
+				mParticleVertices[current].coord = QVector2D(0,0);
+				break;
+			case 1:
+				mParticleVertices[current].coord = QVector2D(1,0);
+				break;
+			case 2:
+				mParticleVertices[current].coord = QVector2D(1,1);
+				break;
+			case 3:
+				mParticleVertices[current].coord = QVector2D(0,1);
+				break;
+			}
+			++nextCoord;
+			++current;
+		}
+		activeVertices+=4;
 	}
 	if( activeVertices )
 	{
@@ -122,5 +129,6 @@ void ParticleSystem::emitSpherical( const QVector3D & source, int toEmit, const 
 		mParticles[i].velocity = direction * randomMinMax( minVel, maxVel );
 		mParticles[i].position = source;
 		mParticles[i].life = randomMinMax( mMinLife, mMaxLife );
+		mParticles[i].rotate = rand()%4;	// for some variation
 	}
 }

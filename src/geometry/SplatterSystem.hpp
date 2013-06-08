@@ -24,8 +24,14 @@ public:
 	void draw();
 	void spray( const QVector3D & source, const float & size );
 
-	float splatterFadeSpeed() { return mSplatterFadeSpeed; }
+	float splatterFadeSpeed() const { return mSplatterFadeSpeed; }
 	void setSplatterFadeSpeed( float speed ) { mSplatterFadeSpeed = speed; }
+
+	float splatterDriftFactor() const { return mSplatterDriftFactor; }
+	void setSplatterDriftFactor( float driftFactor ) { mSplatterDriftFactor = driftFactor; }
+
+	float burstPitchRange() const { return mBurstPitchRange; }
+	void setBurstPitchRange( float range ) { mBurstPitchRange = range; }
 
 protected:
 
@@ -36,6 +42,7 @@ private:
 		Splatter( const QRectF & _rect = QRectF(0,0,0,0) ) : rect(_rect), fade(0.0f) {}
 		QRectF rect;
 		float fade;
+		int rotate;
 	};
 	GLWidget * mGLWidget;
 	Terrain * mTerrain;
@@ -44,6 +51,8 @@ private:
 	Material * mSplatterMaterial;
 	Material * mParticleMaterial;
 	float mSplatterFadeSpeed;
+	float mSplatterDriftFactor;
+	float mBurstPitchRange;
 	QVector< AudioSample * > mBurstSampleSources;
 };
 

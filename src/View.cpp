@@ -22,7 +22,7 @@ void View::initAL()
 //	const ALCchar * extensionsALC = alcGetString( NULL, ALC_EXTENSIONS );
 //	qDebug() << "OpenAL: Supported context extensions:" << extensionsALC;
 #ifdef ALC_ALL_DEVICES_SPECIFIER
-	if( alcIsExtensionPresent( NULL, "ALC_ENUMERATE_ALL_EXT") == AL_TRUE )
+	if( alcIsExtensionPresent( NULL, "ALC_ENUMERATE_ALL_EXT" ) == AL_TRUE )
 	{
 		const ALCchar * devicesAL = alcGetString( NULL, ALC_ALL_DEVICES_SPECIFIER );
 		if( devicesAL )
