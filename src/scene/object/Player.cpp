@@ -131,6 +131,10 @@ void Player::updateSelf( const double & delta )
 	static float rotateY = 0.0f;
 	rotateY += mMouseDelta.x()/5.0f;
 	rotateX += -mMouseDelta.y()/5.0f;
+	if( rotateX > 80 )
+		rotateX = 80;
+	if( rotateX < -80)
+		rotateX = -80;
 	mMouseDelta = QPointF( 0, 0 );
 	QQuaternion qX = QQuaternion::fromAxisAndAngle( 1,0,0, rotateX );
 	QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, rotateY );
