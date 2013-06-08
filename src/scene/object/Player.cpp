@@ -189,11 +189,7 @@ void Player::drawSelf()
 void Player::drawSelfPost()
 {
 	glDisable( GL_LIGHTING );
-	/*
-	glMatrixMode( GL_PROJECTION );
-	glPushMatrix();
-	glLoadIdentity();
-	*/
+
 	glMatrixMode( GL_MODELVIEW );
 	glPushMatrix();
 	glLoadIdentity();
@@ -210,9 +206,31 @@ void Player::drawSelfPost()
 	glVertex3f(-0.15f, 0.0f, -1.0f);
 	glEnd();
 
+	glColor3d( 1.0f, 1.0f, 1.0f );
+	glDisable( GL_CULL_FACE );
+	glEnable( GL_TEXTURE_2D );
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	glEnable( GL_ALPHA_TEST );
+	glAlphaFunc( GL_GREATER, 0.1 );
+	QImage map = QImage( "data/crowbar.png" );
+	if( map.isNull() )
+	{
+		qFatal(
+			"Texture could not be loaded!"
+		);
+	}
+	GLuint texture =  scene()->glWidget()->bindTexture( map );
+	glBindTexture( GL_TEXTURE_2D, texture );
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 0); glVertex3f( -0.7f, -0.7f, -1.0f);
+	glTexCoord2f(0, 1); glVertex3f( -0.7f, 0.1f, -1.0f);
+	glTexCoord2f(1, 1); glVertex3f( 0.0f, 0.1f, -1.0f);
+	glTexCoord2f(1, 0); glVertex3f( 0.0f, -0.7f, -1.0f);
+	glEnd();
+	glDisable( GL_ALPHA_TEST );
+	glDisable( GL_BLEND );
+	glDisable( GL_TEXTURE_2D );
+
 	glPopMatrix();
-	/*
-	glMatrixMode( GL_PROJECTION );
-	glPopMatrix();
-	*/
 }
