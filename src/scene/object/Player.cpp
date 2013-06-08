@@ -17,6 +17,7 @@ Player::Player( Scene * scene, World * world ) :
 	mUpPressed = false;
 	mDownPressed = false;
 	mSpeedPressed = false;
+	mClipped = true;
 
 	mTarget = QVector3D(0,0,0);
 
@@ -86,6 +87,9 @@ void Player::keyReleaseEvent( QKeyEvent * event )
 		break;
 	case Qt::Key_Control:
 		mDownPressed = false;
+		break;
+	case Qt::Key_F5:
+		mClipped = !mClipped;
 		break;
 	default:
 		return;
@@ -159,11 +163,14 @@ void Player::updateSelf( const double & delta )
 	}
 	setPosition( position() + moveX*left() + moveY*up() + moveZ*direction() );
 
-	float landscapeHeight;
-	if( mWorld->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
+	if( mClipped )
 	{
-		if( position().y() < landscapeHeight + 2 )
-			setPositionY( landscapeHeight + 2 );
+		float landscapeHeight;
+		if( mWorld->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
+		{
+			if( position().y() != landscapeHeight + 10 )
+				setPositionY( landscapeHeight + 10 );
+		}
 	}
 
 	float length = 300.0f;

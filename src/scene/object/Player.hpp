@@ -42,6 +42,7 @@ private:
 	bool mUpPressed;
 	bool mDownPressed;
 	bool mSpeedPressed;
+	bool mClipped;
 
 };
 
