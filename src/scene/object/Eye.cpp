@@ -40,8 +40,12 @@ void Eye::updateMatrix() const
 
 void Eye::updateSelf( const double & delta )
 {
-	ALfloat listenerOri[]={(ALfloat)-direction().x(),(ALfloat)-direction().y(),(ALfloat)-direction().z(),
-		(ALfloat)up().x(),(ALfloat)up().y(),(ALfloat)up().z()};
+	QVector3D up = rotation().rotatedVector(QVector3D(0,1,0));
+	QVector3D direction = rotation().rotatedVector(QVector3D(0,0,1));
+	ALfloat listenerOri[] = {
+		(ALfloat)direction.x(), (ALfloat)direction.y(), (ALfloat)direction.z(),
+		(ALfloat)up.x(), (ALfloat)up.y(), (ALfloat)up.z()
+	};
 	alListener( AL_POSITION, position() );
 	alListenerv( AL_ORIENTATION, listenerOri );
 //	ALfloat listenerVel[]={0.0,0.0,0.0};

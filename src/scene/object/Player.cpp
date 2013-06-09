@@ -173,25 +173,26 @@ void Player::updateSelf( const double & delta )
 		}
 		setPosition( position() + moveX*left() + moveY*up() + moveZ*direction() );
 	} else {
-		float moveX = 0.0f;
-		float moveZ = 0.0f;
+		QVector3D move( 0.0f, 0.0f, 0.0f );
 		if( mForwardPressed )
-			moveZ += 1.0f;
+			move.setZ( move.z() + 1.0f );
 		if( mBackwardPressed )
-			moveZ -= 1.0f;
+			move.setZ( move.z() - 1.0f );
 		if( mLeftPressed )
-			moveX += 1.0f;
+			move.setX( move.x() + 1.0f );
 		if( mRightPressed )
-			moveX -= 1.0f;
+			move.setX( move.x() - 1.0f );
+		move.normalize();
 		if( mSpeedPressed )
 		{
-			moveX *= 20.0*delta;
-			moveZ *= 20.0*delta;
+			move *= 20.0*delta;
 		} else {
-			moveX *= 10.0*delta;
-			moveZ *= 10.0*delta;
+			move *= 10.0*delta;
 		}
-		setPosition( position() + moveX*left() + moveZ*direction() );
+		QVector3D moveDirection = direction();
+		moveDirection.setY( 0.0f );
+		moveDirection.normalize();
+		setPosition( position() + move.x()*left() + move.z()*moveDirection );
 
 		mVelocityY += -100.0f * delta;
 		if( mUpPressed && mOnGround )

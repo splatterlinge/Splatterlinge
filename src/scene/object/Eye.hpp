@@ -11,7 +11,9 @@ class Scene;
 
 /// Special scene object representing the "eye" for observing a scene
 /**
- * 
+ * TODO: do not inherit from AObject!
+ * The up, left and direction vectors are unusable because Eye uses an inverted matrix.
+ * Also, less virtual methods are needed in AObject.
  */
 class Eye : public AObject
 {
