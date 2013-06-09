@@ -20,7 +20,7 @@ SplatterSystem::SplatterSystem( GLWidget * glWidget, Terrain * terrain, int maxS
 {
 	mParticleSystem = new ParticleSystem( maxParticles );
 	mParticleSystem->setSize( 4.0f );
-	mParticleSystem->setMass( 0.05f );
+	mParticleSystem->setGravity( QVector3D( 0.0f, -100.0f, 0.0f ) );
 	mParticleSystem->setDrag( 0.25f );
 	
 	mSplatterFadeSpeed = 0.3f;
@@ -109,7 +109,8 @@ void SplatterSystem::draw()
 
 void SplatterSystem::spray( const QVector3D & source, const float & size )
 {
-	mParticleSystem->emitSpherical( source, 2.0f*size, 1.5f*size, 2.0f*size );
+	mParticleSystem->emitSpherical( source, 0.1f*size*size, 1.0f*size, 1.75f*size );
+
 	int minFadeSplatter = 0;
 	for( int i = 0; i < mSplatters.size(); ++i )
 	{

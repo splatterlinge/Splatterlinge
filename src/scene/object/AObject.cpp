@@ -54,8 +54,8 @@ AObject & AObject::operator=( const AObject & other )
 void AObject::updateMatrix() const
 {
 	mMatrix.setToIdentity();
-	mMatrix.rotate( rotation() );
 	mMatrix.translate( position() );
+	mMatrix.rotate( rotation() );
 }
 
 

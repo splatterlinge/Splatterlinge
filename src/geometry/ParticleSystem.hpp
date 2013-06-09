@@ -16,10 +16,9 @@ public:
 	void emitSpherical( const QVector3D & source, int toEmit, const float & minVel, const float & maxVel );
 	void setMinLife( float minLife ) { mMinLife = minLife; }
 	void setMaxLife( float maxLife ) { mMaxLife = maxLife; }
-	void setMass( float mass ) { mMass = mass; }
 	void setDrag( float drag ) { mDrag = drag; }
 	void setSize( float size ) { mSize = size; }
-	void setForce( QVector3D force ) { mForce = force; }
+	void setGravity( QVector3D gravity ) { mGravity = gravity; }
 	void setCapacity( int capacity ) { mParticles.resize( capacity ); mParticleVertices.resize( capacity*4 ); }
 
 protected:
@@ -45,10 +44,9 @@ private:
 	};
 	float mMinLife;
 	float mMaxLife;
-	float mMass;
 	float mDrag;
 	float mSize;
-	QVector3D mForce;
+	QVector3D mGravity;
 	QVector<Particle> mParticles;
 	QVector<ParticleVertex> mParticleVertices;
 };

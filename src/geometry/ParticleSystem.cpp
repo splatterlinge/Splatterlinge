@@ -11,10 +11,9 @@ ParticleSystem::ParticleSystem( int capacity )
 	setCapacity( capacity );
 	mMinLife = 1.0f;
 	mMaxLife = 2.0f;
-	mMass = 1.0f;
 	mDrag = 1.0f;
 	mSize = 1.0f;
-	mForce = QVector3D( 0.0f, -9.81f, 0.0f );
+	mGravity = QVector3D( 0.0f, -9.81f, 0.0f );
 	for( int i=0; i<mParticles.size(); ++i )
 	{
 		mParticles[i] = Particle();
@@ -24,7 +23,7 @@ ParticleSystem::ParticleSystem( int capacity )
 
 void ParticleSystem::update( const double & delta )
 {
-	QVector3D deltaVelocity = ( mForce / mMass ) * delta;
+	QVector3D deltaVelocity = mGravity * delta;
 	double powDragDelta = pow( mDrag, delta );
 	for( int i=0; i<mParticles.size(); ++i )
 	{

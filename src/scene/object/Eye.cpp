@@ -33,7 +33,7 @@ void Eye::updateMatrix() const
 {
 	mMatrix.setToIdentity();
 	mMatrix.rotate( 180.0f, QVector3D( 0, 1, 0 ) );
-	mMatrix.rotate( -rotation() );
+	mMatrix.rotate( rotation().conjugate() );
 	mMatrix.translate( -position() );
 }
 

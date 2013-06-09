@@ -47,11 +47,11 @@ public:
 	/// Returns the transformation matrix for this object's position and orientation
 	const QMatrix4x4 & matrix() const { validateMatrix(); return mMatrix; }
 	/// Returns the vector pointing along the positive X axis
-	const QVector3D left() const { validateMatrix(); return mMatrix.row(0).toVector3D(); }
+	const QVector3D left() const { validateMatrix(); return mMatrix.column(0).toVector3D(); }
 	/// Returns the vector pointing along the positive Y axis
-	const QVector3D up() const { validateMatrix(); return mMatrix.row(1).toVector3D(); }
+	const QVector3D up() const { validateMatrix(); return mMatrix.column(1).toVector3D(); }
 	/// Returns the vector pointing along the positive Z axis
-	const QVector3D direction() const { validateMatrix(); return mMatrix.row(2).toVector3D(); }
+	const QVector3D direction() const { validateMatrix(); return mMatrix.column(2).toVector3D(); }
 
 	/// Adds a vector to the current position
 	void move( const QVector3D & distance ) { mPosition += distance; mMatrixNeedsUpdate = true; }

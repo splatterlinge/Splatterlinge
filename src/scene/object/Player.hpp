@@ -20,7 +20,7 @@ public:
 
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
-	virtual void drawSelfPost();
+	virtual void drawSelfPostProc();
 
 	virtual void keyPressEvent( QKeyEvent * event );
 	virtual void keyReleaseEvent( QKeyEvent * event );
@@ -42,8 +42,10 @@ private:
 	bool mUpPressed;
 	bool mDownPressed;
 	bool mSpeedPressed;
-	bool mClipped;
-
+	bool mGodMode;
+	bool mOnGround;
+	float mVelocityY;
+	float mHeightAboveGround;
 };
 
-#endif // PLAYER_HPP
+#endif
