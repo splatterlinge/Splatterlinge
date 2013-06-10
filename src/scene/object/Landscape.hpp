@@ -30,7 +30,7 @@ public:
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 	virtual void drawSelfPost();
-	virtual void drawSelfPostProc();
+	virtual void drawAfterSelf();
 	
 	void drawPatch( const QRectF & rect );
 

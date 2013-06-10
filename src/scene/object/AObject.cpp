@@ -19,14 +19,14 @@ AObject::AObject( Scene * scene, float boundingSphereRadius ) :
 
 
 AObject::AObject( const AObject & other ) :
-	mMatrix(other.mMatrix),
 	mScene(other.mScene),
 	mParent(other.mParent),
 	mPosition(other.mPosition),
 	mRotation(other.mRotation),
 	mBoundingSphereRadius(other.mBoundingSphereRadius),
 	mSubNodes(other.mSubNodes),
-	mMatrixNeedsUpdate(other.mMatrixNeedsUpdate)
+	mMatrixNeedsUpdate(other.mMatrixNeedsUpdate),
+	mMatrix(other.mMatrix)
 {
 }
 
@@ -104,7 +104,7 @@ void AObject::draw()
 }
 
 
-void AObject::drawPostProc()
+void AObject::drawAfter()
 {
 	if( !matrix().isIdentity() )
 	{
@@ -112,7 +112,7 @@ void AObject::drawPostProc()
 		glMultMatrix( matrix() );
 	}
 
-	drawSelfPostProc();
+	drawAfterSelf();
 	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
@@ -120,10 +120,10 @@ void AObject::drawPostProc()
 		{
 			if( scene()->eye()->isSphereInFrustum( (*i)->position(), (*i)->boundingSphereRadius() ) )
 			{
-				(*i)->drawPostProc();
+				(*i)->drawAfter();
 			}
 		} else {	// zero radius -> no frustum culling
-			(*i)->drawPostProc();
+			(*i)->drawAfter();
 		}
 	}
 

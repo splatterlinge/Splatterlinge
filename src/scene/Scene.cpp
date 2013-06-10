@@ -24,6 +24,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mFramesPerSecond = 0;
 	mWireFrame = false;
 
+	mRoot = 0;
 	mEye = new Eye( this );
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
@@ -65,10 +66,11 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	}
 	mDelta = (double)delta/1000.0;
 
+	mRoot->update( mDelta );
+
+	mEye->applyAL();
+
 	glPushAttrib( GL_ALL_ATTRIB_BITS );
-
-	mEye->update( mDelta );
-
 	glMatrixMode( GL_TEXTURE );	glPushMatrix();	glLoadIdentity();
 	glMatrixMode( GL_PROJECTION );	glPushMatrix();	glLoadIdentity();
 	glMatrixMode( GL_MODELVIEW );	glPushMatrix();	glLoadIdentity();
@@ -86,8 +88,11 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	if( mWireFrame )
 		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-	mEye->draw();
-	mEye->drawPostProc();
+
+	mEye->applyGL();
+	mRoot->draw();
+	mRoot->drawAfter();
+
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();

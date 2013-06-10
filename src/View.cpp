@@ -99,7 +99,8 @@ void View::initGL()
 void View::initScene()
 {
 	mScene = new Scene( mGLWidget, this );
-	mScene->eye()->add( QSharedPointer<AObject>( new World( mScene, "earth" ) ) );
+	mWorld = new World( mScene, "earth" );
+	mScene->setRoot( mWorld );
 	setScene( mScene );
 }
 
@@ -134,6 +135,7 @@ View::~View()
 	delete mHelpWindow;
 	delete mGfxOptionWindow;
 	delete mDebugOptionWindow;
+	delete mWorld;
 	delete mScene;
 	delete mGLWidget;
 }

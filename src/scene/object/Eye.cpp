@@ -7,19 +7,23 @@
 
 
 Eye::Eye( Scene * scene ) :
-	AObject( scene ),
-	mFOV(60.0f),
-	mNearPlane(0.1f),
-	mFarPlane(500.0f)
+	mScene( scene ),
+	mPosition(),
+	mRotation(),
+	mFOV( 60.0f ),
+	mNearPlane( 0.1f ),
+	mFarPlane( 500.0f )
 {
 }
 
 
 Eye::Eye( Eye & other ) :
-	AObject(other),
-	mFOV(other.mFOV),
-	mNearPlane(other.mNearPlane),
-	mFarPlane(other.mFarPlane)
+	mScene( other.mScene ),
+	mPosition( other.mPosition ),
+	mRotation( other.mRotation ),
+	mFOV( other.mFOV ),
+	mNearPlane( other.mNearPlane ),
+	mFarPlane( other.mFarPlane )
 {
 }
 
@@ -29,54 +33,41 @@ Eye::~Eye()
 }
 
 
-void Eye::updateMatrix() const
+void Eye::applyAL()
 {
-	mMatrix.setToIdentity();
-	mMatrix.rotate( 180.0f, QVector3D( 0, 1, 0 ) );
-	mMatrix.rotate( rotation().conjugate() );
-	mMatrix.translate( -position() );
-}
-
-
-void Eye::updateSelf( const double & delta )
-{
-	QVector3D up = rotation().rotatedVector(QVector3D(0,1,0));
-	QVector3D direction = rotation().rotatedVector(QVector3D(0,0,1));
+	QVector3D up = mRotation.rotatedVector( QVector3D(0,1,0) );
+	QVector3D direction = mRotation.rotatedVector( QVector3D(0,0,1) );
 	ALfloat listenerOri[] = {
 		(ALfloat)direction.x(), (ALfloat)direction.y(), (ALfloat)direction.z(),
 		(ALfloat)up.x(), (ALfloat)up.y(), (ALfloat)up.z()
 	};
-	alListener( AL_POSITION, position() );
+	alListener( AL_POSITION, mPosition );
 	alListenerv( AL_ORIENTATION, listenerOri );
 //	ALfloat listenerVel[]={0.0,0.0,0.0};
 //	alListenerfv( AL_VELOCITY, listenerVel);
 }
 
 
-void Eye::updateSelfPost( const double & delta )
-{
-	if( !mAttached.isNull() )
-	{
-		setPosition( mAttached.data()->position() );
-		setRotation( mAttached.data()->rotation() );
-	}
-}
-
-
-void Eye::drawSelf()
+void Eye::applyGL()
 {
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-	gluPerspective( mFOV, (float)scene()->width()/scene()->height(), mNearPlane, mFarPlane );
+	gluPerspective( mFOV, (float)mScene->width()/mScene->height(), mNearPlane, mFarPlane );
 	glMatrixMode( GL_MODELVIEW );
+
+	if( !mAttached.isNull() )
+	{
+		mPosition = mAttached.data()->position();
+		mRotation = mAttached.data()->rotation();
+	}
+	QMatrix4x4 mat;
+	mat.rotate( 180.0f, QVector3D( 0, 1, 0 ) );
+	mat.rotate( mRotation.conjugate() );
+	mat.translate( -mPosition );
+	glMultMatrix( mat );
+
 	prepareFrustum();
-	enableClippingPlanes();
-}
-
-
-void Eye::drawSelfPost()
-{
-	disableClippingPlanes();
+	applyClippingPlanes();
 }
 
 
@@ -84,9 +75,22 @@ void Eye::setClippingPlane( int n, QVector4D plane )
 {
 	if( plane.isNull() )
 	{
+		glDisable( GL_CLIP_PLANE0 + n );
 		mClippingPlanes.remove( n );
 	} else {
 		mClippingPlanes[n] = plane;
+	}
+}
+
+
+void Eye::applyClippingPlanes()
+{
+	QMap<int,QVector4D>::const_iterator i = mClippingPlanes.constBegin();
+	while( i != mClippingPlanes.constEnd() )
+	{
+		double plane[4]={ i.value().x(), i.value().y(), i.value().z(), i.value().w() };
+		glClipPlane( GL_CLIP_PLANE0 + i.key(), plane );
+		++i;
 	}
 }
 
@@ -96,8 +100,6 @@ void Eye::enableClippingPlanes()
 	QMap<int,QVector4D>::const_iterator i = mClippingPlanes.constBegin();
 	while( i != mClippingPlanes.constEnd() )
 	{
-		double plane[4]={ i.value().x(), i.value().y(), i.value().z(), i.value().w() };
-		glClipPlane( GL_CLIP_PLANE0 + i.key(), plane );
 		glEnable( GL_CLIP_PLANE0 + i.key() );
 		++i;
 	}
@@ -222,4 +224,10 @@ bool Eye::isSphereInFrustum( QVector3D center, float radius ) const
 void Eye::attach( QWeakPointer< AObject > object )
 {
 	mAttached = object;
+}
+
+
+void Eye::detach()
+{
+	mAttached = QWeakPointer<AObject>();
 }

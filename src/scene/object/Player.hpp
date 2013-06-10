@@ -20,7 +20,7 @@ public:
 
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
-	virtual void drawSelfPostProc();
+	virtual void drawAfterSelf();
 
 	virtual void keyPressEvent( QKeyEvent * event );
 	virtual void keyReleaseEvent( QKeyEvent * event );

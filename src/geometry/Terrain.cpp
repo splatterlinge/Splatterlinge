@@ -287,6 +287,15 @@ QVector3D Terrain::getNormal( const QPointF & position ) const
 }
 
 
+QQuaternion Terrain::getNormalRotation( const QPointF & position, const QVector3D & from ) const
+{
+	QVector3D normal = getNormal( position );
+	QVector3D axis = QVector3D::crossProduct( from, normal );
+	float angle = acosf( QVector3D::dotProduct( from, normal ) ) * (180.0/M_PI);
+	return QQuaternion::fromAxisAndAngle( axis, angle );
+}
+
+
 bool Terrain::getLineQuadIntersection( const QVector3D & origin, const QVector3D & direction, const QPoint & quadMapCoord, float & length ) const
 {
 	QPoint pos = quadMapCoord;

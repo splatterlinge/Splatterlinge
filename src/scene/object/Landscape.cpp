@@ -40,7 +40,7 @@ Landscape::Landscape( Scene * scene, QString name ) :
 
 	s.beginGroup( "Water" );
 		mWaterHeight = s.value( "height", 0.0f ).toFloat();
-		mWaterClippingPlaneOffset = s.value( "clippingPlaneOffset", 0.05f ).toFloat();
+		mWaterClippingPlaneOffset = s.value( "clippingPlaneOffset", 0.01f ).toFloat();
 	s.endGroup();
 
 	int blobNum = s.beginReadArray( "Blob" );
@@ -110,21 +110,28 @@ void Landscape::renderReflection()
 	glMatrixMode( GL_MODELVIEW );	glPushMatrix();	glLoadIdentity();
 
 	Eye * sceneEye = scene()->eye();
+
 	Eye mirroredEye( *sceneEye );
 	QQuaternion r = mirroredEye.rotation();
 	r.setX( -r.x() );
 	r.setZ( -r.z() );
+	mirroredEye.detach();
 	mirroredEye.setRotation( r );
-	mirroredEye.setPositionY( -mirroredEye.position().y() +2* mWaterHeight);
+	mirroredEye.setPositionY( -mirroredEye.position().y() + 2*mWaterHeight);
 	if( scene()->eye()->position().y()>mWaterHeight )
 		mirroredEye.setClippingPlane( 0, QVector4D(0,1,0, -mWaterHeight+mWaterClippingPlaneOffset) );
 	else
 		mirroredEye.setClippingPlane( 0, QVector4D(0,-1,0, mWaterHeight+mWaterClippingPlaneOffset) );
 	scene()->setEye( &mirroredEye );
-	glScalef( 1,-1,1 );
+	glScalef( 1, -1, 1 );
+
 	glCullFace( GL_FRONT );
-	mirroredEye.draw();
+	scene()->eye()->applyGL();
+	scene()->eye()->enableClippingPlanes();
+	scene()->root()->draw();
 	glCullFace( GL_BACK );
+	scene()->eye()->setClippingPlane( 0 );
+
 	scene()->setEye( sceneEye );
 
 	glMatrixMode( GL_PROJECTION ); glPopMatrix();
@@ -143,15 +150,19 @@ void Landscape::renderRefraction()
 		scene()->eye()->setClippingPlane( 0, QVector4D(0,-1,0, mWaterHeight+mWaterClippingPlaneOffset) );
 	else
 		scene()->eye()->setClippingPlane( 0, QVector4D(0,1,0, -mWaterHeight+mWaterClippingPlaneOffset) );
-	scene()->eye()->draw();
+
+	scene()->eye()->applyGL();
+	scene()->eye()->enableClippingPlanes();
+	scene()->root()->draw();
 	scene()->eye()->setClippingPlane( 0 );
+
 	glMatrixMode( GL_PROJECTION );	glPopMatrix();
 	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
 	mRefractionRenderer->release();
 }
 
 
-void Landscape::drawSelfPostProc()
+void Landscape::drawAfterSelf()
 {
 	MaterialQuality::type defaultQuality = MaterialQuality::maximum();
 	MaterialQuality::setMaximum( MaterialQuality::LOW );

@@ -1,4 +1,5 @@
 #include "Teapot.hpp"
+#include "World.hpp"
 
 #include <scene/Scene.hpp>
 #include <geometry/teapot.h>
@@ -28,6 +29,11 @@ Teapot::~Teapot()
 void Teapot::updateSelf( const double & delta )
 {
 	mAudioSample->setPosition( this->position() );
+	World * world = dynamic_cast<World*>(scene()->root());
+	if( world )
+	{
+		setRotation( QQuaternion::nlerp( rotation(), world->landscape()->terrain()->getNormalRotation(position()), 33.0*delta ) );
+	}
 }
 
 

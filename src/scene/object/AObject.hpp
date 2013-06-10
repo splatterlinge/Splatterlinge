@@ -90,32 +90,28 @@ public:
 
 	/// Updates this object and all of it's sub-objects
 	void update( const double & delta );
-	/// Draws this object and all of it's sub-objects
-	void draw();
 	/// Abstract method for updating this object
 	virtual void updateSelf( const double & delta ) = 0;
-	/// Abstract method for drawing this object
-	virtual void drawSelf() = 0;
 	/// Executed after all sub-objects are updated
 	virtual void updateSelfPost( const double & delta ) {};
+
+	/// Draws this object and all of it's sub-objects
+	void draw();
+	/// Abstract method for drawing this object
+	virtual void drawSelf() = 0;
 	/// Executed after all sub-objects are drawn
 	virtual void drawSelfPost() {};
-	///TODO: Find a better name
-	void drawPostProc();
-	/// Executet after the usual drawing functions - e.g. for rendering FBOs
-	virtual void drawSelfPostProc() {};
+
+	/// Executed after the usual drawing functions - e.g. for rendering FBOs
+	void drawAfter();
+	/// Executed after the usual drawing functions - e.g. for rendering FBOs
+	virtual void drawAfterSelf() {};
 
 	const float & boundingSphereRadius() const { return mBoundingSphereRadius; }
 
 	static void setGlobalDebugBoundingSpheres( bool enable ) { sDebugBoundingSpheres = enable; }
 
 protected:
-	/// Precalculated matrix
-	mutable QMatrix4x4 mMatrix;
-
-	/// Updates this object's matrix to match it's position and rotation
-	virtual void updateMatrix() const;
-
 	void setBoundingSphere( const float & radius ) { mBoundingSphereRadius = radius; }
 	void drawBoundingShpere();
 
@@ -128,6 +124,11 @@ private:
 	float mBoundingSphereRadius;
 	QList< QSharedPointer<AObject> > mSubNodes;
 	mutable bool mMatrixNeedsUpdate;
+
+	/// Precalculated matrix
+	mutable QMatrix4x4 mMatrix;
+	/// Updates this object's matrix to match it's position and rotation
+	void updateMatrix() const;
 
 	void validateMatrix() const { if( mMatrixNeedsUpdate ) { updateMatrix(); mMatrixNeedsUpdate = false; } }
 

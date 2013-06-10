@@ -406,4 +406,3 @@ void Sky::drawCloudPlane()
 
 	glDisable( GL_BLEND );
 }
-

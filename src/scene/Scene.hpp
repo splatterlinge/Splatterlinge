@@ -37,9 +37,13 @@ public:
 	QGraphicsProxyWidget * addWidget( QWidget * widget, Qt::WindowFlags wFlags = 0 );
 
 	GLWidget * glWidget() { return mGLWidget; }
-	AObject * root() { return mEye; }
-	Eye * eye() { return mEye; }
+
+	AObject * root() const { return mRoot; }
+	void setRoot( AObject * root ) { mRoot = root; }
+
+	Eye * eye() const { return mEye; }
 	void setEye( Eye * eye ) { mEye = eye; }
+
 	void addKeyListener( AKeyListener * listener ) { mKeyListeners.append( listener ); }
 	void addMouseListener( AMouseListener * listener ) { mMouseListeners.append( listener ); }
 	void removeKeyListener( AKeyListener * listener ) { mKeyListeners.removeOne( listener ); }
@@ -75,6 +79,7 @@ private:
 	QList<AMouseListener*> mMouseListeners;
 	QList<AKeyListener*> mKeyListeners;
 	Eye * mEye;
+	AObject * mRoot;
 
 private slots:
 	void secondPassed();

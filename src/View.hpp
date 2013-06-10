@@ -13,7 +13,7 @@ class QResizeEvent;
 
 class Scene;
 class GLWidget;
-class Eye;
+class World;
 
 
 class View : public QGraphicsView
@@ -36,6 +36,7 @@ protected:
 private:
 	GLWidget * mGLWidget;
 	Scene * mScene;
+	World * mWorld;
 	QWidget * mDebugOptionWindow;
 	QWidget * mGfxOptionWindow;
 	QWidget * mHelpWindow;

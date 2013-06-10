@@ -92,11 +92,15 @@ public:
 	const QSize & mapSize() const { return mMapSize; }	///< The size of the heightmap.
 	const QVector3D & size() const { return mSize; }	///< The size of the terrain.
 	const QVector3D & offset() const { return mOffset; }	///< The offset of the terrain.
-	
+
 	const QVector3D & getVertexPosition( const int & x, const int & y ) const;	///< The vertex at heightmap coordinates.
 	const QVector3D & getVertexPosition( const QPoint & p ) const;			///< The vertex at heightmap coordinates.
 	const QVector3D & getVertexNormal( const int & x, const int & y ) const;	///< The normal at heightmap coordinates.
 	const QVector3D & getVertexNormal( const QPoint & p ) const;			///< The normal at heightmap coordinates.
+
+	QQuaternion getNormalRotation( const QVector3D & position, const QVector3D & from = QVector3D(0,1,0) ) const
+		{ return getNormalRotation( QPointF( position.x(), position.z() ), from ); }
+	QQuaternion getNormalRotation( const QPointF & position, const QVector3D & from = QVector3D(0,1,0) ) const;
 
 	bool getTriangle( const QVector3D & position, Triangle & t ) const;
 	bool getTriangle( const QPointF & position, Triangle & t ) const;

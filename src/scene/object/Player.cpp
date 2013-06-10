@@ -146,32 +146,26 @@ void Player::updateSelf( const double & delta )
 
 	if( mGodMode )
 	{
-		float moveX = 0.0f;
-		float moveY = 0.0f;
-		float moveZ = 0.0f;
+		QVector3D move( 0.0f, 0.0f, 0.0f );
 		if( mForwardPressed )
-			moveZ += 1.0f;
+			move.setZ( move.z() + 1.0f );
 		if( mBackwardPressed )
-			moveZ -= 1.0f;
+			move.setZ( move.z() - 1.0f );
 		if( mLeftPressed )
-			moveX += 1.0f;
+			move.setX( move.x() + 1.0f );
 		if( mRightPressed )
-			moveX -= 1.0f;
+			move.setX( move.x() - 1.0f );
 		if( mUpPressed )
-			moveY += 1.0f;
+			move.setY( move.y() + 1.0f );
 		if( mDownPressed )
-			moveY -= 1.0f;
+			move.setY( move.y() - 1.0f );
 		if( mSpeedPressed )
 		{
-			moveX *= 300.0*delta;
-			moveY *= 300.0*delta;
-			moveZ *= 300.0*delta;
+			move *= 300.0*delta;
 		} else {
-			moveX *= 50.0*delta;
-			moveY *= 50.0*delta;
-			moveZ *= 50.0*delta;
+			move *= 50.0*delta;
 		}
-		setPosition( position() + moveX*left() + moveY*up() + moveZ*direction() );
+		setPosition( position() + move.x()*left() + move.y()*up() + move.z()*direction() );
 	} else {
 		QVector3D move( 0.0f, 0.0f, 0.0f );
 		if( mForwardPressed )
@@ -192,9 +186,18 @@ void Player::updateSelf( const double & delta )
 		QVector3D moveDirection = direction();
 		moveDirection.setY( 0.0f );
 		moveDirection.normalize();
+		/*
+		QVector3D moveLeft = left();
+		if( QVector3D::dotProduct( mWorld->landscape()->terrain()->getNormal( position() ), QVector3D(0,1,0) ) > cosf(45.0f*(M_PI/180.0f)) )
+		{
+			moveDirection = mWorld->landscape()->terrain()->getNormalRotation( position() ).rotatedVector( moveDirection );
+			moveLeft = mWorld->landscape()->terrain()->getNormalRotation( position() ).rotatedVector( moveLeft );
+		}
+		setPosition( position() + move.x()*moveLeft + move.z()*moveDirection );
+		*/
 		setPosition( position() + move.x()*left() + move.z()*moveDirection );
 
-		mVelocityY += -100.0f * delta;
+		mVelocityY += -80.0f * delta;
 		if( mUpPressed && mOnGround )
 		{
 			mVelocityY = 20.0f;
@@ -232,7 +235,7 @@ void Player::drawSelf()
 
 }
 
-void Player::drawSelfPostProc()
+void Player::drawAfterSelf()
 {
 	glDisable( GL_LIGHTING );
 	

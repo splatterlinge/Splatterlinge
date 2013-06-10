@@ -11,45 +11,80 @@ class Scene;
 
 /// Special scene object representing the "eye" for observing a scene
 /**
- * TODO: do not inherit from AObject!
- * The up, left and direction vectors are unusable because Eye uses an inverted matrix.
- * Also, less virtual methods are needed in AObject.
+ * 
  */
-class Eye : public AObject
+class Eye
 {
 public:
 	Eye( Scene * scene );
 	Eye( Eye & other );
-	virtual ~Eye();
+	~Eye();
 
-	virtual void updateSelf( const double & delta );
-	virtual void updateSelfPost( const double & delta );
-	virtual void drawSelf();
-	virtual void drawSelfPost();
+	/// Sets OpenAL listener position and orientation.
+	void applyAL();
+	/// Sets OpenGL projection and modelview matrices and applies clipping planes.
+	void applyGL();
 
+	/// Attach this eye to an object.
 	void attach( QWeakPointer<AObject> object );
+	/// Detaches this eye from an object.
+	void detach();
 
+	/// Field of view in degrees.
 	float fov() const { return mFOV; }
-	float nearPlane() const { return mNearPlane; }
-	float farPlane() const { return mFarPlane; }
-
+	/// Set field of view in degrees.
 	void setFOV( float fov ) { mFOV = fov; }
+
+	/// Near plane of projection matrix.
+	float nearPlane() const { return mNearPlane; }
+	/// Set near plane of projection matrix.
 	void setNearPlane( float nearPlane ) { mNearPlane = nearPlane; }
+	/// Far plane of projection matrix.
+	float farPlane() const { return mFarPlane; }
+	/// Set far plane of projection matrix.
 	void setFarPlane( float farPlane ) { mFarPlane = farPlane; }
 
+	/// Defines a clipping plane.
+	/**
+	 * @param n The index of the clipping plane.
+	 * @param plane The clipping plane - omit or set to null to disable this plane completely.
+	 */
 	void setClippingPlane( int n, QVector4D plane = QVector4D(0,0,0,0) );
+	/// Enables all defined clipping planes.
 	void enableClippingPlanes();
+	/// Disables all defined clipping planes.
 	void disableClippingPlanes();
 
+	/// Visibility test on viewing frustum.
 	bool isPointInFrustum( QVector3D point ) const ;
+	/// Visibility test on viewing frustum.
 	bool isSphereInFrustum( QVector3D center, float radius ) const;
 
+	/// Sets the position
+	void setPosition( const QVector3D & position ) { mPosition = position; }
+	/// Sets the position on the X axis
+	void setPositionX( const qreal & x ) { mPosition.setX(x); }
+	/// Sets the position on the Y axis
+	void setPositionY( const qreal & y ) { mPosition.setY(y); }
+	/// Sets the position on the Z axis
+	void setPositionZ( const qreal & z ) { mPosition.setZ(z); }
+	/// Sets the rotation
+	void setRotation( const QQuaternion & rotation ) { mRotation = rotation; }
+
+	/// The object's position
+	const QVector3D & position() const { return mPosition; }
+	/// The object's rotation
+	const QQuaternion & rotation() const { return mRotation; }
+
 protected:
-	void updateMatrix() const;
 
 private:
+	Scene * mScene;
+	QVector3D mPosition;
+	QQuaternion mRotation;
 	QWeakPointer<AObject> mAttached;
 	QMap<int,QVector4D> mClippingPlanes;
+	void applyClippingPlanes();
 	float mFOV;
 	float mNearPlane;
 	float mFarPlane;
