@@ -3,6 +3,7 @@
 #include "DebugOptionWindow.hpp"
 #include "GfxOptionWindow.hpp"
 #include "HelpWindow.hpp"
+#include "StartMenuWindow.hpp"
 
 #include <GLWidget.hpp>
 #include <scene/Scene.hpp>
@@ -124,6 +125,11 @@ View::View( QWidget * parent ) : QGraphicsView( parent )
 	scene()->addWidget( mDebugOptionWindow, mDebugOptionWindow->windowFlags() );
 	mDebugOptionWindow->move( 128, 64 );
 	mDebugOptionWindow->hide();
+
+    mStartMenu = new StartMenuWindow( mScene , this);
+    scene()->addWidget( mStartMenu, mStartMenu->windowFlags() );
+    mStartMenu->move(32, 32);
+    mStartMenu->setVisible(false);
 }
 
 

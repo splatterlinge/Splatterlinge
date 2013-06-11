@@ -40,6 +40,7 @@ private:
 	QWidget * mDebugOptionWindow;
 	QWidget * mGfxOptionWindow;
 	QWidget * mHelpWindow;
+    QWidget * mStartMenu;
 
 	ALCdevice * mALDevice;
 	ALCcontext * mALContext;
