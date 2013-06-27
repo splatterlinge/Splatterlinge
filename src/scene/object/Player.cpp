@@ -242,17 +242,22 @@ void Player::drawAfterSelf()
 	glPushAttrib( GL_DEPTH_BUFFER_BIT );
 	glDisable( GL_DEPTH_TEST );
 
+	glPushMatrix();
+	glLoadIdentity();
+	
 	glColor3f( 0.0f, 1.0f, 0.0f );
 	glBegin( GL_LINES );
-	glVertex3f( 0.0f, 0.05f, 1.0f);
-	glVertex3f( 0.0f, 0.1f, 1.0f);
-	glVertex3f( 0.0f,-0.05f, 1.0f);
-	glVertex3f( 0.0f,-0.1f, 1.0f);
-	glVertex3f( 0.05f, 0.0f, 1.0f);
-	glVertex3f( 0.15f, 0.0f, 1.0f);
-	glVertex3f(-0.05f, 0.0f, 1.0f);
-	glVertex3f(-0.15f, 0.0f, 1.0f);
+	glVertex3f( 0.0f, 0.05f, -1.0f);
+	glVertex3f( 0.0f, 0.1f, -1.0f);
+	glVertex3f( 0.0f,-0.05f, -1.0f);
+	glVertex3f( 0.0f,-0.1f, -1.0f);
+	glVertex3f( 0.05f, 0.0f, -1.0f);
+	glVertex3f( 0.15f, 0.0f, -1.0f);
+	glVertex3f(-0.05f, 0.0f, -1.0f);
+	glVertex3f(-0.15f, 0.0f, -1.0f);
 	glEnd();
+	
+	glPopMatrix();
 /*
 	glColor3d( 1.0f, 1.0f, 1.0f );
 	glDisable( GL_CULL_FACE );
