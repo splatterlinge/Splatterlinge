@@ -213,7 +213,6 @@ void Player::updateSelf( const double & delta )
 		setPositionY( position().y() + mVelocityY * delta );
 	}
 
-
 	float landscapeHeight;
 	if( mWorld->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
 	{

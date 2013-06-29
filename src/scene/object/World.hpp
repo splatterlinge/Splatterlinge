@@ -4,6 +4,7 @@
 
 #include <scene/AKeyListener.hpp>
 #include <scene/AMouseListener.hpp>
+#include <geometry/ParticleSystem.hpp>
 
 #include "AObject.hpp"
 #include "Player.hpp"
@@ -49,6 +50,16 @@ public:
 	QSharedPointer<AObject> getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D & normal );
 
 private:
+	class SplatterInteractor : public ParticleSystem::Interactable
+	{
+	public:
+		SplatterInteractor( World & world ) : mWorld(world) {}
+		virtual ~SplatterInteractor() {}
+		virtual void particleInteraction( const double & delta, ParticleSystem::Particle & particle );
+	private:
+		World & mWorld;
+	};
+	SplatterInteractor * mSplatterInteractor;
 	bool mTimeLapse;
 	bool mTimeReverse;
 	float mTimeOfDay;

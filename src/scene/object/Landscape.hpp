@@ -36,6 +36,7 @@ public:
 
 	Terrain * terrain() { return mTerrain; }
 	const Terrain * terrain() const { return mTerrain; }
+	const float & waterHeight() { return mWaterHeight; }
 
 private:
 	/// Draws a part of the Terrain using another Material.

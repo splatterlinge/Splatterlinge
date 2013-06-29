@@ -1,6 +1,7 @@
 #include "World.hpp"
 
 #include <scene/Scene.hpp>
+#include <utility/random.hpp>
 #include <geometry/ParticleSystem.hpp>
 #include <geometry/SplatterSystem.hpp>
 #include "Landscape.hpp"
@@ -34,17 +35,17 @@ World::World( Scene * scene, QString name ) :
 	scene->eye()->attach( mPlayer );
 
 	mTeapot = QSharedPointer<Teapot>( new Teapot( scene, 4 ) );
-	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QVector3D(0,0,0) ) + 3 );
+	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 3 );
 	add( mTeapot );
 	mDragTeapot = false;
 
 	mTable = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/table01/table01.obj" ) );
-	mTable->setPositionY( mLandscape->terrain()->getHeight( QVector3D(0,0,0) ) + 3 );
+	mTable->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 3 );
 	add( mTable );
 
 	mTree = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/tree/tree.obj" ) );
 	mTree->setPositionX( 100 );
-	mTree->setPositionY( mLandscape->terrain()->getHeight( QVector3D(100,0,0) ) - 1 );
+	mTree->setPositionY( mLandscape->terrain()->getHeight( QPointF(100,0) ) - 1 );
 	add( mTree );
 
 	mSky = QSharedPointer<Sky>( new Sky( scene, skyName ) );
@@ -56,6 +57,8 @@ World::World( Scene * scene, QString name ) :
 	mTarget = QVector3D(0,0,0);
 
 	mSplatterSystem = new SplatterSystem( scene->glWidget(), mLandscape->terrain() );
+	mSplatterInteractor = new SplatterInteractor( *this );
+	mSplatterSystem->particleSystem()->setInteractionCallback( mSplatterInteractor );
 }
 
 
@@ -64,6 +67,7 @@ World::~World()
 	scene()->removeKeyListener( this );
 	scene()->removeMouseListener( this );
 	delete mSplatterSystem;
+	delete mSplatterInteractor;
 }
 
 
@@ -206,4 +210,28 @@ QSharedPointer<AObject> World::getLineIntersection( const QVector3D & origin, co
 	// Add checks to other objects here, if they are closer set target accordingly
 
 	return target;
+}
+
+
+void World::SplatterInteractor::particleInteraction( const double & delta, ParticleSystem::Particle & particle )
+{
+	bool belowWater = false;
+	bool belowGround = false;
+
+	if( particle.position().y() - mWorld.landscape()->waterHeight() < -mWorld.splatterSystem()->particleSystem()->size()/2.0f )
+		belowWater = true;
+	if( mWorld.landscape()->terrain()->getHeightAboveGround( particle.position() ) < -mWorld.splatterSystem()->particleSystem()->size()/2.0f )
+		belowGround = true;
+
+	if( belowWater )
+	{
+		particle.rVelocity() -= (mWorld.splatterSystem()->particleSystem()->gravity()/1.1) * delta;
+	}
+
+	if( belowGround )
+	{
+		particle.setLife( 0.0f );
+		if( !belowWater )
+			mWorld.splatterSystem()->splat( particle.position(), mWorld.splatterSystem()->particleSystem()->size() * randomMinMax( 0.5f, 2.0f ) );
+	}
 }

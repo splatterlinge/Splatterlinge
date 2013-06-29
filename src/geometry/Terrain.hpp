@@ -114,6 +114,8 @@ public:
 	bool getHeight( const QPointF & position, float & height ) const;
 	float getHeight( const QVector3D & position ) const;
 	float getHeight( const QPointF & position ) const;
+	bool getHeightAboveGround( const QVector3D & position, float & heightAboveGround ) const;
+	float getHeightAboveGround( const QVector3D & position ) const;
 
 	/// Calculates the intersection distance to the terrain. length is used as input and output.
 	bool getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & lengthl ) const;
@@ -252,6 +254,21 @@ inline bool Terrain::getHeight( const QVector3D & position, float & height ) con
 inline float Terrain::getHeight( const QVector3D & position ) const
 {
 	return getHeight( QPointF(position.x(),position.z()) );
+}
+
+
+inline bool Terrain::getHeightAboveGround( const QVector3D & position, float & heightAboveGround ) const
+{
+	bool ret = getHeight( QPointF(position.x(),position.z()), heightAboveGround );
+	if( ret )
+		heightAboveGround = position.y() - heightAboveGround;
+	return ret;
+}
+
+
+inline float Terrain::getHeightAboveGround( const QVector3D & position ) const
+{
+	return position.y() - getHeight( QPointF(position.x(),position.z()) );
 }
 
 

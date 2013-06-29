@@ -14,6 +14,7 @@ ParticleSystem::ParticleSystem( int capacity )
 	mDrag = 1.0f;
 	mSize = 1.0f;
 	mGravity = QVector3D( 0.0f, -9.81f, 0.0f );
+	mInteractionCallback = 0;
 	for( int i=0; i<mParticles.size(); ++i )
 	{
 		mParticles[i] = Particle();
@@ -27,10 +28,14 @@ void ParticleSystem::update( const double & delta )
 	double powDragDelta = pow( mDrag, delta );
 	for( int i=0; i<mParticles.size(); ++i )
 	{
-		mParticles[i].position += mParticles[i].velocity * delta;
-		mParticles[i].velocity *= powDragDelta;
-		mParticles[i].velocity += deltaVelocity;
-		mParticles[i].life -= delta;
+		if( mParticles[i].life() <= 0.0f )
+			continue;
+		mParticles[i].rPosition() += mParticles[i].velocity() * delta;
+		mParticles[i].rVelocity() *= powDragDelta;
+		mParticles[i].rVelocity() += deltaVelocity;
+		mParticles[i].rLife() -= delta;
+		if( mInteractionCallback )
+			mInteractionCallback->particleInteraction( delta, mParticles[i] );
 	}
 }
 
@@ -56,24 +61,24 @@ void ParticleSystem::draw()
 	int activeVertices = 0;
 	for( int i=0; i<mParticles.size(); ++i )
 	{
-		if( mParticles[i].life <= 0.0f )
+		if( mParticles[i].life() <= 0.0f )
 			continue;
 
 		int current = activeVertices;
-		mParticleVertices[current].position = mParticles[i].position + vD;
+		mParticleVertices[current].position = mParticles[i].position() + vD;
 		mParticleVertices[current].normal = nD;
 		++current;
-		mParticleVertices[current].position = mParticles[i].position + vC;
+		mParticleVertices[current].position = mParticles[i].position() + vC;
 		mParticleVertices[current].normal = nC;
 		++current;
-		mParticleVertices[current].position = mParticles[i].position + vB;
+		mParticleVertices[current].position = mParticles[i].position() + vB;
 		mParticleVertices[current].normal = nB;
 		++current;
-		mParticleVertices[current].position = mParticles[i].position + vA;
+		mParticleVertices[current].position = mParticles[i].position() + vA;
 		mParticleVertices[current].normal = nA;
 
 		current = activeVertices;
-		int nextCoord = mParticles[i].rotate;
+		int nextCoord = mParticles[i].rotation();
 		for( int j = 0; j < 4; ++j )
 		{
 			switch( nextCoord & 0x03 )	// modulo 4
@@ -116,7 +121,7 @@ void ParticleSystem::emitSpherical( const QVector3D & source, int toEmit, const 
 {
 	for( int i=0; i<mParticles.size() && toEmit>0; ++i )
 	{
-		if( mParticles[i].life>0.0f )
+		if( mParticles[i].life()>0.0f )
 			continue;
 
 		--toEmit;
@@ -125,9 +130,8 @@ void ParticleSystem::emitSpherical( const QVector3D & source, int toEmit, const 
 			direction = QVector3D( randomMinMax( -1.0, 1.0 ), randomMinMax( -1.0, 1.0 ), randomMinMax( -1.0, 1.0 ) );
 		} while( direction.length() > 1.0f );
 		direction.normalize();
-		mParticles[i].velocity = direction * randomMinMax( minVel, maxVel );
-		mParticles[i].position = source;
-		mParticles[i].life = randomMinMax( mMinLife, mMaxLife );
-		mParticles[i].rotate = rand()%4;	// for some variation
+		mParticles[i].rVelocity() = direction * randomMinMax( minVel, maxVel );
+		mParticles[i].rPosition() = source;
+		mParticles[i].rLife() = randomMinMax( mMinLife, mMaxLife );
 	}
 }

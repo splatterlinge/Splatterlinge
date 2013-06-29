@@ -132,6 +132,12 @@ void Scene::secondPassed()
 
 void Scene::setMouseGrabbing( bool enable )
 {
+	// this fixes mouse movements on entering grabbing mode
+	QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
+	QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
+	// this prevents the cursor from beeing visible after enabling grabbing mode when the mouse is on a widget
+	QCoreApplication::processEvents( QEventLoop::AllEvents );
+
 	mMouseGrabbing = enable;
 	if( mMouseGrabbing )
 		mGLWidget->setCursor( Qt::BlankCursor );

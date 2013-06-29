@@ -126,10 +126,10 @@ View::View( QWidget * parent ) : QGraphicsView( parent )
 	mDebugOptionWindow->move( 128, 64 );
 	mDebugOptionWindow->hide();
 
-    mStartMenu = new StartMenuWindow( mScene , this);
-    scene()->addWidget( mStartMenu, mStartMenu->windowFlags() );
-    mStartMenu->move(32, 32);
-    mStartMenu->setVisible(false);
+	mStartMenu = new StartMenuWindow( mScene , this);
+	scene()->addWidget( mStartMenu, mStartMenu->windowFlags() );
+	mStartMenu->move(32, 32);
+	mStartMenu->setVisible(false);
 }
 
 
