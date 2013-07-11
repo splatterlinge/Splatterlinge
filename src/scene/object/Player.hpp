@@ -46,6 +46,8 @@ private:
 	bool mOnGround;
 	float mVelocityY;
 	float mHeightAboveGround;
+	float mAxisRotationX;
+	float mAxisRotationY;
 };
 
 #endif

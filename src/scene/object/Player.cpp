@@ -22,6 +22,8 @@ Player::Player( Scene * scene, World * world ) :
 
 	mVelocityY = 0.0f;
 	mHeightAboveGround = 2.0f;
+	mAxisRotationX = 0.0f;
+	mAxisRotationY = 0.0f;
 
 	mTarget = QVector3D(0,0,0);
 
@@ -131,17 +133,15 @@ void Player::mouseWheelEvent( QGraphicsSceneWheelEvent * event )
 
 void Player::updateSelf( const double & delta )
 {
-	static float rotateX = 0.0f;
-	static float rotateY = 0.0f;
-	rotateY += -mMouseDelta.x()/5.0f;
-	rotateX += mMouseDelta.y()/5.0f;
-	if( rotateX > 80 )
-		rotateX = 80;
-	if( rotateX < -80)
-		rotateX = -80;
+	mAxisRotationY += -mMouseDelta.x()/5.0f;
+	mAxisRotationX += mMouseDelta.y()/5.0f;
+	if( mAxisRotationX > 80 )
+		mAxisRotationX = 80;
+	if( mAxisRotationX < -80)
+		mAxisRotationX = -80;
 	mMouseDelta = QPointF( 0, 0 );
-	QQuaternion qX = QQuaternion::fromAxisAndAngle( 1,0,0, rotateX );
-	QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, rotateY );
+	QQuaternion qX = QQuaternion::fromAxisAndAngle( 1,0,0, mAxisRotationX );
+	QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, mAxisRotationY );
 	setRotation( qY * qX );
 
 	if( mGodMode )
@@ -185,42 +185,53 @@ void Player::updateSelf( const double & delta )
 		}
 		QVector3D moveDirection = direction();
 		moveDirection.setY( 0.0f );
-		moveDirection.normalize();
-		/*
 		QVector3D moveLeft = left();
-		if( QVector3D::dotProduct( mWorld->landscape()->terrain()->getNormal( position() ), QVector3D(0,1,0) ) > cosf(45.0f*(M_PI/180.0f)) )
-		{
-			moveDirection = mWorld->landscape()->terrain()->getNormalRotation( position() ).rotatedVector( moveDirection );
-			moveLeft = mWorld->landscape()->terrain()->getNormalRotation( position() ).rotatedVector( moveLeft );
-		}
-		setPosition( position() + move.x()*moveLeft + move.z()*moveDirection );
-		*/
-		setPosition( position() + move.x()*left() + move.z()*moveDirection );
 
-		mVelocityY += -80.0f * delta;
-		if( mUpPressed && mOnGround )
+		QVector3D terrainNormal;
+		if( mWorld->landscape()->terrain()->getNormal( position(), terrainNormal ) )
 		{
-			mVelocityY = 20.0f;
-			mOnGround = false;
+			if( terrainNormal.y() > 0.6 && mOnGround )
+			{	// if the terrain is flat enough and the player touches the ground, move along the terrain instead
+				moveDirection = QVector3D::crossProduct( left(), terrainNormal );
+				moveLeft = QVector3D::crossProduct( terrainNormal, direction() );
+			}
 		}
-		if( mDownPressed )
+
+		moveDirection.normalize();
+		moveLeft.normalize();
+
+		setPosition( position() + move.x()*moveLeft + move.z()*moveDirection );
+
+		mVelocityY += -80.0f * delta;	// apply gravity
+
+		if( mUpPressed && mOnGround )	// jump if key is pressed and player touches ground
+			mVelocityY = 20.0f;
+
+		if( mDownPressed )	// duck by lowering the player's height above ground
 		{
 			mHeightAboveGround = 1.0f;
 		} else {
 			if( mHeightAboveGround < 2.0f )
 				mHeightAboveGround += 10.0f * delta;
 		}
+
 		setPositionY( position().y() + mVelocityY * delta );
 	}
 
 	float landscapeHeight;
 	if( mWorld->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
 	{
-		if( landscapeHeight + mHeightAboveGround > position().y() )
+		if( landscapeHeight + mHeightAboveGround + 0.1f >= position().y() )
 		{
-			setPositionY( landscapeHeight + mHeightAboveGround );
-			mVelocityY = 0.0f;
+			if( landscapeHeight + mHeightAboveGround > position().y() )
+			{
+				setPositionY( landscapeHeight + mHeightAboveGround );
+				if( mVelocityY < 0.0f )
+					mVelocityY = 0.0f;
+			}
 			mOnGround = true;
+		} else {
+			mOnGround = false;
 		}
 	}
 
