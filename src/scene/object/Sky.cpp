@@ -1,6 +1,7 @@
 #include "Sky.hpp"
 
 #include <utility/interpolate.hpp>
+#include <utility/occlusion.hpp>
 #include <resource/Shader.hpp>
 #include <scene/Scene.hpp>
 
@@ -26,15 +27,15 @@ static void TexImage( QGLWidget * glWidget, GLenum target, QString path )
 
 
 const GLfloat Sky::sCubeVertices[] =
-{
-	-1.0,  1.0,  1.0,
-	-1.0, -1.0,  1.0,
-	 1.0, -1.0,  1.0,
-	 1.0,  1.0,  1.0,
-	-1.0,  1.0, -1.0,
-	-1.0, -1.0, -1.0,
-	 1.0, -1.0, -1.0,
-	 1.0,  1.0, -1.0
+{	// positions		texcoords
+	-1.0,  1.0,  1.0,	0.0, 1.0,
+	-1.0, -1.0,  1.0,	0.0, 0.0,
+	 1.0, -1.0,  1.0,	1.0, 0.0,
+	 1.0,  1.0,  1.0,	1.0, 1.0,
+	-1.0,  1.0, -1.0,	0.0, 1.0,
+	-1.0, -1.0, -1.0,	0.0, 0.0,
+	 1.0, -1.0, -1.0,	1.0, 0.0,
+	 1.0,  1.0, -1.0,	1.0, 1.0
 };
 
 QGLBuffer Sky::sCubeVertexBuffer;
@@ -53,6 +54,52 @@ const GLushort Sky::sCubeIndices[] =
 QGLBuffer Sky::sCubeIndexBuffer;
 
 
+void Sky::drawCube( bool texCoords )
+{
+	sCubeVertexBuffer.bind();
+	sCubeIndexBuffer.bind();
+	glEnableClientState( GL_VERTEX_ARRAY );
+	glEnableClientState( GL_INDEX_ARRAY );
+	glVertexPointer( 3, GL_FLOAT, 5*sizeof(GL_FLOAT), 0 );
+	if( texCoords )
+	{
+		glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+		glTexCoordPointer( 2, GL_FLOAT, 5*sizeof(GL_FLOAT), (const GLvoid*)(3*sizeof(GL_FLOAT)) );
+	}
+
+	glDrawElements( GL_QUADS, sizeof(sCubeIndices)/sizeof(GLushort), GL_UNSIGNED_SHORT, 0 );
+
+	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	glDisableClientState( GL_VERTEX_ARRAY );
+	glDisableClientState( GL_INDEX_ARRAY );
+	sCubeVertexBuffer.release();
+	sCubeIndexBuffer.release();
+}
+
+
+void Sky::drawQuad( bool texCoords )
+{
+	sCubeVertexBuffer.bind();
+	sCubeIndexBuffer.bind();
+	glEnableClientState( GL_INDEX_ARRAY );
+	glEnableClientState( GL_VERTEX_ARRAY );
+	glVertexPointer( 3, GL_FLOAT, 5*sizeof(GL_FLOAT), 0 );
+	if( texCoords )
+	{
+		glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+		glTexCoordPointer( 2, GL_FLOAT, 5*sizeof(GL_FLOAT), (const GLvoid*)(3*sizeof(GL_FLOAT)) );
+	}
+
+	glDrawElements( GL_QUADS, 4, GL_UNSIGNED_SHORT, 0 );
+
+	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	glDisableClientState( GL_VERTEX_ARRAY );
+	glDisableClientState( GL_INDEX_ARRAY );
+	sCubeVertexBuffer.release();
+	sCubeIndexBuffer.release();
+}
+
+
 Sky::Sky( Scene * scene, QString name ) :
 	AObject(scene),
 	mTimeOfDay(0)
@@ -60,7 +107,9 @@ Sky::Sky( Scene * scene, QString name ) :
 	QSettings s( "./data/sky/"+name+"/sky.ini", QSettings::IniFormat );
 
 	s.beginGroup( "Sky" );
-		QString skyDomePath = "./data/sky/"+name+"/"+s.value( "domeMapPath", "dome.png").toString();
+		QString skyDomePath = "./data/sky/"+name+"/"+s.value( "domeMapPath", "dome.png" ).toString();
+		QString sunFlarePath = "./data/sky/"+name+"/"+s.value( "sunFlarePath", "flare.png" ).toString();
+		mSunFlareSize = s.value( "sunFlareSize", 0.6 ).toFloat();
 		mAxis = QVector3D(
 			s.value( "axisX", 1.0f ).toFloat(),
 			s.value( "axisY", 0.0f ).toFloat(),
@@ -84,16 +133,16 @@ Sky::Sky( Scene * scene, QString name ) :
 	s.endGroup();
 
 	s.beginGroup( "StarMap" );
-		QString starMapPathPX = "./data/sky/"+name+"/"+s.value( "positiveX", "star.px.png").toString();
-		QString starMapPathNX = "./data/sky/"+name+"/"+s.value( "negativeX", "star.nx.png").toString();
-		QString starMapPathPY = "./data/sky/"+name+"/"+s.value( "positiveY", "star.py.png").toString();
-		QString starMapPathNY = "./data/sky/"+name+"/"+s.value( "negativeY", "star.ny.png").toString();
-		QString starMapPathPZ = "./data/sky/"+name+"/"+s.value( "positiveZ", "star.pz.png").toString();
-		QString starMapPathNZ = "./data/sky/"+name+"/"+s.value( "negativeZ", "star.nz.png").toString();
+		QString starMapPathPX = "./data/sky/"+name+"/"+s.value( "positiveX", "star.px.png" ).toString();
+		QString starMapPathNX = "./data/sky/"+name+"/"+s.value( "negativeX", "star.nx.png" ).toString();
+		QString starMapPathPY = "./data/sky/"+name+"/"+s.value( "positiveY", "star.py.png" ).toString();
+		QString starMapPathNY = "./data/sky/"+name+"/"+s.value( "negativeY", "star.ny.png" ).toString();
+		QString starMapPathPZ = "./data/sky/"+name+"/"+s.value( "positiveZ", "star.pz.png" ).toString();
+		QString starMapPathNZ = "./data/sky/"+name+"/"+s.value( "negativeZ", "star.nz.png" ).toString();
 	s.endGroup();
 
 	s.beginGroup( "CloudPlane" );
-		QString cloudMapPath = "./data/sky/"+name+"/"+s.value( "map", "clouds.png").toString();
+		QString cloudMapPath = "./data/sky/"+name+"/"+s.value( "map", "clouds.png" ).toString();
 		float cloudScale = s.value( "scale", 10.0f ).toFloat();
 		float cloudCurvature = s.value( "curvature", 1.5f ).toFloat();
 		float cloudOffset = s.value( "offset", 1.0f ).toFloat();
@@ -102,12 +151,12 @@ Sky::Sky( Scene * scene, QString name ) :
 		mCloudHorizonFade = s.value( "horizonFade", 8.0f ).toFloat();
 	s.endGroup();
 
-	QImage image( cloudMapPath );
-	if( image.isNull() )
+	QImage cloudImage( cloudMapPath );
+	if( cloudImage.isNull() )
 	{
 		qFatal( "\"%s\" not found!", cloudMapPath.toLocal8Bit().constData() );
 	}
-	mCloudMap = scene->glWidget()->bindTexture( image );
+	mCloudMap = scene->glWidget()->bindTexture( cloudImage );
 
 	mCloudPlaneRes = 10;
 	mCloudPlaneVertices.resize( mCloudPlaneRes * mCloudPlaneRes );
@@ -191,7 +240,7 @@ Sky::Sky( Scene * scene, QString name ) :
 		qFatal( "\"%s\" not found!", skyDomePath.toLocal8Bit().constData() );
 	}
 
-	mDomeMap =  scene->glWidget()->bindTexture( mDomeImage );
+	mDomeMap = scene->glWidget()->bindTexture( mDomeImage );
 	if( mDomeMap >= 0 )
 	{
 		glActiveTexture( GL_TEXTURE0 );
@@ -216,6 +265,13 @@ Sky::Sky( Scene * scene, QString name ) :
 	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, starMapPathNY );
 	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_POSITIVE_Z, starMapPathPZ );
 	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, starMapPathNZ );
+
+	QImage sunFlareImage( sunFlarePath );
+	if( sunFlareImage.isNull() )
+	{
+		qFatal( "\"%s\" not found!", cloudMapPath.toLocal8Bit().constData() );
+	}
+	mSunFlareMap = scene->glWidget()->bindTexture( sunFlareImage );
 }
 
 
@@ -308,24 +364,54 @@ void Sky::drawSelf()
 }
 
 
+void Sky::drawAfterSelf()
+{
+	scene()->eye()->disableClippingPlanes();
+	glPushAttrib( GL_VIEWPORT_BIT | GL_DEPTH_BUFFER_BIT );
+	glPushMatrix();
+	glTranslatef( scene()->eye()->position().x(), scene()->eye()->position().y(), scene()->eye()->position().z() );
+
+	glDepthMask( GL_FALSE );
+	glDisable( GL_CULL_FACE );
+	glDisable( GL_DEPTH_TEST );
+	drawSunFlare();
+
+	glPopMatrix();
+	glPopAttrib();
+	scene()->eye()->enableClippingPlanes();
+}
+
+
+void Sky::drawSunFlare()
+{
+	glPushMatrix();
+	QVector3D sunPoint( mSunDirection * scene()->eye()->farPlane() );
+	if( !occlusionTest( sunPoint ) )
+	{
+		glRotate( mTimeOfDay*360.0f, mAxis );
+		glScalef( mSunFlareSize, mSunFlareSize, 1.0f );
+		glDisable( GL_LIGHTING );
+		glEnable( GL_BLEND );
+		glBlendFunc( GL_ONE, GL_ONE );
+		glActiveTexture( GL_TEXTURE0 );
+		glEnable( GL_TEXTURE_2D );
+		glColor( mDiffuse );
+		glBindTexture( GL_TEXTURE_2D, mSunFlareMap );
+		drawQuad( true );
+		glDisable( GL_BLEND );
+	}
+	glPopMatrix();
+}
+
+
 void Sky::drawStarCube()
 {
 	glPushMatrix();
-	float angle = mTimeOfDay*(360.0f);
-	glRotatef( angle, mAxis.x(), mAxis.y(), mAxis.z() );
+	glRotate( mTimeOfDay*360.0f, mAxis );
 	glBindTexture( GL_TEXTURE_CUBE_MAP, mStarCubeMap );
 	mStarCubeShader->bind();
 	mStarCubeShader->program()->setUniformValue( mStarCubeShader_cubeMap, 0 );
-	sCubeVertexBuffer.bind();
-	sCubeIndexBuffer.bind();
-	glEnableClientState( GL_VERTEX_ARRAY );
-	glEnableClientState( GL_INDEX_ARRAY );
-	glVertexPointer( 3, GL_FLOAT, 0, 0 );
-	glDrawElements( GL_QUADS, sizeof(sCubeIndices)/sizeof(GLushort), GL_UNSIGNED_SHORT, 0 );
-	glDisableClientState( GL_VERTEX_ARRAY );
-	glDisableClientState( GL_INDEX_ARRAY );
-	sCubeVertexBuffer.release();
-	sCubeIndexBuffer.release();
+	drawCube( false );
 	mStarCubeShader->release();
 	glPopMatrix();
 }
@@ -341,16 +427,7 @@ void Sky::drawSky()
 	mDomeShader->program()->setUniformValue( mDomeShader_sunSpotPower, mSunSpotPower );
 	mDomeShader->program()->setUniformValue( mDomeShader_diffuseMap, 0 );
 	glBindTexture( GL_TEXTURE_2D, mDomeMap );
-	sCubeVertexBuffer.bind();
-	sCubeIndexBuffer.bind();
-	glEnableClientState( GL_VERTEX_ARRAY );
-	glEnableClientState( GL_INDEX_ARRAY );
-	glVertexPointer( 3, GL_FLOAT, 0, 0 );
-	glDrawElements( GL_QUADS, sizeof(sCubeIndices)/sizeof(GLushort), GL_UNSIGNED_SHORT, 0 );
-	glDisableClientState( GL_VERTEX_ARRAY );
-	glDisableClientState( GL_INDEX_ARRAY );
-	sCubeVertexBuffer.release();
-	sCubeIndexBuffer.release();
+	drawCube( false );
 	mDomeShader->release();
 	glDisable( GL_BLEND );
 }

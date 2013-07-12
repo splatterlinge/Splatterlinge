@@ -28,6 +28,7 @@ public:
 
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
+	virtual void drawAfterSelf();
 
 	/// Sets the time of the day.
 	/**
@@ -104,6 +105,9 @@ private:
 	GLuint mDomeMap;
 	QImage mDomeImage;
 
+	GLuint mSunFlareMap;
+	float mSunFlareSize;
+
 	float mTimeOfDay;
 	float mSunSpotPower;
 
@@ -120,6 +124,9 @@ private:
 	void drawStarCube();
 	void drawSky();
 	void drawCloudPlane();
+	void drawSunFlare();
+	static void drawCube( bool texCoords );
+	static void drawQuad( bool texCoords );
 };
 
 
