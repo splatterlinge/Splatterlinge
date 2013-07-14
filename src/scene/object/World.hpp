@@ -11,6 +11,7 @@
 #include "Sky.hpp"
 #include "Landscape.hpp"
 #include "Teapot.hpp"
+#include "Torch.hpp"
 #include "WavefrontObject.hpp"
 
 
@@ -67,11 +68,13 @@ private:
 	QSharedPointer<Landscape> mLandscape;
 	QSharedPointer<Player> mPlayer;
 	QSharedPointer<Teapot> mTeapot;
+	QSharedPointer<Torch> mTorch;
 	QSharedPointer<WavefrontObject> mTable;
 	QSharedPointer<WavefrontObject> mTree;
 	QVector3D mTarget;
 	QVector3D mTargetNormal;
 	bool mDragTeapot;
+	bool mDragTorch;
 	SplatterSystem * mSplatterSystem;
 };
 

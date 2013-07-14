@@ -40,6 +40,9 @@ void Teapot::updateSelf( const double & delta )
 void Teapot::drawSelf()
 {
 	mMaterial->bind();
+	glPushMatrix();
+	glTranslatef( 0, -mSize*0.6, 0 );
 	teapot( 6, mSize, GL_FILL );
+	glPopMatrix();
 	mMaterial->release();
 }

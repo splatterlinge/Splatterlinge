@@ -34,10 +34,15 @@ World::World( Scene * scene, QString name ) :
 	add( mPlayer );
 	scene->eye()->attach( mPlayer );
 
-	mTeapot = QSharedPointer<Teapot>( new Teapot( scene, 4 ) );
-	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 3 );
+	mTeapot = QSharedPointer<Teapot>( new Teapot( scene, 2 ) );
+	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) );
 	add( mTeapot );
 	mDragTeapot = false;
+
+	mTorch = QSharedPointer<Torch>( new Torch( scene ) );
+	mTorch->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 1.0f );
+	add( mTorch );
+	mDragTorch = false;
 
 	mTable = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/table01/table01.obj" ) );
 	mTable->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 3 );
@@ -115,6 +120,10 @@ void World::mousePressEvent( QGraphicsSceneMouseEvent * event )
 	{
 		mDragTeapot = true;
 	}
+	else if( event->button() == Qt::MiddleButton )
+	{
+		mDragTorch = true;
+	}
 }
 
 
@@ -123,6 +132,10 @@ void World::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 	if( event->button() == Qt::RightButton )
 	{
 		mDragTeapot = false;
+	}
+	else if( event->button() == Qt::MiddleButton )
+	{
+		mDragTorch = false;
 	}
 }
 
@@ -161,6 +174,11 @@ void World::updateSelfPost( const double & delta )
 		mTeapot->setPosition( mTarget );
 		mTeapot->moveY( 3 );
 	}
+	if( mDragTorch )
+	{
+		mTorch->setPosition( mTarget );
+		mTorch->moveY( 1 );
+	}
 }
 
 
@@ -172,19 +190,12 @@ void World::drawSelf()
 	glLight( GL_LIGHT0, GL_SPECULAR, mSky->specular() );
 	glEnable( GL_LIGHT0 );
 
-	static float cycle = 0.0f;
-	QColor color = QColor::fromHsvF( cycle, 0.5f, 0.5f, 1.0f );
-	cycle+=0.0005f;
-	QVector4D colorVec( color.redF(), color.greenF(), color.blueF(), 1.0f );
-	if( cycle>=1.0f )
-		cycle-=1.0f;
-
-	glLight( GL_LIGHT1, GL_POSITION, QVector4D(	mTeapot->position(),	1	) );
+	glLight( GL_LIGHT1, GL_POSITION, QVector4D(	mTorch->position(),	1	) );
 	glLight( GL_LIGHT1, GL_AMBIENT, QVector4D(	0,	0,	0,	1	) );
-	glLight( GL_LIGHT1, GL_DIFFUSE, QVector4D(	colorVec	) );
-	glLight( GL_LIGHT1, GL_SPECULAR, QVector4D(	colorVec	) );
+	glLight( GL_LIGHT1, GL_DIFFUSE, QVector4D(	mTorch->color()	) );
+	glLight( GL_LIGHT1, GL_SPECULAR, QVector4D(	mTorch->color()	) );
 	glLight( GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.0f );
-	glLight( GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.02f );
+	glLight( GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.05f );
 	glLight( GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.0f );
 	glEnable( GL_LIGHT1 );
 
