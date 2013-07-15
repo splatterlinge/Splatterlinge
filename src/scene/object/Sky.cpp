@@ -426,6 +426,7 @@ void Sky::drawSky()
 	mDomeShader->program()->setUniformValue( mDomeShader_timeOfDay, mTimeOfDay );
 	mDomeShader->program()->setUniformValue( mDomeShader_sunSpotPower, mSunSpotPower );
 	mDomeShader->program()->setUniformValue( mDomeShader_diffuseMap, 0 );
+	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, mDomeMap );
 	drawCube( false );
 	mDomeShader->release();
