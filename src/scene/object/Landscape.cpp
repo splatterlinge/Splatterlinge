@@ -16,6 +16,8 @@ Landscape::Landscape( Scene * scene, QString name ) :
 	AObject( scene )
 {
 	mName = name;
+	mDrawingReflection = false;
+	mDrawingRefraction = false;
 
 	QSettings s( "./data/landscape/"+name+"/landscape.ini", QSettings::IniFormat );
 
@@ -129,6 +131,7 @@ void Landscape::renderReflection()
 	scene()->eye()->applyGL();
 	scene()->eye()->enableClippingPlanes();
 	scene()->root()->draw();
+	scene()->root()->draw2();
 	glCullFace( GL_BACK );
 	scene()->eye()->setClippingPlane( 0 );
 
@@ -154,6 +157,7 @@ void Landscape::renderRefraction()
 	scene()->eye()->applyGL();
 	scene()->eye()->enableClippingPlanes();
 	scene()->root()->draw();
+	scene()->root()->draw2();
 	scene()->eye()->setClippingPlane( 0 );
 
 	glMatrixMode( GL_PROJECTION );	glPopMatrix();
@@ -162,12 +166,19 @@ void Landscape::renderRefraction()
 }
 
 
-void Landscape::drawAfterSelf()
+void Landscape::draw2SelfPost()
 {
+	if( mDrawingReflection || mDrawingRefraction )
+		return;
+
 	MaterialQuality::type defaultQuality = MaterialQuality::maximum();
 	MaterialQuality::setMaximum( MaterialQuality::LOW );
+	mDrawingReflection = true;
 	renderReflection();
+	mDrawingReflection = false;
+	mDrawingRefraction = true;
 	renderRefraction();
+	mDrawingRefraction = false;
 	MaterialQuality::setMaximum( defaultQuality );
 
 	glDisable( GL_CULL_FACE );

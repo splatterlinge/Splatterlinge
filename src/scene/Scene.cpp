@@ -67,6 +67,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	mDelta = (double)delta/1000.0;
 
 	mRoot->update( mDelta );
+	mRoot->update2( mDelta );
 
 	mEye->applyAL();
 
@@ -91,7 +92,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	mEye->applyGL();
 	mRoot->draw();
-	mRoot->drawAfter();
+	mRoot->draw2();
 
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 

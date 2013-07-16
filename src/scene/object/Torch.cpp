@@ -5,8 +5,9 @@
 #include <scene/Scene.hpp>
 
 
-Torch::Torch( Scene * scene ) :
-	AObject( scene, 1.0f )
+Torch::Torch( Scene * scene, World * world ) :
+	AObject( scene, 1.0f ),
+	mWorld( world )
 {
 	mFlareSize = 5.0f;
 	mColorCycle = 0.0f;
@@ -17,11 +18,26 @@ Torch::Torch( Scene * scene ) :
 		qFatal( "\"%s\" not found!", "./data/effect/flare.png" );
 	}
 	mFlareMap = scene->glWidget()->bindTexture( flareImage );
+	mWorld->addLightSource( this );
 }
 
 
 Torch::~Torch()
 {
+	mWorld->removeLightSource( this );
+}
+
+
+void Torch::updateLightSource( GLenum light )
+{
+	glLight( light, GL_POSITION, QVector4D(	position(), 1	) );
+	glLight( light, GL_AMBIENT, QVector4D(	0, 0, 0, 1	) );
+	glLight( light, GL_DIFFUSE, QVector4D(	color()	) );
+	glLight( light, GL_SPECULAR, QVector4D(	color()	) );
+	glLight( light, GL_CONSTANT_ATTENUATION, 0.0f );
+	glLight( light, GL_LINEAR_ATTENUATION, 0.05f );
+	glLight( light, GL_QUADRATIC_ATTENUATION, 0.0f );
+	glEnable( light );
 }
 
 
@@ -47,7 +63,7 @@ void Torch::drawSelf()
 }
 
 
-void Torch::drawAfterSelf()
+void Torch::draw2Self()
 {
 	if( occlusionTest() )
 		return;

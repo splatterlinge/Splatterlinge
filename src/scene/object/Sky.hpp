@@ -28,7 +28,7 @@ public:
 
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
-	virtual void drawAfterSelf();
+	virtual void draw2Self();
 
 	/// Sets the time of the day.
 	/**

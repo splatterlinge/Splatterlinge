@@ -34,16 +34,6 @@ World::World( Scene * scene, QString name ) :
 	add( mPlayer );
 	scene->eye()->attach( mPlayer );
 
-	mTeapot = QSharedPointer<Teapot>( new Teapot( scene, 2 ) );
-	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) );
-	add( mTeapot );
-	mDragTeapot = false;
-
-	mTorch = QSharedPointer<Torch>( new Torch( scene ) );
-	mTorch->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 1.0f );
-	add( mTorch );
-	mDragTorch = false;
-
 	mTable = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/table01/table01.obj" ) );
 	mTable->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 3 );
 	add( mTable );
@@ -57,7 +47,6 @@ World::World( Scene * scene, QString name ) :
 	add( mSky );
 
 	scene->addKeyListener( this );
-	scene->addMouseListener( this );
 
 	mTarget = QVector3D(0,0,0);
 
@@ -69,10 +58,23 @@ World::World( Scene * scene, QString name ) :
 
 World::~World()
 {
+	mLightSources.clear();
 	scene()->removeKeyListener( this );
-	scene()->removeMouseListener( this );
 	delete mSplatterSystem;
 	delete mSplatterInteractor;
+}
+
+
+void World::addLightSource( ALightSource * lightSource )
+{
+	if( !mLightSources.contains( lightSource ) )
+		mLightSources.append( lightSource );
+}
+
+
+void World::removeLightSource( ALightSource * lightSource )
+{
+	mLightSources.removeOne( lightSource );
 }
 
 
@@ -108,43 +110,6 @@ void World::keyReleaseEvent( QKeyEvent * event )
 }
 
 
-void World::mouseMoveEvent( MouseMoveEvent * event )
-{
-
-}
-
-
-void World::mousePressEvent( QGraphicsSceneMouseEvent * event )
-{
-	if( event->button() == Qt::RightButton )
-	{
-		mDragTeapot = true;
-	}
-	else if( event->button() == Qt::MiddleButton )
-	{
-		mDragTorch = true;
-	}
-}
-
-
-void World::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
-{
-	if( event->button() == Qt::RightButton )
-	{
-		mDragTeapot = false;
-	}
-	else if( event->button() == Qt::MiddleButton )
-	{
-		mDragTorch = false;
-	}
-}
-
-
-void World::mouseWheelEvent( QGraphicsSceneWheelEvent * event )
-{
-}
-
-
 void World::updateSelf( const double & delta )
 {
 	mTimeOfDay += 0.01f * delta;
@@ -165,20 +130,7 @@ void World::updateSelf( const double & delta )
 
 void World::updateSelfPost( const double & delta )
 {
-	float length = 300.0f;
-	if( getLineIntersection( mPlayer->position(),mPlayer->direction(), length, mTargetNormal ) )
-		mTarget = mPlayer->position() + mPlayer->direction() * length;
 
-	if( mDragTeapot )
-	{
-		mTeapot->setPosition( mTarget );
-		mTeapot->moveY( 3 );
-	}
-	if( mDragTorch )
-	{
-		mTorch->setPosition( mTarget );
-		mTorch->moveY( 1 );
-	}
 }
 
 
@@ -190,14 +142,13 @@ void World::drawSelf()
 	glLight( GL_LIGHT0, GL_SPECULAR, mSky->specular() );
 	glEnable( GL_LIGHT0 );
 
-	glLight( GL_LIGHT1, GL_POSITION, QVector4D(	mTorch->position(),	1	) );
-	glLight( GL_LIGHT1, GL_AMBIENT, QVector4D(	0,	0,	0,	1	) );
-	glLight( GL_LIGHT1, GL_DIFFUSE, QVector4D(	mTorch->color()	) );
-	glLight( GL_LIGHT1, GL_SPECULAR, QVector4D(	mTorch->color()	) );
-	glLight( GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.0f );
-	glLight( GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.05f );
-	glLight( GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.0f );
-	glEnable( GL_LIGHT1 );
+	int light = 1;
+	QList< ALightSource * >::iterator i;
+	for( i = mLightSources.begin(); i != mLightSources.end(); ++i )
+	{
+		(*i)->updateLightSource( GL_LIGHT0+light );
+		light++;
+	}
 
 	glFog( GL_FOG_COLOR, mSky->baseColor() );
 	glFog( GL_FOG_START, scene()->eye()->farPlane()*0.9f );

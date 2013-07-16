@@ -78,7 +78,7 @@ void Laser::drawSelf()
 }
 
 
-void Laser::drawAfterSelf()
+void Laser::draw2Self()
 {
 	glColor4f( 0.2, 0.4, 1.0f, mTrailAlpha );
 

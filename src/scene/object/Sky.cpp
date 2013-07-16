@@ -4,6 +4,7 @@
 #include <utility/occlusion.hpp>
 #include <resource/Shader.hpp>
 #include <scene/Scene.hpp>
+#include <scene/TextureRenderer.hpp>
 
 #include <QGLShaderProgram>
 #include <QSettings>
@@ -364,7 +365,7 @@ void Sky::drawSelf()
 }
 
 
-void Sky::drawAfterSelf()
+void Sky::draw2Self()
 {
 	scene()->eye()->disableClippingPlanes();
 	glPushAttrib( GL_VIEWPORT_BIT | GL_DEPTH_BUFFER_BIT );
@@ -384,6 +385,8 @@ void Sky::drawAfterSelf()
 
 void Sky::drawSunFlare()
 {
+	if( TextureRenderer::isActive() )
+		return;
 	glPushMatrix();
 	QVector3D sunPoint( mSunDirection * scene()->eye()->farPlane() );
 	if( !occlusionTest( sunPoint ) )

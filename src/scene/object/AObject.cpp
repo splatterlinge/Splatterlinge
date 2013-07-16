@@ -77,6 +77,19 @@ void AObject::update( const double & delta )
 }
 
 
+void AObject::update2( const double & delta )
+{
+	updateMatrix();
+	update2Self( delta );
+	QList< QSharedPointer<AObject> >::iterator i;
+	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
+	{
+		(*i)->update2( delta );
+	}
+	update2SelfPost( delta );
+}
+
+
 void AObject::draw()
 {
 	if( !matrix().isIdentity() )
@@ -113,7 +126,7 @@ void AObject::draw()
 }
 
 
-void AObject::drawAfter()
+void AObject::draw2()
 {
 	if( !matrix().isIdentity() )
 	{
@@ -124,7 +137,7 @@ void AObject::drawAfter()
 	if( mSubNodes.size() )
 		mFrustumTest.sync();
 
-	drawAfterSelf();
+	draw2Self();
 	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
@@ -132,12 +145,13 @@ void AObject::drawAfter()
 		{
 			if( mFrustumTest.isSphereInFrustum( (*i)->position(), (*i)->boundingSphereRadius() ) )
 			{
-				(*i)->drawAfter();
+				(*i)->draw2();
 			}
 		} else {	// zero radius -> no frustum culling
-			(*i)->drawAfter();
+			(*i)->draw2();
 		}
 	}
+	draw2SelfPost();
 
 	if( !matrix().isIdentity() )
 	{

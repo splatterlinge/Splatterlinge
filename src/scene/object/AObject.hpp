@@ -11,6 +11,7 @@
 #include <QSharedPointer>
 
 #include <utility/FrustumTest.hpp>
+#include "ALightSource.hpp"
 
 
 class Scene;
@@ -23,16 +24,21 @@ class Scene;
  * Other objects can be subordinated and are transformed relative to their parents.\n
  * - This is the usual rendering sequence:\n
  *   - Update:
- *     1. updateSelf( const float & delta )
- *     2. (update subnodes)
- *     3. updateSelfPost( const float & delta )
+ *      1. updateSelf( const float & delta )
+ *      2. (update subnodes)
+ *      3. updateSelfPost( const float & delta )
+ *   - Update (second pass):
+ *      4. update2Self( const float & delta )
+ *      5. (update subnodes - second pass)
+ *      6. update2SelfPost( const float & delta )
  *   - Draw:
- *     4. drawSelf()
- *     5. (draw subnodes)
- *     6. drawSelfPost()
- *   - PostProc
- *     7. drawSelfPostProc()
- *     8. (draw subnode's post proc)
+ *      7. drawSelf()
+ *      8. (draw subnodes)
+ *      9. drawSelfPost()
+ *   - Draw (second pass):
+ *     10. draw2Self()
+ *     11. (draw subnodes - second pass)
+ *     12. draw2SelfPost()
  */
 class AObject
 {
@@ -46,8 +52,11 @@ public:
 	/// Copies an object
 	AObject & operator=( const AObject & other );
 
+	/// Transform a vector from local object space to world space
 	const QVector4D toWorld( const QVector4D & v ) { validateMatrix(); return mMatrix * v; }
+	/// Transform a point vectorfrom local object space to world space
 	const QVector3D pointToWorld( const QVector3D & v ) { validateMatrix(); return (mMatrix * QVector4D(v,1)).toVector3D(); }
+	/// Transform a direction vector from local object space to world space
 	const QVector3D directionToWorld( const QVector3D & v ) { validateMatrix(); return (mMatrix * QVector4D(v,0)).toVector3D(); }
 
 	/// Returns the transformation matrix to world space
@@ -106,24 +115,35 @@ public:
 	/// Updates this object and all of it's sub-objects
 	void update( const double & delta );
 	/// Abstract method for updating this object
-	virtual void updateSelf( const double & delta ) = 0;
+	virtual void updateSelf( const double & delta ) {}
 	/// Executed after all sub-objects are updated
-	virtual void updateSelfPost( const double & delta ) {};
+	virtual void updateSelfPost( const double & delta ) {}
+
+	/// Updates this object and all of it's sub-objects (second pass)
+	void update2( const double & delta );
+	/// Abstract method for updating this object (second pass)
+	virtual void update2Self( const double & delta ) {}
+	/// Executed after all sub-objects are updated (second pass)
+	virtual void update2SelfPost( const double & delta ) {}
 
 	/// Draws this object and all of it's sub-objects
 	void draw();
 	/// Abstract method for drawing this object
-	virtual void drawSelf() = 0;
+	virtual void drawSelf() {}
 	/// Executed after all sub-objects are drawn
-	virtual void drawSelfPost() {};
+	virtual void drawSelfPost() {}
 
-	/// Executed after the usual drawing functions - e.g. for rendering FBOs
-	void drawAfter();
-	/// Executed after the usual drawing functions - e.g. for rendering FBOs
-	virtual void drawAfterSelf() {};
+	/// Draws this object and all of it's sub-objects (second pass)
+	void draw2();
+	/// Abstract method for drawing this object (second pass)
+	virtual void draw2Self() {}
+	/// Executed after all sub-objects are drawn (second pass)
+	virtual void draw2SelfPost() {}
 
+	/// Returns the bounding sphere
 	const float & boundingSphereRadius() const { return mBoundingSphereRadius; }
 
+	/// Causes all objects to draw the bounding sphere
 	static void setGlobalDebugBoundingSpheres( bool enable ) { sDebugBoundingSpheres = enable; }
 
 protected:
@@ -144,9 +164,9 @@ private:
 
 	/// Precalculated matrix
 	mutable QMatrix4x4 mMatrix;
-	/// Updates this object's matrix to match it's position and rotation
+	/// Updates this object's model matrix
 	void updateMatrix() const;
-
+	/// Synchronizes matrix to current position and rotation if necessary
 	void validateMatrix() const { if( mMatrixNeedsUpdate ) { updateMatrix(); mMatrixNeedsUpdate = false; } }
 
 	void setParent( AObject * parent ) { mParent = parent; }

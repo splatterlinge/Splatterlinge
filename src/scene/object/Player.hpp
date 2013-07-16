@@ -2,6 +2,8 @@
 #define SCENE_OBJECT_PLAYER_INCLUDED
 
 #include "AObject.hpp"
+#include "Teapot.hpp"
+#include "Torch.hpp"
 #include "weapon/AWeapon.hpp"
 #include <scene/AKeyListener.hpp>
 #include <scene/AMouseListener.hpp>
@@ -20,8 +22,9 @@ public:
 	virtual ~Player();
 
 	virtual void updateSelf( const double & delta );
+	virtual void update2Self( const double & delta );
 	virtual void drawSelf();
-	virtual void drawAfterSelf();
+	virtual void draw2Self();
 
 	virtual void keyPressEvent( QKeyEvent * event );
 	virtual void keyReleaseEvent( QKeyEvent * event );
@@ -49,6 +52,10 @@ private:
 	float mHeightAboveGround;
 	float mAxisRotationX;
 	float mAxisRotationY;
+	bool mDragTeapot;
+	bool mDragTorch;
+	QSharedPointer<Torch> mTorch;
+	QSharedPointer<Teapot> mTeapot;
 	QList< QSharedPointer<AWeapon> > mWeapons;
 	QSharedPointer<AWeapon> mCurrentWeapon;
 };

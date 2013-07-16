@@ -10,8 +10,6 @@
 #include "Player.hpp"
 #include "Sky.hpp"
 #include "Landscape.hpp"
-#include "Teapot.hpp"
-#include "Torch.hpp"
 #include "WavefrontObject.hpp"
 
 
@@ -25,7 +23,7 @@ class SplatterSystem;
 /**
  *
  */
-class World : public AObject, public AKeyListener, public AMouseListener
+class World : public AObject, public AKeyListener
 {
 public:
 	World( Scene * scene, QString name );
@@ -38,10 +36,9 @@ public:
 
 	virtual void keyPressEvent( QKeyEvent * event );
 	virtual void keyReleaseEvent( QKeyEvent * event );
-	virtual void mousePressEvent( QGraphicsSceneMouseEvent * event );
-	virtual void mouseReleaseEvent( QGraphicsSceneMouseEvent * event );
-	virtual void mouseMoveEvent( MouseMoveEvent * event );
-	virtual void mouseWheelEvent( QGraphicsSceneWheelEvent * event );
+
+	void addLightSource( ALightSource * lightSource );
+	void removeLightSource( ALightSource * lightSource );
 
 	SplatterSystem * splatterSystem() { return mSplatterSystem; }
 
@@ -67,15 +64,12 @@ private:
 	QSharedPointer<Sky> mSky;
 	QSharedPointer<Landscape> mLandscape;
 	QSharedPointer<Player> mPlayer;
-	QSharedPointer<Teapot> mTeapot;
-	QSharedPointer<Torch> mTorch;
 	QSharedPointer<WavefrontObject> mTable;
 	QSharedPointer<WavefrontObject> mTree;
 	QVector3D mTarget;
 	QVector3D mTargetNormal;
-	bool mDragTeapot;
-	bool mDragTorch;
 	SplatterSystem * mSplatterSystem;
+	QList< ALightSource * > mLightSources;
 };
 
 

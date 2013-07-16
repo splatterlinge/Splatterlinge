@@ -30,7 +30,7 @@ public:
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 	virtual void drawSelfPost();
-	virtual void drawAfterSelf();
+	virtual void draw2SelfPost();
 	
 	void drawPatch( const QRectF & rect );
 
@@ -94,13 +94,14 @@ private:
 	QVector3D mTerrainSize;
 	QVector3D mTerrainOffset;
 	QVector2D mTerrainMaterialScale;
-
 	float mWaterHeight;
 	Shader * mWaterShader;
 	TextureRenderer * mReflectionRenderer;
 	TextureRenderer * mRefractionRenderer;
 	float mWaterClippingPlaneOffset;
-	
+	bool mDrawingReflection;
+	bool mDrawingRefraction;
+
 	void renderReflection();
 	void renderRefraction();
 };

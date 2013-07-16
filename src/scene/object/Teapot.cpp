@@ -8,7 +8,7 @@
 
 
 Teapot::Teapot( Scene * scene, const float & size ) :
-	AObject( scene, size*2.0f ),
+	AObject( scene, size*1.5f ),
 	mSize( size )
 {
 	mMaterial = new Material( scene->glWidget(), "KirksEntry" );
@@ -41,7 +41,7 @@ void Teapot::drawSelf()
 {
 	mMaterial->bind();
 	glPushMatrix();
-	glTranslatef( 0, -mSize*0.6, 0 );
+	glTranslatef( 0, mSize*0.6, 0 );
 	teapot( 6, mSize, GL_FILL );
 	glPopMatrix();
 	mMaterial->release();
