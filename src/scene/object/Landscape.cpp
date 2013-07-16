@@ -112,18 +112,18 @@ void Landscape::renderReflection()
 	Eye * sceneEye = scene()->eye();
 
 	Eye mirroredEye( *sceneEye );
+	mirroredEye.detach();
 	QQuaternion r = mirroredEye.rotation();
 	r.setX( -r.x() );
 	r.setZ( -r.z() );
-	mirroredEye.detach();
 	mirroredEye.setRotation( r );
 	mirroredEye.setPositionY( -mirroredEye.position().y() + 2*mWaterHeight);
+	mirroredEye.setScale( QVector3D( 1,-1, 1 ) );
 	if( scene()->eye()->position().y()>mWaterHeight )
 		mirroredEye.setClippingPlane( 0, QVector4D(0,1,0, -mWaterHeight+mWaterClippingPlaneOffset) );
 	else
 		mirroredEye.setClippingPlane( 0, QVector4D(0,-1,0, mWaterHeight+mWaterClippingPlaneOffset) );
 	scene()->setEye( &mirroredEye );
-	glScalef( 1, -1, 1 );
 
 	glCullFace( GL_FRONT );
 	scene()->eye()->applyGL();
@@ -337,6 +337,8 @@ void Landscape::Filter::update()
 
 void Landscape::Filter::draw()
 {
+	FrustumTest frustumTest;
+	frustumTest.sync();
 	for( int z=0; z<mFilterSize.height(); ++z )
 	{
 		QRectF mergedRect;	// we will merge patches along the x axis as this is optimal for the terrain mesh VBO
@@ -353,12 +355,14 @@ void Landscape::Filter::draw()
 			glColor3f( 1, 1, 1 );
 			glPushMatrix();
 			glTranslate( spherePosition );
+			glDisable( GL_CULL_FACE );
 			gluSphere( q, patch.boundingSphereRadius(), 32, 32 );
+			glEnable( GL_CULL_FACE );
 			glPopMatrix();
 			glPopAttrib();
 			gluDeleteQuadric( q );
 			*/
-			if( mLandscape->scene()->eye()->isSphereInFrustum( spherePosition, patch.boundingSphereRadius() ) )
+			if( frustumTest.isSphereInFrustum( spherePosition, patch.boundingSphereRadius() ) )
 			{
 				mergedRect = mergedRect.united(
 					QRectF(

@@ -55,11 +55,6 @@ public:
 	/// Disables all defined clipping planes.
 	void disableClippingPlanes();
 
-	/// Visibility test on viewing frustum.
-	bool isPointInFrustum( QVector3D point ) const ;
-	/// Visibility test on viewing frustum.
-	bool isSphereInFrustum( QVector3D center, float radius ) const;
-
 	/// Sets the position
 	void setPosition( const QVector3D & position ) { mPosition = position; }
 	/// Sets the position on the X axis
@@ -68,13 +63,20 @@ public:
 	void setPositionY( const qreal & y ) { mPosition.setY(y); }
 	/// Sets the position on the Z axis
 	void setPositionZ( const qreal & z ) { mPosition.setZ(z); }
+
 	/// Sets the rotation
 	void setRotation( const QQuaternion & rotation ) { mRotation = rotation; }
+
+	void setScale( const QVector3D & scale ) { mScale = scale; }
 
 	/// The object's position
 	const QVector3D & position() const { return mPosition; }
 	/// The object's rotation
 	const QQuaternion & rotation() const { return mRotation; }
+
+	const QVector3D & scale() const { return mScale; }
+	const QMatrix4x4 & matrix() const { return mMatrix; }
+	const QMatrix4x4 & matrixInverse() const { return mMatrixInverse; }
 
 protected:
 
@@ -82,14 +84,15 @@ private:
 	Scene * mScene;
 	QVector3D mPosition;
 	QQuaternion mRotation;
+	QVector3D mScale;
 	QWeakPointer<AObject> mAttached;
 	QMap<int,QVector4D> mClippingPlanes;
 	void applyClippingPlanes();
 	float mFOV;
 	float mNearPlane;
 	float mFarPlane;
-	QVector4D mFrustum[6];
-	void prepareFrustum();
+	QMatrix4x4 mMatrix;
+	QMatrix4x4 mMatrixInverse;
 };
 
 

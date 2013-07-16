@@ -2,6 +2,7 @@
 #define SCENE_OBJECT_PLAYER_INCLUDED
 
 #include "AObject.hpp"
+#include "weapon/AWeapon.hpp"
 #include <scene/AKeyListener.hpp>
 #include <scene/AMouseListener.hpp>
 
@@ -48,6 +49,8 @@ private:
 	float mHeightAboveGround;
 	float mAxisRotationX;
 	float mAxisRotationY;
+	QList< QSharedPointer<AWeapon> > mWeapons;
+	QSharedPointer<AWeapon> mCurrentWeapon;
 };
 
 #endif

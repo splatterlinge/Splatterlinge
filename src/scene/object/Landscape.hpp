@@ -86,7 +86,6 @@ private:
 		QVector<Patch> mPatches;
 	};
 
-
 	QString mName;
 	QVector<Blob*> mBlobs;
 	Terrain * mTerrain;

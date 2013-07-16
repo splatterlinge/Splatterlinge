@@ -8,7 +8,7 @@
 
 
 Teapot::Teapot( Scene * scene, const float & size ) :
-	AObject( scene, size ),
+	AObject( scene, size*2.0f ),
 	mSize( size )
 {
 	mMaterial = new Material( scene->glWidget(), "KirksEntry" );

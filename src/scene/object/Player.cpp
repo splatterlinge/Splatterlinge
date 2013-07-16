@@ -4,6 +4,7 @@
 #include <geometry/SplatterSystem.hpp>
 #include "World.hpp"
 #include "Landscape.hpp"
+#include "weapon/Laser.hpp"
 
 
 Player::Player( Scene * scene, World * world ) :
@@ -26,6 +27,10 @@ Player::Player( Scene * scene, World * world ) :
 	mAxisRotationY = 0.0f;
 
 	mTarget = QVector3D(0,0,0);
+
+	mCurrentWeapon = QSharedPointer<Laser>( new Laser( scene, mWorld ) );
+	mWeapons.append( mCurrentWeapon );
+	add( mCurrentWeapon );
 
 	scene->addKeyListener( this );
 	scene->addMouseListener( this );
@@ -114,14 +119,17 @@ void Player::mousePressEvent( QGraphicsSceneMouseEvent * event )
 {
 	if( event->button() == Qt::LeftButton )
 	{
-		mWorld->splatterSystem()->spray( mTarget+QVector3D(0,3,0), 30.0f );
+		mCurrentWeapon->triggerPressed();
 	}
 }
 
 
 void Player::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
-
+	if( event->button() == Qt::LeftButton )
+	{
+		mCurrentWeapon->triggerReleased();
+	}
 }
 
 
@@ -143,6 +151,8 @@ void Player::updateSelf( const double & delta )
 	QQuaternion qX = QQuaternion::fromAxisAndAngle( 1,0,0, mAxisRotationX );
 	QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, mAxisRotationY );
 	setRotation( qY * qX );
+
+	mCurrentWeapon->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
 
 	if( mGodMode )
 	{

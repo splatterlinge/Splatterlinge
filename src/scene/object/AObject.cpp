@@ -53,7 +53,12 @@ AObject & AObject::operator=( const AObject & other )
 
 void AObject::updateMatrix() const
 {
-	mMatrix.setToIdentity();
+	if( mParent )
+	{
+		mMatrix = mParent->matrix();
+	} else {
+		mMatrix.setToIdentity();
+	}
 	mMatrix.translate( position() );
 	mMatrix.rotate( rotation() );
 }
@@ -61,6 +66,7 @@ void AObject::updateMatrix() const
 
 void AObject::update( const double & delta )
 {
+	updateMatrix();
 	updateSelf( delta );
 	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
@@ -76,8 +82,11 @@ void AObject::draw()
 	if( !matrix().isIdentity() )
 	{
 		glPushMatrix();
+		glLoadMatrix( scene()->eye()->matrix() );
 		glMultMatrix( matrix() );
 	}
+	if( mSubNodes.size() )
+		mFrustumTest.sync();
 
 	drawSelf();
 	QList< QSharedPointer<AObject> >::iterator i;
@@ -85,7 +94,7 @@ void AObject::draw()
 	{
 		if( (*i)->boundingSphereRadius() > FLT_EPSILON )	// nonzero radius -> do frustum culling
 		{
-			if( scene()->eye()->isSphereInFrustum( (*i)->position(), (*i)->boundingSphereRadius() ) )
+			if( mFrustumTest.isSphereInFrustum( (*i)->position(), (*i)->boundingSphereRadius() ) )
 			{
 				(*i)->draw();
 			}
@@ -109,8 +118,11 @@ void AObject::drawAfter()
 	if( !matrix().isIdentity() )
 	{
 		glPushMatrix();
+		glLoadMatrix( scene()->eye()->matrix() );
 		glMultMatrix( matrix() );
 	}
+	if( mSubNodes.size() )
+		mFrustumTest.sync();
 
 	drawAfterSelf();
 	QList< QSharedPointer<AObject> >::iterator i;
@@ -118,7 +130,7 @@ void AObject::drawAfter()
 	{
 		if( (*i)->boundingSphereRadius() > FLT_EPSILON )	// nonzero radius -> do frustum culling
 		{
-			if( scene()->eye()->isSphereInFrustum( (*i)->position(), (*i)->boundingSphereRadius() ) )
+			if( mFrustumTest.isSphereInFrustum( (*i)->position(), (*i)->boundingSphereRadius() ) )
 			{
 				(*i)->drawAfter();
 			}
@@ -159,7 +171,9 @@ void AObject::drawBoundingShpere()
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	glDisable( GL_LIGHTING );
 	glColor3f( 1, 1, 1 );
+	glDisable( GL_CULL_FACE );
 	gluSphere( q, mBoundingSphereRadius, 16, 16 );
+	glEnable( GL_CULL_FACE );
 	glPopAttrib();
 	gluDeleteQuadric( q );
 }
