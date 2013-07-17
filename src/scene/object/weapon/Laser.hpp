@@ -10,6 +10,7 @@ class Scene;
 class World;
 
 
+/// Caution - Laser
 class Laser : public AWeapon
 {
 public:

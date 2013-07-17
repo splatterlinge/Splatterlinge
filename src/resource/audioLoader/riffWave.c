@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 
+/// The Resource Interchange File Format (RIFF) container header
 typedef struct
 {
 	char chunkID[4];	// should contain "RIFF"
@@ -15,6 +16,7 @@ typedef struct
 } RIFFHeader;
 
 
+/// Wave format descriptor
 typedef struct
 {
 	char subChunkID[4];	// should contain "fmt "
@@ -28,6 +30,7 @@ typedef struct
 } WAVEFormat;
 
 
+/// Wave data header
 typedef struct
 {
 	char subChunkID[4];	// should contain "data"

@@ -15,6 +15,7 @@ class AudioSample;
 class Material;
 
 
+/// Simulates splatter on a terrain
 class SplatterSystem : ParticleSystem::Interactable
 {
 public:
@@ -36,6 +37,7 @@ public:
 	
 	ParticleSystem * particleSystem() const { return mParticleSystem; }
 
+	// Overrides:
 	virtual void particleInteraction( const double & delta, ParticleSystem::Particle & particle );
 
 protected:

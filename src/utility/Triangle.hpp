@@ -5,6 +5,7 @@
 #include <QVector3D>
 
 
+/// Triangle
 class Triangle
 {
 public:

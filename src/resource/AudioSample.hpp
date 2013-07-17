@@ -13,19 +13,22 @@
 class AObject;
 
 
+/// Audio sample data
 class AudioSampleData : public AResourceData
 {
 public:
 	AudioSampleData( QString file );
 	virtual ~AudioSampleData();
-	virtual bool load();
-	virtual void unload();
 
 	const QString & file() const { return mFile; }
 
 	ALuint buffer() const { return mBuffer; }
 	ALsizei frequency() const { return mFrequency; }
 	ALenum format() const { return mFormat; }
+
+	// Overrides:
+	virtual bool load();
+	virtual void unload();
 
 private:
 	QString mFile;
@@ -35,6 +38,7 @@ private:
 };
 
 
+/// Audio sample source
 class AudioSample : public AResource<AudioSampleData>
 {
 public:
@@ -66,7 +70,6 @@ public:
 	void rewind() { if( mSource ) alSourceRewind( mSource ); }
 	void play() { if( mSource ) alSourcePlay( mSource ); }
 	void stop() { if( mSource ) alSourceStop( mSource ); }
-
 
 private:
 	ALuint mSource;

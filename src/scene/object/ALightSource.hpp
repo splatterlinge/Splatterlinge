@@ -10,10 +10,12 @@
 class Scene;
 
 
+/// Abstract base class for light sources
 class ALightSource
 {
 public:
 	virtual void updateLightSource( GLenum light ) = 0;
 };
+
 
 #endif

@@ -14,13 +14,10 @@
  */
 class AResourceData
 {
-private:
-	QString mUID;
-	bool mLoaded;
-
 public:
 	/// Initializes a description to the data identified by given UID
 	AResourceData( const QString & uid ) : mUID(uid), mLoaded(false) {}
+	/// Abstract destructor
 	virtual ~AResourceData() = 0;
 
 	/// Returns this data's unique identifier
@@ -31,11 +28,15 @@ public:
 
 	/// Loads the data to memory
 	virtual bool load() { mLoaded = true; return true; }
-
+	/// Unload data
 	virtual void unload() { mLoaded = false; }
 
 	virtual bool operator==( const AResourceData & rhs ) const { return mUID==rhs.mUID; }
 	virtual bool operator!=( const AResourceData & rhs ) const { return !(*this==rhs); }
+
+private:
+	QString mUID;
+	bool mLoaded;
 };
 
 
@@ -49,9 +50,15 @@ public:
 template< class T >
 class AResource
 {
-private:
-	static QHash< QString, QWeakPointer<T> > sCache;
-	QSharedPointer<T> mData;
+public:
+	AResource() {};
+	virtual ~AResource() {};
+
+	/// Returns the pointer to this resource's data
+	const QSharedPointer<T> & constData() const { return mData; }
+
+	/// Returns the entire cache for this resource type
+	static const QHash< QString, QWeakPointer<T> > & cache() { return sCache; }
 
 protected:
 	/// Returns the pointer to this resource's data
@@ -78,14 +85,9 @@ protected:
 		}
 	}
 
-public:
-	AResource() {};
-	virtual ~AResource() {};
-
-	/// Returns the pointer to this resource's data.
-	const QSharedPointer<T> & constData() const { return mData; }
-
-	static const QHash< QString, QWeakPointer<T> > & cache() { return sCache; }
+private:
+	static QHash< QString, QWeakPointer<T> > sCache;
+	QSharedPointer<T> mData;
 };
 
 

@@ -16,11 +16,11 @@ extern "C" {
  **/
 
 
-#define AUDIOLOADER_NOERROR		0
-#define AUDIOLOADER_FILENOTFOUND	1
-#define AUDIOLOADER_INVALIDCONTAINER	2
-#define AUDIOLOADER_INVALIDCODEC	3
-#define AUDIOLOADER_INVALIDFORMAT	4
+#define AUDIOLOADER_NOERROR		0	///< No error occurred
+#define AUDIOLOADER_FILENOTFOUND	1	///< File not existing
+#define AUDIOLOADER_INVALIDCONTAINER	2	///< Unsupported container
+#define AUDIOLOADER_INVALIDCODEC	3	///< Unsupported codec
+#define AUDIOLOADER_INVALIDFORMAT	4	///< Unsupported format
 
 
 /// Loads the given audio file to a new OpenAL buffer and returns its identifier and additional information

@@ -16,6 +16,7 @@ class GLWidget;
 class World;
 
 
+/// View on a scene
 class View : public QGraphicsView
 {
 	Q_OBJECT
@@ -23,15 +24,15 @@ public:
 	View( QWidget * parent = 0 );
 	virtual ~View();
 
-	// Overrides:
-	Scene * scene() const { return mScene; }
-
 	GLWidget * glWidget() const { return mGLWidget; }
+
+	// Overrides:
+	virtual Scene * scene() const { return mScene; }
 
 protected:
 	// Overrides:
-	void resizeEvent( QResizeEvent * event );
-	void keyPressEvent( QKeyEvent * event );
+	virtual void resizeEvent( QResizeEvent * event );
+	virtual void keyPressEvent( QKeyEvent * event );
 
 private:
 	GLWidget * mGLWidget;
@@ -40,7 +41,7 @@ private:
 	QWidget * mDebugOptionWindow;
 	QWidget * mGfxOptionWindow;
 	QWidget * mHelpWindow;
-    QWidget * mStartMenu;
+	QWidget * mStartMenu;
 
 	ALCdevice * mALDevice;
 	ALCcontext * mALContext;

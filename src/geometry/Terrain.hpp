@@ -35,6 +35,7 @@ public:
 	 */
 	Terrain( QString heightMapPath, QVector3D size = QVector3D(1,1,1), QVector3D offset = QVector3D(0,0,0) );
 
+	/// Frees terrain data
 	~Terrain();
 
 	/// Draws the complete terrain.
@@ -81,13 +82,13 @@ public:
 	void drawPatchMap( const QRect & rect );
 
 	QPointF toMapF( const QVector3D & point ) const;	///< Converts a vector in world coordinates to heightmap coordinates.
-	QPointF toMapF( const QPointF & point ) const;	///< Converts a point in world coordinates to heightmap coordinates.
-	QSizeF toMapF( const QSizeF & size ) const;	///< Converts a size in world coordinates to heightmap coordinates.
-	QRectF toMapF( const QRectF & rect ) const;	///< Converts a point in world coordinates to heightmap coordinates.
-	QPoint toMap( const QVector3D & point ) const;	///< Converts a vector in world coordinates to heightmap coordinates.
-	QPoint toMap( const QPointF & point ) const;	///< Converts a point in world coordinates to heightmap coordinates.
-	QSize toMap( const QSizeF & size ) const;	///< Converts a size in world coordinates to heightmap coordinates.
-	QRect toMap( const QRectF & rect ) const;	///< Converts a rectangle in world coordinates to heightmap coordinates.
+	QPointF toMapF( const QPointF & point ) const;		///< Converts a point in world coordinates to heightmap coordinates.
+	QSizeF toMapF( const QSizeF & size ) const;		///< Converts a size in world coordinates to heightmap coordinates.
+	QRectF toMapF( const QRectF & rect ) const;		///< Converts a point in world coordinates to heightmap coordinates.
+	QPoint toMap( const QVector3D & point ) const;		///< Converts a vector in world coordinates to heightmap coordinates.
+	QPoint toMap( const QPointF & point ) const;		///< Converts a point in world coordinates to heightmap coordinates.
+	QSize toMap( const QSizeF & size ) const;		///< Converts a size in world coordinates to heightmap coordinates.
+	QRect toMap( const QRectF & rect ) const;		///< Converts a rectangle in world coordinates to heightmap coordinates.
 
 	const QSize & mapSize() const { return mMapSize; }	///< The size of the heightmap.
 	const QVector3D & size() const { return mSize; }	///< The size of the terrain.
@@ -98,27 +99,28 @@ public:
 	const QVector3D & getVertexNormal( const int & x, const int & y ) const;	///< The normal at heightmap coordinates.
 	const QVector3D & getVertexNormal( const QPoint & p ) const;			///< The normal at heightmap coordinates.
 
-	QQuaternion getNormalRotation( const QVector3D & position, const QVector3D & from = QVector3D(0,1,0) ) const
-		{ return getNormalRotation( QPointF( position.x(), position.z() ), from ); }
+	/// Returns the rotation needed to match the terrains surface normal
+	QQuaternion getNormalRotation( const QVector3D & position, const QVector3D & from = QVector3D(0,1,0) ) const;
+	/// Returns the rotation needed to match the terrains surface normal
 	QQuaternion getNormalRotation( const QPointF & position, const QVector3D & from = QVector3D(0,1,0) ) const;
 
-	bool getTriangle( const QVector3D & position, Triangle & t ) const;
-	bool getTriangle( const QPointF & position, Triangle & t ) const;
-	Triangle getTriangle( const QVector3D & position ) const;
-	Triangle getTriangle( const QPointF & position ) const;
-	bool getNormal( const QVector3D & position, QVector3D & normal ) const;
-	bool getNormal( const QPointF & position, QVector3D & normal ) const;
-	QVector3D getNormal( const QVector3D & position ) const;
-	QVector3D getNormal( const QPointF & position ) const;
-	bool getHeight( const QVector3D & position, float & height ) const;
-	bool getHeight( const QPointF & position, float & height ) const;
-	float getHeight( const QVector3D & position ) const;
-	float getHeight( const QPointF & position ) const;
-	bool getHeightAboveGround( const QVector3D & position, float & heightAboveGround ) const;
-	float getHeightAboveGround( const QVector3D & position ) const;
+	bool getTriangle( const QVector3D & position, Triangle & t ) const;	///< Returns the triangle below a position if existing
+	bool getTriangle( const QPointF & position, Triangle & t ) const;	///< Returns the triangle below a position if existing
+	Triangle getTriangle( const QVector3D & position ) const;		///< Returns the nearest triangle below a position
+	Triangle getTriangle( const QPointF & position ) const;			///< Returns the nearest triangle below a position
+	bool getNormal( const QVector3D & position, QVector3D & normal ) const;	///< Returns the normal below a position if existing
+	bool getNormal( const QPointF & position, QVector3D & normal ) const;	///< Returns the normal below a position if existing
+	QVector3D getNormal( const QVector3D & position ) const;		///< Returns the nearest normal below a position
+	QVector3D getNormal( const QPointF & position ) const;			///< Returns the nearest normal below a position
+	bool getHeight( const QVector3D & position, float & height ) const;	///< Returns the height of the terrain below a position if existing
+	bool getHeight( const QPointF & position, float & height ) const;	///< Returns the height of the terrain below a position if existing
+	float getHeight( const QVector3D & position ) const;			///< Returns the height of the terrain below a position
+	float getHeight( const QPointF & position ) const;			///< Returns the height of the terrain below a position
+	bool getHeightAboveGround( const QVector3D & position, float & heightAboveGround ) const;	///< Returns the height above terrain if existing
+	float getHeightAboveGround( const QVector3D & position ) const;					///< Returns the height above terrain
 
 	/// Calculates the intersection distance to the terrain. length is used as input and output.
-	bool getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & lengthl ) const;
+	bool getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length ) const;
 
 	/// Calculates the intersection distance to the terrain. length is used as input and output.
 	bool getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D & normal ) const;
@@ -242,6 +244,11 @@ inline bool Terrain::getNormal( const QVector3D & position, QVector3D & normal )
 inline QVector3D Terrain::getNormal( const QVector3D & position ) const
 {
 	return getNormal( QPointF(position.x(),position.z()) );
+}
+
+inline QQuaternion Terrain::getNormalRotation( const QVector3D & position, const QVector3D & from ) const
+{
+	return getNormalRotation( QPointF( position.x(), position.z() ), from );
 }
 
 

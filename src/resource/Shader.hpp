@@ -12,18 +12,21 @@
 class QGLShaderProgram;
 
 
+/// Compiled shader program data
 class ShaderData : public AResourceData
 {
 public:
 	ShaderData( GLWidget * glWidget, QString name );
 	virtual ~ShaderData();
-	virtual bool load();
-	virtual void unload();
-	
+
 	QGLShaderProgram * program() { return mProgram; }
 	const QGLShaderProgram * program() const { return mProgram; }
 
 	const QString & name() const { return mName; }
+
+	// Overrides:
+	virtual bool load();
+	virtual void unload();
 
 private:
 	GLWidget * mGLWidget;
@@ -33,6 +36,7 @@ private:
 };
 
 
+/// Shader program
 class Shader : public AResource<ShaderData>
 {
 public:

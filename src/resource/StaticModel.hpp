@@ -7,21 +7,25 @@
 #include <QDebug>
 
 
+/// The model's data
 class StaticModelData : public AResourceData
 {
 public:
 	StaticModelData( QString name );
 	virtual ~StaticModelData();
-	virtual bool load();
-	virtual void unload();
 
 	const QString & name() const { return mName; }
+
+	// Overrides:
+	virtual bool load();
+	virtual void unload();
 
 private:
 	QString mName;
 };
 
 
+/// A static model
 class StaticModel : public AResource<StaticModelData>
 {
 public:

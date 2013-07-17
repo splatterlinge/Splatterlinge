@@ -6,6 +6,7 @@
 #include <QVector4D>
 
 
+/// Frustum culling
 class FrustumTest
 {
 public:

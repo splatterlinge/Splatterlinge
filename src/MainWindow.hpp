@@ -10,6 +10,7 @@
 class View;
 
 
+/// The main window
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT

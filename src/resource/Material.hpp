@@ -12,6 +12,7 @@ class GLWidget;
 class Shader;
 
 
+/// Material's quality settings
 class MaterialQuality
 {
 public:
@@ -31,6 +32,7 @@ private:
 };
 
 
+/// Material's shader variants
 class MaterialShaderVariant
 {
 public:
@@ -43,13 +45,12 @@ public:
 };
 
 
+/// Material's data
 class MaterialData : public AResourceData
 {
 public:
 	MaterialData( GLWidget * glWidget, QString name );
 	virtual ~MaterialData();
-	virtual bool load();
-	virtual void unload();
 
 	const QString & name() const { return mName; }
 	const QVector4D & ambient() const { return mAmbient; }
@@ -64,6 +65,10 @@ public:
 	const GLclampf & alphaTestReferenceValue() const { return mAlphaTestReferenceValue; }
 	const GLenum & alphaTestFunction() const { return mAlphaTestFunction; }
 	const bool & alphaTestEnabled() const { return mAlphaTestEnabled; }
+	
+	// Overrides:
+	virtual bool load();
+	virtual void unload();
 
 private:
 	GLWidget * mGLWidget;
@@ -86,6 +91,7 @@ private:
 };
 
 
+/// A material
 class Material : public AResource<MaterialData>
 {
 public:

@@ -20,17 +20,17 @@ class Scene;
 /// Abstract object in a scene
 /**
  * Base class of every object in a scene.
- * Each object has it's orientation stored as a quaternion and it's position stored as a Vector.
+ * Each object has it's orientation stored as a quaternion and it's position stored as a Vector.\n
  * Other objects can be subordinated and are transformed relative to their parents.\n
  * - This is the usual rendering sequence:\n
  *   - Update:
- *      1. updateSelf( const float & delta )
+ *      1. updateSelf( const double & delta )
  *      2. (update subnodes)
- *      3. updateSelfPost( const float & delta )
+ *      3. updateSelfPost( const double & delta )
  *   - Update (second pass):
- *      4. update2Self( const float & delta )
+ *      4. update2Self( const double & delta )
  *      5. (update subnodes - second pass)
- *      6. update2SelfPost( const float & delta )
+ *      6. update2SelfPost( const double & delta )
  *   - Draw:
  *      7. drawSelf()
  *      8. (draw subnodes)
@@ -39,6 +39,7 @@ class Scene;
  *     10. draw2Self()
  *     11. (draw subnodes - second pass)
  *     12. draw2SelfPost()
+ * Each object tracks its own model transformation matrix and synchronizes it with
  */
 class AObject
 {
@@ -147,7 +148,9 @@ public:
 	static void setGlobalDebugBoundingSpheres( bool enable ) { sDebugBoundingSpheres = enable; }
 
 protected:
+	/// Set bounding sphere radius for frustum culling
 	void setBoundingSphere( const float & radius ) { mBoundingSphereRadius = radius; }
+	/// Draws the bounding sphere as wireframe (for debugging)
 	void drawBoundingShpere();
 
 private:
@@ -162,7 +165,7 @@ private:
 
 	mutable bool mMatrixNeedsUpdate;
 
-	/// Precalculated matrix
+	/// Precalculated model matrix
 	mutable QMatrix4x4 mMatrix;
 	/// Updates this object's model matrix
 	void updateMatrix() const;

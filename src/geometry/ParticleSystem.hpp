@@ -6,9 +6,11 @@
 #include <QVector3D>
 
 
+/// Simple particle system
 class ParticleSystem
 {
 public:
+	/// A single particle
 	class Particle
 	{
 	public:
@@ -32,6 +34,7 @@ public:
 		int mRotation;
 	};
 
+	/// Inherit to define particle interaction with environment
 	class Interactable
 	{
 	public:
