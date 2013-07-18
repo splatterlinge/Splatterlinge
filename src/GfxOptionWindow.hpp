@@ -24,12 +24,17 @@ private:
 	Scene * mScene;
 	QLabel * materialQualityLabel;
 	QSlider * materialQuality;
+	QLabel * materialAnisotropyLabel;
+	QSlider * materialAnisotropy;
 	QLabel * farPlaneLabel;
 	QSlider * farPlane;
+	QCheckBox * mMultiSample;
 
 public slots:
 	void setMaterialQuality( int q );
+	void setMaterialFilterAnisotropy( int a );
 	void setFarPlane( int distance );
+	void setMultiSample( int enable );
 };
 
 

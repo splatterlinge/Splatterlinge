@@ -59,8 +59,8 @@ void Sky::drawCube( bool texCoords )
 {
 	sCubeVertexBuffer.bind();
 	sCubeIndexBuffer.bind();
-	glEnableClientState( GL_VERTEX_ARRAY );
 	glEnableClientState( GL_INDEX_ARRAY );
+	glEnableClientState( GL_VERTEX_ARRAY );
 	glVertexPointer( 3, GL_FLOAT, 5*sizeof(GL_FLOAT), 0 );
 	if( texCoords )
 	{
@@ -202,7 +202,7 @@ Sky::Sky( Scene * scene, QString name ) :
 	mCloudPlaneIndexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
 	mCloudPlaneIndexBuffer.allocate( mCloudPlaneIndex.constData(), mCloudPlaneIndex.size()*sizeof(unsigned short) );
 	mCloudPlaneIndexBuffer.release();
-	
+
 	mCloudShader = new Shader( scene->glWidget(), "cloud" );
 	mCloudShader_cloudMap = mCloudShader->program()->uniformLocation( "cloudMap" );
 	mCloudShader_cloudiness = mCloudShader->program()->uniformLocation( "cloudiness" );
@@ -228,7 +228,7 @@ Sky::Sky( Scene * scene, QString name ) :
 		sCubeIndexBuffer.allocate( sCubeIndices, sizeof(sCubeIndices) );
 		sCubeIndexBuffer.release();
 	}
-	
+
 	mDomeShader = new Shader( scene->glWidget(), "skydome" );
 	mDomeShader_sunDir = mDomeShader->program()->uniformLocation( "sunDir" );
 	mDomeShader_timeOfDay = mDomeShader->program()->uniformLocation( "timeOfDay" );
@@ -396,11 +396,17 @@ void Sky::drawSunFlare()
 		glDisable( GL_LIGHTING );
 		glEnable( GL_BLEND );
 		glBlendFunc( GL_ONE, GL_ONE );
-		glActiveTexture( GL_TEXTURE0 );
 		glEnable( GL_TEXTURE_2D );
-		glColor( mDiffuse );
+		glColor( mDiffuse/2.0f );
 		glBindTexture( GL_TEXTURE_2D, mSunFlareMap );
-		drawQuad( true );
+		glPushMatrix();
+			glRotate( mTimeOfDay*360.0f*2.0f, 0,0,1 );
+			drawQuad( true );
+		glPopMatrix();
+		glPushMatrix();
+			glRotate( -mTimeOfDay*360.0f*3.0f, 0,0,1 );
+			drawQuad( true );
+		glPopMatrix();
 		glDisable( GL_BLEND );
 	}
 	glPopMatrix();
@@ -429,7 +435,6 @@ void Sky::drawSky()
 	mDomeShader->program()->setUniformValue( mDomeShader_timeOfDay, mTimeOfDay );
 	mDomeShader->program()->setUniformValue( mDomeShader_sunSpotPower, mSunSpotPower );
 	mDomeShader->program()->setUniformValue( mDomeShader_diffuseMap, 0 );
-	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, mDomeMap );
 	drawCube( false );
 	mDomeShader->release();
@@ -445,8 +450,10 @@ void Sky::drawCloudPlane()
 	glBindTexture( GL_TEXTURE_2D, mCloudMap );
 
 	glMatrixMode( GL_TEXTURE );
-	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
+
+	glPushMatrix();
 	glTranslatef( mTimeOfDay, 0.0f, 0.0f );
+
 	glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
 	glTranslatef( mTimeOfDay, mTimeOfDay, 0.0f );
 	glScalef( 0.5, 0.5, 1.0f );

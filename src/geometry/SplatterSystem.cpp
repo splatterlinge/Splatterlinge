@@ -76,7 +76,6 @@ void SplatterSystem::draw()
 	glEnable( GL_BLEND );
 	glBlendFunc( GL_DST_COLOR, GL_ZERO );
 	glMatrixMode( GL_TEXTURE );
-	glActiveTexture( GL_TEXTURE0 );
 	for( int i = 0; i < mSplatters.size(); ++i )
 	{
 		if( mSplatters[i].fade <= 0.0f )

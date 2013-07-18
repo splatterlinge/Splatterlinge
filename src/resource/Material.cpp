@@ -1,6 +1,7 @@
 #include "Material.hpp"
 
 #include "Shader.hpp"
+#include <utility/glWrappers.hpp>
 
 #include <QSettings>
 #include <QGLShaderProgram>
@@ -11,17 +12,28 @@
 RESOURCE_CACHE(MaterialData);
 
 
-GLenum MaterialData::alphaTestFunctionFromString( QString name )
+void MaterialQuality::setFilterAnisotropy( float anisotropy )
 {
-	if( name == "GL_NEVER" ) return GL_NEVER;
-	else if( name == "GL_LESS" ) return GL_LESS;
-	else if( name == "GL_EQUAL" ) return GL_EQUAL;
-	else if( name == "GL_LEQUAL" ) return GL_LEQUAL;
-	else if( name == "GL_GREATER" ) return GL_GREATER;
-	else if( name == "GL_NOTEQUAL" ) return GL_NOTEQUAL;
-	else if( name == "GL_GEQUAL" ) return GL_GEQUAL;
-	else if( name == "GL_ALWAYS" ) return GL_ALWAYS;
-	else return GL_ALWAYS;
+	if( anisotropy > filterAnisotropyMaximum() )
+		anisotropy = filterAnisotropyMaximum();
+	else if( anisotropy < 1.0f )
+		anisotropy = 1.0f;
+
+	QHashIterator< QString, QWeakPointer<MaterialData> > mi( Material::cache() );
+	while( mi.hasNext() )
+	{
+		mi.next();
+		QSharedPointer<MaterialData> d = mi.value().toStrongRef();
+		if( d.isNull() )
+			continue;
+		QMapIterator<QString,GLuint> ti (d->textures());
+		while( ti.hasNext() )
+		{
+			ti.next();
+			glBindTexture( GL_TEXTURE_2D, ti.value() );
+			glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy );
+		}
+	}
 }
 
 
@@ -129,7 +141,7 @@ bool MaterialData::load()
 	s.beginGroup( "AlphaTest" );
 	{
 		mAlphaTestEnabled = s.value( "enable", false ).toBool();
-		mAlphaTestFunction = alphaTestFunctionFromString( s.value( "function", "GL_ALWAYS" ).toString() );
+		mAlphaTestFunction = glGetAlphaTestFunctionFromString( s.value( "function", "GL_ALWAYS" ).toString() );
 		mAlphaTestReferenceValue = s.value( "referenceValue", 0.0f ).toFloat();
 	}
 	s.endGroup();
@@ -204,11 +216,11 @@ void Material::bind()
 
 	if( !mShaderSet[mBoundQuality].shader )
 		return;
-	
+
 	mShaderSet[mBoundQuality].shader->bind();
 
 	glPushAttrib( GL_LIGHTING_BIT | GL_ENABLE_BIT );
-	
+
 	if( data()->alphaTestEnabled() )
 	{
 		glAlphaFunc( data()->alphaTestFunction(), data()->alphaTestReferenceValue() );
@@ -261,6 +273,7 @@ void Material::release()
 	if( !mShaderSet[mBoundQuality].shader )
 		return;
 
+	glActiveTexture( GL_TEXTURE0 );
 	glPopAttrib();
 
 	mShaderSet[mBoundQuality].shader->release();

@@ -148,10 +148,23 @@ void Terrain::drawPatchMap( const QRect & rect )
 			GL_TRIANGLE_STRIP,
 			rectToDraw.width()*2+2,
 			GL_UNSIGNED_INT,
-			(void*)((size_t)(2*sizeof(unsigned int)*(	// convert index to pointer
-				rectToDraw.x() + mMapSize.width()*slice	// index to start
+			(const GLvoid*)((size_t)(2*sizeof(unsigned int)*(	// convert index to pointer
+				rectToDraw.x() + mMapSize.width()*slice		// index to start
 			) ) )
 		);
+		/*
+		//TODO: something like this should be faster
+		glDrawRangeElements(
+			GL_TRIANGLE_STRIP,
+			slice*(unsigned int)mMapSize.width()+rectToDraw.x(),
+			(slice+1)*(unsigned int)mMapSize.width()+rectToDraw.x()+rectToDraw.width()+2,
+			rectToDraw.width()*2+2,
+			GL_UNSIGNED_INT,
+			(const GLvoid*)((size_t)(2*sizeof(unsigned int)*(	// convert index to pointer
+				rectToDraw.x() + mMapSize.width()*slice		// index to start
+			) ) )
+		);
+		*/
 	}
 
 	glDisableClientState( GL_VERTEX_ARRAY );
@@ -182,7 +195,7 @@ void Terrain::draw()
 			GL_TRIANGLE_STRIP,
 			mMapSize.width()*2,
 			GL_UNSIGNED_INT,
-			(void*)((size_t)(2*sizeof(unsigned int)*(	// convert index to pointer
+			(const GLvoid*)((size_t)(2*sizeof(unsigned int)*(	// convert index to pointer
 				mMapSize.width()*slice			// index to start
 			) ) )
 		);

@@ -30,7 +30,7 @@ Torch::~Torch()
 
 void Torch::updateLightSource( GLenum light )
 {
-	glLight( light, GL_POSITION, QVector4D(	position(), 1	) );
+	glLight( light, GL_POSITION, QVector4D(	worldPosition(), 1	) );
 	glLight( light, GL_AMBIENT, QVector4D(	0, 0, 0, 1	) );
 	glLight( light, GL_DIFFUSE, QVector4D(	color()	) );
 	glLight( light, GL_SPECULAR, QVector4D(	color()	) );
@@ -48,13 +48,6 @@ void Torch::updateSelf( const double & delta )
 	if( mColorCycle >= 1.0f )
 		mColorCycle -= 1.0f;
 	mColor = QVector4D( color.redF(), color.greenF(), color.blueF(), 1.0f );
-/*
-	World * world = dynamic_cast<World*>(scene()->root());
-	if( world )
-	{
-		setRotation( QQuaternion::nlerp( rotation(), world->landscape()->terrain()->getNormalRotation(position()), 33.0*delta ) );
-	}
-*/
 }
 
 
@@ -72,11 +65,10 @@ void Torch::draw2Self()
 	glDepthMask( GL_FALSE );
 	glDisable( GL_CULL_FACE );
 	glDisable( GL_DEPTH_TEST );
-	
+
 	glDisable( GL_LIGHTING );
 	glEnable( GL_BLEND );
 	glBlendFunc( GL_ONE, GL_ONE );
-	glActiveTexture( GL_TEXTURE0 );
 	glEnable( GL_TEXTURE_2D );
 	glBindTexture( GL_TEXTURE_2D, mFlareMap );
 	glColor( mColor );
@@ -103,14 +95,21 @@ void Torch::draw2Self()
 
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-	glEnableClientState( GL_VERTEX_ARRAY );
+
 	glClientActiveTexture( GL_TEXTURE0 );
+
+	glEnableClientState( GL_VERTEX_ARRAY );
 	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+
 	glVertexPointer( 3, GL_FLOAT, sizeof(struct _vertices), &(vertices[0].position) );
 	glTexCoordPointer( 2, GL_FLOAT, sizeof(struct _vertices), &(vertices[0].texCoord) );
+
 	glDrawArrays( GL_QUADS, 0, 4 );
 
+	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	glDisableClientState( GL_VERTEX_ARRAY );
+
 	glDisable( GL_BLEND );
-	
+
 	glPopAttrib();
 }

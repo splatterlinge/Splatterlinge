@@ -1,7 +1,7 @@
 #include "glWrappers.hpp"
 
 
-QString glGetErrorString( GLenum error )
+QString glGetErrorString( const GLenum & error )
 {
 	switch( error )
 	{
@@ -25,4 +25,18 @@ QString glGetErrorString( GLenum error )
 			return QString( "Table Too Large" );
 	}
 	return QString( "Unknown Error" );
+}
+
+
+GLenum glGetAlphaTestFunctionFromString( const QString & name )
+{
+	if( name == "GL_NEVER" ) return GL_NEVER;
+	else if( name == "GL_LESS" ) return GL_LESS;
+	else if( name == "GL_EQUAL" ) return GL_EQUAL;
+	else if( name == "GL_LEQUAL" ) return GL_LEQUAL;
+	else if( name == "GL_GREATER" ) return GL_GREATER;
+	else if( name == "GL_NOTEQUAL" ) return GL_NOTEQUAL;
+	else if( name == "GL_GEQUAL" ) return GL_GEQUAL;
+	else if( name == "GL_ALWAYS" ) return GL_ALWAYS;
+	else return GL_ALWAYS;
 }

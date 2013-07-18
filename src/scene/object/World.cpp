@@ -33,7 +33,7 @@ World::World( Scene * scene, QString name ) :
 	mPlayer = QSharedPointer<Player>( new Player( scene, this ) );
 	add( mPlayer );
 	scene->eye()->attach( mPlayer );
-
+/*
 	mTable = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/table01/table01.obj" ) );
 	mTable->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 3 );
 	add( mTable );
@@ -42,7 +42,7 @@ World::World( Scene * scene, QString name ) :
 	mTree->setPositionX( 100 );
 	mTree->setPositionY( mLandscape->terrain()->getHeight( QPointF(100,0) ) - 1 );
 	add( mTree );
-
+*/
 	mSky = QSharedPointer<Sky>( new Sky( scene, skyName ) );
 	add( mSky );
 

@@ -105,14 +105,22 @@ void ParticleSystem::draw()
 	{
 		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+
+		glClientActiveTexture( GL_TEXTURE0 );
+
 		glEnableClientState( GL_VERTEX_ARRAY );
 		glEnableClientState( GL_NORMAL_ARRAY );
-		glClientActiveTexture( GL_TEXTURE0 );
 		glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+
 		glVertexPointer( 3, GL_FLOAT, sizeof(ParticleVertex), &(mParticleVertices.constData()->position) );
 		glNormalPointer( GL_FLOAT, sizeof(ParticleVertex), &(mParticleVertices.constData()->normal) );
 		glTexCoordPointer( 2, GL_FLOAT, sizeof(ParticleVertex), &(mParticleVertices.constData()->coord) );
+
 		glDrawArrays( GL_QUADS, 0, activeVertices );
+
+		glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+		glDisableClientState( GL_NORMAL_ARRAY );
+		glDisableClientState( GL_VERTEX_ARRAY );
 	}
 }
 

@@ -4,7 +4,6 @@
 
 #include <GLWidget.hpp>
 
-#include <QGLFramebufferObject>
 #include <QGLBuffer>
 #include <QString>
 #include <QSize>

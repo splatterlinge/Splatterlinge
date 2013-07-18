@@ -15,6 +15,8 @@ class Shader;
 /// Material's quality settings
 class MaterialQuality
 {
+	MaterialQuality() {}
+	~MaterialQuality() {}
 public:
 	enum type
 	{
@@ -24,8 +26,10 @@ public:
 	};
 	const static int num = 3;
 
-	static type maximum() { return sMaximum; }
-	static void setMaximum( type max ) { sMaximum = max; }
+	static const type & maximum() { return sMaximum; }
+	static void setMaximum( const type & max ) { sMaximum = max; }
+	static float filterAnisotropyMaximum() { GLfloat maxAnisotropy; glGetFloatv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy ); return maxAnisotropy; }
+	static void setFilterAnisotropy( float maxAnisotropy );
 
 private:
 	static type sMaximum;
@@ -35,6 +39,8 @@ private:
 /// Material's shader variants
 class MaterialShaderVariant
 {
+	MaterialShaderVariant() {}
+	~MaterialShaderVariant() {}
 public:
 	enum type
 	{
@@ -65,7 +71,7 @@ public:
 	const GLclampf & alphaTestReferenceValue() const { return mAlphaTestReferenceValue; }
 	const GLenum & alphaTestFunction() const { return mAlphaTestFunction; }
 	const bool & alphaTestEnabled() const { return mAlphaTestEnabled; }
-	
+
 	// Overrides:
 	virtual bool load();
 	virtual void unload();
@@ -86,8 +92,6 @@ private:
 	bool mAlphaTestEnabled;
 	GLclampf mAlphaTestReferenceValue;
 	GLenum mAlphaTestFunction;
-
-	static GLenum alphaTestFunctionFromString( QString name );
 };
 
 
@@ -131,7 +135,7 @@ private:
 
 	GLuint mBlobMap;
 	GLuint mCubeMap;
-	
+
 	GLclampf mAlphaTestReferenceValueOverride;
 	const GLclampf * mUsedAlphaTestReferenceValue;
 

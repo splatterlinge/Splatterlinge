@@ -31,6 +31,18 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	layout->addWidget( materialQualityLabel );
 	layout->addWidget( materialQuality );
 
+	materialAnisotropyLabel = new QLabel();
+	materialAnisotropy = new QSlider( Qt::Horizontal );
+	materialAnisotropy->setRange( 1, MaterialQuality::filterAnisotropyMaximum() );
+	materialAnisotropy->setSingleStep( 1 );
+	materialAnisotropy->setPageStep( 1 );
+	materialAnisotropy->setTickPosition( QSlider::TicksAbove );
+	materialAnisotropy->setValue( 1.0f );
+	setMaterialFilterAnisotropy( materialAnisotropy->value() );
+	QObject::connect( materialAnisotropy, SIGNAL(valueChanged(int)), this, SLOT(setMaterialFilterAnisotropy(int)) );
+	layout->addWidget( materialAnisotropyLabel );
+	layout->addWidget( materialAnisotropy );
+
 	farPlaneLabel = new QLabel();
 	farPlane = new QSlider( Qt::Horizontal );
 	farPlane->setRange( 50, 1000 );
@@ -42,6 +54,10 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	QObject::connect( farPlane, SIGNAL(valueChanged(int)), this, SLOT(setFarPlane(int)) );
 	layout->addWidget( farPlaneLabel );
 	layout->addWidget( farPlane );
+
+	mMultiSample = new QCheckBox( "MultiSample" );
+	QObject::connect( mMultiSample, SIGNAL(stateChanged(int)), this, SLOT(setMultiSample(int)) );
+	layout->addWidget( mMultiSample );
 
 	setLayout( layout );
 
@@ -76,8 +92,21 @@ void GfxOptionWindow::setMaterialQuality( int q )
 }
 
 
+void GfxOptionWindow::setMaterialFilterAnisotropy( int a )
+{
+	MaterialQuality::setFilterAnisotropy( a );
+	materialAnisotropyLabel->setText(tr("Material Anisotropy (%1):").arg(a));
+}
+
+
 void GfxOptionWindow::setFarPlane( int distance )
 {
 	mScene->eye()->setFarPlane( distance );
 	farPlaneLabel->setText(tr("Viewing Distance (%1m):").arg(distance));
+}
+
+
+void GfxOptionWindow::setMultiSample( int enable )
+{
+	mScene->setMultiSample( enable );
 }

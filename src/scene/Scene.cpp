@@ -23,6 +23,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mFrameCountSecond = 0;
 	mFramesPerSecond = 0;
 	mWireFrame = false;
+	mMultiSample = false;
 
 	mRoot = 0;
 	mEye = new Eye( this );
@@ -90,6 +91,11 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	if( mWireFrame )
 		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
+	if( mMultiSample )
+		glEnable( GL_MULTISAMPLE );
+	else
+		glDisable( GL_MULTISAMPLE );
+
 	mEye->applyGL();
 	mRoot->draw();
 	mRoot->draw2();
@@ -101,6 +107,9 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
 
 	glPopAttrib();
+
+	glBindBuffer( GL_ARRAY_BUFFER, 0 );
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
 //	glFlush();
 //	glFinish();

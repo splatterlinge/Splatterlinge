@@ -127,12 +127,12 @@ void Landscape::renderReflection()
 		mirroredEye.setClippingPlane( 0, QVector4D(0,-1,0, mWaterHeight+mWaterClippingPlaneOffset) );
 	scene()->setEye( &mirroredEye );
 
-	glCullFace( GL_FRONT );
+	glFrontFace( GL_CW );
 	scene()->eye()->applyGL();
 	scene()->eye()->enableClippingPlanes();
 	scene()->root()->draw();
 	scene()->root()->draw2();
-	glCullFace( GL_BACK );
+	glFrontFace( GL_CCW );
 	scene()->eye()->setClippingPlane( 0 );
 
 	scene()->setEye( sceneEye );
@@ -204,10 +204,12 @@ void Landscape::draw2SelfPost()
 void Landscape::drawPatch( const QRectF & rect )
 {
 	mTerrainMaterial->bind();
-	glMatrixMode( GL_TEXTURE );	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
+	glMatrixMode( GL_TEXTURE );	glPushMatrix();
 		glScalef( mTerrainMaterialScale.x(), -mTerrainMaterialScale.y(), 1.0f );
+		glMatrixMode( GL_MODELVIEW );
 		mTerrain->drawPatch( rect );
-	glMatrixMode( GL_TEXTURE );	glPopMatrix();	glMatrixMode( GL_MODELVIEW );
+	glMatrixMode( GL_TEXTURE );	glPopMatrix();
+	glMatrixMode( GL_MODELVIEW );
 	mTerrainMaterial->release();
 
 	glDepthMask( GL_FALSE );

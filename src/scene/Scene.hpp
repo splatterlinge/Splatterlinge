@@ -53,6 +53,7 @@ public:
 	bool isMouseGrabbing() const { return mMouseGrabbing; }
 
 	void setWireFrame( bool enable ) { mWireFrame = enable; }
+	void setMultiSample( bool enable ) { mMultiSample = enable; }
 
 protected:
 	// Overrides:
@@ -73,6 +74,7 @@ private:
 	int mFramesPerSecond;
 	QFont mFont;
 	bool mWireFrame;
+	bool mMultiSample;
 
 	bool mMouseGrabbing;
 

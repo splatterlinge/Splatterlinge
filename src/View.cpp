@@ -77,7 +77,7 @@ void View::initGL()
 	setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
 	setFrameShape( QFrame::NoFrame );
 
-	QGLFormat glFormat( QGL::DoubleBuffer | QGL::DepthBuffer | QGL::Rgba | QGL::DirectRendering | QGL::NoAccumBuffer );
+	QGLFormat glFormat( QGL::DoubleBuffer | QGL::DepthBuffer | QGL::Rgba | QGL::DirectRendering | QGL::SampleBuffers );
 	glFormat.setVersion( 2, 1 );
 //	glFormat.setSwapInterval( 1 );
 
