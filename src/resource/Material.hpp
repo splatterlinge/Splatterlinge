@@ -26,10 +26,10 @@ public:
 	};
 	const static int num = 3;
 
+	static type fromString( const QString & name );
+	static QString toString( const type & quality );
 	static const type & maximum() { return sMaximum; }
 	static void setMaximum( const type & max ) { sMaximum = max; }
-	static float filterAnisotropyMaximum() { GLfloat maxAnisotropy; glGetFloatv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy ); return maxAnisotropy; }
-	static void setFilterAnisotropy( float maxAnisotropy );
 
 private:
 	static type sMaximum;
@@ -118,6 +118,10 @@ public:
 
 	void setDefaultQuality( MaterialQuality::type q ) { mDefaultQuality = q; }
 
+	static float filterAnisotropyMaximum() { GLfloat maxAnisotropy; glGetFloatv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy ); return maxAnisotropy; }
+	static void setFilterAnisotropy( float maxAnisotropy );
+	static float filterAnisotropy() { return sFilterAnisotropy; }
+
 private:
 	typedef struct
 	{
@@ -145,6 +149,8 @@ private:
 
 	MaterialQuality::type getBindingQuality();
 	void setShader( MaterialQuality::type quality, QString shaderFullName );
+
+	static float sFilterAnisotropy;
 };
 
 

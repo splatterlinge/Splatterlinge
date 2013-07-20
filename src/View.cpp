@@ -16,6 +16,8 @@
 #include <QGraphicsWidget>
 #include <QGraphicsProxyWidget>
 #include <QRect>
+#include <qvarlengtharray.h>
+#include <QSettings>
 
 
 void View::initAL()
@@ -77,9 +79,12 @@ void View::initGL()
 	setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
 	setFrameShape( QFrame::NoFrame );
 
-	QGLFormat glFormat( QGL::DoubleBuffer | QGL::DepthBuffer | QGL::Rgba | QGL::DirectRendering | QGL::SampleBuffers );
+	QGLFormat glFormat( QGL::DoubleBuffer | QGL::DepthBuffer | QGL::Rgba | QGL::DirectRendering );
 	glFormat.setVersion( 2, 1 );
 //	glFormat.setSwapInterval( 1 );
+
+	QSettings settings;
+	glFormat.setSampleBuffers( settings.value( "sampleBuffers", false ).toBool() );
 
 	mGLWidget = new GLWidget( glFormat, this );
 	setViewport( mGLWidget );
@@ -103,6 +108,14 @@ void View::initScene()
 	mWorld = new World( mScene, "earth" );
 	mScene->setRoot( mWorld );
 	setScene( mScene );
+
+	QSettings settings;
+	mScene->setMultiSample( settings.value( "sampleBuffers", false ).toBool() );
+	mScene->eye()->setFarPlane( settings.value( "farPlane", 500.0f ).toFloat() );
+	Material::setFilterAnisotropy( settings.value( "materialFilterAnisotropy", 1.0f ).toFloat() );
+	MaterialQuality::setMaximum( MaterialQuality::fromString(
+		settings.value( "materialQuality", MaterialQuality::toString(MaterialQuality::HIGH) ).toString()
+	));
 }
 
 

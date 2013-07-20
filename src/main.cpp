@@ -5,10 +5,13 @@
 
 int main( int argc, char * argv[] )
 {
-    QTextCodec::setCodecForLocale( QTextCodec::codecForName("UTF-8") );
+	QCoreApplication::setOrganizationName( "Ununoctium" );
+	QCoreApplication::setApplicationName( "Ununoctium" );
+
+	QTextCodec::setCodecForLocale( QTextCodec::codecForName("UTF-8") );
 
 	QApplication::setDesktopSettingsAware( false );
-    QApplication::setStyle(QStyleFactory::create("Plastique"));
+	QApplication::setStyle(QStyleFactory::create("Plastique"));
 
 	QApplication app( argc, argv );
 

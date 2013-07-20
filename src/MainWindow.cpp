@@ -3,8 +3,12 @@
 #include <View.hpp>
 
 
-MainWindow::MainWindow( QWidget * parent) : QMainWindow( parent )
+MainWindow::MainWindow( QWidget * parent) :
+	QMainWindow( parent )
 {
+	QSettings settings;
+	restoreGeometry( settings.value("geometry").toByteArray() );
+
 	mView = new View( this );
 	this->setCentralWidget( mView );
 }
@@ -22,6 +26,14 @@ void MainWindow::toggleFullScreen()
 		this->showNormal();
 	else
 		this->showFullScreen();
+}
+
+
+void MainWindow::closeEvent( QCloseEvent * event )
+{
+	QSettings settings;
+	settings.setValue( "geometry", saveGeometry() );
+	QWidget::closeEvent( event );
 }
 
 

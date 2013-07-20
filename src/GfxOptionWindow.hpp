@@ -34,7 +34,7 @@ public slots:
 	void setMaterialQuality( int q );
 	void setMaterialFilterAnisotropy( int a );
 	void setFarPlane( int distance );
-	void setMultiSample( int enable );
+	void setMultiSample( int state );
 };
 
 

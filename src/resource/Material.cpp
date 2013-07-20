@@ -11,29 +11,37 @@
 
 RESOURCE_CACHE(MaterialData);
 
+MaterialQuality::type MaterialQuality::sMaximum = MaterialQuality::HIGH;
 
-void MaterialQuality::setFilterAnisotropy( float anisotropy )
+float Material::sFilterAnisotropy = 1.0f;
+
+
+MaterialQuality::type MaterialQuality::fromString( const QString & name )
 {
-	if( anisotropy > filterAnisotropyMaximum() )
-		anisotropy = filterAnisotropyMaximum();
-	else if( anisotropy < 1.0f )
-		anisotropy = 1.0f;
+	QString up = name.toUpper();
+	if( up == "LOW" )
+		return LOW;
+	if( up == "MEDIUM" )
+		return MEDIUM;
+	if( up == "HIGH" )
+		return HIGH;
+	qWarning() << name << QT_TR_NOOP("is not a valid material quality type");
+	return LOW;
+}
 
-	QHashIterator< QString, QWeakPointer<MaterialData> > mi( Material::cache() );
-	while( mi.hasNext() )
+
+QString MaterialQuality::toString( const MaterialQuality::type & quality )
+{
+	switch( quality )
 	{
-		mi.next();
-		QSharedPointer<MaterialData> d = mi.value().toStrongRef();
-		if( d.isNull() )
-			continue;
-		QMapIterator<QString,GLuint> ti (d->textures());
-		while( ti.hasNext() )
-		{
-			ti.next();
-			glBindTexture( GL_TEXTURE_2D, ti.value() );
-			glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy );
-		}
+		case MaterialQuality::HIGH:
+			return "High";
+		case MaterialQuality::MEDIUM:
+			return "Medium";
+		case MaterialQuality::LOW:
+			return "Low";
 	}
+	return "Low";
 }
 
 
@@ -158,7 +166,30 @@ bool MaterialData::load()
 }
 
 
-MaterialQuality::type MaterialQuality::sMaximum = MaterialQuality::HIGH;
+void Material::setFilterAnisotropy( float anisotropy )
+{
+	if( anisotropy > filterAnisotropyMaximum() )
+		anisotropy = filterAnisotropyMaximum();
+	else if( anisotropy < 1.0f )
+		anisotropy = 1.0f;
+
+	QHashIterator< QString, QWeakPointer<MaterialData> > mi( Material::cache() );
+	while( mi.hasNext() )
+	{
+		mi.next();
+		QSharedPointer<MaterialData> d = mi.value().toStrongRef();
+		if( d.isNull() )
+			continue;
+		QMapIterator<QString,GLuint> ti (d->textures());
+		while( ti.hasNext() )
+		{
+			ti.next();
+			glBindTexture( GL_TEXTURE_2D, ti.value() );
+			glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropy );
+		}
+	}
+	sFilterAnisotropy = anisotropy;
+}
 
 
 Material::Material( GLWidget * glWidget, QString name, MaterialShaderVariant::type type ) : AResource()

@@ -53,7 +53,9 @@ public:
 	bool isMouseGrabbing() const { return mMouseGrabbing; }
 
 	void setWireFrame( bool enable ) { mWireFrame = enable; }
+	bool wireFrame() const { return mWireFrame; }
 	void setMultiSample( bool enable ) { mMultiSample = enable; }
+	bool multiSample() const { return mMultiSample; }
 
 protected:
 	// Overrides:

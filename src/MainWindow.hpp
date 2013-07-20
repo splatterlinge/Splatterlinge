@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <QStyleFactory>
 #include <QKeyEvent>
+#include <QSettings>
 
 
 class View;
@@ -21,7 +22,8 @@ public:
 
 protected:
 	// Overrides:
-	void keyPressEvent( QKeyEvent * event );
+	virtual void keyPressEvent( QKeyEvent * event );
+	virtual void closeEvent( QCloseEvent * event );
 
 private:
 	View * mView;
