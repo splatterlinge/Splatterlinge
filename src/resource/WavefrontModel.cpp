@@ -128,10 +128,8 @@ bool WavefrontModel::render()
 			{
 				if( lastMat != NULL )
 				{
-					// TODO fix release!
 					lastMat->release();
 				}
-				qDebug() << ">>> Change Material";
 				face.material->bind();
 			}
 		}
