@@ -25,7 +25,7 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	materialQuality->setRange( 0, 2 );
 	materialQuality->setSingleStep( 1 );
 	materialQuality->setPageStep( 1 );
-	materialQuality->setTickPosition( QSlider::TicksAbove );
+//	materialQuality->setTickPosition( QSlider::TicksAbove );
 	materialQuality->setValue( MaterialQuality::maximum() );
 	setMaterialQuality( materialQuality->value() );
 	QObject::connect( materialQuality, SIGNAL(valueChanged(int)), this, SLOT(setMaterialQuality(int)) );
@@ -37,7 +37,7 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	materialAnisotropy->setRange( 1, Material::filterAnisotropyMaximum() );
 	materialAnisotropy->setSingleStep( 1 );
 	materialAnisotropy->setPageStep( 1 );
-	materialAnisotropy->setTickPosition( QSlider::TicksAbove );
+//	materialAnisotropy->setTickPosition( QSlider::TicksAbove );
 	materialAnisotropy->setValue( Material::filterAnisotropy() );
 	setMaterialFilterAnisotropy( materialAnisotropy->value() );
 	QObject::connect( materialAnisotropy, SIGNAL(valueChanged(int)), this, SLOT(setMaterialFilterAnisotropy(int)) );
@@ -49,7 +49,7 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	farPlane->setRange( 50, 1000 );
 	farPlane->setSingleStep( 10 );
 	farPlane->setPageStep( 50 );
-	farPlane->setTickPosition( QSlider::TicksAbove );
+//	farPlane->setTickPosition( QSlider::TicksAbove );
 	farPlane->setValue( mScene->eye()->farPlane() );
 	setFarPlane( farPlane->value() );
 	QObject::connect( farPlane, SIGNAL(valueChanged(int)), this, SLOT(setFarPlane(int)) );

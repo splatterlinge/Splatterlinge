@@ -57,22 +57,25 @@ public:
 	const QVector3D velocity() const { QVector3D v; alGetSourcefv( mSource, AL_VELOCITY, reinterpret_cast<float*>(&v) ); return v; }
 	const QVector3D direction() const { QVector3D v; alGetSourcefv( mSource, AL_DIRECTION, reinterpret_cast<float*>(&v) ); return v; }
 
-	void setLooping( bool loop ) { if( mSource ) alSource( mSource, AL_LOOPING, loop?AL_TRUE:AL_FALSE ); }
-	void setGain( float gain ) { if( mSource ) alSource( mSource, AL_GAIN, gain ); }
-	void setPitch( float pitch ) { if( mSource ) alSource( mSource, AL_PITCH, pitch); }
-	void setReferenceDistance( float ref ) { if( mSource ) alSource( mSource, AL_REFERENCE_DISTANCE, ref ); }
-	void setMaxDistance( float maxDist ) { if( mSource ) alSource( mSource, AL_MAX_DISTANCE, maxDist ); }
-	void setRolloffFactor( float rolloff ) { if( mSource ) alSource( mSource, AL_ROLLOFF_FACTOR, rolloff ); }
-	void setPosition( const QVector3D & position ) { if( mSource ) alSource( mSource, AL_POSITION, position ); }
-	void setVelocity( const QVector3D & velocity ) { if( mSource ) alSource( mSource, AL_VELOCITY, velocity ); }
-	void setDirection( const QVector3D & direction ) { if( mSource ) alSource( mSource, AL_DIRECTION, direction ); }
+	void setLooping( bool loop ) { alSource( mSource, AL_LOOPING, loop?AL_TRUE:AL_FALSE ); }
+	void setGain( float gain ) { alSource( mSource, AL_GAIN, gain ); }
+	void setPitch( float pitch ) { alSource( mSource, AL_PITCH, pitch); }
+	void setReferenceDistance( float ref ) { alSource( mSource, AL_REFERENCE_DISTANCE, ref ); }
+	void setMaxDistance( float maxDist ) { alSource( mSource, AL_MAX_DISTANCE, maxDist ); }
+	void setRolloffFactor( float rolloff ) { alSource( mSource, AL_ROLLOFF_FACTOR, rolloff ); }
+	void setPosition( const QVector3D & position ) { alSource( mSource, AL_POSITION, position ); }
+	void setVelocity( const QVector3D & velocity ) { alSource( mSource, AL_VELOCITY, velocity ); }
+	void setDirection( const QVector3D & direction ) { alSource( mSource, AL_DIRECTION, direction ); }
 
-	void rewind() { if( mSource ) alSourceRewind( mSource ); }
-	void play() { if( mSource ) alSourcePlay( mSource ); }
-	void stop() { if( mSource ) alSourceStop( mSource ); }
+	void setPositionAutoVelocity( const QVector3D & position, const double & delta );
+
+	void rewind() { alSourceRewind( mSource ); }
+	void play() { alSourcePlay( mSource ); }
+	void stop() { alSourceStop( mSource ); }
 
 private:
 	ALuint mSource;
+	QVector3D mLastPosition;
 };
 
 

@@ -11,7 +11,7 @@ class Scene;
 
 /// Special scene object representing the "eye" for observing a scene
 /**
- * 
+ *
  */
 class Eye
 {
@@ -20,8 +20,8 @@ public:
 	Eye( Eye & other );
 	~Eye();
 
-	/// Sets OpenAL listener position and orientation.
-	void applyAL();
+	/// Updates OpenAL listener position/velocity and orientation.
+	void applyAL( const double & delta );
 	/// Sets OpenGL projection and modelview matrices and applies clipping planes.
 	void applyGL();
 
@@ -83,6 +83,7 @@ protected:
 private:
 	Scene * mScene;
 	QVector3D mPosition;
+	QVector3D mLastPosition;
 	QQuaternion mRotation;
 	QVector3D mScale;
 	QWeakPointer<AObject> mAttached;

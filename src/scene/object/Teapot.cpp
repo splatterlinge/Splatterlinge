@@ -28,7 +28,7 @@ Teapot::~Teapot()
 
 void Teapot::updateSelf( const double & delta )
 {
-	mAudioSample->setPosition( this->position() );
+	mAudioSample->setPositionAutoVelocity( worldPosition(), delta );
 	World * world = dynamic_cast<World*>(scene()->root());
 	if( world )
 	{

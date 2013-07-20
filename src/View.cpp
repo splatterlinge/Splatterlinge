@@ -71,6 +71,8 @@ void View::initAL()
 	qDebug() << "OpenAL: Version:\t" << QString(versionAL);
 //	const ALCchar * extensionsAL = alcGetString( NULL, AL_EXTENSIONS );
 //	qDebug() << "OpenAL: Supported extensions:" << extensionsAL;
+
+	alDopplerFactor( 0.2f );
 }
 
 

@@ -51,7 +51,7 @@ AObject & AObject::operator=( const AObject & other )
 }
 
 
-void AObject::updateMatrix() const
+void AObject::syncMatrix() const
 {
 	if( mParent )
 	{
@@ -66,7 +66,7 @@ void AObject::updateMatrix() const
 
 void AObject::update( const double & delta )
 {
-	updateMatrix();
+	syncMatrix();
 	updateSelf( delta );
 	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
@@ -79,7 +79,6 @@ void AObject::update( const double & delta )
 
 void AObject::update2( const double & delta )
 {
-	updateMatrix();
 	update2Self( delta );
 	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )

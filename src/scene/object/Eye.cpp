@@ -35,7 +35,7 @@ Eye::~Eye()
 }
 
 
-void Eye::applyAL()
+void Eye::applyAL( const double & delta )
 {
 	QVector3D up = mRotation.rotatedVector( QVector3D(0,1,0) );
 	QVector3D direction = mRotation.rotatedVector( QVector3D(0,0,1) );
@@ -45,8 +45,9 @@ void Eye::applyAL()
 	};
 	alListener( AL_POSITION, mPosition );
 	alListenerv( AL_ORIENTATION, listenerOri );
-//	ALfloat listenerVel[]={0.0,0.0,0.0};
-//	alListenerfv( AL_VELOCITY, listenerVel);
+	QVector3D velocity = (mPosition - mLastPosition) / delta;
+	mLastPosition = mPosition;
+	alListener( AL_VELOCITY, velocity );
 }
 
 

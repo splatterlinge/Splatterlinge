@@ -70,7 +70,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	mRoot->update( mDelta );
 	mRoot->update2( mDelta );
 
-	mEye->applyAL();
+	mEye->applyAL( mDelta );
 
 	glPushAttrib( GL_ALL_ATTRIB_BITS );
 	glMatrixMode( GL_TEXTURE );	glPushMatrix();	glLoadIdentity();

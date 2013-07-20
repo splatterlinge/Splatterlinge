@@ -167,10 +167,10 @@ private:
 
 	/// Precalculated model matrix
 	mutable QMatrix4x4 mMatrix;
-	/// Updates this object's model matrix
-	void updateMatrix() const;
+	/// Synchronizes matrix to current position and rotation
+	void syncMatrix() const;
 	/// Synchronizes matrix to current position and rotation if necessary
-	void validateMatrix() const { if( mMatrixNeedsUpdate ) { updateMatrix(); mMatrixNeedsUpdate = false; } }
+	void validateMatrix() const { if( mMatrixNeedsUpdate ) { syncMatrix(); mMatrixNeedsUpdate = false; } }
 
 	void setParent( AObject * parent ) { mParent = parent; }
 };

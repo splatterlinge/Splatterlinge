@@ -62,7 +62,9 @@ AudioSample::AudioSample( QString file ) : AResource()
 
 	alGenSources( 1, &mSource );
 	if( !mSource )
-		return;
+	{
+		qFatal("Could not allocate sound source");
+	}
 	alSourcei( mSource, AL_SOURCE_RELATIVE, AL_FALSE );
 	alSourcei( mSource, AL_BUFFER, data()->buffer() );
 
@@ -80,4 +82,13 @@ AudioSample::~AudioSample()
 	if( !mSource )
 		return;
 	alDeleteSources( 1, &mSource );
+}
+
+
+void AudioSample::setPositionAutoVelocity( const QVector3D & position, const double & delta )
+{
+	setPosition( position );
+	QVector3D velocity = (position - mLastPosition) / delta;
+	setVelocity( velocity );
+	mLastPosition = position;
 }
