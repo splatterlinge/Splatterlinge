@@ -2,6 +2,7 @@
 #define WAVEFRONTMODEL_HPP
 
 #include "Material.hpp"
+#include "scene/Scene.hpp"
 
 #include <QString>
 #include <QStringList>
@@ -30,17 +31,19 @@ public:
 	QString material;
 };
 
+static QMap<QString, GLuint> mMap = QMap<QString, GLuint>();
+
 class WavefrontModel
 {
 public:
-	WavefrontModel(QString filename);
+	WavefrontModel( GLWidget * widget, QString filename );
 
 	int load();
 	bool parse();
 	bool render();
 
 private:
-	QMap<QString, GLuint> mMap;
+	GLWidget * mGLWidget;
 	QString mFilename;
 	QList<Face> * mFaces;
 };

@@ -2,7 +2,7 @@
 #define WAVEFRONTOBJECT_HPP
 
 #include <scene/Scene.hpp>
-#include <resource/Material.hpp>
+#include <resource/WavefrontModel.hpp>
 
 #include <QString>
 #include <QMessageBox>
@@ -16,44 +16,19 @@
 #include <QRgb>
 #include <QMap>
 
-struct FacePoint
-{
-	const QVector3D * vertex;
-	const QVector3D * texCoord;
-	const QVector3D * normal;
-};
-
-class Face
-{
-public:
-	Face() {
-		points = new QList<FacePoint>();
-	}
-
-	QList<FacePoint> * points;
-	Material * material;
-};
-
 class WavefrontObject : public AObject
 {
 public:
-	WavefrontObject( Scene * scene, QString filename );
+	WavefrontObject( Scene * scene, QString filename, float scale = 1.0f );
 	virtual ~WavefrontObject();
 
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
-	bool parseObj( QString filename );
-
 private:
 	Scene * mScene;
 	float mScale;
-	QString mMtllib;
-	QList<QVector3D> * mVertices;
-	QList<QVector3D> * mTextureVertices;
-	QList<QVector3D> * mNormals;
-	QList<Face> * mFaces;
-	Material * mMaterial;
+	GLuint mIndex;
 };
 
 #endif // WAVEFRONTOBJECT_HPP

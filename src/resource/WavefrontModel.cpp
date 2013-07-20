@@ -1,7 +1,10 @@
 #include "WavefrontModel.hpp"
 
-WavefrontModel::WavefrontModel( QString filename )
+WavefrontModel::WavefrontModel( GLWidget * widget, QString filename )
 {
+	mGLWidget = widget;
+	mFaces = new QList<Face>();
+	mFilename = filename;
 	qDebug() << "+" << this << "WavefrontModel:" << filename;
 }
 
@@ -9,9 +12,12 @@ int WavefrontModel::load()
 {
 	if( !mMap.contains( mFilename ) )
 	{
+		qDebug() << "need to load model " + mFilename;
 		parse();
 		render();
 	}
+
+	qDebug() << mMap[mFilename];
 
 	return mMap[mFilename];
 }
@@ -107,27 +113,21 @@ bool WavefrontModel::parse()
 
 	file.close();
 
-	vertices->clear();
-	textureVertices->clear();
-	normals->clear();
-
-	free(vertices);
-	free(textureVertices);
-	free(normals);
-
 	return true;
 }
 
 bool WavefrontModel::render()
 {
-	GLuint cubelist = glGenLists(1);
+	GLuint index = glGenLists(1);
+	Material * mat;
 
-	glNewList(cubelist,GL_COMPILE);
+	glNewList( index, GL_COMPILE );
 	foreach( Face face, *mFaces )
 	{
-		if( face.material.length() == 0 )
+		if( face.material.length() != 0 )
 		{
-			//face.material->bind();
+			mat = new Material(mGLWidget, face.material);
+			mat->bind();
 		}
 		glBegin( GL_TRIANGLES );
 		foreach( FacePoint fp, *face.points )
@@ -141,14 +141,14 @@ bool WavefrontModel::render()
 			glVertex3f( vertex.x(), vertex.y(), vertex.z() );
 		}
 		glEnd();
-		if( face.material.length() == 0 )
+		if( face.material.length() != 0 )
 		{
-			//face.material->release();
+			mat->release();
 		}
 	}
 	glEndList();
 
-	mMap[mFilename] = cubelist;
+	mMap[mFilename] = index;
 
 	return true;
 }
