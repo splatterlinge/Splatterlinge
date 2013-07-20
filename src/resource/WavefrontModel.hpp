@@ -28,7 +28,7 @@ public:
 	}
 
 	QList<FacePoint> * points;
-	QString material;
+	Material * material;
 };
 
 static QMap<QString, GLuint> mMap = QMap<QString, GLuint>();

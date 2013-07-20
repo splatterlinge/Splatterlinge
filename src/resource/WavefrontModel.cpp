@@ -12,12 +12,9 @@ int WavefrontModel::load()
 {
 	if( !mMap.contains( mFilename ) )
 	{
-		qDebug() << "need to load model " + mFilename;
 		parse();
 		render();
 	}
-
-	qDebug() << mMap[mFilename];
 
 	return mMap[mFilename];
 }
@@ -31,7 +28,7 @@ bool WavefrontModel::parse()
 	QList<QVector3D> * vertices = new QList<QVector3D>();
 	QList<QVector2D> * textureVertices = new QList<QVector2D>();
 	QList<QVector3D> * normals = new QList<QVector3D>();
-	QString material;
+	Material * material;
 	float x, y, z;
 	float u, v;
 
@@ -107,7 +104,7 @@ bool WavefrontModel::parse()
 		else if( keyword == "usemtl" )
 		{
 			QFileInfo fileinfo( file );
-			material = fileinfo.baseName()+"_"+fields.takeFirst();
+			material = new Material( mGLWidget, fileinfo.baseName()+"_"+fields.takeFirst() );
 		}
 	}
 
@@ -119,15 +116,24 @@ bool WavefrontModel::parse()
 bool WavefrontModel::render()
 {
 	GLuint index = glGenLists(1);
-	Material * mat;
+	Material * lastMat = NULL;
 
 	glNewList( index, GL_COMPILE );
+
 	foreach( Face face, *mFaces )
 	{
-		if( face.material.length() != 0 )
+		if( face.material != NULL )
 		{
-			mat = new Material(mGLWidget, face.material);
-			mat->bind();
+			if( face.material != lastMat )
+			{
+				if( lastMat != NULL )
+				{
+					// TODO fix release!
+					//lastMat->release();
+				}
+				qDebug() << ">>> Change Material";
+				face.material->bind();
+			}
 		}
 		glBegin( GL_TRIANGLES );
 		foreach( FacePoint fp, *face.points )
@@ -137,15 +143,13 @@ bool WavefrontModel::render()
 			QVector3D vertex = *fp.vertex;
 
 			glNormal3f( normal.x(), normal.y(), normal.z() );
-			glTexCoord3f( texture.x(), texture.y(), texture.z() );
+			glTexCoord2f( texture.x(), texture.y() );
 			glVertex3f( vertex.x(), vertex.y(), vertex.z() );
 		}
 		glEnd();
-		if( face.material.length() != 0 )
-		{
-			mat->release();
-		}
+		lastMat = face.material;
 	}
+
 	glEndList();
 
 	mMap[mFilename] = index;

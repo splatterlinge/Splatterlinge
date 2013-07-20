@@ -38,12 +38,12 @@ World::World( Scene * scene, QString name ) :
 	mTable->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 3 );
 	add( mTable );
 
-	for(int i=0; i<=100; i+=10)
+	for(int i=0; i<=40; i+=10)
 	{
 		mTree = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/tree/tree.obj", 0.4f ) );
 		mTree->setPositionX( 100 );
-		mTree->setPositionZ( i );
-		mTree->setPositionY( mLandscape->terrain()->getHeight( QPointF(100,0) ) - 1 );
+		mTree->setPositionZ( -i );
+		mTree->setPositionY( mLandscape->terrain()->getHeight( QPointF(100,-i) ) - 1 );
 		add( mTree );
 	}
 
