@@ -129,7 +129,7 @@ bool WavefrontModel::render()
 				if( lastMat != NULL )
 				{
 					// TODO fix release!
-					//lastMat->release();
+					lastMat->release();
 				}
 				qDebug() << ">>> Change Material";
 				face.material->bind();
@@ -149,7 +149,7 @@ bool WavefrontModel::render()
 		glEnd();
 		lastMat = face.material;
 	}
-
+	lastMat->release();
 	glEndList();
 
 	mMap[mFilename] = index;
