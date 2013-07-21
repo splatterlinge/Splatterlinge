@@ -3,20 +3,14 @@
 WavefrontModel::WavefrontModel( GLWidget * widget, QString filename )
 {
 	mGLWidget = widget;
-	mFaces = new QList<Face>();
 	mFilename = filename;
+	mIndex = 0;
+	mFaces = new QList<Face>();
+	mSize = QSizeF(0,0);
 	qDebug() << "+" << this << "WavefrontModel:" << filename;
-}
 
-int WavefrontModel::load()
-{
-	if( !mMap.contains( mFilename ) )
-	{
-		parse();
-		render();
-	}
-
-	return mMap[mFilename];
+	parse();
+	render();
 }
 
 bool WavefrontModel::parse()
@@ -31,6 +25,11 @@ bool WavefrontModel::parse()
 	Material * material;
 	float x, y, z;
 	float u, v;
+
+	float minX = 0;
+	float maxX = 0;
+	float minY = 0;
+	float maxY = 0;
 
 	if( !file.open( QIODevice::ReadOnly ) ) {
 		qDebug() << file.errorString();
@@ -63,7 +62,17 @@ bool WavefrontModel::parse()
 		if( keyword == "v" )
 		{
 			x = fields.takeFirst().toFloat();
+			if( x > maxX )
+				maxX = x;
+			if( x < minX )
+				minX = x;
+
 			y = fields.takeFirst().toFloat();
+			if( y > maxY )
+				maxY = y;
+			if( y < minY )
+				minY = y;
+
 			z = fields.takeFirst().toFloat();
 			vertices->append( QVector3D( x, y, z ) );
 		}
@@ -110,15 +119,18 @@ bool WavefrontModel::parse()
 
 	file.close();
 
+	mSize.setWidth(maxX-minX);
+	mSize.setHeight(maxY-minY);
+
 	return true;
 }
 
 bool WavefrontModel::render()
 {
-	GLuint index = glGenLists(1);
+	mIndex = glGenLists(1);
 	Material * lastMat = NULL;
 
-	glNewList( index, GL_COMPILE );
+	glNewList( mIndex, GL_COMPILE );
 
 	foreach( Face face, *mFaces )
 	{
@@ -150,8 +162,6 @@ bool WavefrontModel::render()
 	if(lastMat)
 		lastMat->release();
 	glEndList();
-
-	mMap[mFilename] = index;
 
 	return true;
 }

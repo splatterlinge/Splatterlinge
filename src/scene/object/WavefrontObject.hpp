@@ -22,13 +22,19 @@ public:
 	WavefrontObject( Scene * scene, QString filename, float scale = 1.0f );
 	virtual ~WavefrontObject();
 
+	void load();
+
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
 private:
+	WavefrontModel * mModel;
 	Scene * mScene;
+	QString mFilename;
 	float mScale;
 	GLuint mIndex;
 };
+
+static QMap<QString, WavefrontModel *> mObjects = QMap<QString, WavefrontModel *>();
 
 #endif // WAVEFRONTOBJECT_HPP

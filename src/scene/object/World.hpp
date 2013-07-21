@@ -12,6 +12,7 @@
 #include "Landscape.hpp"
 #include "WavefrontObject.hpp"
 
+#include <QTime>
 
 class Shader;
 class TextureRenderer;

@@ -12,6 +12,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QMap>
+#include <QSizeF>
 
 struct FacePoint
 {
@@ -31,14 +32,13 @@ public:
 	Material * material;
 };
 
-static QMap<QString, GLuint> mMap = QMap<QString, GLuint>();
-
 class WavefrontModel
 {
 public:
 	WavefrontModel( GLWidget * widget, QString filename );
+	QSizeF getSize() { return mSize; }
+	GLuint getIndex() { return mIndex; }
 
-	int load();
 	bool parse();
 	bool render();
 
@@ -46,6 +46,8 @@ private:
 	GLWidget * mGLWidget;
 	QString mFilename;
 	QList<Face> * mFaces;
+	QSizeF mSize;
+	GLuint mIndex;
 };
 
 #endif // WAVEFRONTMODEL_HPP

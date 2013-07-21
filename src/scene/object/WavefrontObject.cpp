@@ -4,13 +4,30 @@ WavefrontObject::WavefrontObject( Scene * scene, QString filename, float scale )
 	AObject( scene )
 {
 	mScene = scene;
+	mFilename = filename;
 	mScale = scale;
 
-	mIndex = WavefrontModel(mScene->glWidget(), filename).load();
+	load();
 }
 
 WavefrontObject::~WavefrontObject()
 {
+}
+
+void WavefrontObject::load()
+{
+	if( !mObjects.contains( mFilename ) )
+	{
+		mObjects[mFilename] = new WavefrontModel( mScene->glWidget(), mFilename );
+	}
+
+	mModel = mObjects[mFilename];
+	qDebug() << mObjects[mFilename];
+
+	mIndex = mModel->getIndex();
+	qDebug() << mModel->getIndex();
+
+	setBoundingSphere( qMax( mModel->getSize().width(), mModel->getSize().height() )/4 );
 }
 
 void WavefrontObject::updateSelf( const double & delta )

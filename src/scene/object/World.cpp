@@ -27,6 +27,9 @@ World::World( Scene * scene, QString name ) :
 	mTimeReverse = false;
 	mTimeOfDay = 0.0f;
 
+	QTime time = QTime::currentTime();
+	qsrand((uint)time.msec());
+
 	mLandscape = QSharedPointer<Landscape>( new Landscape( scene, landscapeName ) );
 	add( mLandscape );
 
@@ -38,12 +41,13 @@ World::World( Scene * scene, QString name ) :
 	mTable->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 3 );
 	add( mTable );
 
-	for(int i=0; i<=40; i+=10)
+	for( float i=0; i<=200; i+=(float)rand()/( (float)RAND_MAX/3) )
 	{
-		mTree = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/tree/tree.obj", 0.4f ) );
-		mTree->setPositionX( 100 );
-		mTree->setPositionZ( -i );
-		mTree->setPositionY( mLandscape->terrain()->getHeight( QPointF(100,-i) ) - 1 );
+		float j = (float)rand()/( (float)RAND_MAX/200);
+		mTree = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/tree/tree.obj", 0.3f+(float)rand()/( (float)RAND_MAX/0.3) ) );
+		mTree->setPositionX( 100+i );
+		mTree->setPositionZ( -j );
+		mTree->setPositionY( mLandscape->terrain()->getHeight( QPointF(100+i,-j) ) - 1 );
 		add( mTree );
 	}
 
