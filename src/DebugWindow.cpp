@@ -1,4 +1,4 @@
-#include "DebugOptionWindow.hpp"
+#include "DebugWindow.hpp"
 
 #include <scene/Scene.hpp>
 #include <scene/object/Landscape.hpp>
@@ -10,11 +10,11 @@
 #include <QDebug>
 
 
-DebugOptionWindow::DebugOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFlags f ) :
+DebugWindow::DebugWindow( Scene * scene, QWidget * parent, Qt::WindowFlags f ) :
 	QWidget( parent, f ),
 	mScene( scene )
 {
-	setWindowTitle( tr("Debug Options") );
+	setWindowTitle( tr("Debug") );
 	setWindowOpacity( 0.8 );
 
 	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
@@ -33,18 +33,18 @@ DebugOptionWindow::DebugOptionWindow( Scene * scene, QWidget * parent, Qt::Windo
 }
 
 
-DebugOptionWindow::~DebugOptionWindow()
+DebugWindow::~DebugWindow()
 {
 }
 
 
-void DebugOptionWindow::setWireFrame( int enable )
+void DebugWindow::setWireFrame( int enable )
 {
 	mScene->setWireFrame( enable );
 }
 
 
-void DebugOptionWindow::setObjectBoundingSpheres( int enable )
+void DebugWindow::setObjectBoundingSpheres( int enable )
 {
 	AObject::setGlobalDebugBoundingSpheres( enable );
 }

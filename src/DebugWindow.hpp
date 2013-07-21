@@ -11,13 +11,13 @@ class QSlider;
 class QCheckBox;
 
 
-class DebugOptionWindow : public QWidget
+class DebugWindow : public QWidget
 {
 	Q_OBJECT
 
 public:
-	DebugOptionWindow( Scene * scene, QWidget * parent = 0, Qt::WindowFlags f = 0 );
-	~DebugOptionWindow();
+	DebugWindow( Scene * scene, QWidget * parent = 0, Qt::WindowFlags f = 0 );
+	~DebugWindow();
 
 private:
 	Scene * mScene;

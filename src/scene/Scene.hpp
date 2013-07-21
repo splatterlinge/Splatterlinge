@@ -17,6 +17,8 @@ class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 
 class GLWidget;
+class DebugWindow;
+class StartMenuWindow;
 class AMouseListener;
 class AKeyListener;
 
@@ -57,6 +59,9 @@ public:
 	void setMultiSample( bool enable ) { mMultiSample = enable; }
 	bool multiSample() const { return mMultiSample; }
 
+	StartMenuWindow * startMenuWindow() { return mStartMenuWindow; }
+	DebugWindow * debugWindow() { return mDebugWindow; }
+
 protected:
 	// Overrides:
 	void keyPressEvent( QKeyEvent * event );
@@ -69,6 +74,9 @@ protected:
 
 private:
 	GLWidget * mGLWidget;
+
+	DebugWindow * mDebugWindow;
+	StartMenuWindow * mStartMenuWindow;
 
 	QElapsedTimer mElapsedTimer;
 	double mDelta;

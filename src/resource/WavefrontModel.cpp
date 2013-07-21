@@ -131,6 +131,7 @@ bool WavefrontModel::render()
 					lastMat->release();
 				}
 				face.material->bind();
+				lastMat = face.material;
 			}
 		}
 		glBegin( GL_TRIANGLES );
@@ -145,9 +146,9 @@ bool WavefrontModel::render()
 			glVertex3f( vertex.x(), vertex.y(), vertex.z() );
 		}
 		glEnd();
-		lastMat = face.material;
 	}
-	lastMat->release();
+	if(lastMat)
+		lastMat->release();
 	glEndList();
 
 	mMap[mFilename] = index;

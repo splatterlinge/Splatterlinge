@@ -3,7 +3,7 @@
 #include <View.hpp>
 
 
-MainWindow::MainWindow( QWidget * parent) :
+MainWindow::MainWindow( QWidget * parent ) :
 	QMainWindow( parent )
 {
 	QSettings settings;

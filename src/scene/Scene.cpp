@@ -1,5 +1,10 @@
 #include "Scene.hpp"
 
+#include "HelpWindow.hpp"
+#include "GfxOptionWindow.hpp"
+#include "DebugWindow.hpp"
+#include "StartMenuWindow.hpp"
+
 #include "TextureRenderer.hpp"
 #include "object/World.hpp"
 #include <GLWidget.hpp>
@@ -7,6 +12,7 @@
 #include <utility/glWrappers.hpp>
 #include <utility/alWrappers.hpp>
 
+#include <QSettings>
 #include <QPainter>
 #include <QTimer>
 #include <QGraphicsItem>
@@ -20,15 +26,29 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mGLWidget( glWidget ),
 	mEye(0)
 {
+	QSettings settings;
+
+	mRoot = 0;
 	mFrameCountSecond = 0;
 	mFramesPerSecond = 0;
 	mWireFrame = false;
-	mMultiSample = false;
 
-	mRoot = 0;
+	mMultiSample = settings.value( "sampleBuffers", false ).toBool();
+
 	mEye = new Eye( this );
+	mEye->setFarPlane( settings.value( "farPlane", 500.0f ).toFloat() );
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
+
+	mDebugWindow = new DebugWindow( this );
+	addWidget( mDebugWindow, mDebugWindow->windowFlags() );
+	mDebugWindow->move( 64, 64 );
+	mDebugWindow->hide();
+
+	mStartMenuWindow = new StartMenuWindow( this );
+	addWidget( mStartMenuWindow, mStartMenuWindow->windowFlags() );
+	mStartMenuWindow->move( 128, 128 );
+	mStartMenuWindow->hide();
 
 	QTimer * secondTimer = new QTimer( this );
 	QObject::connect( secondTimer, SIGNAL(timeout()), this, SLOT(secondPassed()) );
@@ -44,6 +64,8 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 Scene::~Scene()
 {
 	delete mEye;
+	delete mDebugWindow;
+	delete mStartMenuWindow;
 }
 
 
@@ -142,11 +164,11 @@ void Scene::secondPassed()
 
 void Scene::setMouseGrabbing( bool enable )
 {
-	// this fixes mouse movements on entering grabbing mode
+	//HACK: this fixes mouse movements on entering grabbing mode - unfortunately it may produce stack overflows
+	// in QGestureManager::filterEvent(QGraphicsObject*, QEvent*)
 	QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
-	QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
-	// this prevents the cursor from beeing visible after enabling grabbing mode when the mouse is on a widget
-	QCoreApplication::processEvents( QEventLoop::AllEvents );
+	//HACK: this used to prevent the cursor from beeing visible after enabling grabbing mode when the mouse is on a widget
+	//QCoreApplication::processEvents( QEventLoop::AllEvents );
 
 	mMouseGrabbing = enable;
 	if( mMouseGrabbing )
@@ -158,10 +180,6 @@ void Scene::setMouseGrabbing( bool enable )
 
 void Scene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 {
-	QGraphicsScene::mouseMoveEvent( event );
-	if( event->isAccepted() )
-		return;
-
 	if( isMouseGrabbing() )
 	{
 		QPointF delta = event->scenePos() - QPoint( width()/2, height()/2 );
@@ -173,55 +191,66 @@ void Scene::mouseMoveEvent( QGraphicsSceneMouseEvent * event )
 				(*i)->mouseMoveEvent( &mouseMoveEvent );
 			QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
 		}
+		event->accept();
 	}
+
+	QGraphicsScene::mouseMoveEvent( event );
 }
 
 
 void Scene::mousePressEvent( QGraphicsSceneMouseEvent * event )
 {
-	QGraphicsScene::mousePressEvent( event );
-	if( event->isAccepted() )
-		return;
+	if( isMouseGrabbing() )
+	{
+		QList< AMouseListener* >::iterator i;
+		for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
+			(*i)->mousePressEvent( event );
+		event->accept();
+	}
 
-	QList< AMouseListener* >::iterator i;
-	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
-		(*i)->mousePressEvent( event );
+	QGraphicsScene::mousePressEvent( event );
 }
 
 
 void Scene::mouseDoubleClickEvent( QGraphicsSceneMouseEvent * event )
 {
-	QGraphicsScene::mouseDoubleClickEvent( event );
-	if( event->isAccepted() )
-		return;
+	if( isMouseGrabbing() )
+	{
+		QList< AMouseListener* >::iterator i;
+		for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
+			(*i)->mousePressEvent( event );
+		event->accept();
+	}
 
-	QList< AMouseListener* >::iterator i;
-	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
-		(*i)->mousePressEvent( event );
+	QGraphicsScene::mouseDoubleClickEvent( event );
 }
 
 
 void Scene::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
-	QGraphicsScene::mouseReleaseEvent(event);
-	if( event->isAccepted() )
-		return;
+	if( isMouseGrabbing() )
+	{
+		QList< AMouseListener* >::iterator i;
+		for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
+			(*i)->mouseReleaseEvent( event );
+		event->accept();
+	}
 
-	QList< AMouseListener* >::iterator i;
-	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
-		(*i)->mouseReleaseEvent( event );
+	QGraphicsScene::mouseReleaseEvent(event);
 }
 
 
 void Scene::wheelEvent( QGraphicsSceneWheelEvent * event )
 {
-	QGraphicsScene::wheelEvent( event );
-	if( event->isAccepted() )
-		return;
+	if( isMouseGrabbing() )
+	{
+		QList< AMouseListener* >::iterator i;
+		for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
+			(*i)->mouseWheelEvent( event );
+		event->accept();
+	}
 
-	QList< AMouseListener* >::iterator i;
-	for( i = mMouseListeners.begin(); i != mMouseListeners.end(); ++i )
-		(*i)->mouseWheelEvent( event );
+	QGraphicsScene::wheelEvent( event );
 }
 
 
@@ -238,7 +267,17 @@ void Scene::keyPressEvent( QKeyEvent * event )
 	switch( event->key() )
 	{
 	case Qt::Key_Escape:
-		setMouseGrabbing( !isMouseGrabbing() );
+		mStartMenuWindow->setVisible( mMouseGrabbing );
+		setMouseGrabbing( !mMouseGrabbing );
+		break;
+	case Qt::Key_F1:
+		mStartMenuWindow->helpWindow()->setVisible( mStartMenuWindow->helpWindow()->isHidden() );
+		break;
+	case Qt::Key_F2:
+		mStartMenuWindow->gfxOptionWindow()->setVisible( mStartMenuWindow->gfxOptionWindow()->isHidden() );
+		break;
+	case Qt::Key_F3:
+		mDebugWindow->setVisible( mDebugWindow->isHidden() );
 		break;
 	default:
 		return;

@@ -1,71 +1,98 @@
 #include "StartMenuWindow.hpp"
-#include <scene/Scene.hpp>
+
 #include "GfxOptionWindow.hpp"
-#include "View.hpp"
-#include<QDebug>
-#include<QPushButton>
-#include<QApplication>
-#include<QDesktopWidget>
+#include "HelpWindow.hpp"
 
-StartMenuWindow::StartMenuWindow(Scene * scene, QWidget *parent) :
-    QWidget(parent),
-    mScene( scene )
+#include <scene/Scene.hpp>
+
+#include <QDebug>
+#include <QPushButton>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QBoxLayout>
+
+
+StartMenuWindow::StartMenuWindow( Scene * scene, QWidget * parent ) :
+	QWidget( parent ),
+	mScene( scene )
 {
-    setWindowTitle( tr("Start Menu") );
-    setWindowOpacity( 0.8 );
+	setWindowTitle( tr( "Start Menu" ) );
+	setWindowOpacity( 0.8 );
 
-    setGeometry(QRect(QPoint(10,10), QSize(WIDTH, HEIGHT)));
-    activateButtons();
+	mHelpWindow = new HelpWindow();
+	mScene->addWidget( mHelpWindow, mHelpWindow->windowFlags() );
+	mHelpWindow->move( 32, 32 );
 
-    setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint );
+	mGfxOptionWindow = new GfxOptionWindow( mScene );
+	mScene->addWidget( mGfxOptionWindow, mGfxOptionWindow->windowFlags() );
+	mGfxOptionWindow->move( 32, 32 );
+	mGfxOptionWindow->hide();
+
+	initMenu();
+
+	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint );
 }
 
-StartMenuWindow::~StartMenuWindow(){
+
+StartMenuWindow::~StartMenuWindow()
+{
+	delete mHelpWindow;
+	delete mGfxOptionWindow;
 }
 
-void StartMenuWindow::activateButtons(){
-    mNewGame = new QPushButton("New Game", this);
 
-    QPalette pal = mNewGame->palette( );
-    pal.setColor( QPalette::Active, QPalette::Button, Qt::darkRed );
-    pal.setColor( QPalette::Inactive, QPalette::Button, Qt::darkRed );
-    pal.setColor( QPalette::ButtonText, Qt::white);
+void StartMenuWindow::initMenu()
+{
+/*
+	QPalette pal = mNewGame->palette( );
+	pal.setColor( QPalette::Active, QPalette::Button, Qt::darkRed );
+	pal.setColor( QPalette::Inactive, QPalette::Button, Qt::darkRed );
+	pal.setColor( QPalette::ButtonText, Qt::white );
+*/
+	QFont buttonFont = font();
+	buttonFont.setBold( true );
+	buttonFont.setPixelSize( 24 );
 
-    QFont buttonFont = mNewGame->font();
-    buttonFont.setBold(true);
-    buttonFont.setPixelSize(18);
+	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
 
-    int xPos = width()/2.0-BUTTON_WIDTH/2.0;
+	mNewGame = new QPushButton( "New Game", this );
+//	mNewGame->setPalette( pal );
+	mNewGame->setFont( buttonFont );
+	layout->addWidget( mNewGame );
+	connect( mNewGame, SIGNAL( released() ), this, SLOT( handleNewGameButton() ) );
 
-    mNewGame->setGeometry(QRect(QPoint(xPos, 25), QSize(BUTTON_WIDTH, BUTTON_HEIGHT)));
-    mNewGame->setPalette(pal);
-    mNewGame->setFont(buttonFont);
-    connect(mNewGame, SIGNAL(released()), this, SLOT(handleNewGameButton()));
+	mOptions = new QPushButton( "Options", this );
+//	mOptions->setPalette( pal );
+	mOptions->setFont( buttonFont );
+	layout->addWidget( mOptions );
+	connect( mOptions, SIGNAL( released() ), this, SLOT( handleOptionsButton() ) );
 
-    mOptions = new QPushButton("Options", this);
-    mOptions ->setGeometry(QRect(QPoint(xPos, 2*25+BUTTON_HEIGHT), QSize(BUTTON_WIDTH, BUTTON_HEIGHT)));
-    mOptions->setPalette(pal);
-    mOptions->setFont(buttonFont);
-    connect(mOptions, SIGNAL(released()), this, SLOT(handleOptionButton()));
+	mEnd = new QPushButton( "End Game", this );
+//	mEnd->setPalette( pal );
+	mEnd->setFont( buttonFont );
+	layout->addWidget( mEnd );
+	connect( mEnd, SIGNAL( released() ), this, SLOT( handleEndGameButton() ) );
 
-
-    mEnd = new QPushButton("End Game", this);
-    mEnd ->setGeometry(QRect(QPoint(xPos, 3*25+2*BUTTON_HEIGHT), QSize(BUTTON_WIDTH, BUTTON_HEIGHT)));
-    mEnd->setPalette(pal);
-    mEnd->setFont(buttonFont);
-    connect(mEnd, SIGNAL(released()), this, SLOT(handleEndGameButton()));
+	setLayout( layout );
 }
 
-void StartMenuWindow::handleNewGameButton(){
-    qDebug() << "handleNewGameButton";
-    this->setVisible(false);
+
+void StartMenuWindow::handleNewGameButton()
+{
+	//TODO: implement
+	this->setVisible( false );
 }
 
-void StartMenuWindow::handleOptionButton(){
-    qDebug() << "handleOptionButton";
-//    ((View*)parent())->showGfxOptionWindow(true);
+
+void StartMenuWindow::handleOptionsButton()
+{
+	mGfxOptionWindow->show();
+	mGfxOptionWindow->raise();
+	lower();
 }
 
-void StartMenuWindow::handleEndGameButton(){
-    exit(0);
+
+void StartMenuWindow::handleEndGameButton()
+{
+	QCoreApplication::exit(0);
 }

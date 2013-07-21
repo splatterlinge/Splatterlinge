@@ -100,6 +100,7 @@ bool MaterialData::load()
 				);
 			}
 			GLuint texture =  mGLWidget->bindTexture( map );
+			glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, Material::filterAnisotropy() );
 			mTextures[(*i)] = texture;
 		}
 	}

@@ -11,6 +11,10 @@ class QWidget;
 class QGraphicsScene;
 class QResizeEvent;
 
+class StartMenuWindow;
+class DebugWindow;
+class HelpWindow;
+class GfxOptionWindow;
 class Scene;
 class GLWidget;
 class World;
@@ -32,16 +36,11 @@ public:
 protected:
 	// Overrides:
 	virtual void resizeEvent( QResizeEvent * event );
-	virtual void keyPressEvent( QKeyEvent * event );
 
 private:
 	GLWidget * mGLWidget;
 	Scene * mScene;
 	World * mWorld;
-	QWidget * mDebugOptionWindow;
-	QWidget * mGfxOptionWindow;
-	QWidget * mHelpWindow;
-	QWidget * mStartMenu;
 
 	ALCdevice * mALDevice;
 	ALCcontext * mALContext;

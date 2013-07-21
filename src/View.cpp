@@ -1,10 +1,5 @@
 #include "View.hpp"
 
-#include "DebugOptionWindow.hpp"
-#include "GfxOptionWindow.hpp"
-#include "HelpWindow.hpp"
-#include "StartMenuWindow.hpp"
-
 #include <GLWidget.hpp>
 #include <scene/Scene.hpp>
 #include <scene/object/Eye.hpp>
@@ -14,9 +9,7 @@
 #include <QLabel>
 #include <QResizeEvent>
 #include <QGraphicsWidget>
-#include <QGraphicsProxyWidget>
 #include <QRect>
-#include <qvarlengtharray.h>
 #include <QSettings>
 
 
@@ -106,18 +99,16 @@ void View::initGL()
 
 void View::initScene()
 {
-	mScene = new Scene( mGLWidget, this );
-	mWorld = new World( mScene, "earth" );
-	mScene->setRoot( mWorld );
-	setScene( mScene );
-
 	QSettings settings;
-	mScene->setMultiSample( settings.value( "sampleBuffers", false ).toBool() );
-	mScene->eye()->setFarPlane( settings.value( "farPlane", 500.0f ).toFloat() );
 	Material::setFilterAnisotropy( settings.value( "materialFilterAnisotropy", 1.0f ).toFloat() );
 	MaterialQuality::setMaximum( MaterialQuality::fromString(
 		settings.value( "materialQuality", MaterialQuality::toString(MaterialQuality::HIGH) ).toString()
 	));
+
+	mScene = new Scene( mGLWidget, this );
+	mWorld = new World( mScene, "earth" );
+	mScene->setRoot( mWorld );
+	setScene( mScene );
 }
 
 
@@ -126,25 +117,6 @@ View::View( QWidget * parent ) : QGraphicsView( parent )
 	initGL();
 	initAL();
 	initScene();
-
-	mHelpWindow = new HelpWindow();
-	scene()->addWidget( mHelpWindow, mHelpWindow->windowFlags() );
-	mHelpWindow->move( 32, 32 );
-
-	mGfxOptionWindow = new GfxOptionWindow( mScene );
-	scene()->addWidget( mGfxOptionWindow, mGfxOptionWindow->windowFlags() );
-	mGfxOptionWindow->move( 64, 64 );
-	mGfxOptionWindow->hide();
-
-	mDebugOptionWindow = new DebugOptionWindow( mScene );
-	scene()->addWidget( mDebugOptionWindow, mDebugOptionWindow->windowFlags() );
-	mDebugOptionWindow->move( 128, 64 );
-	mDebugOptionWindow->hide();
-
-	mStartMenu = new StartMenuWindow( mScene , this);
-	scene()->addWidget( mStartMenu, mStartMenu->windowFlags() );
-	mStartMenu->move(32, 32);
-	mStartMenu->setVisible(false);
 }
 
 
@@ -153,9 +125,6 @@ View::~View()
 	alcMakeContextCurrent( NULL );
 	alcDestroyContext( mALContext );
 	alcCloseDevice( mALDevice );
-	delete mHelpWindow;
-	delete mGfxOptionWindow;
-	delete mDebugOptionWindow;
 	delete mWorld;
 	delete mScene;
 	delete mGLWidget;
@@ -166,34 +135,4 @@ void View::resizeEvent( QResizeEvent * event )
 {
 	scene()->setSceneRect( QRect(QPoint(0, 0), event->size()) );
 	QGraphicsView::resizeEvent( event );
-}
-
-
-void View::keyPressEvent( QKeyEvent * event )
-{
-	QGraphicsView::keyPressEvent( event );
-	switch( event->key() )
-	{
-	case Qt::Key_F1:
-		if( mHelpWindow->isHidden() )
-			mHelpWindow->show();
-		else
-			mHelpWindow->hide();
-		break;
-	case Qt::Key_F2:
-		if( mGfxOptionWindow->isHidden() )
-			mGfxOptionWindow->show();
-		else
-			mGfxOptionWindow->hide();
-		break;
-	case Qt::Key_F3:
-		if( mDebugOptionWindow->isHidden() )
-			mDebugOptionWindow->show();
-		else
-			mDebugOptionWindow->hide();
-		break;
-	default:
-		event->ignore();
-		break;
-	}
 }
