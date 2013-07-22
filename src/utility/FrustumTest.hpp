@@ -13,8 +13,10 @@ public:
 	FrustumTest() {}
 	~FrustumTest() {}
 
-	/// Sync to current modelview/perspective matrix stack.
+	/// Sync to current OpenGL modelview/perspective matrix stack.
 	void sync();
+	/// Sync to modelview/perspective matrix stack.
+	void sync( const QMatrix4x4 & perspective, const QMatrix4x4 & modelView );
 
 	/// Visibility test on viewing frustum.
 	bool isPointInFrustum( QVector3D point ) const ;

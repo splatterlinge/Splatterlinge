@@ -32,6 +32,7 @@ private:
 	float mFlareSize;
 	float mColorCycle;
 	QVector4D mColor;
+	float mFlareRotation;
 };
 
 

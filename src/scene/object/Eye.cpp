@@ -53,9 +53,10 @@ void Eye::applyAL( const double & delta )
 
 void Eye::applyGL()
 {
+	mProjectionMatrix.setToIdentity();
+	mProjectionMatrix.perspective( mFOV, (float)mScene->width()/mScene->height(), mNearPlane, mFarPlane );
 	glMatrixMode( GL_PROJECTION );
-	glLoadIdentity();
-	gluPerspective( mFOV, (float)mScene->width()/mScene->height(), mNearPlane, mFarPlane );
+	glLoadMatrix( mProjectionMatrix );
 
 	if( !mAttached.isNull() )
 	{
@@ -63,15 +64,15 @@ void Eye::applyGL()
 		mRotation = mAttached.data()->rotation();
 	}
 
-	mMatrixInverse.setToIdentity();
-	mMatrixInverse.translate( mPosition );
-	mMatrixInverse.rotate( mRotation );
-	mMatrixInverse.rotate( 180.0f, QVector3D( 0, 1, 0 ) );
-	mMatrixInverse.scale( mScale );
-	mMatrix = mMatrixInverse.inverted();
+	mViewMatrixInverse.setToIdentity();
+	mViewMatrixInverse.translate( mPosition );
+	mViewMatrixInverse.rotate( mRotation );
+	mViewMatrixInverse.rotate( 180.0f, QVector3D( 0, 1, 0 ) );
+	mViewMatrixInverse.scale( mScale );
+	mViewMatrix = mViewMatrixInverse.inverted();
 
 	glMatrixMode( GL_MODELVIEW );
-	glLoadMatrix( mMatrix );
+	glLoadMatrix( mViewMatrix );
 
 	applyClippingPlanes();
 }

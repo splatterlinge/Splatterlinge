@@ -40,11 +40,11 @@ public:
 	public:
 		virtual void particleInteraction( const double & delta, Particle & particle ) = 0;
 	};
-	
+
 	ParticleSystem( int capacity=1000 );
 	~ParticleSystem() {}
 	void update( const double & delta );
-	void draw();
+	void draw( const QMatrix4x4 & modelView );
 	void emitSpherical( const QVector3D & source, int toEmit, const float & minVel, const float & maxVel );
 	const float & minLife() const { return mMinLife; }
 	const float & maxLife() const { return mMaxLife; }

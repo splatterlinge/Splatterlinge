@@ -87,8 +87,6 @@ void StartMenuWindow::handleNewGameButton()
 void StartMenuWindow::handleOptionsButton()
 {
 	mGfxOptionWindow->show();
-	mGfxOptionWindow->raise();
-	lower();
 }
 
 

@@ -63,11 +63,11 @@ void SplatterSystem::update( const double & delta )
 }
 
 
-void SplatterSystem::draw()
+void SplatterSystem::draw( const QMatrix4x4 & modelView )
 {
 	mParticleMaterial->bind();
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	mParticleSystem->draw();
+	mParticleSystem->draw( modelView );
 	mParticleMaterial->release();
 
 	mSplatterMaterial->bind();

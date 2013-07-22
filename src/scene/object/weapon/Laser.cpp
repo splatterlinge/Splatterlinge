@@ -93,16 +93,14 @@ void Laser::draw2Self()
 	QVector3D toEye = scene()->eye()->position() - mTrailStart;
 	QVector3D crossDir = QVector3D::crossProduct( mTrailDirection, toEye ).normalized();
 
-	glPushMatrix();
-	glLoadMatrix( scene()->eye()->matrix() );
+	glLoadMatrix( scene()->eye()->viewMatrix() );
 	glBegin( GL_TRIANGLE_STRIP );
 		glVertex(-crossDir*mTrailRadius + mTrailStart);
 		glVertex( crossDir*mTrailRadius + mTrailStart);
 		glVertex(-crossDir*mTrailRadius + mTrailEnd );
 		glVertex( crossDir*mTrailRadius + mTrailEnd );
 	glEnd();
-	glPopMatrix();
-	
+
 	glDisable( GL_BLEND );
 	glDepthMask( GL_TRUE );
 }

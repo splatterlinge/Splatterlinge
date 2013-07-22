@@ -20,9 +20,9 @@ public:
 	Eye( Eye & other );
 	~Eye();
 
-	/// Updates OpenAL listener position/velocity and orientation.
+	/// Applies position/velocity/orientation to OpenAL.
 	void applyAL( const double & delta );
-	/// Sets OpenGL projection and modelview matrices and applies clipping planes.
+	/// Applies OpenGL projection/modelview matrices and clipping planes.
 	void applyGL();
 
 	/// Attach this eye to an object.
@@ -75,8 +75,9 @@ public:
 	const QQuaternion & rotation() const { return mRotation; }
 
 	const QVector3D & scale() const { return mScale; }
-	const QMatrix4x4 & matrix() const { return mMatrix; }
-	const QMatrix4x4 & matrixInverse() const { return mMatrixInverse; }
+	const QMatrix4x4 & viewMatrix() const { return mViewMatrix; }
+	const QMatrix4x4 & viewMatrixInverse() const { return mViewMatrixInverse; }
+	const QMatrix4x4 & projectionMatrix() const { return mProjectionMatrix; }
 
 protected:
 
@@ -92,8 +93,9 @@ private:
 	float mFOV;
 	float mNearPlane;
 	float mFarPlane;
-	QMatrix4x4 mMatrix;
-	QMatrix4x4 mMatrixInverse;
+	QMatrix4x4 mViewMatrix;
+	QMatrix4x4 mViewMatrixInverse;
+	QMatrix4x4 mProjectionMatrix;
 };
 
 

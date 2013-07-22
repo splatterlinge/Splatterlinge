@@ -40,6 +40,8 @@ class Scene;
  *     11. (draw subnodes - second pass)
  *     12. draw2SelfPost()
  * Each object tracks its own model transformation matrix and synchronizes it with
+ * it's parent object on each update( const double & delta ) call.\n
+ * Changes in position/orientation are only allowed in an update pass.
  */
 class AObject
 {
@@ -54,22 +56,33 @@ public:
 	AObject & operator=( const AObject & other );
 
 	/// Transform a vector from local object space to world space
-	const QVector4D toWorld( const QVector4D & v ) { validateMatrix(); return mMatrix * v; }
+	const QVector4D toWorld( const QVector4D & v ) { validateMatrix(); return mModelMatrix * v; }
 	/// Transform a point vectorfrom local object space to world space
-	const QVector3D pointToWorld( const QVector3D & v ) { validateMatrix(); return (mMatrix * QVector4D(v,1)).toVector3D(); }
+	const QVector3D pointToWorld( const QVector3D & v ) { validateMatrix(); return (mModelMatrix * QVector4D(v,1)).toVector3D(); }
 	/// Transform a direction vector from local object space to world space
-	const QVector3D directionToWorld( const QVector3D & v ) { validateMatrix(); return (mMatrix * QVector4D(v,0)).toVector3D(); }
+	const QVector3D directionToWorld( const QVector3D & v ) { validateMatrix(); return (mModelMatrix * QVector4D(v,0)).toVector3D(); }
+
+	/// Returns the transformation matrix to eye space - only valid while drawing
+	const QMatrix4x4 & modelViewMatrix() const { return mModelViewMatrix; }
+	/// The object's position in eye space - only valid while drawing
+	const QVector3D eyePosition() const { return mModelViewMatrix.row(3).toVector3D(); }
+	/// Returns the vector in eye space pointing along the positive local X axis - only valid while drawing
+	const QVector3D eyeLeft() const { return mModelViewMatrix.row(0).toVector3D(); }
+	/// Returns the vector in eye space pointing along the positive local Y axis - only valid while drawing
+	const QVector3D eyeUp() const { return mModelViewMatrix.row(1).toVector3D(); }
+	/// Returns the vector in eye space pointing along the positive local Z axis - only valid while drawing
+	const QVector3D eyeDirection() const { return mModelViewMatrix.row(2).toVector3D(); }
 
 	/// Returns the transformation matrix to world space
-	const QMatrix4x4 & matrix() const { validateMatrix(); return mMatrix; }
+	const QMatrix4x4 & modelMatrix() const { validateMatrix(); return mModelMatrix; }
 	/// The object's position in world space
-	const QVector3D worldPosition() const { validateMatrix(); return mMatrix.column(3).toVector3D(); }
+	const QVector3D worldPosition() const { validateMatrix(); return mModelMatrix.column(3).toVector3D(); }
 	/// Returns the vector in world space pointing along the positive local X axis
-	const QVector3D worldLeft() const { validateMatrix(); return mMatrix.column(0).toVector3D(); }
+	const QVector3D worldLeft() const { validateMatrix(); return mModelMatrix.column(0).toVector3D(); }
 	/// Returns the vector in world space pointing along the positive local Y axis
-	const QVector3D worldUp() const { validateMatrix(); return mMatrix.column(1).toVector3D(); }
+	const QVector3D worldUp() const { validateMatrix(); return mModelMatrix.column(1).toVector3D(); }
 	/// Returns the vector in world space pointing along the positive local Z axis
-	const QVector3D worldDirection() const { validateMatrix(); return mMatrix.column(2).toVector3D(); }
+	const QVector3D worldDirection() const { validateMatrix(); return mModelMatrix.column(2).toVector3D(); }
 
 	/// Returns the vector pointing along the positive local X axis
 	const QVector3D left() const { return mRotation.rotatedVector(QVector3D(1,0,0)); }
@@ -79,23 +92,23 @@ public:
 	const QVector3D direction() const { return mRotation.rotatedVector(QVector3D(0,0,1)); }
 
 	/// Adds a vector to the local position
-	void move( const QVector3D & distance ) { mPosition += distance; mMatrixNeedsUpdate = true; }
+	void move( const QVector3D & distance ) { mPosition += distance; mModelMatrixNeedsUpdate = true; }
 	/// Adds a scalar to the local position on the X axis
-	void moveX( const qreal & x ) { mPosition.setX(mPosition.x()+x); mMatrixNeedsUpdate = true; }
+	void moveX( const qreal & x ) { mPosition.setX(mPosition.x()+x); mModelMatrixNeedsUpdate = true; }
 	/// Adds a scalar to the local position on the Y axis
-	void moveY( const qreal & y ) { mPosition.setY(mPosition.y()+y); mMatrixNeedsUpdate = true; }
+	void moveY( const qreal & y ) { mPosition.setY(mPosition.y()+y); mModelMatrixNeedsUpdate = true; }
 	/// Adds a scalar to the local position on the Z axis
-	void moveZ( const qreal & z ) { mPosition.setZ(mPosition.z()+z); mMatrixNeedsUpdate = true; }
+	void moveZ( const qreal & z ) { mPosition.setZ(mPosition.z()+z); mModelMatrixNeedsUpdate = true; }
 	/// Sets the local position
-	void setPosition( const QVector3D & position ) { mPosition = position; mMatrixNeedsUpdate = true; }
+	void setPosition( const QVector3D & position ) { mPosition = position; mModelMatrixNeedsUpdate = true; }
 	/// Sets the local position on the X axis
-	void setPositionX( const qreal & x ) { mPosition.setX(x); mMatrixNeedsUpdate = true; }
+	void setPositionX( const qreal & x ) { mPosition.setX(x); mModelMatrixNeedsUpdate = true; }
 	/// Sets the local position on the Y axis
-	void setPositionY( const qreal & y ) { mPosition.setY(y); mMatrixNeedsUpdate = true; }
+	void setPositionY( const qreal & y ) { mPosition.setY(y); mModelMatrixNeedsUpdate = true; }
 	/// Sets the local position on the Z axis
-	void setPositionZ( const qreal & z ) { mPosition.setZ(z); mMatrixNeedsUpdate = true; }
+	void setPositionZ( const qreal & z ) { mPosition.setZ(z); mModelMatrixNeedsUpdate = true; }
 	/// Sets the local rotation
-	void setRotation( const QQuaternion & rotation ) { mRotation = rotation; mMatrixNeedsUpdate = true; }
+	void setRotation( const QQuaternion & rotation ) { mRotation = rotation; mModelMatrixNeedsUpdate = true; }
 
 	/// The object's local position
 	const QVector3D & position() const { return mPosition; }
@@ -162,15 +175,16 @@ private:
 	float mBoundingSphereRadius;
 	QList< QSharedPointer<AObject> > mSubNodes;
 	FrustumTest mFrustumTest;
-
-	mutable bool mMatrixNeedsUpdate;
+	QMatrix4x4 mModelViewMatrix;
 
 	/// Precalculated model matrix
-	mutable QMatrix4x4 mMatrix;
+	mutable QMatrix4x4 mModelMatrix;
+	/// Set to true if this object's position/orientation changed
+	mutable bool mModelMatrixNeedsUpdate;
 	/// Synchronizes matrix to current position and rotation
 	void syncMatrix() const;
 	/// Synchronizes matrix to current position and rotation if necessary
-	void validateMatrix() const { if( mMatrixNeedsUpdate ) { syncMatrix(); mMatrixNeedsUpdate = false; } }
+	void validateMatrix() const { if( mModelMatrixNeedsUpdate ) { syncMatrix(); mModelMatrixNeedsUpdate = false; } }
 
 	void setParent( AObject * parent ) { mParent = parent; }
 };

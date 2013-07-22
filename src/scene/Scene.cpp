@@ -89,15 +89,16 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	}
 	mDelta = (double)delta/1000.0;
 
-	mRoot->update( mDelta );
-	mRoot->update2( mDelta );
-
-	mEye->applyAL( mDelta );
-
 	glPushAttrib( GL_ALL_ATTRIB_BITS );
 	glMatrixMode( GL_TEXTURE );	glPushMatrix();	glLoadIdentity();
 	glMatrixMode( GL_PROJECTION );	glPushMatrix();	glLoadIdentity();
 	glMatrixMode( GL_MODELVIEW );	glPushMatrix();	glLoadIdentity();
+
+	mRoot->update( mDelta );
+	mRoot->update2( mDelta );
+
+	mEye->applyGL();
+	mEye->applyAL( mDelta );
 
 	glDisable( GL_BLEND );
 	glDisable( GL_TEXTURE_2D );
@@ -118,7 +119,6 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	else
 		glDisable( GL_MULTISAMPLE );
 
-	mEye->applyGL();
 	mRoot->draw();
 	mRoot->draw2();
 

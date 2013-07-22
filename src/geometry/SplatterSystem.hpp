@@ -22,7 +22,7 @@ public:
 	SplatterSystem( GLWidget * glWidget, Terrain * terrain, int maxSplatters = 200, int maxParticles = 500 );
 	virtual ~SplatterSystem();
 	void update( const double & delta );
-	void draw();
+	void draw( const QMatrix4x4 & modelView );
 	void spray( const QVector3D & source, float size );
 	void splat( const QVector3D & source, float size );
 
@@ -34,7 +34,7 @@ public:
 
 	float burstPitchRange() const { return mBurstPitchRange; }
 	void setBurstPitchRange( float range ) { mBurstPitchRange = range; }
-	
+
 	ParticleSystem * particleSystem() const { return mParticleSystem; }
 
 	// Overrides:

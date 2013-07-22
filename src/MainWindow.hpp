@@ -23,10 +23,12 @@ public:
 protected:
 	// Overrides:
 	virtual void keyPressEvent( QKeyEvent * event );
-	virtual void closeEvent( QCloseEvent * event );
 
 private:
 	View * mView;
+
+private slots:
+	void saveWindowGeometry();
 };
 
 

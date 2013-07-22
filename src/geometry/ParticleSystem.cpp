@@ -40,13 +40,11 @@ void ParticleSystem::update( const double & delta )
 }
 
 
-void ParticleSystem::draw()
+void ParticleSystem::draw( const QMatrix4x4 & modelView )
 {
-	float m[16];
-	glGetFloatv( GL_MODELVIEW_MATRIX, m );
-	QVector3D dir( m[2], m[6], m[10] );
-	QVector3D up( m[1], m[5], m[9] );
-	QVector3D right( m[0], m[4], m[8] );
+	QVector3D dir( modelView.row(2).toVector3D() );
+	QVector3D up( modelView.row(1).toVector3D() );
+	QVector3D right( modelView.row(0).toVector3D() );
 
 	QVector3D vA = (-right+up) * mSize;
 	QVector3D vB = ( right+up) * mSize;

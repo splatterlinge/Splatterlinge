@@ -7,26 +7,27 @@
 
 
 AObject::AObject( Scene * scene, float boundingSphereRadius ) :
-	mScene(scene),
+	mScene( scene ),
 	mParent(),
-	mPosition(0,0,0),
+	mPosition( 0, 0, 0 ),
 	mRotation(),
-	mBoundingSphereRadius(boundingSphereRadius),
+	mBoundingSphereRadius( boundingSphereRadius ),
 	mSubNodes(),
-	mMatrixNeedsUpdate(true)
+	mModelMatrix(),
+	mModelMatrixNeedsUpdate( true )
 {
 }
 
 
 AObject::AObject( const AObject & other ) :
-	mScene(other.mScene),
-	mParent(other.mParent),
-	mPosition(other.mPosition),
-	mRotation(other.mRotation),
-	mBoundingSphereRadius(other.mBoundingSphereRadius),
-	mSubNodes(other.mSubNodes),
-	mMatrixNeedsUpdate(other.mMatrixNeedsUpdate),
-	mMatrix(other.mMatrix)
+	mScene( other.mScene ),
+	mParent( other.mParent ),
+	mPosition( other.mPosition ),
+	mRotation( other.mRotation ),
+	mBoundingSphereRadius( other.mBoundingSphereRadius ),
+	mSubNodes( other.mSubNodes ),
+	mModelMatrix( other.mModelMatrix ),
+	mModelMatrixNeedsUpdate( other.mModelMatrixNeedsUpdate )
 {
 }
 
@@ -39,14 +40,14 @@ AObject::~AObject()
 
 AObject & AObject::operator=( const AObject & other )
 {
-	mMatrix = other.mMatrix;
-	mScene =other.mScene;
+	mModelMatrix = other.mModelMatrix;
+	mScene = other.mScene;
 	mParent = other.mParent;
 	mPosition = other.mPosition;
 	mRotation = other.mRotation;
 	mBoundingSphereRadius = other.mBoundingSphereRadius;
 	mSubNodes = other.mSubNodes;
-	mMatrixNeedsUpdate = other.mMatrixNeedsUpdate;
+	mModelMatrixNeedsUpdate = other.mModelMatrixNeedsUpdate;
 	return *this;
 }
 
@@ -55,12 +56,12 @@ void AObject::syncMatrix() const
 {
 	if( mParent )
 	{
-		mMatrix = mParent->matrix();
+		mModelMatrix = mParent->modelMatrix();
 	} else {
-		mMatrix.setToIdentity();
+		mModelMatrix.setToIdentity();
 	}
-	mMatrix.translate( position() );
-	mMatrix.rotate( rotation() );
+	mModelMatrix.translate( position() );
+	mModelMatrix.rotate( rotation() );
 }
 
 
@@ -91,16 +92,13 @@ void AObject::update2( const double & delta )
 
 void AObject::draw()
 {
-	if( !matrix().isIdentity() )
-	{
-		glPushMatrix();
-		glLoadMatrix( scene()->eye()->matrix() );
-		glMultMatrix( matrix() );
-	}
+	mModelViewMatrix = scene()->eye()->viewMatrix() * modelMatrix();
 	if( mSubNodes.size() )
-		mFrustumTest.sync();
+		mFrustumTest.sync( mScene->eye()->projectionMatrix(), mModelViewMatrix );
 
+	glLoadMatrix( mModelViewMatrix );
 	drawSelf();
+
 	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
@@ -114,29 +112,20 @@ void AObject::draw()
 			(*i)->draw();
 		}
 	}
+
+	glLoadMatrix( mModelViewMatrix );
 	drawSelfPost();
+
 	if( sDebugBoundingSpheres )
 		drawBoundingShpere();
-
-	if( !matrix().isIdentity() )
-	{
-		glPopMatrix();
-	}
 }
 
 
 void AObject::draw2()
 {
-	if( !matrix().isIdentity() )
-	{
-		glPushMatrix();
-		glLoadMatrix( scene()->eye()->matrix() );
-		glMultMatrix( matrix() );
-	}
-	if( mSubNodes.size() )
-		mFrustumTest.sync();
-
+	glLoadMatrix( mModelViewMatrix );
 	draw2Self();
+
 	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
@@ -150,12 +139,9 @@ void AObject::draw2()
 			(*i)->draw2();
 		}
 	}
-	draw2SelfPost();
 
-	if( !matrix().isIdentity() )
-	{
-		glPopMatrix();
-	}
+	glLoadMatrix( mModelViewMatrix );
+	draw2SelfPost();
 }
 
 

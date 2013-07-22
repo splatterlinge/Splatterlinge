@@ -33,6 +33,9 @@ World::World( Scene * scene, QString name ) :
 	mLandscape = QSharedPointer<Landscape>( new Landscape( scene, landscapeName ) );
 	add( mLandscape );
 
+	mSky = QSharedPointer<Sky>( new Sky( scene, skyName ) );
+	add( mSky );
+
 	mPlayer = QSharedPointer<Player>( new Player( scene, this ) );
 	add( mPlayer );
 	scene->eye()->attach( mPlayer );
@@ -41,7 +44,7 @@ World::World( Scene * scene, QString name ) :
 	mTable->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 3 );
 	add( mTable );
 
-	for( float i=0; i<=200; i+=(float)rand()/( (float)RAND_MAX/3) )
+	for( float i=0; i<=100; i+=(float)rand()/( (float)RAND_MAX/3) )
 	{
 		float j = (float)rand()/( (float)RAND_MAX/200);
 		mTree = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/tree/tree.obj", 0.3f+(float)rand()/( (float)RAND_MAX/0.3) ) );
@@ -50,9 +53,6 @@ World::World( Scene * scene, QString name ) :
 		mTree->setPositionY( mLandscape->terrain()->getHeight( QPointF(100+i,-j) ) - 1 );
 		add( mTree );
 	}
-
-	mSky = QSharedPointer<Sky>( new Sky( scene, skyName ) );
-	add( mSky );
 
 	scene->addKeyListener( this );
 
@@ -166,7 +166,7 @@ void World::drawSelf()
 
 void World::drawSelfPost()
 {
-	mSplatterSystem->draw();
+	mSplatterSystem->draw( modelViewMatrix() );
 }
 
 

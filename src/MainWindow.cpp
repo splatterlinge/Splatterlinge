@@ -11,6 +11,8 @@ MainWindow::MainWindow( QWidget * parent ) :
 
 	mView = new View( this );
 	this->setCentralWidget( mView );
+
+	connect( QCoreApplication::instance(), SIGNAL(aboutToQuit()), this, SLOT(saveWindowGeometry()) );
 }
 
 
@@ -20,20 +22,19 @@ MainWindow::~MainWindow()
 }
 
 
+void MainWindow::saveWindowGeometry()
+{
+	QSettings settings;
+	settings.setValue( "geometry", saveGeometry() );
+}
+
+
 void MainWindow::toggleFullScreen()
 {
 	if( this->windowState() == Qt::WindowFullScreen )
 		this->showNormal();
 	else
 		this->showFullScreen();
-}
-
-
-void MainWindow::closeEvent( QCloseEvent * event )
-{
-	QSettings settings;
-	settings.setValue( "geometry", saveGeometry() );
-	QWidget::closeEvent( event );
 }
 
 

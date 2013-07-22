@@ -11,6 +11,7 @@ Torch::Torch( Scene * scene, World * world ) :
 {
 	mFlareSize = 5.0f;
 	mColorCycle = 0.0f;
+	mFlareRotation = 0.0f;
 
 	QImage flareImage( "./data/effect/flare.png" );
 	if( flareImage.isNull() )
@@ -48,6 +49,8 @@ void Torch::updateSelf( const double & delta )
 	if( mColorCycle >= 1.0f )
 		mColorCycle -= 1.0f;
 	mColor = QVector4D( color.redF(), color.greenF(), color.blueF(), 1.0f );
+
+	mFlareRotation += 20.0f * delta;
 }
 
 
@@ -71,12 +74,10 @@ void Torch::draw2Self()
 	glBlendFunc( GL_ONE, GL_ONE );
 	glEnable( GL_TEXTURE_2D );
 	glBindTexture( GL_TEXTURE_2D, mFlareMap );
-	glColor( mColor );
 
-	float m[16];
-	glGetFloatv( GL_MODELVIEW_MATRIX, m );
-	QVector3D up( m[1], m[5], m[9] );
-	QVector3D right( m[0], m[4], m[8] );
+	QVector3D dir( eyeDirection() );
+	QVector3D up( eyeUp() );
+	QVector3D left( eyeLeft() );
 
 	struct _vertices
 	{
@@ -84,13 +85,13 @@ void Torch::draw2Self()
 		QVector2D texCoord;
 	};
 	struct _vertices vertices[4];
-	vertices[0].position = (-right+up) * mFlareSize;
+	vertices[0].position = (-left+up) * mFlareSize;
 	vertices[0].texCoord = QVector2D(0,0);
-	vertices[1].position = ( right+up) * mFlareSize;
+	vertices[1].position = ( left+up) * mFlareSize;
 	vertices[1].texCoord = QVector2D(1,0);
-	vertices[2].position = ( right-up) * mFlareSize;
+	vertices[2].position = ( left-up) * mFlareSize;
 	vertices[2].texCoord = QVector2D(1,1);
-	vertices[3].position = (-right-up) * mFlareSize;
+	vertices[3].position = (-left-up) * mFlareSize;
 	vertices[3].texCoord = QVector2D(0,1);
 
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
@@ -104,7 +105,13 @@ void Torch::draw2Self()
 	glVertexPointer( 3, GL_FLOAT, sizeof(struct _vertices), &(vertices[0].position) );
 	glTexCoordPointer( 2, GL_FLOAT, sizeof(struct _vertices), &(vertices[0].texCoord) );
 
+	glPushMatrix();
+	glColor( mColor/2.0f );
+	glRotate( mFlareRotation, dir );
 	glDrawArrays( GL_QUADS, 0, 4 );
+	glRotate( -mFlareRotation*2.7f, dir );
+	glDrawArrays( GL_QUADS, 0, 4 );
+	glPopMatrix();
 
 	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 	glDisableClientState( GL_VERTEX_ARRAY );

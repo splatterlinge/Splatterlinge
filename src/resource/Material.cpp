@@ -197,7 +197,7 @@ Material::Material( GLWidget * glWidget, QString name, MaterialShaderVariant::ty
 {
 	mGLWidget = glWidget;
 	mName = name;
-	mDefaultQuality = MaterialQuality::maximum();
+	mDefaultQuality = MaterialQuality::HIGH;
 	mShaderSet[MaterialQuality::LOW].textureUnits.clear();
 	mShaderSet[MaterialQuality::LOW].shader = 0;
 	mShaderSet[MaterialQuality::LOW].blobMapUniform = -1;
@@ -296,7 +296,6 @@ void Material::bind()
 		mShaderSet[mBoundQuality].shader->program()->setUniformValue( mShaderSet[mBoundQuality].blobMapUniform, texUnit );
 		texUnit++;
 	}
-
 }
 
 
