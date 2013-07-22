@@ -220,7 +220,6 @@ void teapot( GLint grid, GLdouble scale, GLenum type )
 {
 	float p[4][4][3], q[4][4][3], r[4][4][3], s[4][4][3];
 	int i, j, k, l;
-	
 	glPushAttrib(GL_ENABLE_BIT | GL_EVAL_BIT | GL_POLYGON_BIT);
 	glFrontFace(GL_CW);
 	glEnable(GL_AUTO_NORMAL);

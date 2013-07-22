@@ -74,6 +74,13 @@ void Laser::drawSelf()
 {
 	glDisable( GL_TEXTURE_2D );
 	glEnable( GL_LIGHTING );
+
+	glMaterial( GL_FRONT_AND_BACK, GL_AMBIENT, QVector4D(0,0,0,0) );
+	glMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE, QVector4D(1,1,1,1) );
+	glMaterial( GL_FRONT_AND_BACK, GL_SPECULAR, QVector4D(1,1,1,1) );
+	glMaterial( GL_FRONT_AND_BACK, GL_EMISSION, QVector4D(0,0,0,0) );
+	glMaterial( GL_FRONT_AND_BACK, GL_SHININESS, 32.0f );
+
 	gluCylinder( mQuadric, 0.1f, 0.1f, 0.4f, 16, 16 );
 }
 
