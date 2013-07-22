@@ -16,9 +16,9 @@
 
 struct FacePoint
 {
-	const QVector3D * vertex;
-	const QVector2D * texCoord;
-	const QVector3D * normal;
+	QVector3D vertex;
+	QVector2D texCoord;
+	QVector3D normal;
 };
 
 class Face

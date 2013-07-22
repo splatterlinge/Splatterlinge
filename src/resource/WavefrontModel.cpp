@@ -19,10 +19,10 @@ bool WavefrontModel::parse()
 	QString line;
 	QString keyword;
 	QStringList fields;
-	QList<QVector3D> * vertices = new QList<QVector3D>();
-	QList<QVector2D> * textureVertices = new QList<QVector2D>();
-	QList<QVector3D> * normals = new QList<QVector3D>();
-	Material * material;
+	QList<QVector3D> vertices;
+	QList<QVector2D> textureVertices;
+	QList<QVector3D> normals;
+	Material * material = NULL;
 	float x, y, z;
 	float u, v;
 
@@ -74,20 +74,20 @@ bool WavefrontModel::parse()
 				minY = y;
 
 			z = fields.takeFirst().toFloat();
-			vertices->append( QVector3D( x, y, z ) );
+			vertices.append( QVector3D( x, y, z ) );
 		}
 		else if( keyword == "vt" )
 		{
 			u = fields.takeFirst().toFloat();
 			v = fields.takeFirst().toFloat();
-			textureVertices->append( QVector2D( u, v ) );
+			textureVertices.append( QVector2D( u, v ) );
 		}
 		else if( keyword == "vn" )
 		{
 			x = fields.takeFirst().toFloat();
 			y = fields.takeFirst().toFloat();
 			z = fields.takeFirst().toFloat();
-			normals->append( QVector3D( x, y, z ) );
+			normals.append( QVector3D( x, y, z ) );
 		}
 		else if( keyword == "f" )
 		{
@@ -100,9 +100,9 @@ bool WavefrontModel::parse()
 				points = fields.takeFirst().split( "/" );
 				while( !points.isEmpty() )
 				{
-					point.vertex = &vertices->at( points.takeFirst().toInt()-1 );
-					point.texCoord = &textureVertices->at( points.takeFirst().toInt()-1 );
-					point.normal = &normals->at( points.takeFirst().toInt()-1 );
+					point.vertex = vertices.at( points.takeFirst().toInt()-1 );
+					point.texCoord = textureVertices.at( points.takeFirst().toInt()-1 );
+					point.normal = normals.at( points.takeFirst().toInt()-1 );
 
 					face.points->append( point );
 					face.material = material;
@@ -149,13 +149,9 @@ bool WavefrontModel::render()
 		glBegin( GL_TRIANGLES );
 		foreach( FacePoint fp, *face.points )
 		{
-			QVector3D normal = *fp.normal;
-			QVector3D texture = *fp.texCoord;
-			QVector3D vertex = *fp.vertex;
-
-			glNormal3f( normal.x(), normal.y(), normal.z() );
-			glTexCoord2f( texture.x(), texture.y() );
-			glVertex3f( vertex.x(), vertex.y(), vertex.z() );
+			glNormal( fp.normal );
+			glTexCoord( fp.texCoord );
+			glVertex( fp.vertex );
 		}
 		glEnd();
 	}

@@ -62,6 +62,42 @@ inline void glNormal3v( const GLint * v )	{ glNormal3iv( v ); }
 inline void glNormal3v( const GLshort * v )	{ glNormal3sv( v ); }
 inline void glNormal( const QVector3D & v )	{ glNormal3v( reinterpret_cast<const float*>(&v) ); }
 
+inline void glTexCoord( const GLshort & s )	{ glTexCoord1s( s ); }
+inline void glTexCoord( const GLint & s )	{ glTexCoord1i( s ); }
+inline void glTexCoord( const GLfloat & s )	{ glTexCoord1f( s ); }
+inline void glTexCoord( const GLdouble & s )	{ glTexCoord1d( s ); }
+inline void glTexCoord( const GLshort & s, const GLshort & t )		{ glTexCoord2s( s, t ); }
+inline void glTexCoord( const GLint & s, const GLint & t )		{ glTexCoord2i( s, t ); }
+inline void glTexCoord( const GLfloat & s, const GLfloat & t )		{ glTexCoord2f( s, t ); }
+inline void glTexCoord( const GLdouble & s, const GLdouble & t )	{ glTexCoord2d( s, t ); }
+inline void glTexCoord( const GLshort & s, const GLshort & t, const GLshort & r )	{ glTexCoord3s( s, t, r ); }
+inline void glTexCoord( const GLint & s, const GLint & t, const GLint & r )		{ glTexCoord3i( s, t, r ); }
+inline void glTexCoord( const GLfloat & s, const GLfloat & t, const GLfloat & r )	{ glTexCoord3f( s, t, r ); }
+inline void glTexCoord( const GLdouble & s, const GLdouble & t, const GLdouble & r )	{ glTexCoord3d( s, t, r ); }
+inline void glTexCoord( const GLshort & s, const GLshort & t, const GLshort & r, const GLshort & q )		{ glTexCoord4s( s, t, r, q ); }
+inline void glTexCoord( const GLint & s, const GLint & t, const GLint & r, const GLint & q )			{ glTexCoord4i( s, t, r, q ); }
+inline void glTexCoord( const GLfloat & s, const GLfloat & t, const GLfloat & r, const GLfloat & q )		{ glTexCoord4f( s, t, r, q ); }
+inline void glTexCoord( const GLdouble & s, const GLdouble & t, const GLdouble & r, const GLdouble & q )	{ glTexCoord4d( s, t, r, q ); }
+inline void glTexCoord1v( const GLshort * v )	{ glTexCoord1sv( v ); }
+inline void glTexCoord1v( const GLint * v )	{ glTexCoord1iv( v ); }
+inline void glTexCoord1v( const GLfloat * v )	{ glTexCoord1fv( v ); }
+inline void glTexCoord1v( const GLdouble * v )	{ glTexCoord1dv( v ); }
+inline void glTexCoord2v( const GLshort * v )	{ glTexCoord2sv( v ); }
+inline void glTexCoord2v( const GLint * v )	{ glTexCoord2iv( v ); }
+inline void glTexCoord2v( const GLfloat * v )	{ glTexCoord2fv( v ); }
+inline void glTexCoord2v( const GLdouble * v )	{ glTexCoord2dv( v ); }
+inline void glTexCoord3v( const GLshort * v )	{ glTexCoord3sv( v ); }
+inline void glTexCoord3v( const GLint * v )	{ glTexCoord3iv( v ); }
+inline void glTexCoord3v( const GLfloat * v )	{ glTexCoord3fv( v ); }
+inline void glTexCoord3v( const GLdouble * v )	{ glTexCoord3dv( v ); }
+inline void glTexCoord4v( const GLshort * v )	{ glTexCoord4sv( v ); }
+inline void glTexCoord4v( const GLint * v )	{ glTexCoord4iv( v ); }
+inline void glTexCoord4v( const GLfloat * v )	{ glTexCoord4fv( v ); }
+inline void glTexCoord4v( const GLdouble * v )	{ glTexCoord4dv( v ); }
+inline void glTexCoord( const QVector2D & v )	{ glTexCoord2v( reinterpret_cast<const float*>(&v) ); }
+inline void glTexCoord( const QVector3D & v )	{ glTexCoord3v( reinterpret_cast<const float*>(&v) ); }
+inline void glTexCoord( const QVector4D & v )	{ glTexCoord4v( reinterpret_cast<const float*>(&v) ); }
+
 inline void glRotate( const GLfloat & angle, const GLfloat & x, const GLfloat & y, const GLfloat & z )		{ glRotatef( angle, x, y, z ); }
 inline void glRotate( const GLdouble & angle, const GLdouble & x, const GLdouble & y, const GLdouble & z )	{ glRotated( angle, x, y, z ); }
 inline void glRotate( const GLfloat & angle, const QVector3D & axis )	{ glRotate( angle, static_cast<GLfloat>(axis.x()), static_cast<GLfloat>(axis.y()), static_cast<GLfloat>(axis.z()) ); }
