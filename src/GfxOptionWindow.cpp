@@ -2,6 +2,7 @@
 
 #include <resource/Material.hpp>
 #include <scene/Scene.hpp>
+#include <scene/object/World.hpp>
 
 #include <QBoxLayout>
 #include <QCheckBox>
@@ -20,41 +21,53 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 
 	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
 
-	materialQualityLabel = new QLabel();
-	materialQuality = new QSlider( Qt::Horizontal );
-	materialQuality->setRange( 0, 2 );
-	materialQuality->setSingleStep( 1 );
-	materialQuality->setPageStep( 1 );
-//	materialQuality->setTickPosition( QSlider::TicksAbove );
-	materialQuality->setValue( MaterialQuality::maximum() );
-	setMaterialQuality( materialQuality->value() );
-	QObject::connect( materialQuality, SIGNAL(valueChanged(int)), this, SLOT(setMaterialQuality(int)) );
-	layout->addWidget( materialQualityLabel );
-	layout->addWidget( materialQuality );
+	mSplatterQualityLabel = new QLabel();
+	mSplatterQuality = new QSlider( Qt::Horizontal );
+	mSplatterQuality->setRange( 0, SplatterQuality::num-1 );
+	mSplatterQuality->setSingleStep( 1 );
+	mSplatterQuality->setPageStep( 1 );
+//	mSplatterQuality->setTickPosition( QSlider::TicksAbove );
+	mSplatterQuality->setValue( SplatterQuality::maximum() );
+	setSplatterQuality( mSplatterQuality->value() );
+	QObject::connect( mSplatterQuality, SIGNAL(valueChanged(int)), this, SLOT(setSplatterQuality(int)) );
+	layout->addWidget( mSplatterQualityLabel );
+	layout->addWidget( mSplatterQuality );
 
-	materialAnisotropyLabel = new QLabel();
-	materialAnisotropy = new QSlider( Qt::Horizontal );
-	materialAnisotropy->setRange( 1, Material::filterAnisotropyMaximum() );
-	materialAnisotropy->setSingleStep( 1 );
-	materialAnisotropy->setPageStep( 1 );
+	mMaterialQualityLabel = new QLabel();
+	mMaterialQuality = new QSlider( Qt::Horizontal );
+	mMaterialQuality->setRange( 0, MaterialQuality::num-1 );
+	mMaterialQuality->setSingleStep( 1 );
+	mMaterialQuality->setPageStep( 1 );
+//	mMaterialQuality->setTickPosition( QSlider::TicksAbove );
+	mMaterialQuality->setValue( MaterialQuality::maximum() );
+	setMaterialQuality( mMaterialQuality->value() );
+	QObject::connect( mMaterialQuality, SIGNAL(valueChanged(int)), this, SLOT(setMaterialQuality(int)) );
+	layout->addWidget( mMaterialQualityLabel );
+	layout->addWidget( mMaterialQuality );
+
+	mMaterialAnisotropyLabel = new QLabel();
+	mMaterialAnisotropy = new QSlider( Qt::Horizontal );
+	mMaterialAnisotropy->setRange( 1, Material::filterAnisotropyMaximum() );
+	mMaterialAnisotropy->setSingleStep( 1 );
+	mMaterialAnisotropy->setPageStep( 1 );
 //	materialAnisotropy->setTickPosition( QSlider::TicksAbove );
-	materialAnisotropy->setValue( Material::filterAnisotropy() );
-	setMaterialFilterAnisotropy( materialAnisotropy->value() );
-	QObject::connect( materialAnisotropy, SIGNAL(valueChanged(int)), this, SLOT(setMaterialFilterAnisotropy(int)) );
-	layout->addWidget( materialAnisotropyLabel );
-	layout->addWidget( materialAnisotropy );
+	mMaterialAnisotropy->setValue( Material::filterAnisotropy() );
+	setMaterialFilterAnisotropy( mMaterialAnisotropy->value() );
+	QObject::connect( mMaterialAnisotropy, SIGNAL(valueChanged(int)), this, SLOT(setMaterialFilterAnisotropy(int)) );
+	layout->addWidget( mMaterialAnisotropyLabel );
+	layout->addWidget( mMaterialAnisotropy );
 
-	farPlaneLabel = new QLabel();
-	farPlane = new QSlider( Qt::Horizontal );
-	farPlane->setRange( 50, 1000 );
-	farPlane->setSingleStep( 10 );
-	farPlane->setPageStep( 50 );
-//	farPlane->setTickPosition( QSlider::TicksAbove );
-	farPlane->setValue( mScene->eye()->farPlane() );
-	setFarPlane( farPlane->value() );
-	QObject::connect( farPlane, SIGNAL(valueChanged(int)), this, SLOT(setFarPlane(int)) );
-	layout->addWidget( farPlaneLabel );
-	layout->addWidget( farPlane );
+	mFarPlaneLabel = new QLabel();
+	mFarPlane = new QSlider( Qt::Horizontal );
+	mFarPlane->setRange( 50, 1000 );
+	mFarPlane->setSingleStep( 10 );
+	mFarPlane->setPageStep( 50 );
+//	mFarPlane->setTickPosition( QSlider::TicksAbove );
+	mFarPlane->setValue( mScene->eye()->farPlane() );
+	setFarPlane( mFarPlane->value() );
+	QObject::connect( mFarPlane, SIGNAL(valueChanged(int)), this, SLOT(setFarPlane(int)) );
+	layout->addWidget( mFarPlaneLabel );
+	layout->addWidget( mFarPlane );
 
 	mMultiSample = new QCheckBox( "MultiSample (needs restart)" );
 	mMultiSample->setChecked( mScene->multiSample() );
@@ -72,11 +85,22 @@ GfxOptionWindow::~GfxOptionWindow()
 }
 
 
+void GfxOptionWindow::setSplatterQuality( int q )
+{
+	SplatterQuality::type quality = static_cast<SplatterQuality::type>(q);
+	SplatterQuality::setMaximum( quality );
+	mSplatterQualityLabel->setText( tr("Splatter Quality (%1):").arg( SplatterQuality::toString(quality) ) );
+
+	QSettings settings;
+	settings.setValue( "splatterQuality", SplatterQuality::toString(quality) );
+}
+
+
 void GfxOptionWindow::setMaterialQuality( int q )
 {
 	MaterialQuality::type quality = static_cast<MaterialQuality::type>(q);
 	MaterialQuality::setMaximum( quality );
-	materialQualityLabel->setText( tr("Material Quality (%1):").arg( MaterialQuality::toString(quality) ) );
+	mMaterialQualityLabel->setText( tr("Material Quality (%1):").arg( MaterialQuality::toString(quality) ) );
 
 	QSettings settings;
 	settings.setValue( "materialQuality", MaterialQuality::toString(quality) );
@@ -86,7 +110,7 @@ void GfxOptionWindow::setMaterialQuality( int q )
 void GfxOptionWindow::setMaterialFilterAnisotropy( int a )
 {
 	Material::setFilterAnisotropy( a );
-	materialAnisotropyLabel->setText(tr("Material Anisotropy (%1):").arg(a));
+	mMaterialAnisotropyLabel->setText(tr("Material Anisotropy (%1):").arg(a));
 
 	QSettings settings;
 	settings.setValue( "materialFilterAnisotropy", a );
@@ -96,7 +120,7 @@ void GfxOptionWindow::setMaterialFilterAnisotropy( int a )
 void GfxOptionWindow::setFarPlane( int distance )
 {
 	mScene->eye()->setFarPlane( distance );
-	farPlaneLabel->setText(tr("Viewing Distance (%1m):").arg(distance));
+	mFarPlaneLabel->setText(tr("Viewing Distance (%1m):").arg(distance));
 
 	QSettings settings;
 	settings.setValue( "farPlane", distance );

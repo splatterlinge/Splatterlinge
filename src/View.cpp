@@ -104,6 +104,9 @@ void View::initScene()
 	MaterialQuality::setMaximum( MaterialQuality::fromString(
 		settings.value( "materialQuality", MaterialQuality::toString(MaterialQuality::HIGH) ).toString()
 	));
+	SplatterQuality::setMaximum( SplatterQuality::fromString(
+		settings.value( "splatterQuality", SplatterQuality::toString(SplatterQuality::HIGH) ).toString()
+	));
 
 	mScene = new Scene( mGLWidget, this );
 	mWorld = new World( mScene, "earth" );

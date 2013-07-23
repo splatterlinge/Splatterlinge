@@ -22,16 +22,19 @@ public:
 
 private:
 	Scene * mScene;
-	QLabel * materialQualityLabel;
-	QSlider * materialQuality;
-	QLabel * materialAnisotropyLabel;
-	QSlider * materialAnisotropy;
-	QLabel * farPlaneLabel;
-	QSlider * farPlane;
+	QLabel * mSplatterQualityLabel;
+	QSlider * mSplatterQuality;
+	QLabel * mMaterialQualityLabel;
+	QSlider * mMaterialQuality;
+	QLabel * mMaterialAnisotropyLabel;
+	QSlider * mMaterialAnisotropy;
+	QLabel * mFarPlaneLabel;
+	QSlider * mFarPlane;
 	QCheckBox * mMultiSample;
 
 public slots:
 	void setMaterialQuality( int q );
+	void setSplatterQuality( int q );
 	void setMaterialFilterAnisotropy( int a );
 	void setFarPlane( int distance );
 	void setMultiSample( int state );

@@ -14,6 +14,37 @@
 #include <QSettings>
 
 
+SplatterQuality::type SplatterQuality::sMaximum = SplatterQuality::HIGH;
+
+SplatterQuality::type SplatterQuality::fromString( const QString & name )
+{
+	QString up = name.toUpper();
+	if( up == "LOW" )
+		return LOW;
+	if( up == "MEDIUM" )
+		return MEDIUM;
+	if( up == "HIGH" )
+		return HIGH;
+	qWarning() << name << QT_TR_NOOP("is not a valid splatter quality type");
+	return LOW;
+}
+
+
+QString SplatterQuality::toString( const SplatterQuality::type & quality )
+{
+	switch( quality )
+	{
+		case SplatterQuality::HIGH:
+			return "High";
+		case SplatterQuality::MEDIUM:
+			return "Medium";
+		case SplatterQuality::LOW:
+			return "Low";
+	}
+	return "Low";
+}
+
+
 World::World( Scene * scene, QString name ) :
 	AObject( scene )
 {
@@ -132,6 +163,10 @@ void World::updateSelf( const double & delta )
 
 	mSky->setTimeOfDay( mTimeOfDay );
 
+	if( SplatterQuality::maximum() == SplatterQuality::MEDIUM )
+		mSplatterSystem->setSplatBelow( true );
+	else
+		mSplatterSystem->setSplatBelow( false );
 	mSplatterSystem->update( delta );
 }
 
@@ -201,7 +236,7 @@ void World::SplatterInteractor::particleInteraction( const double & delta, Parti
 	if( belowGround )
 	{
 		particle.setLife( 0.0f );
-		if( !belowWater )
+		if( !belowWater && SplatterQuality::maximum() == SplatterQuality::HIGH )
 			mWorld.splatterSystem()->splat( particle.position(), mWorld.splatterSystem()->particleSystem()->size() * randomMinMax( 0.5f, 2.0f ) );
 	}
 }

@@ -23,6 +23,7 @@ SplatterSystem::SplatterSystem( GLWidget * glWidget, Terrain * terrain, int maxS
 	mParticleSystem->setDrag( 0.25f );
 	mParticleSystem->setInteractionCallback( this );
 
+	mSplatBelow = true;
 	mSplatterFadeSpeed = 0.3f;
 	mSplatterDriftFactor = 100.0f;
 
@@ -118,6 +119,9 @@ void SplatterSystem::spray( const QVector3D & source, float size )
 {
 	mParticleSystem->emitSpherical( source, 0.05f*size*size, 1.0f*size, 1.75f*size );
 
+	if( mSplatBelow && mTerrain->getHeightAboveGround( source ) < size )
+		splat( source, size * randomMinMax( 0.75f, 1.0f ) );
+
 	int maxSecOffset = 0;
 	for( int i=0; i<mBurstSampleSources.size(); ++i )
 	{
@@ -163,6 +167,4 @@ void SplatterSystem::particleInteraction( const double & delta, ParticleSystem::
 	if( mTerrain->getHeightAboveGround( particle.position() ) > -particleSystem()->size()/2.0f )
 		return;
 	particle.setLife( 0.0f );
-
-	splat( particle.position(), particleSystem()->size() * randomMinMax( 0.5f, 2.0f ) );
 }

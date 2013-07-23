@@ -26,14 +26,17 @@ public:
 	void spray( const QVector3D & source, float size );
 	void splat( const QVector3D & source, float size );
 
-	float splatterFadeSpeed() const { return mSplatterFadeSpeed; }
-	void setSplatterFadeSpeed( float speed ) { mSplatterFadeSpeed = speed; }
+	const bool & splatBelow() const { return mSplatBelow; }
+	void setSplatBelow( const bool & enable ) { mSplatBelow = enable; }
 
-	float splatterDriftFactor() const { return mSplatterDriftFactor; }
-	void setSplatterDriftFactor( float driftFactor ) { mSplatterDriftFactor = driftFactor; }
+	const float & splatterFadeSpeed() const { return mSplatterFadeSpeed; }
+	void setSplatterFadeSpeed( const float & speed ) { mSplatterFadeSpeed = speed; }
 
-	float burstPitchRange() const { return mBurstPitchRange; }
-	void setBurstPitchRange( float range ) { mBurstPitchRange = range; }
+	const float & splatterDriftFactor() const { return mSplatterDriftFactor; }
+	void setSplatterDriftFactor( const float & driftFactor ) { mSplatterDriftFactor = driftFactor; }
+
+	const float & burstPitchRange() const { return mBurstPitchRange; }
+	void setBurstPitchRange( const float & range ) { mBurstPitchRange = range; }
 
 	ParticleSystem * particleSystem() const { return mParticleSystem; }
 
@@ -60,6 +63,7 @@ private:
 	float mSplatterFadeSpeed;
 	float mSplatterDriftFactor;
 	float mBurstPitchRange;
+	bool mSplatBelow;
 	QVector< AudioSample * > mBurstSampleSources;
 };
 

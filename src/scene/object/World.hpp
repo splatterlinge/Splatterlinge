@@ -20,6 +20,30 @@ class Material;
 class SplatterSystem;
 
 
+/// SplatterSystem quality settings
+class SplatterQuality
+{
+	SplatterQuality() {}
+	~SplatterQuality() {}
+public:
+	enum type
+	{
+		LOW	= 0,
+		MEDIUM	= 1,
+		HIGH	= 2
+	};
+	const static int num = 3;
+
+	static type fromString( const QString & name );
+	static QString toString( const type & quality );
+	static const type & maximum() { return sMaximum; }
+	static void setMaximum( const type & max ) { sMaximum = max; }
+
+private:
+	static type sMaximum;
+};
+
+
 /// World object
 /**
  *
