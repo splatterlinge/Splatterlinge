@@ -4,8 +4,6 @@
 
 #include <GLWidget.hpp>
 
-#include <QVector4D>
-
 
 class Scene;
 

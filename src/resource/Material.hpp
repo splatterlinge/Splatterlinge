@@ -18,7 +18,7 @@ class MaterialQuality
 	MaterialQuality() {}
 	~MaterialQuality() {}
 public:
-	enum type
+	enum Type
 	{
 		LOW	= 0,
 		MEDIUM	= 1,
@@ -26,13 +26,13 @@ public:
 	};
 	const static int num = 3;
 
-	static type fromString( const QString & name );
-	static QString toString( const type & quality );
-	static const type & maximum() { return sMaximum; }
-	static void setMaximum( const type & max ) { sMaximum = max; }
+	static Type fromString( const QString & name );
+	static QString toString( const Type & quality );
+	static const Type & maximum() { return sMaximum; }
+	static void setMaximum( const Type & max ) { sMaximum = max; }
 
 private:
-	static type sMaximum;
+	static Type sMaximum;
 };
 
 
@@ -42,7 +42,7 @@ class MaterialShaderVariant
 	MaterialShaderVariant() {}
 	~MaterialShaderVariant() {}
 public:
-	enum type
+	enum Type
 	{
 		DEFAULT		= 0,
 		BLOBBING	= 1
@@ -66,7 +66,7 @@ public:
 	const GLfloat & shininess() const { return mShininess; }
 	const QMap<QString,GLuint> & textures() const { return mTextures; }
 	const QMap<QString,GLfloat> & constants() const { return mConstants; }
-	const QString shaderName( MaterialQuality::type quality ) const { return mShaderNames[quality]; }
+	const QString shaderName( MaterialQuality::Type quality ) const { return mShaderNames[quality]; }
 
 	const GLclampf & alphaTestReferenceValue() const { return mAlphaTestReferenceValue; }
 	const GLenum & alphaTestFunction() const { return mAlphaTestFunction; }
@@ -99,10 +99,10 @@ private:
 class Material : public AResource<MaterialData>
 {
 public:
-	Material( GLWidget * glWidget, QString name, MaterialShaderVariant::type type = MaterialShaderVariant::DEFAULT );
+	Material( GLWidget * glWidget, QString name, MaterialShaderVariant::Type variant = MaterialShaderVariant::DEFAULT );
 	virtual ~Material();
 
-	void setShader( MaterialShaderVariant::type variant );
+	void setShader( MaterialShaderVariant::Type variant );
 
 	void overrideAmbient( const QVector4D & ambient ) { glMaterial( GL_FRONT_AND_BACK, GL_AMBIENT, ambient ); }
 	void overrideDiffuse( const QVector4D & diffuse ) { glMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse ); }
@@ -116,7 +116,7 @@ public:
 	void bind();
 	void release();
 
-	void setDefaultQuality( MaterialQuality::type q ) { mDefaultQuality = q; }
+	void setDefaultQuality( MaterialQuality::Type q ) { mDefaultQuality = q; }
 
 	static float filterAnisotropyMaximum() { GLfloat maxAnisotropy; glGetFloatv( GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAnisotropy ); return maxAnisotropy; }
 	static void setFilterAnisotropy( float maxAnisotropy );
@@ -144,11 +144,11 @@ private:
 	const GLclampf * mUsedAlphaTestReferenceValue;
 
 	ShaderSet mShaderSet[MaterialQuality::num];
-	MaterialQuality::type mDefaultQuality;
-	MaterialQuality::type mBoundQuality;
+	MaterialQuality::Type mDefaultQuality;
+	MaterialQuality::Type mBoundQuality;
 
-	MaterialQuality::type getBindingQuality();
-	void setShader( MaterialQuality::type quality, QString shaderFullName );
+	MaterialQuality::Type getBindingQuality();
+	void setShader( MaterialQuality::Type quality, QString shaderFullName );
 
 	static float sFilterAnisotropy;
 };

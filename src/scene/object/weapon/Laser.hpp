@@ -6,15 +6,13 @@
 
 
 struct GLUquadric;
-class Scene;
-class World;
 
 
 /// Caution - Laser
 class Laser : public AWeapon
 {
 public:
-	Laser( Scene * scene, World * world );
+	Laser( World * world );
 	~Laser();
 
 	virtual void updateSelf( const double & delta );
@@ -25,7 +23,6 @@ public:
 	virtual void triggerReleased();
 
 private:
-	World * mWorld;
 	GLUquadric * mQuadric;
 	bool mFired;
 	float mCoolDown;

@@ -6,7 +6,8 @@
 #include "StartMenuWindow.hpp"
 
 #include "TextureRenderer.hpp"
-#include "object/World.hpp"
+#include "AMouseListener.hpp"
+#include "AKeyListener.hpp"
 #include <GLWidget.hpp>
 #include <resource/Material.hpp>
 #include <utility/glWrappers.hpp>

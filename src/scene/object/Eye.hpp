@@ -1,6 +1,7 @@
 #ifndef SCENE_OBJECT_EYE_INCLUDED
 #define SCENE_OBJECT_EYE_INCLUDED
 
+
 #include "AObject.hpp"
 
 #include <GLWidget.hpp>

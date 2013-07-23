@@ -7,7 +7,8 @@
 #include <geometry/ParticleSystem.hpp>
 
 #include "AObject.hpp"
-#include "Player.hpp"
+#include "creature/Player.hpp"
+#include "creature/Dummy.hpp"
 #include "Sky.hpp"
 #include "Landscape.hpp"
 #include "WavefrontObject.hpp"
@@ -20,13 +21,13 @@ class Material;
 class SplatterSystem;
 
 
-/// SplatterSystem quality settings
+/// Splatter quality settings
 class SplatterQuality
 {
 	SplatterQuality() {}
 	~SplatterQuality() {}
 public:
-	enum type
+	enum Type
 	{
 		LOW	= 0,
 		MEDIUM	= 1,
@@ -34,13 +35,13 @@ public:
 	};
 	const static int num = 3;
 
-	static type fromString( const QString & name );
-	static QString toString( const type & quality );
-	static const type & maximum() { return sMaximum; }
-	static void setMaximum( const type & max ) { sMaximum = max; }
+	static Type fromString( const QString & name );
+	static QString toString( const Type & quality );
+	static const Type & maximum() { return sMaximum; }
+	static void setMaximum( const Type & max ) { sMaximum = max; }
 
 private:
-	static type sMaximum;
+	static Type sMaximum;
 };
 
 
@@ -72,6 +73,8 @@ public:
 
 	QSharedPointer<AObject> getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D & normal );
 
+	QSharedPointer<Player> player() { return mPlayer; }
+
 private:
 	class SplatterInteractor : public ParticleSystem::Interactable
 	{
@@ -89,6 +92,7 @@ private:
 	QSharedPointer<Sky> mSky;
 	QSharedPointer<Landscape> mLandscape;
 	QSharedPointer<Player> mPlayer;
+	QSharedPointer<Dummy> mDummy;
 	QSharedPointer<WavefrontObject> mTable;
 	QSharedPointer<WavefrontObject> mTree;
 	QVector3D mTarget;

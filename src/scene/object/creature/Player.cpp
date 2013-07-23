@@ -1,15 +1,15 @@
 #include "Player.hpp"
 
+
 #include <scene/Scene.hpp>
 #include <geometry/SplatterSystem.hpp>
-#include "World.hpp"
-#include "Landscape.hpp"
-#include "weapon/Laser.hpp"
+#include "../World.hpp"
+#include "../Landscape.hpp"
+#include "../weapon/Laser.hpp"
 
 
-Player::Player( Scene * scene, World * world ) :
-	AObject( scene ),
-	mWorld( world )
+Player::Player( World * world ) :
+	ACreature( world )
 {
 	mForwardPressed = false;
 	mLeftPressed = false;
@@ -28,22 +28,22 @@ Player::Player( Scene * scene, World * world ) :
 
 	mTarget = QVector3D(0,0,0);
 
-	mCurrentWeapon = QSharedPointer<Laser>( new Laser( scene, mWorld ) );
+	mCurrentWeapon = QSharedPointer<Laser>( new Laser( world ) );
 	mWeapons.append( mCurrentWeapon );
 	add( mCurrentWeapon );
 
-	mTeapot = QSharedPointer<Teapot>( new Teapot( scene, 2 ) );
-	mTeapot->setPositionY( mWorld->landscape()->terrain()->getHeight( QPointF(0,0) ) );
-	mWorld->add( mTeapot );
+	mTeapot = QSharedPointer<Teapot>( new Teapot( scene(), 2 ) );
+	mTeapot->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) );
+	world->add( mTeapot );
 	mDragTeapot = false;
 
-	mTorch = QSharedPointer<Torch>( new Torch( scene, world ) );
-	mTorch->setPositionY( mWorld->landscape()->terrain()->getHeight( QPointF(0,0) ) + 1.0f );
-	mWorld->add( mTorch );
+	mTorch = QSharedPointer<Torch>( new Torch( world ) );
+	mTorch->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) + 1.0f );
+	world->add( mTorch );
 	mDragTorch = false;
 
-	scene->addKeyListener( this );
-	scene->addMouseListener( this );
+	scene()->addKeyListener( this );
+	scene()->addMouseListener( this );
 }
 
 
@@ -162,7 +162,7 @@ void Player::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 
 void Player::mouseWheelEvent( QGraphicsSceneWheelEvent * event )
 {
-	mWorld->splatterSystem()->spray( mTarget+QVector3D(0,3,0), 10.0f );
+	world()->splatterSystem()->spray( mTarget+QVector3D(0,3,0), 10.0f );
 }
 
 
@@ -225,7 +225,7 @@ void Player::updateSelf( const double & delta )
 		QVector3D moveLeft = left();
 
 		QVector3D terrainNormal;
-		if( mWorld->landscape()->terrain()->getNormal( position(), terrainNormal ) )
+		if( world()->landscape()->terrain()->getNormal( position(), terrainNormal ) )
 		{
 			if( terrainNormal.y() > 0.6 && mOnGround )
 			{	// if the terrain is flat enough and the player touches the ground, move along the terrain instead
@@ -256,7 +256,7 @@ void Player::updateSelf( const double & delta )
 	}
 
 	float landscapeHeight;
-	if( mWorld->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
+	if( world()->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
 	{
 		if( landscapeHeight + mHeightAboveGround + 0.1f >= position().y() )
 		{
@@ -278,7 +278,7 @@ void Player::updateSelf( const double & delta )
 void Player::update2Self( const double & delta )
 {
 	float length = 300.0f;
-	if( mWorld->getLineIntersection( position(), direction(), length, mTargetNormal ) )
+	if( world()->getLineIntersection( position(), direction(), length, mTargetNormal ) )
 		mTarget = position() + direction() * length;
 	if( mDragTeapot )
 	{

@@ -87,7 +87,7 @@ GfxOptionWindow::~GfxOptionWindow()
 
 void GfxOptionWindow::setSplatterQuality( int q )
 {
-	SplatterQuality::type quality = static_cast<SplatterQuality::type>(q);
+	SplatterQuality::Type quality = static_cast<SplatterQuality::Type>(q);
 	SplatterQuality::setMaximum( quality );
 	mSplatterQualityLabel->setText( tr("Splatter Quality (%1):").arg( SplatterQuality::toString(quality) ) );
 
@@ -98,7 +98,7 @@ void GfxOptionWindow::setSplatterQuality( int q )
 
 void GfxOptionWindow::setMaterialQuality( int q )
 {
-	MaterialQuality::type quality = static_cast<MaterialQuality::type>(q);
+	MaterialQuality::Type quality = static_cast<MaterialQuality::Type>(q);
 	MaterialQuality::setMaximum( quality );
 	mMaterialQualityLabel->setText( tr("Material Quality (%1):").arg( MaterialQuality::toString(quality) ) );
 

@@ -8,15 +8,14 @@
 #include "Teapot.hpp"
 #include "WavefrontObject.hpp"
 #include "Sky.hpp"
-#include "Player.hpp"
 
 #include <QPainter>
 #include <QSettings>
 
 
-SplatterQuality::type SplatterQuality::sMaximum = SplatterQuality::HIGH;
+SplatterQuality::Type SplatterQuality::sMaximum = SplatterQuality::HIGH;
 
-SplatterQuality::type SplatterQuality::fromString( const QString & name )
+SplatterQuality::Type SplatterQuality::fromString( const QString & name )
 {
 	QString up = name.toUpper();
 	if( up == "LOW" )
@@ -30,7 +29,7 @@ SplatterQuality::type SplatterQuality::fromString( const QString & name )
 }
 
 
-QString SplatterQuality::toString( const SplatterQuality::type & quality )
+QString SplatterQuality::toString( const SplatterQuality::Type & quality )
 {
 	switch( quality )
 	{
@@ -67,9 +66,12 @@ World::World( Scene * scene, QString name ) :
 	mSky = QSharedPointer<Sky>( new Sky( scene, skyName ) );
 	add( mSky );
 
-	mPlayer = QSharedPointer<Player>( new Player( scene, this ) );
+	mPlayer = QSharedPointer<Player>( new Player( this ) );
 	add( mPlayer );
 	scene->eye()->attach( mPlayer );
+
+	mDummy = QSharedPointer<Dummy>( new Dummy( this ) );
+	add( mDummy );
 
 	mTable = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/table01/table01.obj", 0.4f ) );
 	mTable->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 3 );

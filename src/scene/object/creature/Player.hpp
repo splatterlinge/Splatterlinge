@@ -1,24 +1,21 @@
 #ifndef SCENE_OBJECT_PLAYER_INCLUDED
 #define SCENE_OBJECT_PLAYER_INCLUDED
 
-#include "AObject.hpp"
-#include "Teapot.hpp"
-#include "Torch.hpp"
-#include "weapon/AWeapon.hpp"
+
+#include "ACreature.hpp"
+#include "../Teapot.hpp"
+#include "../Torch.hpp"
+#include "../weapon/AWeapon.hpp"
 #include <scene/AKeyListener.hpp>
 #include <scene/AMouseListener.hpp>
 
 #include <GLWidget.hpp>
 
 
-class World;
-class Scene;
-
-
-class Player : public AObject, public AKeyListener, public AMouseListener
+class Player : public ACreature, public AKeyListener, public AMouseListener
 {
 public:
-	Player( Scene * scene, World * world );
+	Player( World * world );
 	virtual ~Player();
 
 	virtual void updateSelf( const double & delta );
@@ -34,8 +31,9 @@ public:
 	virtual void mouseMoveEvent( MouseMoveEvent * event );
 	virtual void mouseWheelEvent( QGraphicsSceneWheelEvent * event );
 
+	QSharedPointer<Teapot> teapot() { return mTeapot; }
+
 private:
-	World * mWorld;
 	QVector3D mTarget;
 	QVector3D mTargetNormal;
 	QPointF mMouseDelta;

@@ -11,12 +11,12 @@
 
 RESOURCE_CACHE(MaterialData);
 
-MaterialQuality::type MaterialQuality::sMaximum = MaterialQuality::HIGH;
+MaterialQuality::Type MaterialQuality::sMaximum = MaterialQuality::HIGH;
 
 float Material::sFilterAnisotropy = 1.0f;
 
 
-MaterialQuality::type MaterialQuality::fromString( const QString & name )
+MaterialQuality::Type MaterialQuality::fromString( const QString & name )
 {
 	QString up = name.toUpper();
 	if( up == "LOW" )
@@ -30,7 +30,7 @@ MaterialQuality::type MaterialQuality::fromString( const QString & name )
 }
 
 
-QString MaterialQuality::toString( const MaterialQuality::type & quality )
+QString MaterialQuality::toString( const MaterialQuality::Type & quality )
 {
 	switch( quality )
 	{
@@ -193,7 +193,7 @@ void Material::setFilterAnisotropy( float anisotropy )
 }
 
 
-Material::Material( GLWidget * glWidget, QString name, MaterialShaderVariant::type type ) : AResource()
+Material::Material( GLWidget * glWidget, QString name, MaterialShaderVariant::Type variant ) : AResource()
 {
 	mGLWidget = glWidget;
 	mName = name;
@@ -215,7 +215,7 @@ Material::Material( GLWidget * glWidget, QString name, MaterialShaderVariant::ty
 	QSharedPointer<MaterialData> n( new MaterialData( glWidget, name ) );
 	cache( n );
 
-	setShader( type );
+	setShader( variant );
 }
 
 
@@ -227,9 +227,9 @@ Material::~Material()
 }
 
 
-MaterialQuality::type Material::getBindingQuality()
+MaterialQuality::Type Material::getBindingQuality()
 {
-	MaterialQuality::type q = mDefaultQuality;
+	MaterialQuality::Type q = mDefaultQuality;
 	if( mDefaultQuality > MaterialQuality::maximum() )
 		q = MaterialQuality::maximum();
 
@@ -311,7 +311,7 @@ void Material::release()
 }
 
 
-void Material::setShader( MaterialQuality::type quality, QString shaderFullName )
+void Material::setShader( MaterialQuality::Type quality, QString shaderFullName )
 {
 	delete mShaderSet[quality].shader;
 	mShaderSet[quality].shader = 0;
@@ -358,7 +358,7 @@ void Material::setShader( MaterialQuality::type quality, QString shaderFullName 
 }
 
 
-void Material::setShader( MaterialShaderVariant::type variant )
+void Material::setShader( MaterialShaderVariant::Type variant )
 {
 	switch( variant )
 	{

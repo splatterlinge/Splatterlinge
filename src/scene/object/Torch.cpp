@@ -2,12 +2,10 @@
 #include "World.hpp"
 
 #include <utility/occlusion.hpp>
-#include <scene/Scene.hpp>
 
 
-Torch::Torch( Scene * scene, World * world ) :
-	AObject( scene, 1.0f ),
-	mWorld( world )
+Torch::Torch( World * world ) :
+	AWorldObject( world, 1.0f )
 {
 	mFlareSize = 5.0f;
 	mColorCycle = 0.0f;
@@ -18,14 +16,14 @@ Torch::Torch( Scene * scene, World * world ) :
 	{
 		qFatal( "\"%s\" not found!", "./data/effect/flare.png" );
 	}
-	mFlareMap = scene->glWidget()->bindTexture( flareImage );
-	mWorld->addLightSource( this );
+	mFlareMap = scene()->glWidget()->bindTexture( flareImage );
+	world->addLightSource( this );
 }
 
 
 Torch::~Torch()
 {
-	mWorld->removeLightSource( this );
+	world()->removeLightSource( this );
 }
 
 

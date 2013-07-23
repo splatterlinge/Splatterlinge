@@ -2,32 +2,24 @@
 #define SCENE_OBJECT_WEAPON_AWEAPON_INCLUDED
 
 
-#include "../AObject.hpp"
-
-
-class Scene;
+#include "../AWorldObject.hpp"
 
 
 /// Abstract baseclass for a weapon
 /**
- * 
+ *
  */
-class AWeapon : public AObject
+class AWeapon : public AWorldObject
 {
 public:
-	/// Creates a weapon for the given scene
-	AWeapon( Scene * scene, float boundingSphereRadius=0.0f );
+	/// Creates a weapon for the given world
+	AWeapon( World * world );
 	/// Frees this object
-	~AWeapon() = 0;
+	virtual ~AWeapon();
 
 	virtual void triggerPressed() = 0;
 	virtual void triggerReleased() = 0;
-
-protected:
-
-private:
-
 };
 
-#endif
 
+#endif

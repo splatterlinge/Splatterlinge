@@ -11,7 +11,6 @@
 #include <QSharedPointer>
 
 #include <utility/FrustumTest.hpp>
-#include "ALightSource.hpp"
 
 
 class Scene;
@@ -188,5 +187,6 @@ private:
 
 	void setParent( AObject * parent ) { mParent = parent; }
 };
+
 
 #endif

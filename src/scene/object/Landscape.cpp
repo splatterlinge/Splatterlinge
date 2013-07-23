@@ -171,7 +171,7 @@ void Landscape::draw2SelfPost()
 	if( mDrawingReflection || mDrawingRefraction )
 		return;
 
-	MaterialQuality::type defaultQuality = MaterialQuality::maximum();
+	MaterialQuality::Type defaultQuality = MaterialQuality::maximum();
 	MaterialQuality::setMaximum( MaterialQuality::LOW );
 	mDrawingReflection = true;
 	renderReflection();

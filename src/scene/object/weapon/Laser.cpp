@@ -1,13 +1,13 @@
 #include "Laser.hpp"
 
+#include "../World.hpp"
+
 #include <geometry/SplatterSystem.hpp>
-#include <scene/object/World.hpp>
 #include <scene/Scene.hpp>
 
 
-Laser::Laser( Scene * scene, World * world ) :
-	AWeapon( scene ),
-	mWorld( world )
+Laser::Laser( World * world ) :
+	AWeapon( world )
 {
 	mQuadric = gluNewQuadric();
 	mCoolDown = 0.0f;
@@ -48,10 +48,10 @@ void Laser::updateSelf( const double & delta )
 			mTrailDirection = worldDirection();
 			mTrailLength = mRange;
 			QVector3D normal;
-			if( mWorld->getLineIntersection( mTrailStart, mTrailDirection, mTrailLength, normal ) )
+			if( world()->getLineIntersection( mTrailStart, mTrailDirection, mTrailLength, normal ) )
 			{
 				mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
-				mWorld->splatterSystem()->spray( mTrailEnd + QVector3D(0,1.0f,0), 30.0f );
+				world()->splatterSystem()->spray( mTrailEnd + QVector3D(0,1.0f,0), 30.0f );
 			} else {
 				mTrailEnd = mTrailStart + mTrailDirection*mRange;
 			}
