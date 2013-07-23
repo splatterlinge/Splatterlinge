@@ -47,13 +47,12 @@ void Laser::updateSelf( const double & delta )
 			mTrailStart = worldPosition();
 			mTrailDirection = worldDirection();
 			mTrailLength = mRange;
-			QVector3D normal;
-			if( world()->getLineIntersection( mTrailStart, mTrailDirection, mTrailLength, normal ) )
+			AObject * target = world()->getLineIntersection( mTrailStart, mTrailDirection, mTrailLength );
+			mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
+			ACreature * victim = dynamic_cast<ACreature*>(target);
+			if( victim )
 			{
-				mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
-				world()->splatterSystem()->spray( mTrailEnd + QVector3D(0,1.0f,0), 30.0f );
-			} else {
-				mTrailEnd = mTrailStart + mTrailDirection*mRange;
+				victim->receiveDamage( 1, &mTrailEnd, &mTrailDirection );
 			}
 		}
 	}

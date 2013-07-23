@@ -19,7 +19,7 @@ class Material;
 
 /// A Landscape consisting of terrain and water
 /**
- * 
+ *
  */
 class Landscape : public AObject
 {
@@ -31,7 +31,10 @@ public:
 	virtual void drawSelf();
 	virtual void drawSelfPost();
 	virtual void draw2SelfPost();
-	
+
+	virtual AObject * getLineIntersection( const QVector3D & origin, const QVector3D & direction,
+		float & length, QVector3D * normal = NULL );
+
 	void drawPatch( const QRectF & rect );
 
 	Terrain * terrain() { return mTerrain; }

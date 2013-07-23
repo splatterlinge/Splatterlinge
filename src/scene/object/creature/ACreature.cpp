@@ -3,7 +3,8 @@
 
 ACreature::ACreature( World * world ) :
 	AWorldObject( world ),
-	mState( ACreature::SPAWNING )
+	mState( ACreature::SPAWNING ),
+	mLife( 0 )
 {
 }
 

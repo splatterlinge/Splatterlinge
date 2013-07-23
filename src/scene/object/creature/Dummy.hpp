@@ -18,12 +18,14 @@ public:
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
-	virtual void receiveDamage( int damage, const QVector3D & direction );
+	virtual AObject * getLineIntersection( const QVector3D & origin, const QVector3D & direction,
+		float & length, QVector3D * normal = NULL );
 
+	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
 private:
 	GLUquadric * mQuadric;
-	double mTimeToOrientationChange;
 	QVector3D mTarget;
+	float mVelocityY;
 };
 
 

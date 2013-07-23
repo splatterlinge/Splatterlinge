@@ -357,7 +357,7 @@ bool Terrain::getLineQuadIntersection( const QVector3D & origin, const QVector3D
 }
 
 
-bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length ) const
+bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal ) const
 {
 	QPoint mapFrom = toMap( origin );
 	QPoint mapTo = toMap( origin + direction * length );
@@ -385,6 +385,8 @@ bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & d
 		intersects |= getLineQuadIntersection( origin, direction, QPoint(x-ox, y-oy), length );
 		if( intersects )
 		{
+			if( normal )
+				*normal = getNormal( origin + direction*length );
 			return true;
 		}
 
@@ -404,13 +406,4 @@ bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & d
 		}
 	}
 	return false;
-}
-
-
-bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D & normal ) const
-{
-	if( !getLineIntersection( origin, direction, length ) )
-		return false;
-	normal = getNormal( origin + direction*length );
-	return true;
 }

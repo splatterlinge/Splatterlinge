@@ -27,15 +27,11 @@ Player::Player( World * world ) :
 	mAxisRotationY = 0.0f;
 
 	mTarget = QVector3D(0,0,0);
+	mDragTeapot = false;
 
 	mCurrentWeapon = QSharedPointer<Laser>( new Laser( world ) );
 	mWeapons.append( mCurrentWeapon );
 	add( mCurrentWeapon );
-
-	mTeapot = QSharedPointer<Teapot>( new Teapot( scene(), 2 ) );
-	mTeapot->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) );
-	world->add( mTeapot );
-	mDragTeapot = false;
 
 	mTorch = QSharedPointer<Torch>( new Torch( world ) );
 	mTorch->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) + 1.0f );
@@ -271,23 +267,25 @@ void Player::updateSelf( const double & delta )
 			mOnGround = false;
 		}
 	}
-
 }
 
 
 void Player::update2Self( const double & delta )
 {
 	float length = 300.0f;
-	if( world()->getLineIntersection( position(), direction(), length, mTargetNormal ) )
-		mTarget = position() + direction() * length;
-	if( mDragTeapot )
+	if( mDragTeapot || mDragTorch )
 	{
-		mTeapot->setPosition( mTarget );
-	}
-	if( mDragTorch )
-	{
-		mTorch->setPosition( mTarget );
-		mTorch->moveY( 1 );
+		if( world()->getLineIntersection( position(), direction(), length, &mTargetNormal ) )
+			mTarget = position() + direction() * length;
+		if( mDragTeapot )
+		{
+			world()->teapot()->setPosition( mTarget );
+		}
+		if( mDragTorch )
+		{
+			mTorch->setPosition( mTarget );
+			mTorch->moveY( 1 );
+		}
 	}
 }
 

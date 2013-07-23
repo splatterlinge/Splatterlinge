@@ -120,10 +120,7 @@ public:
 	float getHeightAboveGround( const QVector3D & position ) const;					///< Returns the height above terrain
 
 	/// Calculates the intersection distance to the terrain. length is used as input and output.
-	bool getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length ) const;
-
-	/// Calculates the intersection distance to the terrain. length is used as input and output.
-	bool getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D & normal ) const;
+	bool getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal ) const;
 
 protected:
 

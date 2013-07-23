@@ -125,6 +125,13 @@ public:
 	/// Returns all child objects
 	QList< QSharedPointer<AObject> > & subNodes() { return mSubNodes; }
 
+	/// Returns the bounding sphere
+	const float & boundingSphereRadius() const { return mBoundingSphereRadius; }
+
+	/// Recursively intersects a line with an object
+	virtual AObject * getLineIntersection( const QVector3D & origin, const QVector3D & direction,
+		float & length, QVector3D * normal = NULL );
+
 	/// Updates this object and all of it's sub-objects
 	void update( const double & delta );
 	/// Abstract method for updating this object
@@ -152,9 +159,6 @@ public:
 	virtual void draw2Self() {}
 	/// Executed after all sub-objects are drawn (second pass)
 	virtual void draw2SelfPost() {}
-
-	/// Returns the bounding sphere
-	const float & boundingSphereRadius() const { return mBoundingSphereRadius; }
 
 	/// Causes all objects to draw the bounding sphere
 	static void setGlobalDebugBoundingSpheres( bool enable ) { sDebugBoundingSpheres = enable; }

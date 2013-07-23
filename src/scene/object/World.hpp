@@ -71,9 +71,8 @@ public:
 	QSharedPointer<Landscape> landscape() { return mLandscape; }
 	QSharedPointer<Sky> sky() { return mSky; }
 
-	QSharedPointer<AObject> getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D & normal );
-
 	QSharedPointer<Player> player() { return mPlayer; }
+	QSharedPointer<Teapot> teapot() { return mTeapot; }
 
 private:
 	class SplatterInteractor : public ParticleSystem::Interactable
@@ -91,6 +90,7 @@ private:
 	float mTimeOfDay;
 	QSharedPointer<Sky> mSky;
 	QSharedPointer<Landscape> mLandscape;
+	QSharedPointer<Teapot> mTeapot;
 	QSharedPointer<Player> mPlayer;
 	QSharedPointer<Dummy> mDummy;
 	QSharedPointer<WavefrontObject> mTable;

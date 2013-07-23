@@ -31,8 +31,6 @@ public:
 	virtual void mouseMoveEvent( MouseMoveEvent * event );
 	virtual void mouseWheelEvent( QGraphicsSceneWheelEvent * event );
 
-	QSharedPointer<Teapot> teapot() { return mTeapot; }
-
 private:
 	QVector3D mTarget;
 	QVector3D mTargetNormal;
@@ -53,7 +51,6 @@ private:
 	bool mDragTeapot;
 	bool mDragTorch;
 	QSharedPointer<Torch> mTorch;
-	QSharedPointer<Teapot> mTeapot;
 	QList< QSharedPointer<AWeapon> > mWeapons;
 	QSharedPointer<AWeapon> mCurrentWeapon;
 };

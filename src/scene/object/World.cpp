@@ -70,6 +70,10 @@ World::World( Scene * scene, QString name ) :
 	add( mPlayer );
 	scene->eye()->attach( mPlayer );
 
+	mTeapot = QSharedPointer<Teapot>( new Teapot( scene, 2 ) );
+	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) );
+	add( mTeapot );
+
 	mDummy = QSharedPointer<Dummy>( new Dummy( this ) );
 	add( mDummy );
 
@@ -204,19 +208,6 @@ void World::drawSelf()
 void World::drawSelfPost()
 {
 	mSplatterSystem->draw( modelViewMatrix() );
-}
-
-
-QSharedPointer<AObject> World::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D & normal )
-{
-	QSharedPointer<AObject> target;
-
-	if( mLandscape->terrain()->getLineIntersection( origin, direction, length, normal ) )
-		target = mLandscape;
-
-	// Add checks to other objects here, if they are closer set target accordingly
-
-	return target;
 }
 
 
