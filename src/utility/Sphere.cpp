@@ -3,6 +3,26 @@
 #include <math.h>
 
 
+bool Sphere::intersectSphere( const QVector3D & centerA, const float & radiusA, const QVector3D & centerB, const float & radiusB, float * depth )
+{
+	QVector3D relPos = centerB - centerA;
+
+	float squaredDistance = relPos.lengthSquared();
+
+	float squaredRadi = radiusA + radiusB;
+	squaredRadi *= squaredRadi;
+
+	if( squaredRadi < squaredDistance )
+		return false;
+
+	if( !depth )
+		return true;
+
+	*depth = sqrtf( squaredRadi ) - sqrtf( squaredDistance );
+	return true;
+}
+
+
 // http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection
 
 bool Sphere::intersectRay( const QVector3D & sphereCenter, const float & sphereRadius, const QVector3D & rayOrigin, const QVector3D & rayDirection, float * intersectionDistance )

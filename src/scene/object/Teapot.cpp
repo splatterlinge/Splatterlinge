@@ -5,6 +5,7 @@
 #include <geometry/teapot.h>
 #include <resource/Material.hpp>
 #include <resource/AudioSample.hpp>
+#include <utility/Sphere.hpp>
 
 
 Teapot::Teapot( Scene * scene, const float & size ) :
@@ -45,4 +46,22 @@ void Teapot::drawSelf()
 	teapot( 6, mSize, GL_FILL );
 	glPopMatrix();
 	mMaterial->release();
+}
+
+
+bool Teapot::collideSphere( const float & radius, QVector3D & center, QVector3D * normal )
+{
+	bool collide = AObject::collideSphere( radius, center, normal );
+	float depth;
+	if( Sphere::intersectSphere( center, radius, position(), boundingSphereRadius(), &depth ) )
+	{
+		collide = true;
+		if( normal )
+		{
+			*normal = (center - position()).normalized();
+			center += *normal * depth;
+			collide = true;
+		}
+	}
+	return collide;
 }

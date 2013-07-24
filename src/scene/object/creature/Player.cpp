@@ -267,6 +267,13 @@ void Player::updateSelf( const double & delta )
 			mOnGround = false;
 		}
 	}
+
+	QVector3D newPosition = position();
+	QVector3D normal;
+	if( world()->collideSphere( 1, newPosition, &normal ) )
+	{
+		setPosition( newPosition );
+	}
 }
 
 
@@ -275,16 +282,18 @@ void Player::update2Self( const double & delta )
 	float length = 300.0f;
 	if( mDragTeapot || mDragTorch )
 	{
-		if( world()->getLineIntersection( position(), direction(), length, &mTargetNormal ) )
+		if( world()->intersectLine( position(), direction(), length, &mTargetNormal ) )
+		{
 			mTarget = position() + direction() * length;
-		if( mDragTeapot )
-		{
-			world()->teapot()->setPosition( mTarget );
-		}
-		if( mDragTorch )
-		{
-			mTorch->setPosition( mTarget );
-			mTorch->moveY( 1 );
+			if( mDragTeapot )
+			{
+				world()->teapot()->setPosition( mTarget );
+			}
+			if( mDragTorch )
+			{
+				mTorch->setPosition( mTarget );
+				mTorch->moveY( 1 );
+			}
 		}
 	}
 }

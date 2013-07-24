@@ -357,7 +357,7 @@ bool Terrain::getLineQuadIntersection( const QVector3D & origin, const QVector3D
 }
 
 
-bool Terrain::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal ) const
+bool Terrain::intersectLine( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal ) const
 {
 	QPoint mapFrom = toMap( origin );
 	QPoint mapTo = toMap( origin + direction * length );

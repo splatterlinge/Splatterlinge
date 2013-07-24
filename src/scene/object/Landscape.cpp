@@ -224,10 +224,10 @@ void Landscape::drawPatch( const QRectF & rect )
 }
 
 
-AObject * Landscape::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal )
+AObject * Landscape::intersectLine( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal )
 {
-	AObject * nearestTarget = AObject::getLineIntersection( origin, direction, length, normal );
-	if( mTerrain->getLineIntersection( origin, direction, length, normal ) )
+	AObject * nearestTarget = AObject::intersectLine( origin, direction, length, normal );
+	if( mTerrain->intersectLine( origin, direction, length, normal ) )
 		nearestTarget = this;
 	return nearestTarget;
 }

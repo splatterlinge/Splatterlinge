@@ -128,9 +128,13 @@ public:
 	/// Returns the bounding sphere
 	const float & boundingSphereRadius() const { return mBoundingSphereRadius; }
 
-	/// Recursively intersects a line with an object
-	virtual AObject * getLineIntersection( const QVector3D & origin, const QVector3D & direction,
+	/// Recursively intersect a line with an object and the object's objects
+	virtual AObject * intersectLine( const QVector3D & origin, const QVector3D & direction,
 		float & length, QVector3D * normal = NULL );
+
+	/// Recursively collision-test a sphere with an object and the object's objects
+	virtual bool collideSphere( const float & radius,
+		QVector3D & center, QVector3D * normal = NULL );
 
 	/// Updates this object and all of it's sub-objects
 	void update( const double & delta );

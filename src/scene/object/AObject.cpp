@@ -178,18 +178,31 @@ void AObject::drawBoundingShpere()
 }
 
 
-AObject * AObject::getLineIntersection( const QVector3D & origin, const QVector3D & direction,
+AObject * AObject::intersectLine( const QVector3D & origin, const QVector3D & direction,
 	float & length, QVector3D * normal )
 {
 	AObject * nearestTarget = NULL;
 	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
-		AObject * target = (*i)->getLineIntersection( origin, direction, length, normal );
+		AObject * target = (*i)->intersectLine( origin, direction, length, normal );
 		if( target )
 			nearestTarget = target;
 	}
 	return nearestTarget;
+}
+
+
+bool AObject::collideSphere( const float & radius,
+	QVector3D & center, QVector3D * normal )
+{
+	bool collision = false;
+	QList< QSharedPointer<AObject> >::iterator i;
+	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
+	{
+		collision |= (*i)->collideSphere( radius, center, normal );
+	}
+	return collision;
 }
 
 
