@@ -3,10 +3,10 @@
 #include "float.h"
 
 
-bool Triangle::intersectRay( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
+bool Triangle::intersectRay( const QVector3D & p, const QVector3D & q, const QVector3D & r, const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
 {
-	QVector3D edge1 = mQ - mP;
-	QVector3D edge2 = mR - mP;
+	QVector3D edge1 = q - p;
+	QVector3D edge2 = r - p;
 
 	QVector3D pVec = QVector3D::crossProduct( direction, edge2 );
 
@@ -14,7 +14,7 @@ bool Triangle::intersectRay( const QVector3D & origin, const QVector3D & directi
 	if( det < FLT_EPSILON )
 		return false;
 
-	QVector3D tVec = origin - mP;
+	QVector3D tVec = origin - p;
 	float u = QVector3D::dotProduct( tVec, pVec );
 	if( u < 0.0f || u > det )
 		return false;

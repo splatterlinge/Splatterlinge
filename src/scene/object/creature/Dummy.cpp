@@ -1,9 +1,11 @@
 #include "Dummy.hpp"
 
 #include <scene/object/World.hpp>
+#include <resource/Material.hpp>
 #include <geometry/SplatterSystem.hpp>
 #include <utility/random.hpp>
 #include <utility/quaternion.hpp>
+#include <utility/Sphere.hpp>
 
 #include <math.h>
 #include <float.h>
@@ -12,13 +14,17 @@
 Dummy::Dummy( World * world ) : ACreature( world )
 {
 	mQuadric = gluNewQuadric();
+	gluQuadricTexture( mQuadric, GL_TRUE );
+
 	mVelocityY = 0.0f;
+	mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
 }
 
 
 Dummy::~Dummy()
 {
 	gluDeleteQuadric( mQuadric );
+	delete mMaterial;
 }
 
 
@@ -47,7 +53,7 @@ void Dummy::updateSelf( const double & delta )
 			mTarget = world()->teapot()->worldPosition();
 			QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 			QQuaternion targetRotation = quaternionLookAt( directionToTarget, QVector3D(0,1,0) );
-			setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.95 ) );
+			setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
 			setPosition( position() + direction()*delta*10.0 );
 			if( life() <= 0 )
 				setState( DYING );
@@ -61,8 +67,10 @@ void Dummy::updateSelf( const double & delta )
 		case DEAD:
 			break;
 	}
-	mVelocityY += -80.0f * delta;	// apply gravity
+
+	mVelocityY += -3.0f * delta;	// apply some gravity
 	setPositionY( position().y() + mVelocityY * delta );
+
 	float landscapeHeight;
 	if( world()->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
 	{
@@ -78,16 +86,9 @@ void Dummy::updateSelf( const double & delta )
 
 void Dummy::drawSelf()
 {
-	glDisable( GL_TEXTURE_2D );
-	glEnable( GL_LIGHTING );
-
-	glMaterial( GL_FRONT_AND_BACK, GL_AMBIENT, QVector4D(0,0,0,0) );
-	glMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE, QVector4D(1,1,1,1) );
-	glMaterial( GL_FRONT_AND_BACK, GL_SPECULAR, QVector4D(1,1,1,1) );
-	glMaterial( GL_FRONT_AND_BACK, GL_EMISSION, QVector4D(0,0,0,0) );
-	glMaterial( GL_FRONT_AND_BACK, GL_SHININESS, 32.0f );
-
+	mMaterial->bind();
 	gluSphere( mQuadric, 4, 8, 8 );
+	mMaterial->release();
 
 	glDisable( GL_LIGHTING );
 	glBegin( GL_LINES );
@@ -106,72 +107,22 @@ void Dummy::drawSelf()
 }
 
 
-static bool getLineSphereIntersection( const QVector3D & sphereCenter, const float & sphereRadius,
-	const QVector3D & rayOrigin, const QVector3D & rayDirection,
-	float & length, QVector3D * normal = NULL )
-{
-	QVector3D relRayOrigin = rayOrigin - sphereCenter;
-
-	//Compute A, B and C coefficients
-	float a = rayDirection.lengthSquared();
-	float b = 2.0f * QVector3D::dotProduct( rayDirection, relRayOrigin );
-	float c = relRayOrigin.lengthSquared() - (sphereRadius * sphereRadius);
-
-	//Find discriminant
-	float disc = b * b - 4 * a * c;
-
-	// if discriminant is negative there are no real roots, so return false as ray misses sphere
-	if( disc < 0.0f )
-		return false;
-
-	float distSqrt = sqrtf( disc );
-	float q;
-	if( b < 0.0f )
-		q = (-b - distSqrt)/2.0f;
-	else
-		q = (-b + distSqrt)/2.0f;
-
-	// compute t0 and t1
-	float t0 = q / a;
-	float t1 = c / q;
-
-	// make sure t0 is smaller than t1
-	if( t0 > t1 )
-	{
-		// if t0 is bigger than t1 swap them around
-		float temp = t0;
-		t0 = t1;
-		t1 = temp;
-	}
-
-	// if t1 is less than zero, the object is in the ray's negative direction
-	// and consequently the ray misses the sphere
-	if( t1 < 0.0f )
-		return false;
-
-	// if t0 is less than zero, the intersection point is at t1
-	if( t0 < 0.0f )
-	{
-		qDebug() << "Baeam1!";
-		if( length > t1 )
-			length = t1;
-		return true;
-	}
-	else	// else the intersection point is at t0
-	{
-		qDebug() << "Baeam0!";
-		if( length > t0 )
-			length = t0;
-		return true;
-	}
-}
-
-
 AObject * Dummy::getLineIntersection( const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal )
 {
 	AObject * nearestTarget = AObject::getLineIntersection( origin, direction, length, normal );
-	if( getLineSphereIntersection( worldPosition(), 4, origin, direction, length, normal ) )
-		nearestTarget = this;
+
+	float rayLength;
+	if( Sphere::intersectRay( worldPosition(), 4, origin, direction, &rayLength ) )
+	{
+		if( rayLength < length )
+		{	// intersection closer than previous intersections?
+			length = rayLength;
+			if( normal )	// interested in normal?
+				*normal = origin - worldPosition();
+			nearestTarget = this;
+		}
+	}
+
 	return nearestTarget;
 }
 

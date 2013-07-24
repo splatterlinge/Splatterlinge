@@ -6,6 +6,7 @@
 
 
 struct GLUquadric;
+class Material;
 
 
 /// Dummy creature
@@ -24,6 +25,7 @@ public:
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
 private:
 	GLUquadric * mQuadric;
+	Material * mMaterial;
 	QVector3D mTarget;
 	float mVelocityY;
 };
