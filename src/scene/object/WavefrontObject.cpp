@@ -1,13 +1,13 @@
 #include "WavefrontObject.hpp"
 
 WavefrontObject::WavefrontObject( Scene * scene, QString filename, float scale ) :
-	AObject( scene )
+    AObject( scene )
 {
-	mScene = scene;
-	mFilename = filename;
-	mScale = scale;
+    mScene = scene;
+    mFilename = filename;
+    mScale = scale;
 
-	load();
+    load();
 }
 
 WavefrontObject::~WavefrontObject()
@@ -16,37 +16,36 @@ WavefrontObject::~WavefrontObject()
 
 void WavefrontObject::load()
 {
-	if( !mObjects.contains( mFilename ) )
-	{
-		mObjects[mFilename] = new WavefrontModel( mScene->glWidget(), mFilename );
-	}
+    if( !mObjects.contains( mFilename ) )
+    {
+        mObjects[mFilename] = new WavefrontModel( mScene->glWidget(), mFilename );
+    }
 
-	mModel = mObjects[mFilename];
-	mIndex = mModel->getIndex();
+    mModel = mObjects[mFilename];
 
-	setBoundingSphere( qMax( mModel->getSize().width(), mModel->getSize().height() )/4 );
+    setBoundingSphere( qMax( mModel->getSize().width(), mModel->getSize().height() )/4 );
 }
 
 void WavefrontObject::updateSelf( const double & delta )
 {
-	// TODO
+    // TODO
 }
 
 void WavefrontObject::drawSelf()
 {
-	glPushAttrib( GL_ENABLE_BIT );
-	glDisable( GL_CULL_FACE );
-	glEnable( GL_AUTO_NORMAL );
-	glEnable( GL_NORMALIZE );
-	glEnable( GL_LIGHTING );
+    glPushAttrib( GL_ENABLE_BIT );
+    glDisable( GL_CULL_FACE );
+    glEnable( GL_AUTO_NORMAL );
+    glEnable( GL_NORMALIZE );
+    glEnable( GL_LIGHTING );
 
-	glPushMatrix();
+    glPushMatrix();
 
-	glScalef( 1.0*mScale, 1.0*mScale, 1.0*mScale );
-	glColor3f( 1.0f, 1.0f, 1.0f );
+    glScalef( 1.0*mScale, 1.0*mScale, 1.0*mScale );
+    glColor3f( 1.0f, 1.0f, 1.0f );
 
-	glCallList(mIndex);
+    mModel->render();
 
-	glPopMatrix();
-	glPopAttrib();
+    glPopMatrix();
+    glPopAttrib();
 }

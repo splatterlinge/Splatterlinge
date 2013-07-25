@@ -21,8 +21,8 @@ public:
     Vertex() {}
 
     QVector3D position;
-	QVector2D texCoord;
-	QVector3D normal;
+    QVector2D texCoord;
+    QVector3D normal;
 
     bool operator == ( const Vertex & other )
     {
@@ -37,28 +37,27 @@ class Face
 public:
     Face() {
         points = new QVector<Vertex>();
-	}
+    }
 
     QVector<Vertex> * points;
-	Material * material;
+    Material * material;
 };
 
 class WavefrontModel
 {
 public:
-	WavefrontModel( GLWidget * widget, QString filename );
-	QSizeF getSize() { return mSize; }
-	GLuint getIndex() { return mIndex; }
+    WavefrontModel( GLWidget * widget, QString filename );
+    QSizeF getSize() { return mSize; }
 
-	bool parse();
-	bool render();
+    bool parse();
+    bool render();
 
 private:
-	GLWidget * mGLWidget;
-	QString mFilename;
-    QVector<Face> * mFaces;
-	QSizeF mSize;
-	GLuint mIndex;
+    GLWidget * mGLWidget;
+    QString mFilename;
+    QSizeF mSize;
+    QVector<Vertex> mVertices;
+    QVector<unsigned int> mIndices;
     QGLBuffer mVertexBuffer;
     QGLBuffer mIndexBuffer;
 };
