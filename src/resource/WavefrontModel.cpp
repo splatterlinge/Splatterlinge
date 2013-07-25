@@ -193,7 +193,7 @@ bool WavefrontModel::render()
                     GL_TRIANGLES,
                     part.count,
                     GL_UNSIGNED_INT,
-                    (void*)((size_t)(2*sizeof(unsigned short)*(	// convert index to pointer
+                    (void*)((size_t)(sizeof(unsigned int)*(	// convert index to pointer
                         part.start		// index to start
                     ) ) )
         );
