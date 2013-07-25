@@ -7,23 +7,14 @@ WavefrontObject::WavefrontObject( Scene * scene, QString filename, float scale )
     mFilename = filename;
     mScale = scale;
 
-    load();
+    mModel = new StaticModel( mScene->glWidget(), mFilename );
+
+    //setBoundingSphere( qMin( mModel->getSize().width(), mModel->getSize().height() )/2 );
 }
 
 WavefrontObject::~WavefrontObject()
 {
-}
-
-void WavefrontObject::load()
-{
-    if( !mObjects.contains( mFilename ) )
-    {
-        mObjects[mFilename] = new WavefrontModel( mScene->glWidget(), mFilename );
-    }
-
-    mModel = mObjects[mFilename];
-
-    setBoundingSphere( qMax( mModel->getSize().width(), mModel->getSize().height() )/4 );
+    // TODO
 }
 
 void WavefrontObject::updateSelf( const double & delta )
@@ -44,7 +35,7 @@ void WavefrontObject::drawSelf()
     glScalef( 1.0*mScale, 1.0*mScale, 1.0*mScale );
     glColor3f( 1.0f, 1.0f, 1.0f );
 
-    mModel->render();
+    mModel->draw();
 
     glPopMatrix();
     glPopAttrib();
