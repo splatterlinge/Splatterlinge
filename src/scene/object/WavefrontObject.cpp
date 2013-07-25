@@ -22,10 +22,7 @@ void WavefrontObject::load()
 	}
 
 	mModel = mObjects[mFilename];
-	qDebug() << mObjects[mFilename];
-
 	mIndex = mModel->getIndex();
-	qDebug() << mModel->getIndex();
 
 	setBoundingSphere( qMax( mModel->getSize().width(), mModel->getSize().height() )/4 );
 }

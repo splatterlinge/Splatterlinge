@@ -5,7 +5,7 @@ WavefrontModel::WavefrontModel( GLWidget * widget, QString filename )
 	mGLWidget = widget;
 	mFilename = filename;
 	mIndex = 0;
-	mFaces = new QList<Face>();
+    mFaces = new QVector<Face>();
 	mSize = QSizeF(0,0);
 	qDebug() << "+" << this << "WavefrontModel:" << filename;
 
@@ -19,9 +19,9 @@ bool WavefrontModel::parse()
 	QString line;
 	QString keyword;
 	QStringList fields;
-	QList<QVector3D> vertices;
-	QList<QVector2D> textureVertices;
-	QList<QVector3D> normals;
+    QVector<QVector3D> positions;
+    QVector<QVector2D> texCoords;
+    QVector<QVector3D> normals;
 	Material * material = NULL;
 	float x, y, z;
 	float u, v;
@@ -74,13 +74,13 @@ bool WavefrontModel::parse()
 				minY = y;
 
 			z = fields.takeFirst().toFloat();
-			vertices.append( QVector3D( x, y, z ) );
+            positions.append( QVector3D( x, y, z ) );
 		}
 		else if( keyword == "vt" )
 		{
 			u = fields.takeFirst().toFloat();
 			v = fields.takeFirst().toFloat();
-			textureVertices.append( QVector2D( u, v ) );
+            texCoords.append( QVector2D( u, v ) );
 		}
 		else if( keyword == "vn" )
 		{
@@ -91,8 +91,8 @@ bool WavefrontModel::parse()
 		}
 		else if( keyword == "f" )
 		{
-			Face face;
-			FacePoint point;
+            Face face;
+            Vertex vertex;
 			QStringList points;
 
 			while( !fields.isEmpty() )
@@ -100,11 +100,11 @@ bool WavefrontModel::parse()
 				points = fields.takeFirst().split( "/" );
 				while( !points.isEmpty() )
 				{
-					point.vertex = vertices.at( points.takeFirst().toInt()-1 );
-					point.texCoord = textureVertices.at( points.takeFirst().toInt()-1 );
-					point.normal = normals.at( points.takeFirst().toInt()-1 );
+                    vertex.position = positions.at( points.takeFirst().toInt()-1 );
+                    vertex.texCoord = texCoords.at( points.takeFirst().toInt()-1 );
+                    vertex.normal = normals.at( points.takeFirst().toInt()-1 );
 
-					face.points->append( point );
+                    face.points->append( vertex );
 					face.material = material;
 				}
 			}
@@ -120,7 +120,7 @@ bool WavefrontModel::parse()
 	file.close();
 
 	mSize.setWidth(maxX-minX);
-	mSize.setHeight(maxY-minY);
+    mSize.setHeight(maxY-minY);
 
 	return true;
 }
@@ -128,17 +128,64 @@ bool WavefrontModel::parse()
 bool WavefrontModel::render()
 {
 	mIndex = glGenLists(1);
-	Material * lastMat = NULL;
+    //Material * lastMat = NULL;
+
+    QVector<Vertex> vertices;
+    QVector<unsigned int> indices;
+    foreach( Face face, *mFaces )
+    {
+        foreach( Vertex vertex, *face.points )
+        {
+            if( vertices.indexOf( vertex ) == -1 )
+            {
+                vertices.append( vertex );
+            }
+            indices.append( vertices.indexOf( vertex ) );
+        }
+    }
+
+    mVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
+    mVertexBuffer.create();
+    mVertexBuffer.bind();
+    mVertexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
+    mVertexBuffer.allocate( vertices.constData(), vertices.size() * sizeof( Vertex ) );
+    mVertexBuffer.release();
+
+    mIndexBuffer = QGLBuffer( QGLBuffer::IndexBuffer );
+    mIndexBuffer.create();
+    mIndexBuffer.bind();
+    mIndexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
+    mIndexBuffer.allocate( indices.constData(), indices.size() * sizeof( unsigned int ) );
+    mIndexBuffer.release();
+
+    mVertexBuffer.bind();
+    mIndexBuffer.bind();
 
 	glNewList( mIndex, GL_COMPILE );
 
-	foreach( Face face, *mFaces )
+    glEnableClientState( GL_VERTEX_ARRAY );
+    glEnableClientState( GL_INDEX_ARRAY );
+
+    glVertexPointer( 3, GL_FLOAT, sizeof( Vertex ), 0 );
+
+    glDrawElements(
+                GL_TRIANGLES,
+                indices.size(),
+                GL_UNSIGNED_INT,
+                0
+    );
+
+    glDisableClientState( GL_INDEX_ARRAY );
+    glDisableClientState( GL_VERTEX_ARRAY );
+
+    /*
+    foreach( Face face, *mFaces )
 	{
-		if( face.material != NULL )
+        if( face.material )
 		{
 			if( face.material != lastMat )
 			{
-				if( lastMat != NULL )
+                if( lastMat )
 				{
 					lastMat->release();
 				}
@@ -147,17 +194,21 @@ bool WavefrontModel::render()
 			}
 		}
 		glBegin( GL_TRIANGLES );
-		foreach( FacePoint fp, *face.points )
+        foreach( Vertex vertex, *face.points )
 		{
-			glNormal( fp.normal );
-			glTexCoord( fp.texCoord );
-			glVertex( fp.vertex );
+            glNormal( vertex.normal );
+            glTexCoord( vertex.texCoord );
+            glVertex( vertex.position );
 		}
 		glEnd();
 	}
-	if(lastMat)
+    if( lastMat )
 		lastMat->release();
+    */
 	glEndList();
+
+    mVertexBuffer.release();
+    mIndexBuffer.release();
 
 	return true;
 }

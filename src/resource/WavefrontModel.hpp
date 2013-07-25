@@ -6,29 +6,40 @@
 
 #include <QString>
 #include <QStringList>
-#include <QList>
+#include <QVector>
 #include <QVector2D>
 #include <QVector3D>
 #include <QFile>
 #include <QFileInfo>
 #include <QMap>
 #include <QSizeF>
+#include <QGLBuffer>
 
-struct FacePoint
+class Vertex
 {
-	QVector3D vertex;
+public:
+    Vertex() {}
+
+    QVector3D position;
 	QVector2D texCoord;
 	QVector3D normal;
+
+    bool operator == ( const Vertex & other )
+    {
+        return position == other.position
+                && texCoord == other.texCoord
+                && normal == other.normal;
+    }
 };
 
 class Face
 {
 public:
-	Face() {
-		points = new QList<FacePoint>();
+    Face() {
+        points = new QVector<Vertex>();
 	}
 
-	QList<FacePoint> * points;
+    QVector<Vertex> * points;
 	Material * material;
 };
 
@@ -45,9 +56,11 @@ public:
 private:
 	GLWidget * mGLWidget;
 	QString mFilename;
-	QList<Face> * mFaces;
+    QVector<Face> * mFaces;
 	QSizeF mSize;
 	GLuint mIndex;
+    QGLBuffer mVertexBuffer;
+    QGLBuffer mIndexBuffer;
 };
 
 #endif // WAVEFRONTMODEL_HPP
