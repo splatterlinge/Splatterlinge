@@ -202,6 +202,8 @@ bool WavefrontModel::render()
     }
 
     glDisableClientState( GL_INDEX_ARRAY );
+    glDisableClientState( GL_NORMAL_ARRAY );
+    glDisableClientState( GL_TEXTURE_COORD_ARRAY );
     glDisableClientState( GL_VERTEX_ARRAY );
 
     mVertexBuffer.release();
