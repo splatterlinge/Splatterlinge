@@ -14,7 +14,8 @@ Laser::Laser( World * world ) :
 	mTrailAlpha = 0.0f;
 	mFired = false;
 	mRange = 250.0f;
-	mTrailRadius = 0.04;
+    mTrailRadius = 0.04f;
+    mDamage = 50.0f;
 }
 
 
@@ -52,7 +53,7 @@ void Laser::updateSelf( const double & delta )
 			ACreature * victim = dynamic_cast<ACreature*>(target);
 			if( victim )
 			{
-				victim->receiveDamage( 1, &mTrailEnd, &mTrailDirection );
+                victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
 			}
 		}
 	}
