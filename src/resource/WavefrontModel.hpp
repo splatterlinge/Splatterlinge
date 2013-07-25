@@ -41,6 +41,20 @@ public:
 
     QVector<Vertex> * points;
     Material * material;
+
+    bool operator == ( const Face & other )
+    {
+        return points == other.points
+                && material == other.material;
+    }
+};
+
+class Part
+{
+public:
+    unsigned int start;
+    unsigned int count;
+    Material * material;
 };
 
 class WavefrontModel
@@ -56,6 +70,7 @@ private:
     GLWidget * mGLWidget;
     QString mFilename;
     QSizeF mSize;
+    QVector<Part> mParts;
     QVector<Vertex> mVertices;
     QVector<unsigned int> mIndices;
     QGLBuffer mVertexBuffer;

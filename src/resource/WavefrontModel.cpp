@@ -121,8 +121,26 @@ bool WavefrontModel::parse()
     mSize.setWidth(maxX-minX);
     mSize.setHeight(maxY-minY);
 
+    Material * lastMat = faces.first().material;
+    unsigned int current = 0;
+    unsigned int count = 0;
+
     foreach( Face face, faces )
     {
+        if( face.material )
+        {
+            if( face.material != lastMat || face == faces.last() )
+            {
+                Part p;
+                p.start = current - count;
+                p.count = count;
+                p.material = lastMat;
+                mParts.append(p);
+
+                lastMat = face.material;
+                count = 0;
+            }
+        }
         foreach( Vertex vertex, *face.points )
         {
             if( mVertices.indexOf( vertex ) == -1 )
@@ -130,6 +148,9 @@ bool WavefrontModel::parse()
                 mVertices.append( vertex );
             }
             mIndices.append( mVertices.indexOf( vertex ) );
+
+            current++;
+            count++;
         }
     }
 
@@ -152,24 +173,33 @@ bool WavefrontModel::parse()
 
 bool WavefrontModel::render()
 {
-    //Material * lastMat = NULL;
-
     mVertexBuffer.bind();
     mIndexBuffer.bind();
 
     glEnableClientState( GL_VERTEX_ARRAY );
+    glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+    glEnableClientState( GL_NORMAL_ARRAY );
     glEnableClientState( GL_INDEX_ARRAY );
 
     glVertexPointer( 3, GL_FLOAT, sizeof( Vertex ), (void*)offsetof(Vertex,position) );
     glTexCoordPointer( 2, GL_FLOAT, sizeof( Vertex ), (void*)offsetof(Vertex,texCoord) );
     glNormalPointer( GL_FLOAT, sizeof( Vertex ), (void*)offsetof(Vertex,normal) );
 
-    glDrawElements(
-                GL_TRIANGLES,
-                mIndices.size(),
-                GL_UNSIGNED_INT,
-                0
-    );
+    foreach( Part part, mParts )
+    {
+        part.material->bind();
+
+        glDrawElements(
+                    GL_TRIANGLES,
+                    part.count,
+                    GL_UNSIGNED_INT,
+                    (void*)((size_t)(2*sizeof(unsigned short)*(	// convert index to pointer
+                        part.start		// index to start
+                    ) ) )
+        );
+
+        part.material->release();
+    }
 
     glDisableClientState( GL_INDEX_ARRAY );
     glDisableClientState( GL_VERTEX_ARRAY );
