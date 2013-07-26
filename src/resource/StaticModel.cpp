@@ -30,6 +30,10 @@ void StaticModelData::unload()
 		return;
 	qDebug() << "-" << this << "StaticModelData" << uid();
 
+	mParts.clear();
+	mVertices.clear();
+	mIndices.clear();
+
 	mVertexBuffer.release();
 	mVertexBuffer.destroy();
 
