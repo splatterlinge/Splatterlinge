@@ -12,7 +12,9 @@ Laser::Laser( World * world ) :
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
 
-	mCoolDown = 0.0f;
+	mTrailVisibilityDuration = 1.0f;
+	mCoolDown = 2.0f;
+	mHeat = 0.0f;
 	mTrailAlpha = 0.0f;
 	mFired = false;
 	mRange = 250.0f;
@@ -45,9 +47,9 @@ void Laser::updateSelf( const double & delta )
 {
 	if( mFired )
 	{
-		if( mCoolDown <= 0.0f )
+		if( mHeat <= 0.0f )
 		{
-			mCoolDown = 0.0f;
+			mHeat = 1.0f;
 			mTrailAlpha = 1.0f;
 			mTrailStart = worldPosition();
 			mTrailDirection = worldDirection();
@@ -65,13 +67,13 @@ void Laser::updateSelf( const double & delta )
 		}
 	}
 
-	if( mCoolDown > delta )
-		mCoolDown -= delta * 0.5;
+	if( mHeat > delta )
+		mHeat -= delta / mCoolDown;
 	else
-		mCoolDown = 0.0f;
+		mHeat = 0.0f;
 
 	if( mTrailAlpha > delta )
-		mTrailAlpha -= delta * 2.0;
+		mTrailAlpha -= delta / mTrailVisibilityDuration;
 	else
 		mTrailAlpha = 0.0f;
 }
@@ -97,7 +99,7 @@ void Laser::draw2Self()
 	glEnable( GL_BLEND );
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 
-	QVector3D toEye = scene()->eye()->position() - worldPosition();
+	QVector3D toEye = scene()->eye()->position() - mTrailStart;
 	QVector3D crossDir = QVector3D::crossProduct( mTrailDirection, toEye ).normalized();
 
 	glLoadMatrix( scene()->eye()->viewMatrix() );

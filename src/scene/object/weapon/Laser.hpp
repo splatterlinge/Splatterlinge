@@ -26,11 +26,13 @@ public:
 private:
 	GLUquadric * mQuadric;
 	bool mFired;
+	float mHeat;
 	float mCoolDown;
 	float mRange;
 	float mTrailRadius;
 	float mTrailLength;
 	float mTrailAlpha;
+	float mTrailVisibilityDuration;
 	float mDamage;
 	QVector3D mTrailStart;
 	QVector3D mTrailDirection;
