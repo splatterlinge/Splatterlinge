@@ -47,7 +47,7 @@ void Minigun::updateSelf( const double & delta )
 	{
 		if( mCoolDown <= 0.0f )
 		{
-			mCoolDown = 0.0f;
+			mCoolDown = 0.1f;
 			mTrailAlpha = 1.0f;
 			mTrailStart = worldPosition();
 			mTrailDirection = worldDirection();
