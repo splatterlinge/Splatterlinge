@@ -6,6 +6,7 @@
 #include "../World.hpp"
 #include "../Landscape.hpp"
 #include "../weapon/Laser.hpp"
+#include "../weapon/Minigun.hpp"
 
 
 Player::Player( World * world ) :
@@ -29,7 +30,7 @@ Player::Player( World * world ) :
 	mTarget = QVector3D(0,0,0);
 	mDragTeapot = false;
 
-	mCurrentWeapon = QSharedPointer<Laser>( new Laser( world ) );
+	mCurrentWeapon = QSharedPointer<Minigun>( new Minigun( world ) );
 	mWeapons.append( mCurrentWeapon );
 	add( mCurrentWeapon );
 
