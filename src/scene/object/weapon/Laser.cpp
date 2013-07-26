@@ -17,7 +17,7 @@ Laser::Laser( World * world ) :
 	mFired = false;
 	mRange = 250.0f;
 	mTrailRadius = 0.04f;
-	mDamage = 50.0f;
+	mDamage = 5.0f;
 	mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
 }
 
@@ -47,7 +47,7 @@ void Laser::updateSelf( const double & delta )
 	{
 		if( mCoolDown <= 0.0f )
 		{
-			mCoolDown = 1.0f;
+			mCoolDown = 0.0f;
 			mTrailAlpha = 1.0f;
 			mTrailStart = worldPosition();
 			mTrailDirection = worldDirection();
@@ -57,7 +57,10 @@ void Laser::updateSelf( const double & delta )
 			ACreature * victim = dynamic_cast<ACreature*>(target);
 			if( victim )
 			{
-				victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
+				if( victim->life() != 0 )
+				{
+					victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
+				}
 			}
 		}
 	}
@@ -94,7 +97,7 @@ void Laser::draw2Self()
 	glEnable( GL_BLEND );
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 
-	QVector3D toEye = scene()->eye()->position() - mTrailStart;
+	QVector3D toEye = scene()->eye()->position() - worldPosition();
 	QVector3D crossDir = QVector3D::crossProduct( mTrailDirection, toEye ).normalized();
 
 	glLoadMatrix( scene()->eye()->viewMatrix() );
