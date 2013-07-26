@@ -18,6 +18,7 @@ Minigun::Minigun( World * world ) :
 	mRange = 100.0f;
 	mTrailRadius = 0.01f;
 	mDamage = 5.0f;
+	mMaterial = new Material( scene()->glWidget(), "BlackSteel" );
 }
 
 
@@ -102,8 +103,7 @@ void Minigun::updateSelf( const double & delta )
 
 void Minigun::drawSelf()
 {
-	glEnable( GL_COLOR_MATERIAL );
-	glEnable( GL_LIGHTING );
+	mMaterial->bind();
 
 	glPushMatrix();
 
@@ -136,8 +136,7 @@ void Minigun::drawSelf()
 
 	glPopMatrix();
 
-	glDisable( GL_LIGHTING );
-	glDisable( GL_COLOR_MATERIAL );
+	mMaterial->release();
 }
 
 
