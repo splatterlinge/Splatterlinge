@@ -2,7 +2,7 @@
 
 #include <scene/object/World.hpp>
 #include <resource/Material.hpp>
-#include <geometry/SplatterSystem.hpp>
+#include <effect/SplatterSystem.hpp>
 #include <utility/random.hpp>
 #include <utility/quaternion.hpp>
 #include <utility/Sphere.hpp>
@@ -16,6 +16,7 @@ Dummy::Dummy( World * world ) : ACreature( world )
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
 
+	mHeightAboveGround = 6.0f;
 	mVelocityY = 0.0f;
 	mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
 }
@@ -45,6 +46,7 @@ void Dummy::updateSelf( const double & delta )
 			setPosition( randomPointOnWorld( world() ) + QVector3D(0,10,0) );
 			setState( ALIVE );
 			setLife( 100 );
+			mHeightAboveGround = 6.0f;
 			break;
 		}
 
@@ -62,6 +64,7 @@ void Dummy::updateSelf( const double & delta )
 
 		case DYING:
 			setState( DEAD );
+			mHeightAboveGround = 3.0f;
 			break;
 
 		case DEAD:
@@ -74,9 +77,9 @@ void Dummy::updateSelf( const double & delta )
 	float landscapeHeight;
 	if( world()->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
 	{
-		if( landscapeHeight + 5.0f > position().y() )
+		if( landscapeHeight + mHeightAboveGround > position().y() )
 		{
-			setPositionY( landscapeHeight + 5.0f );
+			setPositionY( landscapeHeight + mHeightAboveGround );
 			if( mVelocityY < 0.0f )
 				mVelocityY = 0.0f;
 		}

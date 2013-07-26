@@ -233,6 +233,27 @@ AObject * Landscape::intersectLine( const QVector3D & origin, const QVector3D & 
 }
 
 
+QVector<AObject*> Landscape::collideSphere( const float & radius, QVector3D & center, QVector3D * normal )
+{
+	QVector<AObject*> collides = AObject::collideSphere( radius, center, normal );
+
+	float landscapeHeight;
+	if( mTerrain->getHeight( center, landscapeHeight ) )
+	{
+		if( landscapeHeight + radius > center.y() )
+		{
+			collides.append( this );
+			center.setY( landscapeHeight + radius );
+			if( normal )
+			{
+				*normal = mTerrain->getNormal( center );
+			}
+		}
+	}
+	return collides;
+}
+
+
 
 
 ////////////////////////////////////////////////////////////////

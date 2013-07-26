@@ -5,6 +5,7 @@
 #include "AWeapon.hpp"
 
 
+class Material;
 struct GLUquadric;
 
 
@@ -30,10 +31,11 @@ private:
 	float mTrailRadius;
 	float mTrailLength;
 	float mTrailAlpha;
-    float mDamage;
+	float mDamage;
 	QVector3D mTrailStart;
 	QVector3D mTrailDirection;
 	QVector3D mTrailEnd;
+	Material * mMaterial;
 };
 
 

@@ -49,19 +49,17 @@ void Teapot::drawSelf()
 }
 
 
-bool Teapot::collideSphere( const float & radius, QVector3D & center, QVector3D * normal )
+QVector<AObject*> Teapot::collideSphere( const float & radius, QVector3D & center, QVector3D * normal )
 {
-	bool collide = AObject::collideSphere( radius, center, normal );
+	QVector<AObject*> collides = AObject::collideSphere( radius, center, normal );
 	float depth;
 	if( Sphere::intersectSphere( center, radius, position(), boundingSphereRadius(), &depth ) )
 	{
-		collide = true;
+		collides.append( this );
+		QVector3D tmpNormal = (center - position()).normalized();
+		center += tmpNormal * depth;
 		if( normal )
-		{
-			*normal = (center - position()).normalized();
-			center += *normal * depth;
-			collide = true;
-		}
+			*normal = tmpNormal;
 	}
-	return collide;
+	return collides;
 }

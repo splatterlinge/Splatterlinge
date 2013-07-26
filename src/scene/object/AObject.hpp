@@ -133,7 +133,7 @@ public:
 		float & length, QVector3D * normal = NULL );
 
 	/// Recursively collision-test a sphere with an object and the object's objects
-	virtual bool collideSphere( const float & radius,
+	virtual QVector<AObject*> collideSphere( const float & radius,
 		QVector3D & center, QVector3D * normal = NULL );
 
 	/// Updates this object and all of it's sub-objects
@@ -198,3 +198,4 @@ private:
 
 
 #endif
+

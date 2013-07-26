@@ -2,7 +2,7 @@
 
 
 #include <scene/Scene.hpp>
-#include <geometry/SplatterSystem.hpp>
+#include <effect/SplatterSystem.hpp>
 #include "../World.hpp"
 #include "../Landscape.hpp"
 #include "../weapon/Laser.hpp"
@@ -179,61 +179,69 @@ void Player::updateSelf( const double & delta )
 
 	if( mGodMode )
 	{
-		QVector3D move( 0.0f, 0.0f, 0.0f );
+		QVector3D control( 0.0f, 0.0f, 0.0f );
+		float speed;
 		if( mForwardPressed )
-			move.setZ( move.z() + 1.0f );
+			control.setZ( control.z() + 1.0f );
 		if( mBackwardPressed )
-			move.setZ( move.z() - 1.0f );
+			control.setZ( control.z() - 1.0f );
 		if( mLeftPressed )
-			move.setX( move.x() + 1.0f );
+			control.setX( control.x() + 1.0f );
 		if( mRightPressed )
-			move.setX( move.x() - 1.0f );
+			control.setX( control.x() - 1.0f );
 		if( mUpPressed )
-			move.setY( move.y() + 1.0f );
+			control.setY( control.y() + 1.0f );
 		if( mDownPressed )
-			move.setY( move.y() - 1.0f );
+			control.setY( control.y() - 1.0f );
 		if( mSpeedPressed )
 		{
-			move *= 300.0*delta;
+			speed = 300.0;
 		} else {
-			move *= 50.0*delta;
+			speed = 50.0;
 		}
-		setPosition( position() + move.x()*left() + move.y()*up() + move.z()*direction() );
+		QVector3D finalMove( control.x()*left() + control.y()*up() + control.z()*direction() );
+		move( finalMove*speed*delta );
 	} else {
-		QVector3D move( 0.0f, 0.0f, 0.0f );
+		QVector3D control( 0.0f, 0.0f, 0.0f );
+		float speed;
 		if( mForwardPressed )
-			move.setZ( move.z() + 1.0f );
+			control.setZ( control.z() + 1.0f );
 		if( mBackwardPressed )
-			move.setZ( move.z() - 1.0f );
+			control.setZ( control.z() - 1.0f );
 		if( mLeftPressed )
-			move.setX( move.x() + 1.0f );
+			control.setX( control.x() + 1.0f );
 		if( mRightPressed )
-			move.setX( move.x() - 1.0f );
-		move.normalize();
+			control.setX( control.x() - 1.0f );
+		control.normalize();
 		if( mSpeedPressed )
 		{
-			move *= 20.0*delta;
+			speed = 20.0;
 		} else {
-			move *= 10.0*delta;
+			speed = 10.0;
 		}
-		QVector3D moveDirection = direction();
-		moveDirection.setY( 0.0f );
-		QVector3D moveLeft = left();
 
-		QVector3D terrainNormal;
-		if( world()->landscape()->terrain()->getNormal( position(), terrainNormal ) )
+		QVector3D finalMove(0,0,0);
+		if( mOnGround )
 		{
-			if( terrainNormal.y() > 0.6 && mOnGround )
-			{	// if the terrain is flat enough and the player touches the ground, move along the terrain instead
-				moveDirection = QVector3D::crossProduct( left(), terrainNormal );
-				moveLeft = QVector3D::crossProduct( terrainNormal, direction() );
+			QVector3D groundDirection = QVector3D::crossProduct( left(), mGroundNormal );
+			QVector3D groundLeft = QVector3D::crossProduct( mGroundNormal, groundDirection );
+			if( mGroundNormal.y() > 0.7 )
+			{	// if the terrain is flat enough, move along the ground
+				finalMove += groundDirection * control.z();
+				finalMove += groundLeft * control.x();
+			} else {
+				finalMove += QVector3D::crossProduct( left(), QVector3D(0,1,0) ) * control.z();
+				finalMove += left() * control.x();
 			}
+			finalMove.normalize();
+			finalMove -= mGroundNormal * qMin( 0.0, QVector3D::dotProduct( finalMove, mGroundNormal ) );
+		} else {
+			finalMove += QVector3D::crossProduct( left(), QVector3D(0,1,0) ) * control.z();
+			finalMove += left() * control.x();
+			finalMove.normalize();
 		}
 
-		moveDirection.normalize();
-		moveLeft.normalize();
-
-		setPosition( position() + move.x()*moveLeft + move.z()*moveDirection );
+		move( finalMove*speed*delta );
 
 		mVelocityY += -80.0f * delta;	// apply gravity
 
@@ -248,31 +256,22 @@ void Player::updateSelf( const double & delta )
 				mHeightAboveGround += 10.0f * delta;
 		}
 
-		setPositionY( position().y() + mVelocityY * delta );
-	}
-
-	float landscapeHeight;
-	if( world()->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
-	{
-		if( landscapeHeight + mHeightAboveGround + 0.1f >= position().y() )
-		{
-			if( landscapeHeight + mHeightAboveGround > position().y() )
-			{
-				setPositionY( landscapeHeight + mHeightAboveGround );
-				if( mVelocityY < 0.0f )
-					mVelocityY = 0.0f;
-			}
-			mOnGround = true;
-		} else {
-			mOnGround = false;
-		}
+		moveY( mVelocityY * delta );
 	}
 
 	QVector3D newPosition = position();
-	QVector3D normal;
-	if( world()->collideSphere( 1, newPosition, &normal ) )
+	if( !( world()->collideSphere( mHeightAboveGround+0.1f, newPosition, &mGroundNormal ) ).isEmpty() )
 	{
-		setPosition( newPosition );
+		mOnGround = true;
+		newPosition = position();
+		if( !( world()->collideSphere( mHeightAboveGround, newPosition, &mGroundNormal ) ).isEmpty() )
+		{
+			setPosition( newPosition );
+			if( mVelocityY < 0.0f )
+				mVelocityY = 0.0f;
+		}
+	} else {
+		mOnGround = false;
 	}
 }
 

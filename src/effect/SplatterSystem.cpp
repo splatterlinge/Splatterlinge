@@ -1,8 +1,7 @@
 #include "SplatterSystem.hpp"
 
-#include "ParticleSystem.hpp"
-
 #include <GLWidget.hpp>
+#include <geometry/Terrain.hpp>
 #include <utility/interpolate.hpp>
 #include <utility/random.hpp>
 #include <resource/Material.hpp>
@@ -12,10 +11,13 @@
 #include <float.h>
 
 
-SplatterSystem::SplatterSystem( GLWidget * glWidget, Terrain * terrain, int maxSplatters, int maxParticles ) :
+SplatterSystem::SplatterSystem( GLWidget * glWidget, Terrain * terrain,
+		Material * splatterMaterial, Material * particleMaterial, int maxSplatters, int maxParticles ) :
 	mGLWidget( glWidget ),
 	mTerrain( terrain ),
-	mSplatters( maxSplatters )
+	mSplatters( maxSplatters ),
+	mSplatterMaterial( splatterMaterial ),
+	mParticleMaterial( particleMaterial )
 {
 	mParticleSystem = new ParticleSystem( maxParticles );
 	mParticleSystem->setSize( 4.0f );
@@ -28,9 +30,6 @@ SplatterSystem::SplatterSystem( GLWidget * glWidget, Terrain * terrain, int maxS
 	mSplatterDriftFactor = 100.0f;
 
 	mBurstPitchRange = 0.3;
-
-	mSplatterMaterial = new Material( glWidget, "SplatterBig" );
-	mParticleMaterial = new Material( glWidget, "Splatter" );
 
 	mBurstSampleSources.resize( 4 );
 	for( int i=0; i<mBurstSampleSources.size(); ++i )

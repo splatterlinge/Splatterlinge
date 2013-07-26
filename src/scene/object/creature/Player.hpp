@@ -50,9 +50,11 @@ private:
 	float mAxisRotationY;
 	bool mDragTeapot;
 	bool mDragTorch;
+	QVector3D mGroundNormal;
 	QSharedPointer<Torch> mTorch;
 	QList< QSharedPointer<AWeapon> > mWeapons;
 	QSharedPointer<AWeapon> mCurrentWeapon;
 };
+
 
 #endif

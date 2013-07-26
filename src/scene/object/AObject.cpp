@@ -193,16 +193,16 @@ AObject * AObject::intersectLine( const QVector3D & origin, const QVector3D & di
 }
 
 
-bool AObject::collideSphere( const float & radius,
+QVector<AObject*> AObject::collideSphere( const float & radius,
 	QVector3D & center, QVector3D * normal )
 {
-	bool collision = false;
+	QVector<AObject*> collisions;
 	QList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
-		collision |= (*i)->collideSphere( radius, center, normal );
+		collisions << ((*i)->collideSphere( radius, center, normal ));
 	}
-	return collision;
+	return collisions;
 }
 
 

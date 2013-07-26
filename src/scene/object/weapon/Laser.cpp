@@ -2,7 +2,7 @@
 
 #include "../World.hpp"
 
-#include <geometry/SplatterSystem.hpp>
+#include <effect/SplatterSystem.hpp>
 #include <scene/Scene.hpp>
 
 
@@ -10,18 +10,22 @@ Laser::Laser( World * world ) :
 	AWeapon( world )
 {
 	mQuadric = gluNewQuadric();
+	gluQuadricTexture( mQuadric, GL_TRUE );
+
 	mCoolDown = 0.0f;
 	mTrailAlpha = 0.0f;
 	mFired = false;
 	mRange = 250.0f;
-    mTrailRadius = 0.04f;
-    mDamage = 50.0f;
+	mTrailRadius = 0.04f;
+	mDamage = 50.0f;
+	mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
 }
 
 
 Laser::~Laser()
 {
 	gluDeleteQuadric( mQuadric );
+	delete mMaterial;
 }
 
 
@@ -53,7 +57,7 @@ void Laser::updateSelf( const double & delta )
 			ACreature * victim = dynamic_cast<ACreature*>(target);
 			if( victim )
 			{
-                victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
+				victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
 			}
 		}
 	}
@@ -72,16 +76,9 @@ void Laser::updateSelf( const double & delta )
 
 void Laser::drawSelf()
 {
-	glDisable( GL_TEXTURE_2D );
-	glEnable( GL_LIGHTING );
-
-	glMaterial( GL_FRONT_AND_BACK, GL_AMBIENT, QVector4D(0,0,0,0) );
-	glMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE, QVector4D(1,1,1,1) );
-	glMaterial( GL_FRONT_AND_BACK, GL_SPECULAR, QVector4D(1,1,1,1) );
-	glMaterial( GL_FRONT_AND_BACK, GL_EMISSION, QVector4D(0,0,0,0) );
-	glMaterial( GL_FRONT_AND_BACK, GL_SHININESS, 32.0f );
-
+	mMaterial->bind();
 	gluCylinder( mQuadric, 0.1f, 0.1f, 0.4f, 16, 16 );
+	mMaterial->release();
 }
 
 

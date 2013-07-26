@@ -28,6 +28,7 @@ private:
 	Material * mMaterial;
 	QVector3D mTarget;
 	float mVelocityY;
+	float mHeightAboveGround;
 };
 
 

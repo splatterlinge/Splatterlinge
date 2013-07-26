@@ -35,6 +35,9 @@ public:
 	virtual AObject * intersectLine( const QVector3D & origin, const QVector3D & direction,
 		float & length, QVector3D * normal = NULL );
 
+	virtual QVector<AObject*> collideSphere( const float & radius,
+		QVector3D & center, QVector3D * normal = NULL );
+
 	void drawPatch( const QRectF & rect );
 
 	Terrain * terrain() { return mTerrain; }

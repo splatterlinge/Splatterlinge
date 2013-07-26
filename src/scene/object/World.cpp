@@ -3,7 +3,7 @@
 #include <scene/Scene.hpp>
 #include <utility/random.hpp>
 #include <geometry/ParticleSystem.hpp>
-#include <geometry/SplatterSystem.hpp>
+#include <effect/SplatterSystem.hpp>
 #include "Landscape.hpp"
 #include "Teapot.hpp"
 #include "WavefrontObject.hpp"
@@ -95,7 +95,13 @@ World::World( Scene * scene, QString name ) :
 
 	mTarget = QVector3D(0,0,0);
 
-	mSplatterSystem = new SplatterSystem( scene->glWidget(), mLandscape->terrain() );
+	mSplatterSystem = new SplatterSystem
+	(
+		scene->glWidget(),
+		mLandscape->terrain(),
+		new Material( scene->glWidget(), "SplatterBig" ),
+		new Material( scene->glWidget(), "Splatter" )
+	);
 	mSplatterInteractor = new SplatterInteractor( *this );
 	mSplatterSystem->particleSystem()->setInteractionCallback( mSplatterInteractor );
 }
