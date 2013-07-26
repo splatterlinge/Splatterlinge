@@ -172,7 +172,7 @@ bool StaticModelData::parse()
 			Part p;
 			p.start = current - count;
 			p.count = count;
-			p.material = new Material( mGLWidget, face.material );
+			p.material = new Material( mGLWidget, lastMat );
 			mParts.append(p);
 
 			lastMat = face.material;
