@@ -19,6 +19,8 @@ Minigun::Minigun( World * world ) :
 	mTrailRadius = 0.01f;
 	mDamage = 5.0f;
 	mMaterial = new Material( scene()->glWidget(), "BlackSteel" );
+	mFireSound = new AudioSample( "./data/sound/minigun.ogg" );
+	mFireSound->setLooping( true );
 }
 
 
@@ -75,6 +77,12 @@ void Minigun::updateSelf( const double & delta )
 		else
 		{
 			mRotation += 25.0f;
+
+			qDebug() << "fire";
+			if( !mFireSound->isPlaying() )
+			{
+				mFireSound->play();
+			}
 		}
 	}
 	else
@@ -86,6 +94,7 @@ void Minigun::updateSelf( const double & delta )
 		else
 		{
 			mRotation = 0.0f;
+			mFireSound->stop();
 		}
 	}
 

@@ -3,7 +3,7 @@
 
 
 #include "AWeapon.hpp"
-
+#include "resource/AudioSample.hpp"
 
 class Material;
 struct GLUquadric;
@@ -37,6 +37,7 @@ private:
 	QVector3D mTrailDirection;
 	QVector3D mTrailEnd;
 	Material * mMaterial;
+	AudioSample * mFireSound;
 };
 
 
