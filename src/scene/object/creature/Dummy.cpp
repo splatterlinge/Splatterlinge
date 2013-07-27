@@ -138,5 +138,9 @@ void Dummy::receiveDamage( int damage, const QVector3D * position, const QVector
 		splatterSource = *position;
 	else
 		splatterSource = worldPosition();
-	world()->splatterSystem()->spray( splatterSource, 30.0f );
+
+	if( state() != DEAD )
+		world()->splatterSystem()->spray( splatterSource, 30.0f );
+	else
+		world()->splatterSystem()->spray( splatterSource, 10.0f );
 }

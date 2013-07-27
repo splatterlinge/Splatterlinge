@@ -6,6 +6,7 @@
 #include <resource/Material.hpp>
 #include <resource/AudioSample.hpp>
 #include <utility/Sphere.hpp>
+#include <utility/Capsule.hpp>
 
 
 Teapot::Teapot( Scene * scene, const float & size ) :
@@ -53,13 +54,23 @@ QVector<AObject*> Teapot::collideSphere( const float & radius, QVector3D & cente
 {
 	QVector<AObject*> collides = AObject::collideSphere( radius, center, normal );
 	float depth;
-	if( Sphere::intersectSphere( center, radius, position(), boundingSphereRadius(), &depth ) )
+	QVector3D tmpNormal;
+	/*
+	if( Sphere::intersectSphere( position(), boundingSphereRadius(), center, radius, &tmpNormal, &depth ) )
 	{
 		collides.append( this );
-		QVector3D tmpNormal = (center - position()).normalized();
 		center += tmpNormal * depth;
 		if( normal )
 			*normal = tmpNormal;
 	}
+	*/
+	if( Capsule::intersectSphere( position(), position()+QVector3D(0,2,0), boundingSphereRadius()/2.0f, center, radius, &tmpNormal, &depth ) )
+	{
+		collides.append( this );
+		center += tmpNormal * depth;
+		if( normal )
+			*normal = tmpNormal;
+	}
+
 	return collides;
 }

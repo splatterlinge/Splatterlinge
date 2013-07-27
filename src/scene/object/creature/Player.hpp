@@ -53,7 +53,7 @@ private:
 	QVector3D mGroundNormal;
 	QSharedPointer<Torch> mTorch;
 	QList< QSharedPointer<AWeapon> > mWeapons;
-	QSharedPointer<AWeapon> mCurrentWeapon;
+	QList< QSharedPointer<AWeapon> >::iterator mCurrentWeapon;
 };
 
 

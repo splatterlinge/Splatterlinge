@@ -19,7 +19,7 @@ Laser::Laser( World * world ) :
 	mFired = false;
 	mRange = 250.0f;
 	mTrailRadius = 0.04f;
-	mDamage = 5.0f;
+	mDamage = 50.0f;
 	mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
 }
 
@@ -59,10 +59,7 @@ void Laser::updateSelf( const double & delta )
 			ACreature * victim = dynamic_cast<ACreature*>(target);
 			if( victim )
 			{
-				if( victim->life() != 0 )
-				{
-					victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
-				}
+				victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
 			}
 		}
 	}

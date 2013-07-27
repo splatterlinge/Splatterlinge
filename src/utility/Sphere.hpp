@@ -16,11 +16,19 @@ public:
 	void setCenter( const QVector3D & center ) { mCenter = center; }
 	void setRadius( const float & radius ) { mRadius = radius; }
 
+	bool intersectSphere( const QVector3D & centerB, const float & radiusB, QVector3D * normal, float * depth ) const
+		{ return intersectSphere( mCenter, mRadius, centerB, radiusB, normal, depth ); }
+
 	bool intersectRay( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance ) const
 		{ return intersectRay( mCenter, mRadius, origin, direction, intersectionDistance ); }
 
-	static bool intersectSphere( const QVector3D & centerA, const float & radiusA, const QVector3D & centerB, const float & radiusB, float * depth );
-	static bool intersectRay( const QVector3D & sphereCenter, const float & sphereRadius, const QVector3D & rayOrigin, const QVector3D & rayDirection, float * intersectionDistance );
+	static bool intersectSphere( const QVector3D & centerA, const float & radiusA,
+		const QVector3D & centerB, const float & radiusB,
+		QVector3D * normal, float * depth );
+
+	static bool intersectRay( const QVector3D & sphereCenter, const float & sphereRadius,
+		const QVector3D & rayOrigin, const QVector3D & rayDirection,
+		float * intersectionDistance );
 
 private:
 	QVector3D mCenter;

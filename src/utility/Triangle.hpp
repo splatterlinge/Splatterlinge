@@ -18,9 +18,10 @@ public:
 	void setQ( const QVector3D & point ) { mQ = point; }
 	void setR( const QVector3D & point ) { mR = point; }
 
+	QVector3D normal() const { return QVector3D::normal( mP, mQ, mR); }
+
 	bool intersectRay( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance ) const
 		{ return intersectRay( mP, mQ, mR, origin, direction, intersectionDistance ); }
-	QVector3D normal() const { return QVector3D::normal( mP, mQ, mR); }
 
 	static bool intersectRay( const QVector3D & p, const QVector3D & q, const QVector3D & r, const QVector3D & origin, const QVector3D & direction, float * intersectionDistance );
 

@@ -3,7 +3,9 @@
 #include <math.h>
 
 
-bool Sphere::intersectSphere( const QVector3D & centerA, const float & radiusA, const QVector3D & centerB, const float & radiusB, float * depth )
+bool Sphere::intersectSphere( const QVector3D & centerA, const float & radiusA,
+	const QVector3D & centerB, const float & radiusB,
+	QVector3D * normal, float * depth )
 {
 	QVector3D relPos = centerB - centerA;
 
@@ -15,17 +17,21 @@ bool Sphere::intersectSphere( const QVector3D & centerA, const float & radiusA, 
 	if( squaredRadi < squaredDistance )
 		return false;
 
-	if( !depth )
-		return true;
+	if( depth )
+		*depth = sqrtf( squaredRadi ) - sqrtf( squaredDistance );
 
-	*depth = sqrtf( squaredRadi ) - sqrtf( squaredDistance );
+	if( normal )
+		*normal = relPos.normalized();
+
 	return true;
 }
 
 
 // http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection
 
-bool Sphere::intersectRay( const QVector3D & sphereCenter, const float & sphereRadius, const QVector3D & rayOrigin, const QVector3D & rayDirection, float * intersectionDistance )
+bool Sphere::intersectRay( const QVector3D & sphereCenter, const float & sphereRadius,
+	const QVector3D & rayOrigin, const QVector3D & rayDirection,
+	float * intersectionDistance )
 {
 	QVector3D relRayOrigin = rayOrigin - sphereCenter;
 
@@ -65,14 +71,14 @@ bool Sphere::intersectRay( const QVector3D & sphereCenter, const float & sphereR
 	if( t1 < 0.0f )
 		return false;
 
-	// skip the rest if not interested in distance
-	if( !intersectionDistance )
-		return true;
+	if( intersectionDistance )
+	{
+		// if t0 is less than zero, the intersection point is at t1
+		if( t0 < 0.0f )
+			*intersectionDistance = t1;
+		else	// else the intersection point is at t0
+			*intersectionDistance = t0;
+	}
 
-	// if t0 is less than zero, the intersection point is at t1
-	if( t0 < 0.0f )
-		*intersectionDistance = t1;
-	else	// else the intersection point is at t0
-		*intersectionDistance = t0;
 	return true;
 }

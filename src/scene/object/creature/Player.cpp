@@ -30,9 +30,10 @@ Player::Player( World * world ) :
 	mTarget = QVector3D(0,0,0);
 	mDragTeapot = false;
 
-	mCurrentWeapon = QSharedPointer<Minigun>( new Minigun( world ) );
-	mWeapons.append( mCurrentWeapon );
-	add( mCurrentWeapon );
+	mWeapons.append( QSharedPointer<Minigun>( new Minigun( world ) ) );
+	mWeapons.append( QSharedPointer<Laser>( new Laser( world ) ) );
+	mCurrentWeapon = mWeapons.begin();
+	add( (*mCurrentWeapon) );
 
 	mTorch = QSharedPointer<Torch>( new Torch( world ) );
 	mTorch->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) + 1.0f );
@@ -126,7 +127,7 @@ void Player::mousePressEvent( QGraphicsSceneMouseEvent * event )
 {
 	if( event->button() == Qt::LeftButton )
 	{
-		mCurrentWeapon->triggerPressed();
+		(*mCurrentWeapon)->triggerPressed();
 	}
 	else if( event->button() == Qt::RightButton )
 	{
@@ -144,7 +145,7 @@ void Player::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 	if( event->button() == Qt::LeftButton )
 	{
-		mCurrentWeapon->triggerReleased();
+		(*mCurrentWeapon)->triggerReleased();
 	}
 	else if( event->button() == Qt::RightButton )
 	{
@@ -159,7 +160,18 @@ void Player::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 
 void Player::mouseWheelEvent( QGraphicsSceneWheelEvent * event )
 {
-	world()->splatterSystem()->spray( mTarget+QVector3D(0,3,0), 10.0f );
+	if( event->delta() > 0 && mCurrentWeapon != --mWeapons.end() )
+	{
+		remove( *mCurrentWeapon );
+		++mCurrentWeapon;
+		add( *mCurrentWeapon );
+	}
+	else if( event->delta() < 0 && mCurrentWeapon != mWeapons.begin() )
+	{
+		remove( *mCurrentWeapon );
+		--mCurrentWeapon;
+		add( *mCurrentWeapon );
+	}
 }
 
 
@@ -176,7 +188,7 @@ void Player::updateSelf( const double & delta )
 	QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, mAxisRotationY );
 	setRotation( qY * qX );
 
-	mCurrentWeapon->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
+	(*mCurrentWeapon)->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
 
 	if( mGodMode )
 	{
@@ -246,7 +258,7 @@ void Player::updateSelf( const double & delta )
 
 		mVelocityY += -80.0f * delta;	// apply gravity
 
-		if( mUpPressed && mOnGround )	// jump if key is pressed and player touches ground
+		if( mUpPressed && mOnGround && mGroundNormal.y() > 0.7 )	// jump if key is pressed and player touches ground
 			mVelocityY = 20.0f;
 
 		if( mDownPressed )	// duck by lowering the player's height above ground
