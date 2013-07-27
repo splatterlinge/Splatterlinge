@@ -50,9 +50,9 @@ void Teapot::drawSelf()
 }
 
 
-QVector<AObject*> Teapot::collideSphere( const float & radius, QVector3D & center, QVector3D * normal )
+QVector<AObject*> Teapot::collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal )
 {
-	QVector<AObject*> collides = AObject::collideSphere( radius, center, normal );
+	QVector<AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
 	float depth;
 	QVector3D tmpNormal;
 	/*
