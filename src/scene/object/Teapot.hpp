@@ -21,7 +21,7 @@ public:
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
-	virtual QVector<AObject*> collideSphere( const float & radius, QVector3D & center, QVector3D * normal = NULL );
+	virtual QVector<AObject*> collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal = NULL );
 
 private:
 	Material * mMaterial;

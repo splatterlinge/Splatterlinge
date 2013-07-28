@@ -54,7 +54,7 @@ void Minigun::updateSelf( const double & delta )
 			mTrailStart = worldPosition();
 			mTrailDirection = worldDirection();
 			mTrailLength = mRange;
-			AObject * target = world()->intersectLine( mTrailStart, mTrailDirection, mTrailLength );
+			AObject * target = world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength );
 			mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
 			ACreature * victim = dynamic_cast<ACreature*>(target);
 			if( victim )

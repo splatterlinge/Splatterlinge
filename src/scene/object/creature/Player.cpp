@@ -273,11 +273,11 @@ void Player::updateSelf( const double & delta )
 	}
 
 	QVector3D newPosition = position();
-	if( !( world()->collideSphere( mHeightAboveGround+0.1f, newPosition, &mGroundNormal ) ).isEmpty() )
+	if( !( world()->collideSphere( this, mHeightAboveGround+0.1f, newPosition, &mGroundNormal ) ).isEmpty() )
 	{
 		mOnGround = true;
 		newPosition = position();
-		if( !( world()->collideSphere( mHeightAboveGround, newPosition, &mGroundNormal ) ).isEmpty() )
+		if( !( world()->collideSphere( this, mHeightAboveGround, newPosition, &mGroundNormal ) ).isEmpty() )
 		{
 			setPosition( newPosition );
 			if( mVelocityY < 0.0f )
@@ -294,7 +294,7 @@ void Player::update2Self( const double & delta )
 	float length = 300.0f;
 	if( mDragTeapot || mDragTorch )
 	{
-		if( world()->intersectLine( position(), direction(), length, &mTargetNormal ) )
+		if( world()->intersectLine( this, position(), direction(), length, &mTargetNormal ) )
 		{
 			mTarget = position() + direction() * length;
 			if( mDragTeapot )
