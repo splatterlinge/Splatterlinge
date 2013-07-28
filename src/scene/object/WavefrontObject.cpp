@@ -9,7 +9,7 @@ WavefrontObject::WavefrontObject( Scene * scene, QString filename, float scale )
 
 	mModel = new StaticModel( mScene->glWidget(), mFilename );
 
-	setBoundingSphere( qMin( mModel->getSize().width(), mModel->getSize().height() )*mScale );
+	setBoundingSphere( qMin( mModel->getSize().width(), mModel->getSize().height() )*(mScale*2) );
 }
 
 WavefrontObject::~WavefrontObject()
