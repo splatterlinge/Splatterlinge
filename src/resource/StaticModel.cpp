@@ -225,7 +225,6 @@ StaticModel::StaticModel( GLWidget * widget, QString name ) :
 
 StaticModel::~StaticModel()
 {
-	//TODO: free data
 }
 
 void StaticModel::draw()

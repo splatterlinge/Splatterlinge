@@ -1,42 +1,40 @@
 #include "WavefrontObject.hpp"
 
 WavefrontObject::WavefrontObject( Scene * scene, QString filename, float scale ) :
-    AObject( scene )
+	AObject( scene )
 {
-    mScene = scene;
-    mFilename = filename;
-    mScale = scale;
+	mScene = scene;
+	mFilename = filename;
+	mScale = scale;
 
-    mModel = new StaticModel( mScene->glWidget(), mFilename );
+	mModel = new StaticModel( mScene->glWidget(), mFilename );
 
-    //setBoundingSphere( qMin( mModel->getSize().width(), mModel->getSize().height() )/2 );
+	setBoundingSphere( qMin( mModel->getSize().width(), mModel->getSize().height() )*mScale );
 }
 
 WavefrontObject::~WavefrontObject()
 {
-    // TODO
 }
 
 void WavefrontObject::updateSelf( const double & delta )
 {
-    // TODO
 }
 
 void WavefrontObject::drawSelf()
 {
-    glPushAttrib( GL_ENABLE_BIT );
-    glDisable( GL_CULL_FACE );
-    glEnable( GL_AUTO_NORMAL );
-    glEnable( GL_NORMALIZE );
-    glEnable( GL_LIGHTING );
+	glPushAttrib( GL_ENABLE_BIT );
+	glDisable( GL_CULL_FACE );
+	glEnable( GL_AUTO_NORMAL );
+	glEnable( GL_NORMALIZE );
+	glEnable( GL_LIGHTING );
 
-    glPushMatrix();
+	glPushMatrix();
 
-    glScalef( 1.0*mScale, 1.0*mScale, 1.0*mScale );
-    glColor3f( 1.0f, 1.0f, 1.0f );
+	glScalef( 1.0*mScale, 1.0*mScale, 1.0*mScale );
+	glColor3f( 1.0f, 1.0f, 1.0f );
 
-    mModel->draw();
+	mModel->draw();
 
-    glPopMatrix();
-    glPopAttrib();
+	glPopMatrix();
+	glPopAttrib();
 }

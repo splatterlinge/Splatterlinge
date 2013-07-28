@@ -30,6 +30,7 @@ Laser::~Laser()
 {
 	gluDeleteQuadric( mQuadric );
 	delete mMaterial;
+	delete mFireSound;
 }
 
 

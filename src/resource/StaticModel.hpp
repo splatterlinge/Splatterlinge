@@ -73,6 +73,8 @@ public:
 	StaticModel( GLWidget * widget, QString name );
 	virtual ~StaticModel();
 
+	QSizeF getSize() { return data()->size(); }
+
 	void draw();
 
 private:

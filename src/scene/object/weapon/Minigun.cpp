@@ -18,6 +18,7 @@ Minigun::Minigun( World * world ) :
 	mRange = 100.0f;
 	mTrailRadius = 0.01f;
 	mDamage = 5.0f;
+	mRotation = 0.0f;
 	mMaterial = new Material( scene()->glWidget(), "BlackSteel" );
 	mFireSound = new AudioSample( "./data/sound/minigun.ogg" );
 	mFireSound->setLooping( true );
@@ -28,6 +29,7 @@ Minigun::~Minigun()
 {
 	gluDeleteQuadric( mQuadric );
 	delete mMaterial;
+	delete mFireSound;
 }
 
 
