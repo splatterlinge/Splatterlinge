@@ -17,17 +17,17 @@ DebugWindow::DebugWindow( Scene * scene, QWidget * parent, Qt::WindowFlags f ) :
 	setWindowTitle( tr("Debug") );
 	setWindowOpacity( 0.8 );
 
-	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
+	mLayout = new QBoxLayout( QBoxLayout::TopToBottom, this );
 
 	mWireFrame = new QCheckBox( "WireFrame" );
 	QObject::connect( mWireFrame, SIGNAL(stateChanged(int)), this, SLOT(setWireFrame(int)) );
-	layout->addWidget( mWireFrame );
+	mLayout->addWidget( mWireFrame );
 
 	mObjectBoundingSpheres = new QCheckBox( "Bounding spheres for objects" );
 	QObject::connect( mObjectBoundingSpheres, SIGNAL(stateChanged(int)), this, SLOT(setObjectBoundingSpheres(int)) );
-	layout->addWidget( mObjectBoundingSpheres );
+	mLayout->addWidget( mObjectBoundingSpheres );
 
-	setLayout( layout );
+	setLayout( mLayout );
 
 	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint );
 }
@@ -35,6 +35,9 @@ DebugWindow::DebugWindow( Scene * scene, QWidget * parent, Qt::WindowFlags f ) :
 
 DebugWindow::~DebugWindow()
 {
+	delete mLayout;
+	delete mWireFrame;
+	delete mObjectBoundingSpheres;
 }
 
 

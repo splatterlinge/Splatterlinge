@@ -12,13 +12,16 @@
 
 
 SplatterSystem::SplatterSystem( GLWidget * glWidget, Terrain * terrain,
-		Material * splatterMaterial, Material * particleMaterial, int maxSplatters, int maxParticles ) :
+		const QString & splatterMaterialName, const QString & particleMaterialName,
+		const QString & burstAudioSampleName,
+		int maxSplatters, int maxParticles ) :
 	mGLWidget( glWidget ),
 	mTerrain( terrain ),
-	mSplatters( maxSplatters ),
-	mSplatterMaterial( splatterMaterial ),
-	mParticleMaterial( particleMaterial )
+	mSplatters( maxSplatters )
 {
+	mSplatterMaterial = new Material( glWidget, splatterMaterialName );
+	mParticleMaterial = new Material( glWidget, particleMaterialName );
+
 	mParticleSystem = new ParticleSystem( maxParticles );
 	mParticleSystem->setSize( 4.0f );
 	mParticleSystem->setGravity( QVector3D( 0.0f, -120.0f, 0.0f ) );
@@ -34,7 +37,7 @@ SplatterSystem::SplatterSystem( GLWidget * glWidget, Terrain * terrain,
 	mBurstSampleSources.resize( 4 );
 	for( int i=0; i<mBurstSampleSources.size(); ++i )
 	{
-		mBurstSampleSources[i] = new AudioSample( "./data/sound/splatter.ogg" );
+		mBurstSampleSources[i] = new AudioSample( burstAudioSampleName );
 		mBurstSampleSources[i]->setLooping( false );
 		mBurstSampleSources[i]->setRolloffFactor( 0.05f );
 	}

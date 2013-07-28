@@ -19,7 +19,7 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	setWindowTitle( tr("Graphics Options") );
 	setWindowOpacity( 0.8 );
 
-	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
+	mLayout = new QBoxLayout( QBoxLayout::TopToBottom, this );
 
 	mSplatterQualityLabel = new QLabel();
 	mSplatterQuality = new QSlider( Qt::Horizontal );
@@ -30,8 +30,8 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	mSplatterQuality->setValue( SplatterQuality::maximum() );
 	setSplatterQuality( mSplatterQuality->value() );
 	QObject::connect( mSplatterQuality, SIGNAL(valueChanged(int)), this, SLOT(setSplatterQuality(int)) );
-	layout->addWidget( mSplatterQualityLabel );
-	layout->addWidget( mSplatterQuality );
+	mLayout->addWidget( mSplatterQualityLabel );
+	mLayout->addWidget( mSplatterQuality );
 
 	mMaterialQualityLabel = new QLabel();
 	mMaterialQuality = new QSlider( Qt::Horizontal );
@@ -42,8 +42,8 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	mMaterialQuality->setValue( MaterialQuality::maximum() );
 	setMaterialQuality( mMaterialQuality->value() );
 	QObject::connect( mMaterialQuality, SIGNAL(valueChanged(int)), this, SLOT(setMaterialQuality(int)) );
-	layout->addWidget( mMaterialQualityLabel );
-	layout->addWidget( mMaterialQuality );
+	mLayout->addWidget( mMaterialQualityLabel );
+	mLayout->addWidget( mMaterialQuality );
 
 	mMaterialAnisotropyLabel = new QLabel();
 	mMaterialAnisotropy = new QSlider( Qt::Horizontal );
@@ -54,8 +54,8 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	mMaterialAnisotropy->setValue( Material::filterAnisotropy() );
 	setMaterialFilterAnisotropy( mMaterialAnisotropy->value() );
 	QObject::connect( mMaterialAnisotropy, SIGNAL(valueChanged(int)), this, SLOT(setMaterialFilterAnisotropy(int)) );
-	layout->addWidget( mMaterialAnisotropyLabel );
-	layout->addWidget( mMaterialAnisotropy );
+	mLayout->addWidget( mMaterialAnisotropyLabel );
+	mLayout->addWidget( mMaterialAnisotropy );
 
 	mFarPlaneLabel = new QLabel();
 	mFarPlane = new QSlider( Qt::Horizontal );
@@ -66,15 +66,15 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	mFarPlane->setValue( mScene->eye()->farPlane() );
 	setFarPlane( mFarPlane->value() );
 	QObject::connect( mFarPlane, SIGNAL(valueChanged(int)), this, SLOT(setFarPlane(int)) );
-	layout->addWidget( mFarPlaneLabel );
-	layout->addWidget( mFarPlane );
+	mLayout->addWidget( mFarPlaneLabel );
+	mLayout->addWidget( mFarPlane );
 
 	mMultiSample = new QCheckBox( "MultiSample (needs restart)" );
 	mMultiSample->setChecked( mScene->multiSample() );
 	QObject::connect( mMultiSample, SIGNAL(stateChanged(int)), this, SLOT(setMultiSample(int)) );
-	layout->addWidget( mMultiSample );
+	mLayout->addWidget( mMultiSample );
 
-	setLayout( layout );
+	setLayout( mLayout );
 
 	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint );
 }
@@ -82,6 +82,15 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 
 GfxOptionWindow::~GfxOptionWindow()
 {
+	delete mMultiSample;
+	delete mFarPlaneLabel;
+	delete mMaterialAnisotropy;
+	delete mMaterialAnisotropyLabel;
+	delete mMaterialQuality;
+	delete mMaterialQualityLabel;
+	delete mSplatterQuality;
+	delete mSplatterQualityLabel;
+	delete mLayout;
 }
 
 

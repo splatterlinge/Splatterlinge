@@ -10,6 +10,7 @@ class Scene;
 class QLabel;
 class QSlider;
 class QCheckBox;
+class QBoxLayout;
 
 
 class GfxOptionWindow : public QWidget
@@ -22,6 +23,7 @@ public:
 
 private:
 	Scene * mScene;
+	QBoxLayout * mLayout;
 	QLabel * mSplatterQualityLabel;
 	QSlider * mSplatterQuality;
 	QLabel * mMaterialQualityLabel;

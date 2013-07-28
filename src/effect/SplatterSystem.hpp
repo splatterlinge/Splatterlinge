@@ -18,8 +18,10 @@ class Terrain;
 class SplatterSystem : ParticleSystem::Interactable
 {
 public:
-	SplatterSystem( GLWidget * glWidget, Terrain * terrain, Material * splatterMaterial, Material * particleMaterial,
-			int maxSplatters = 200, int maxParticles = 500 );
+	SplatterSystem( GLWidget * glWidget, Terrain * terrain,
+		const QString & splatterMaterialName, const QString & particleMaterialName,
+		const QString & burstAudioSampleName,
+		int maxSplatters = 200, int maxParticles = 500 );
 	virtual ~SplatterSystem();
 	void update( const double & delta );
 	void draw( const QMatrix4x4 & modelView );
@@ -29,7 +31,7 @@ public:
 	Material * splatterMaterial() { return mSplatterMaterial; }
 	void setSplatterMaterial( Material * splatterMaterial ) { mSplatterMaterial = splatterMaterial; }
 
-	Material * particleMaterialMaterial() { return mParticleMaterial; }
+	Material * particleMaterial() { return mParticleMaterial; }
 	void setParticleMaterial( Material * particleMaterial ) { mParticleMaterial = particleMaterial; }
 
 	const bool & splatBelow() const { return mSplatBelow; }

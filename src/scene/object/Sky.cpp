@@ -280,11 +280,15 @@ Sky::~Sky()
 {
 	scene()->glWidget()->deleteTexture( mDomeMap );
 	scene()->glWidget()->deleteTexture( mStarCubeMap );
+	scene()->glWidget()->deleteTexture( mSunFlareMap );
 	delete mDomeShader;
 	delete mStarCubeShader;
 	delete mCloudShader;
-	sCubeVertexBuffer.destroy();
+	mCloudPlaneIndexBuffer.destroy();
+	mCloudPlaneVertexBuffer.destroy();
+
 	sCubeIndexBuffer.destroy();
+	sCubeVertexBuffer.destroy();
 }
 
 
