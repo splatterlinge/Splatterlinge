@@ -129,10 +129,24 @@ public:
 	const float & boundingSphereRadius() const { return mBoundingSphereRadius; }
 
 	/// Recursively intersect a line with an object and the object's objects
+	/**
+	 * @param exclude Exclude this object and all subordinates - NULL to disable exclusion.
+	 * @param origin The origin of the line.
+	 * @param direction The direction of the line.
+	 * @param length Length of the line from origin - if an intersection occured,
+	 *  this will be set to the distance from origin to the intersection point.
+	 * @param normal Optionally return surface normal.
+	 */
 	virtual AObject * intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
 		float & length, QVector3D * normal = NULL );
 
 	/// Recursively collision-test a sphere with an object and the object's objects
+	/**
+	 * @param exclude Exclude this object and all subordinates - NULL to disable exclusion.
+	 * @param radius The radius of the sphere.
+	 * @param center The center of the sphere - if an intersection occurs, this will be set to a nonintersecting position.
+	 * @param normal Optionally return surface normal.
+	 */
 	virtual QVector<AObject*> collideSphere( const AObject * exclude, const float & radius,
 		QVector3D & center, QVector3D * normal = NULL );
 
