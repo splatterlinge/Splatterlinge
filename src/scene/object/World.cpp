@@ -99,8 +99,9 @@ World::World( Scene * scene, QString name ) :
 	(
 		scene->glWidget(),
 		mLandscape->terrain(),
-		new Material( scene->glWidget(), "SplatterBig" ),
-		new Material( scene->glWidget(), "Splatter" )
+		"SplatterBig",
+		"Splatter",
+		"./data/sound/splatter.ogg"
 	);
 	mSplatterInteractor = new SplatterInteractor( *this );
 	mSplatterSystem->particleSystem()->setInteractionCallback( mSplatterInteractor );

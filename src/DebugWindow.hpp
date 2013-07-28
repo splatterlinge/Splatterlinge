@@ -9,6 +9,7 @@ class Scene;
 
 class QSlider;
 class QCheckBox;
+class QBoxLayout;
 
 
 class DebugWindow : public QWidget
@@ -21,6 +22,7 @@ public:
 
 private:
 	Scene * mScene;
+	QBoxLayout * mLayout;
 	QCheckBox * mWireFrame;
 	QCheckBox * mObjectBoundingSpheres;
 

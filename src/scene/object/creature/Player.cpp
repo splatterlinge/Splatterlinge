@@ -127,7 +127,8 @@ void Player::mousePressEvent( QGraphicsSceneMouseEvent * event )
 {
 	if( event->button() == Qt::LeftButton )
 	{
-		(*mCurrentWeapon)->triggerPressed();
+		if( mCurrentWeapon != mWeapons.end() )
+			(*mCurrentWeapon)->triggerPressed();
 	}
 	else if( event->button() == Qt::RightButton )
 	{
@@ -145,7 +146,8 @@ void Player::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 	if( event->button() == Qt::LeftButton )
 	{
-		(*mCurrentWeapon)->triggerReleased();
+		if( mCurrentWeapon != mWeapons.end() )
+			(*mCurrentWeapon)->triggerReleased();
 	}
 	else if( event->button() == Qt::RightButton )
 	{
@@ -160,17 +162,20 @@ void Player::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 
 void Player::mouseWheelEvent( QGraphicsSceneWheelEvent * event )
 {
-	if( event->delta() > 0 && mCurrentWeapon != --mWeapons.end() )
+	if( mWeapons.size() )
 	{
-		remove( *mCurrentWeapon );
-		++mCurrentWeapon;
-		add( *mCurrentWeapon );
-	}
-	else if( event->delta() < 0 && mCurrentWeapon != mWeapons.begin() )
-	{
-		remove( *mCurrentWeapon );
-		--mCurrentWeapon;
-		add( *mCurrentWeapon );
+		if( event->delta() > 0 && mCurrentWeapon != --mWeapons.end() )
+		{
+			remove( *mCurrentWeapon );
+			++mCurrentWeapon;
+			add( *mCurrentWeapon );
+		}
+		else if( event->delta() < 0 && mCurrentWeapon != mWeapons.begin() )
+		{
+			remove( *mCurrentWeapon );
+			--mCurrentWeapon;
+			add( *mCurrentWeapon );
+		}
 	}
 }
 
@@ -188,7 +193,8 @@ void Player::updateSelf( const double & delta )
 	QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, mAxisRotationY );
 	setRotation( qY * qX );
 
-	(*mCurrentWeapon)->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
+	if( mCurrentWeapon != mWeapons.end() )
+		(*mCurrentWeapon)->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
 
 	if( mGodMode )
 	{

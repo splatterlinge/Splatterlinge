@@ -23,6 +23,7 @@ Torch::Torch( World * world ) :
 
 Torch::~Torch()
 {
+	scene()->glWidget()->deleteTexture( mFlareMap );
 	world()->removeLightSource( this );
 }
 

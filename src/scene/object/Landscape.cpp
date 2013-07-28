@@ -279,6 +279,7 @@ Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, 
 
 Landscape::Blob::~Blob()
 {
+	mGLWidget->deleteTexture( mBlobMap );
 	delete mMaterial;
 }
 

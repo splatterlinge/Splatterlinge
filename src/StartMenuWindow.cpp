@@ -38,6 +38,9 @@ StartMenuWindow::~StartMenuWindow()
 {
 	delete mHelpWindow;
 	delete mGfxOptionWindow;
+	delete mNewGame;
+	delete mOptions;
+	delete mEnd;
 }
 
 
