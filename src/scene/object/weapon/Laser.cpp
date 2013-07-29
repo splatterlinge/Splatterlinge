@@ -12,6 +12,7 @@ Laser::Laser( World * world ) :
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
 
+	mDrawn = false;
 	mTrailVisibilityDuration = 1.0f;
 	mCoolDown = 2.0f;
 	mHeat = 0.0f;
@@ -43,6 +44,18 @@ void Laser::triggerPressed()
 void Laser::triggerReleased()
 {
 	mFired = false;
+}
+
+
+void Laser::pull()
+{
+	mDrawn = true;
+}
+
+
+void Laser::holster()
+{
+	mDrawn = false;
 }
 
 
@@ -83,9 +96,12 @@ void Laser::updateSelf( const double & delta )
 
 void Laser::drawSelf()
 {
-	mMaterial->bind();
-	gluCylinder( mQuadric, 0.1f, 0.1f, 0.4f, 16, 16 );
-	mMaterial->release();
+	if( mDrawn )
+	{
+		mMaterial->bind();
+		gluCylinder( mQuadric, 0.1f, 0.1f, 0.4f, 16, 16 );
+		mMaterial->release();
+	}
 }
 
 

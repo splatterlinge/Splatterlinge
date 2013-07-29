@@ -33,7 +33,11 @@ Player::Player( World * world ) :
 	mWeapons.append( QSharedPointer<Minigun>( new Minigun( world ) ) );
 	mWeapons.append( QSharedPointer<Laser>( new Laser( world ) ) );
 	mCurrentWeapon = mWeapons.begin();
-	add( (*mCurrentWeapon) );
+	foreach( QSharedPointer<AWeapon> w, mWeapons )
+	{
+		add( w );
+	}
+	(*mCurrentWeapon)->pull();
 
 	mTorch = QSharedPointer<Torch>( new Torch( world ) );
 	mTorch->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) + 1.0f );
@@ -166,15 +170,15 @@ void Player::mouseWheelEvent( QGraphicsSceneWheelEvent * event )
 	{
 		if( event->delta() > 0 && mCurrentWeapon != --mWeapons.end() )
 		{
-			remove( *mCurrentWeapon );
+			(*mCurrentWeapon)->holster();
 			++mCurrentWeapon;
-			add( *mCurrentWeapon );
+			(*mCurrentWeapon)->pull();
 		}
 		else if( event->delta() < 0 && mCurrentWeapon != mWeapons.begin() )
 		{
-			remove( *mCurrentWeapon );
+			(*mCurrentWeapon)->holster();
 			--mCurrentWeapon;
-			add( *mCurrentWeapon );
+			(*mCurrentWeapon)->pull();
 		}
 	}
 }

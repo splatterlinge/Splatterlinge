@@ -19,6 +19,8 @@ public:
 
 	virtual void triggerPressed() = 0;
 	virtual void triggerReleased() = 0;
+	virtual void holster() = 0;
+	virtual void pull() = 0;
 };
 
 

@@ -22,9 +22,12 @@ public:
 
 	virtual void triggerPressed();
 	virtual void triggerReleased();
+	virtual void holster();
+	virtual void pull();
 
 private:
 	GLUquadric * mQuadric;
+	bool mDrawn;
 	bool mFired;
 	float mHeat;
 	float mCoolDown;

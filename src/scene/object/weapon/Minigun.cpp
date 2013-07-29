@@ -12,6 +12,7 @@ Minigun::Minigun( World * world ) :
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
 
+	mDrawn = false;
 	mCoolDown = 0.0f;
 	mTrailAlpha = 0.0f;
 	mFired = false;
@@ -45,6 +46,18 @@ void Minigun::triggerReleased()
 }
 
 
+void Minigun::pull()
+{
+	mDrawn = true;
+}
+
+
+void Minigun::holster()
+{
+	mDrawn = false;
+}
+
+
 void Minigun::updateSelf( const double & delta )
 {
 	if( mFired )
@@ -61,10 +74,7 @@ void Minigun::updateSelf( const double & delta )
 			ACreature * victim = dynamic_cast<ACreature*>(target);
 			if( victim )
 			{
-				if( victim->life() != 0 )
-				{
-					victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
-				}
+				victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
 			}
 		}
 
@@ -114,6 +124,9 @@ void Minigun::updateSelf( const double & delta )
 
 void Minigun::drawSelf()
 {
+	if( !mDrawn )
+		return;
+
 	mMaterial->bind();
 
 	glPushMatrix();
