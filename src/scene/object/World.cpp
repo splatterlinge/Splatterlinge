@@ -1,7 +1,7 @@
 #include "World.hpp"
 
 #include <scene/Scene.hpp>
-#include <utility/random.hpp>
+#include <utility/RandomNumber.hpp>
 #include <geometry/ParticleSystem.hpp>
 #include <effect/SplatterSystem.hpp>
 #include "Landscape.hpp"
@@ -237,6 +237,6 @@ void World::SplatterInteractor::particleInteraction( const double & delta, Parti
 	{
 		particle.setLife( 0.0f );
 		if( !belowWater && SplatterQuality::maximum() == SplatterQuality::HIGH )
-			mWorld.splatterSystem()->splat( particle.position(), mWorld.splatterSystem()->particleSystem()->size() * randomMinMax( 0.5f, 2.0f ) );
+			mWorld.splatterSystem()->splat( particle.position(), mWorld.splatterSystem()->particleSystem()->size() * RandomNumber::minMax( 0.5f, 2.0f ) );
 	}
 }

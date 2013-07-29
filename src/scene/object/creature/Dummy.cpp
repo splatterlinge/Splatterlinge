@@ -3,8 +3,8 @@
 #include <scene/object/World.hpp>
 #include <resource/Material.hpp>
 #include <effect/SplatterSystem.hpp>
-#include <utility/random.hpp>
-#include <utility/quaternion.hpp>
+#include <utility/RandomNumber.hpp>
+#include <utility/Quaternion.hpp>
 #include <utility/Sphere.hpp>
 
 #include <math.h>
@@ -31,7 +31,7 @@ Dummy::~Dummy()
 
 static QVector3D randomPointOnWorld( World * world )
 {
-	QVector3D pos( randomMinMax(-100,100), 0, randomMinMax(-100,100) );
+	QVector3D pos( RandomNumber::minMax(-100,100), 0, RandomNumber::minMax(-100,100) );
 	pos.setY( world->landscape()->terrain()->getHeight( pos ) );
 	return pos;
 }
@@ -54,7 +54,7 @@ void Dummy::updateSelf( const double & delta )
 		{
 			mTarget = world()->teapot()->worldPosition();
 			QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
-			QQuaternion targetRotation = quaternionLookAt( directionToTarget, QVector3D(0,1,0) );
+			QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D(0,1,0) );
 			setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
 			setPosition( position() + direction()*delta*10.0 );
 			if( life() <= 0 )

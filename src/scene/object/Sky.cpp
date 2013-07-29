@@ -1,6 +1,6 @@
 #include "Sky.hpp"
 
-#include <utility/interpolate.hpp>
+#include <utility/Interpolation.hpp>
 #include <resource/Shader.hpp>
 #include <scene/Scene.hpp>
 #include <scene/TextureRenderer.hpp>
@@ -183,7 +183,7 @@ Sky::Sky( Scene * scene, QString name ) :
 	mCloudPlaneVertexBuffer.create();
 	mCloudPlaneVertexBuffer.bind();
 	mCloudPlaneVertexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
-	mCloudPlaneVertexBuffer.allocate( mCloudPlaneVertices.constData(), mCloudPlaneVertices.size()*sizeof(Vertex) );
+	mCloudPlaneVertexBuffer.allocate( mCloudPlaneVertices.constData(), mCloudPlaneVertices.size()*sizeof(VertexP3fT2f) );
 	mCloudPlaneVertexBuffer.release();
 
 	mCloudPlaneIndex.resize( 2 * (mCloudPlaneRes-1) * mCloudPlaneRes );
@@ -326,17 +326,17 @@ void Sky::updateSelf( const double & delta )
 	QVector4D colorBF( qRed(colorB), qGreen(colorB), qBlue(colorB), qAlpha(colorB) );
 	colorBF /= 255.0f;
 
-	mBaseColor = interpolateLinear( colorAF, colorBF, skyMapTime-floorf( skyMapTime ) );
+	mBaseColor = Interpolation::linear( colorAF, colorBF, skyMapTime-floorf( skyMapTime ) );
 
-	float diffuseFactor = interpolateLinear( mDiffuseFactorDay, mDiffuseFactorNight, (float)((sunDirection().y()+1.0f)*0.5f) );
+	float diffuseFactor = Interpolation::linear( mDiffuseFactorDay, mDiffuseFactorNight, (float)((sunDirection().y()+1.0f)*0.5f) );
 	if( diffuseFactor > mDiffuseFactorMax )
 		diffuseFactor = mDiffuseFactorMax;
 
-	float specularFactor = interpolateLinear( mSpecularFactorDay, mSpecularFactorNight, (float)((sunDirection().y()+1.0f)*0.5f) );
+	float specularFactor = Interpolation::linear( mSpecularFactorDay, mSpecularFactorNight, (float)((sunDirection().y()+1.0f)*0.5f) );
 	if( diffuseFactor > mSpecularFactorMax )
 		diffuseFactor = mSpecularFactorMax;
 
-	float ambientFactor = interpolateLinear( mAmbientFactorDay, mAmbientFactorNight, (float)((sunDirection().y()+1.0f)*0.5f) );
+	float ambientFactor = Interpolation::linear( mAmbientFactorDay, mAmbientFactorNight, (float)((sunDirection().y()+1.0f)*0.5f) );
 	if( ambientFactor > mAmbientFactorMax )
 		ambientFactor = mAmbientFactorMax;
 
@@ -468,11 +468,9 @@ void Sky::drawCloudPlane()
 	mCloudShader->program()->setUniformValue( mCloudShader_horizonFade, mCloudHorizonFade );
 	mCloudPlaneVertexBuffer.bind();
 	mCloudPlaneIndexBuffer.bind();
-	glEnableClientState( GL_VERTEX_ARRAY );
 	glEnableClientState( GL_INDEX_ARRAY );
-	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	glVertexPointer( 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,position) );
-	glTexCoordPointer( 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,texCoord) );
+	VertexP3fT2f::glEnableClientState();
+	VertexP3fT2f::glPointerVBO();
 	for( int slice=0; slice<mCloudPlaneRes-1; slice++ )
 	{
 		glDrawElements(
@@ -484,9 +482,8 @@ void Sky::drawCloudPlane()
 			) ) )
 		);
 	}
-	glDisableClientState( GL_VERTEX_ARRAY );
 	glDisableClientState( GL_INDEX_ARRAY );
-	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	VertexP3fT2f::glDisableClientState();
 	mCloudPlaneIndexBuffer.release();
 	mCloudPlaneVertexBuffer.release();
 	mCloudShader->release();

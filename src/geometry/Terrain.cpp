@@ -93,7 +93,7 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 	mVertexBuffer.create();
 	mVertexBuffer.bind();
 	mVertexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
-	mVertexBuffer.allocate( mVertices.data(), mVertices.size()*sizeof(Vertex) );
+	mVertexBuffer.allocate( mVertices.data(), mVertices.size()*VertexP3fN3fT2f::size() );
 	mVertexBuffer.release();
 
 	// indices
@@ -133,14 +133,9 @@ void Terrain::drawPatchMap( const QRect & rect )
 
 	mVertexBuffer.bind();
 	mIndexBuffer.bind();
-	glEnableClientState( GL_VERTEX_ARRAY );
 	glEnableClientState( GL_INDEX_ARRAY );
-	glEnableClientState( GL_NORMAL_ARRAY );
-	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-
-	glVertexPointer( 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,position) );
-	glNormalPointer( GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,normal) );
-	glTexCoordPointer( 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,texCoord) );
+	VertexP3fN3fT2f::glEnableClientState();
+	VertexP3fN3fT2f::glPointerVBO();
 
 	for( int slice=rectToDraw.y(); slice<rectToDraw.y()+rectToDraw.height(); slice++ )
 	{
@@ -167,10 +162,9 @@ void Terrain::drawPatchMap( const QRect & rect )
 		*/
 	}
 
-	glDisableClientState( GL_VERTEX_ARRAY );
 	glDisableClientState( GL_INDEX_ARRAY );
-	glDisableClientState( GL_NORMAL_ARRAY );
-	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	VertexP3fN3fT2f::glDisableClientState();
+
 	mVertexBuffer.release();
 	mIndexBuffer.release();
 }
@@ -180,14 +174,9 @@ void Terrain::draw()
 {
 	mVertexBuffer.bind();
 	mIndexBuffer.bind();
-	glEnableClientState( GL_VERTEX_ARRAY );
 	glEnableClientState( GL_INDEX_ARRAY );
-	glEnableClientState( GL_NORMAL_ARRAY );
-	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-
-	glVertexPointer( 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,position) );
-	glNormalPointer( GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,normal) );
-	glTexCoordPointer( 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex,texCoord) );
+	VertexP3fN3fT2f::glEnableClientState();
+	VertexP3fN3fT2f::glPointerVBO();
 
 	for( int slice=0; slice<mMapSize.height()-1; slice++ )
 	{
@@ -201,10 +190,8 @@ void Terrain::draw()
 		);
 	}
 
-	glDisableClientState( GL_VERTEX_ARRAY );
 	glDisableClientState( GL_INDEX_ARRAY );
-	glDisableClientState( GL_NORMAL_ARRAY );
-	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	VertexP3fN3fT2f::glDisableClientState();
 	mVertexBuffer.release();
 	mIndexBuffer.release();
 }

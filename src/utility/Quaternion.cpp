@@ -1,5 +1,5 @@
-#include "quaternion.hpp"
-#include "vector.hpp"
+#include "Quaternion.hpp"
+#include "Vector.hpp"
 
 #include <math.h>
 #include <float.h>
@@ -7,11 +7,11 @@
 
 // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
 
-QQuaternion quaternionLookAt( const QVector3D & lookAt, const QVector3D & upDirection )
+QQuaternion Quaternion::lookAt( const QVector3D & lookAt, const QVector3D & upDirection )
 {
 	QQuaternion ret;
 	QVector3D forward = lookAt.normalized();
-	QVector3D up = vectorOrthoNormalize( lookAt, upDirection );
+	QVector3D up = Vector::orthoNormalize( lookAt, upDirection );
 	if( up.isNull() )	// we are looking parallel to the up vector
 		return QQuaternion();
 	QVector3D right = QVector3D::crossProduct( up, forward );

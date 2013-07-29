@@ -37,11 +37,8 @@ private:
 
 
 /// Material's shader variants
-class MaterialShaderVariant
+namespace MaterialShaderVariant
 {
-	MaterialShaderVariant() {}
-	~MaterialShaderVariant() {}
-public:
 	enum Type
 	{
 		DEFAULT		= 0,

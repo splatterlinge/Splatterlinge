@@ -2,8 +2,8 @@
 
 #include <GLWidget.hpp>
 #include <geometry/Terrain.hpp>
-#include <utility/interpolate.hpp>
-#include <utility/random.hpp>
+#include <utility/Interpolation.hpp>
+#include <utility/RandomNumber.hpp>
 #include <resource/Material.hpp>
 #include <resource/AudioSample.hpp>
 
@@ -84,7 +84,7 @@ void SplatterSystem::draw( const QMatrix4x4 & modelView )
 		if( mSplatters[i].fade <= 0.0f )
 			continue;
 
-		QVector4D c = interpolateLinear( QVector4D(1.0f,1.0f,1.0f,1.0f), mSplatterMaterial->constData()->emission(), sqrtf(mSplatters[i].fade) );
+		QVector4D c = Interpolation::linear( QVector4D(1.0f,1.0f,1.0f,1.0f), mSplatterMaterial->constData()->emission(), sqrtf(mSplatters[i].fade) );
 		mSplatterMaterial->overrideEmission( c );
 
 		glPushMatrix();
@@ -122,7 +122,7 @@ void SplatterSystem::spray( const QVector3D & source, float size )
 	mParticleSystem->emitSpherical( source, 0.05f*size*size, 1.0f*size, 1.75f*size );
 
 	if( mSplatBelow && mTerrain->getHeightAboveGround( source ) < size*0.5f )
-		splat( source, size * randomMinMax( 0.75f, 1.0f ) );
+		splat( source, size * RandomNumber::minMax( 0.75f, 1.0f ) );
 
 	int maxSecOffset = 0;
 	for( int i=0; i<mBurstSampleSources.size(); ++i )
@@ -139,7 +139,7 @@ void SplatterSystem::spray( const QVector3D & source, float size )
 	}
 	mBurstSampleSources[maxSecOffset]->setPosition( source );
 	mBurstSampleSources[maxSecOffset]->rewind();
-	mBurstSampleSources[maxSecOffset]->setPitch( randomMinMax( 1.0f-mBurstPitchRange*0.5, 1.0+mBurstPitchRange*0.5 ) );
+	mBurstSampleSources[maxSecOffset]->setPitch( RandomNumber::minMax( 1.0f-mBurstPitchRange*0.5, 1.0+mBurstPitchRange*0.5 ) );
 	mBurstSampleSources[maxSecOffset]->play();
 }
 

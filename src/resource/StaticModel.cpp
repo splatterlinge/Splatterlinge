@@ -134,7 +134,7 @@ bool StaticModelData::parse()
 		else if( keyword == "f" )
 		{
 			Face face;
-			Vertex vertex;
+			VertexP3fN3fT2f vertex;
 			QStringList points;
 
 			while( !fields.isEmpty() )
@@ -146,7 +146,7 @@ bool StaticModelData::parse()
 					vertex.texCoord = texCoords.at( points.takeFirst().toInt()-1 );
 					vertex.normal = normals.at( points.takeFirst().toInt()-1 );
 
-					face.points->append( vertex );
+					face.points.append( vertex );
 					face.material = material;
 				}
 			}
@@ -183,7 +183,7 @@ bool StaticModelData::parse()
 			count = 0;
 		}
 
-		foreach( Vertex vertex, *face.points )
+		foreach( VertexP3fN3fT2f vertex, face.points )
 		{
 			if( mVertices.indexOf( vertex ) == -1 )
 			{
@@ -200,7 +200,7 @@ bool StaticModelData::parse()
 	mVertexBuffer.create();
 	mVertexBuffer.bind();
 	mVertexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
-	mVertexBuffer.allocate( mVertices.constData(), mVertices.size() * sizeof( Vertex ) );
+	mVertexBuffer.allocate( mVertices.constData(), mVertices.size() * sizeof( VertexP3fN3fT2f ) );
 	mVertexBuffer.release();
 
 	mIndexBuffer = QGLBuffer( QGLBuffer::IndexBuffer );
@@ -232,14 +232,9 @@ void StaticModel::draw()
 	data()->vertexBuffer().bind();
 	data()->indexBuffer().bind();
 
-	glEnableClientState( GL_VERTEX_ARRAY );
-	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-	glEnableClientState( GL_NORMAL_ARRAY );
 	glEnableClientState( GL_INDEX_ARRAY );
-
-	glVertexPointer( 3, GL_FLOAT, sizeof( Vertex ), (void*)offsetof(Vertex,position) );
-	glTexCoordPointer( 2, GL_FLOAT, sizeof( Vertex ), (void*)offsetof(Vertex,texCoord) );
-	glNormalPointer( GL_FLOAT, sizeof( Vertex ), (void*)offsetof(Vertex,normal) );
+	VertexP3fN3fT2f::glEnableClientState();
+	VertexP3fN3fT2f::glPointerVBO();
 
 	foreach( Part part, data()->parts() )
 	{
@@ -249,12 +244,12 @@ void StaticModel::draw()
 		}
 
 		glDrawElements(
-					GL_TRIANGLES,
-					part.count,
-					GL_UNSIGNED_INT,
-					(void*)((size_t)(sizeof(unsigned int)*(	// convert index to pointer
-						part.start		// index to start
-					) ) )
+			GL_TRIANGLES,
+			part.count,
+			GL_UNSIGNED_INT,
+			(void*)((size_t)(sizeof(unsigned int)*(	// convert index to pointer
+				part.start		// index to start
+			) ) )
 		);
 
 		if( part.material )
@@ -264,9 +259,7 @@ void StaticModel::draw()
 	}
 
 	glDisableClientState( GL_INDEX_ARRAY );
-	glDisableClientState( GL_NORMAL_ARRAY );
-	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-	glDisableClientState( GL_VERTEX_ARRAY );
+	VertexP3fN3fT2f::glDisableClientState();
 
 	data()->vertexBuffer().release();
 	data()->indexBuffer().release();

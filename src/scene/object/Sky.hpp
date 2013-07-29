@@ -11,6 +11,7 @@
 #include <resource/Shader.hpp>
 #include <scene/object/AObject.hpp>
 #include <utility/OcclusionTest.hpp>
+#include <geometry/Vertex.hpp>
 
 
 class Scene;
@@ -63,13 +64,6 @@ private:
 	static QGLBuffer sCubeIndexBuffer;
 	static QGLBuffer sCubeVertexBuffer;
 
-	class Vertex
-	{
-	public:
-		Vertex() : position(), texCoord() {}
-		QVector3D position;
-		QVector2D texCoord;
-	};
 	Shader * mCloudShader;
 	int mCloudShader_cloudMap;
 	int mCloudShader_cloudiness;
@@ -79,7 +73,7 @@ private:
 	float mCloudCloudiness;
 	float mCloudHorizonFade;
 	QVector<unsigned short> mCloudPlaneIndex;
-	QVector<Vertex> mCloudPlaneVertices;
+	QVector<VertexP3fT2f> mCloudPlaneVertices;
 	QGLBuffer mCloudPlaneIndexBuffer;
 	QGLBuffer mCloudPlaneVertexBuffer;
 	int mCloudPlaneRes;

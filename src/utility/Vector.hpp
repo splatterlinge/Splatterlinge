@@ -5,7 +5,10 @@
 #include <QVector3D>
 
 
-QVector3D vectorOrthoNormalize( const QVector3D & fixed, const QVector3D & v );
+namespace Vector
+{
+	QVector3D orthoNormalize( const QVector3D & fixed, const QVector3D & v );
+}
 
 
 #endif

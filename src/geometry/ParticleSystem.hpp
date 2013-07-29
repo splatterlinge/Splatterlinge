@@ -1,6 +1,8 @@
 #ifndef GEOMETRY_PARTICLESYSTEM_INCLUDED
 #define GEOMETRY_PARTICLESYSTEM_INCLUDED
 
+#include "Vertex.hpp"
+
 #include <QVector>
 #include <QVector2D>
 #include <QVector3D>
@@ -63,20 +65,13 @@ public:
 protected:
 
 private:
-	class ParticleVertex
-	{
-	public:
-		QVector3D position;
-		QVector3D normal;
-		QVector2D coord;
-	};
 	float mMinLife;
 	float mMaxLife;
 	float mDrag;
 	float mSize;
 	QVector3D mGravity;
 	QVector<Particle> mParticles;
-	QVector<ParticleVertex> mParticleVertices;
+	QVector<VertexP3fN3fT2f> mParticleVertices;
 	Interactable * mInteractionCallback;
 };
 

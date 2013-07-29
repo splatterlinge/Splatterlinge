@@ -1,6 +1,8 @@
 #ifndef GEOMETRY_TERRAIN_INCLUDED
 #define GEOMETRY_TERRAIN_INCLUDED
 
+#include "Vertex.hpp"
+
 #include <GLWidget.hpp>
 #include <utility/Triangle.hpp>
 
@@ -125,23 +127,15 @@ public:
 protected:
 
 private:
-	class Vertex
-	{
-	public:
-		Vertex() : position(), normal(0,1,0), texCoord() {}
-		QVector3D position;
-		QVector3D normal;
-		QVector2D texCoord;
-	};
-	Vertex & vertex( const int & x, const int & y );
-	Vertex & vertex( const QPoint & p );
+	VertexP3fN3fT2f & vertex( const int & x, const int & y );
+	VertexP3fN3fT2f & vertex( const QPoint & p );
 
 	bool getLineQuadIntersection( const QVector3D & origin, const QVector3D & direction, const QPoint & quadMapCoord, float & length ) const;
 
 	QSize mMapSize;
 	QVector3D mOffset;
 	QVector3D mSize;
-	QVector<Vertex> mVertices;
+	QVector<VertexP3fN3fT2f> mVertices;
 	QGLBuffer mIndexBuffer;
 	QGLBuffer mVertexBuffer;
 	QSizeF mToMapFactor;
@@ -300,13 +294,13 @@ inline const QVector3D & Terrain::getVertexNormal( const QPoint & p ) const
 }
 
 
-inline Terrain::Vertex & Terrain::vertex( const int & x, const int & y )
+inline VertexP3fN3fT2f & Terrain::vertex( const int & x, const int & y )
 {
 	return mVertices[x+y*mMapSize.width()];
 }
 
 
-inline Terrain::Vertex & Terrain::vertex( const QPoint & p )
+inline VertexP3fN3fT2f & Terrain::vertex( const QPoint & p )
 {
 	return vertex( p.x(), p.y() );
 }

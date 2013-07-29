@@ -4,7 +4,7 @@
 #include "GLWidget.hpp"
 #include "AResource.hpp"
 #include "Material.hpp"
-#include "utility/Vertex.hpp"
+#include <geometry/Vertex.hpp>
 
 #include <QGLBuffer>
 #include <QFile>
@@ -13,17 +13,15 @@
 class Face
 {
 public:
-	Face() {
-		points = new QVector<Vertex>();
-	}
+	Face() {}
 
-	QVector<Vertex> * points;
+	QVector<VertexP3fN3fT2f> points;
 	QString material;
 
 	bool operator==( const Face & other )
 	{
 		return points == other.points
-				&& material == other.material;
+			&& material == other.material;
 	}
 };
 
@@ -59,7 +57,7 @@ protected:
 	QString mName;
 	QSizeF mSize;
 	QVector<Part> mParts;
-	QVector<Vertex> mVertices;
+	QVector<VertexP3fN3fT2f> mVertices;
 	QVector<unsigned int> mIndices;
 	QGLBuffer mVertexBuffer;
 	QGLBuffer mIndexBuffer;

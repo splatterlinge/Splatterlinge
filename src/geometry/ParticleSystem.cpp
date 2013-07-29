@@ -1,7 +1,7 @@
 #include "ParticleSystem.hpp"
 
 #include <GLWidget.hpp>
-#include <utility/random.hpp>
+#include <utility/RandomNumber.hpp>
 
 #include <math.h>
 
@@ -82,16 +82,16 @@ void ParticleSystem::draw( const QMatrix4x4 & modelView )
 			switch( nextCoord & 0x03 )	// modulo 4
 			{
 			case 0:
-				mParticleVertices[current].coord = QVector2D(0,0);
+				mParticleVertices[current].texCoord = QVector2D(0,0);
 				break;
 			case 1:
-				mParticleVertices[current].coord = QVector2D(1,0);
+				mParticleVertices[current].texCoord = QVector2D(1,0);
 				break;
 			case 2:
-				mParticleVertices[current].coord = QVector2D(1,1);
+				mParticleVertices[current].texCoord = QVector2D(1,1);
 				break;
 			case 3:
-				mParticleVertices[current].coord = QVector2D(0,1);
+				mParticleVertices[current].texCoord = QVector2D(0,1);
 				break;
 			}
 			++nextCoord;
@@ -105,20 +105,15 @@ void ParticleSystem::draw( const QMatrix4x4 & modelView )
 		glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
 		glClientActiveTexture( GL_TEXTURE0 );
+		VertexP3fN3fT2f::glEnableClientState();
 
-		glEnableClientState( GL_VERTEX_ARRAY );
-		glEnableClientState( GL_NORMAL_ARRAY );
-		glEnableClientState( GL_TEXTURE_COORD_ARRAY );
-
-		glVertexPointer( 3, GL_FLOAT, sizeof(ParticleVertex), &(mParticleVertices.constData()->position) );
-		glNormalPointer( GL_FLOAT, sizeof(ParticleVertex), &(mParticleVertices.constData()->normal) );
-		glTexCoordPointer( 2, GL_FLOAT, sizeof(ParticleVertex), &(mParticleVertices.constData()->coord) );
+		glVertexPointer( 3, GL_FLOAT, sizeof(VertexP3fN3fT2f), &(mParticleVertices.constData()->position) );
+		glNormalPointer( GL_FLOAT, sizeof(VertexP3fN3fT2f), &(mParticleVertices.constData()->normal) );
+		glTexCoordPointer( 2, GL_FLOAT, sizeof(VertexP3fN3fT2f), &(mParticleVertices.constData()->texCoord) );
 
 		glDrawArrays( GL_QUADS, 0, activeVertices );
 
-		glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-		glDisableClientState( GL_NORMAL_ARRAY );
-		glDisableClientState( GL_VERTEX_ARRAY );
+		VertexP3fN3fT2f::glDisableClientState();
 	}
 }
 
@@ -133,11 +128,11 @@ void ParticleSystem::emitSpherical( const QVector3D & source, int toEmit, const 
 		--toEmit;
 		QVector3D direction;
 		do {
-			direction = QVector3D( randomMinMax( -1.0, 1.0 ), randomMinMax( -1.0, 1.0 ), randomMinMax( -1.0, 1.0 ) );
+			direction = QVector3D( RandomNumber::minMax( -1.0, 1.0 ), RandomNumber::minMax( -1.0, 1.0 ), RandomNumber::minMax( -1.0, 1.0 ) );
 		} while( direction.length() > 1.0f );
 		direction.normalize();
-		mParticles[i].rVelocity() = direction * randomMinMax( minVel, maxVel );
+		mParticles[i].rVelocity() = direction * RandomNumber::minMax( minVel, maxVel );
 		mParticles[i].rPosition() = source;
-		mParticles[i].rLife() = randomMinMax( mMinLife, mMaxLife );
+		mParticles[i].rLife() = RandomNumber::minMax( mMinLife, mMaxLife );
 	}
 }

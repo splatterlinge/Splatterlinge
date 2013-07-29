@@ -5,7 +5,10 @@
 #include <QQuaternion>
 
 
-QQuaternion quaternionLookAt( const QVector3D & lookAt, const QVector3D & upDirection );
+namespace Quaternion
+{
+	QQuaternion lookAt( const QVector3D & lookAt, const QVector3D & upDirection );
+}
 
 
 #endif
