@@ -10,6 +10,7 @@
 
 #include <resource/Shader.hpp>
 #include <scene/object/AObject.hpp>
+#include <utility/OcclusionTest.hpp>
 
 
 class Scene;
@@ -104,6 +105,7 @@ private:
 	GLuint mDomeMap;
 	QImage mDomeImage;
 
+	OcclusionTest mOcclusionTest;
 	GLuint mSunFlareMap;
 	float mSunFlareSize;
 

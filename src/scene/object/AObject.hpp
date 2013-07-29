@@ -64,7 +64,7 @@ public:
 	/// Returns the transformation matrix to eye space - only valid while drawing
 	const QMatrix4x4 & modelViewMatrix() const { return mModelViewMatrix; }
 	/// The object's position in eye space - only valid while drawing
-	const QVector3D eyePosition() const { return mModelViewMatrix.row(3).toVector3D(); }
+	const QVector3D eyePosition() const { return mModelViewMatrix.column(3).toVector3D(); }
 	/// Returns the vector in eye space pointing along the positive local X axis - only valid while drawing
 	const QVector3D eyeLeft() const { return mModelViewMatrix.row(0).toVector3D(); }
 	/// Returns the vector in eye space pointing along the positive local Y axis - only valid while drawing

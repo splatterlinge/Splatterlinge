@@ -1,7 +1,18 @@
 #include "Torch.hpp"
 #include "World.hpp"
 
-#include <utility/occlusion.hpp>
+#include <scene/TextureRenderer.hpp>
+
+
+const GLfloat Torch::sQuadVertices[] =
+{	// positions		texcoords
+	-1.0,  1.0,  0.0,	0.0, 1.0,
+	-1.0, -1.0,  0.0,	0.0, 0.0,
+	 1.0, -1.0,  0.0,	1.0, 0.0,
+	 1.0,  1.0,  0.0,	1.0, 1.0
+};
+
+QGLBuffer Torch::sQuadVertexBuffer;
 
 
 Torch::Torch( World * world ) :
@@ -10,6 +21,16 @@ Torch::Torch( World * world ) :
 	mFlareSize = 5.0f;
 	mColorCycle = 0.0f;
 	mFlareRotation = 0.0f;
+
+	if( !sQuadVertexBuffer.isCreated() )
+	{
+		sQuadVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
+		sQuadVertexBuffer.create();
+		sQuadVertexBuffer.bind();
+		sQuadVertexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
+		sQuadVertexBuffer.allocate( sQuadVertices, sizeof(sQuadVertices) );
+		sQuadVertexBuffer.release();
+	}
 
 	QImage flareImage( "./data/effect/flare.png" );
 	if( flareImage.isNull() )
@@ -60,7 +81,10 @@ void Torch::drawSelf()
 
 void Torch::draw2Self()
 {
-	if( occlusionTest() )
+	if( TextureRenderer::isActive() )
+		return;
+
+	if( !mOcclusionTest.pointVisible() )
 		return;
 
 	glPushAttrib( GL_VIEWPORT_BIT | GL_DEPTH_BUFFER_BIT );
@@ -73,47 +97,27 @@ void Torch::draw2Self()
 	glBlendFunc( GL_ONE, GL_ONE );
 	glEnable( GL_TEXTURE_2D );
 	glBindTexture( GL_TEXTURE_2D, mFlareMap );
+	glColor( mColor/2.0f );
 
-	QVector3D dir( eyeDirection() );
-	QVector3D up( eyeUp() );
-	QVector3D left( eyeLeft() );
-
-	struct _vertices
-	{
-		QVector3D position;
-		QVector2D texCoord;
-	};
-	struct _vertices vertices[4];
-	vertices[0].position = (-left+up) * mFlareSize;
-	vertices[0].texCoord = QVector2D(0,0);
-	vertices[1].position = ( left+up) * mFlareSize;
-	vertices[1].texCoord = QVector2D(1,0);
-	vertices[2].position = ( left-up) * mFlareSize;
-	vertices[2].texCoord = QVector2D(1,1);
-	vertices[3].position = (-left-up) * mFlareSize;
-	vertices[3].texCoord = QVector2D(0,1);
-
-	glBindBuffer( GL_ARRAY_BUFFER, 0 );
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
-
+	sQuadVertexBuffer.bind();
 	glClientActiveTexture( GL_TEXTURE0 );
-
 	glEnableClientState( GL_VERTEX_ARRAY );
 	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 
-	glVertexPointer( 3, GL_FLOAT, sizeof(struct _vertices), &(vertices[0].position) );
-	glTexCoordPointer( 2, GL_FLOAT, sizeof(struct _vertices), &(vertices[0].texCoord) );
+	glVertexPointer( 3, GL_FLOAT, 5*sizeof(GLfloat), (void*)0 );
+	glTexCoordPointer( 2, GL_FLOAT, 5*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)) );
 
-	glPushMatrix();
-	glColor( mColor/2.0f );
-	glRotate( mFlareRotation, dir );
+	Bilboard::begin( modelViewMatrix() );
+	glScalef( mFlareSize, mFlareSize, 1 );
+	glRotate( mFlareRotation, QVector3D(0,0,1) );
 	glDrawArrays( GL_QUADS, 0, 4 );
-	glRotate( -mFlareRotation*2.7f, dir );
+	glRotate( -mFlareRotation*2.7f, QVector3D(0,0,1) );
 	glDrawArrays( GL_QUADS, 0, 4 );
-	glPopMatrix();
+	Bilboard::end();
 
 	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 	glDisableClientState( GL_VERTEX_ARRAY );
+	sQuadVertexBuffer.release();
 
 	glDisable( GL_BLEND );
 

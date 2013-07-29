@@ -1,7 +1,6 @@
 #include "Sky.hpp"
 
 #include <utility/interpolate.hpp>
-#include <utility/occlusion.hpp>
 #include <resource/Shader.hpp>
 #include <scene/Scene.hpp>
 #include <scene/TextureRenderer.hpp>
@@ -287,8 +286,8 @@ Sky::~Sky()
 	mCloudPlaneIndexBuffer.destroy();
 	mCloudPlaneVertexBuffer.destroy();
 
-	sCubeIndexBuffer.destroy();
-	sCubeVertexBuffer.destroy();
+//	sCubeIndexBuffer.destroy();
+//	sCubeVertexBuffer.destroy();
 }
 
 
@@ -393,7 +392,7 @@ void Sky::drawSunFlare()
 		return;
 	glPushMatrix();
 	QVector3D sunPoint( mSunDirection * scene()->eye()->farPlane() );
-	if( !occlusionTest( sunPoint ) )
+	if( mOcclusionTest.pointVisible( sunPoint ) )
 	{
 		glRotate( mTimeOfDay*360.0f, mAxis );
 		glScalef( mSunFlareSize, mSunFlareSize, 1.0f );

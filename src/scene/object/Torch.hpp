@@ -4,6 +4,12 @@
 #include "AWorldObject.hpp"
 #include "ALightSource.hpp"
 
+#include <GLWidget.hpp>
+#include <utility/OcclusionTest.hpp>
+#include <utility/Bilboard.hpp>
+
+#include <QGLBuffer>
+
 
 /// A torch
 /**
@@ -24,6 +30,10 @@ public:
 	const QVector4D & color() const { return mColor; }
 
 private:
+	static const GLfloat sQuadVertices[];
+	static QGLBuffer sQuadVertexBuffer;
+
+	OcclusionTest mOcclusionTest;
 	GLuint mFlareMap;
 	float mFlareSize;
 	float mColorCycle;
