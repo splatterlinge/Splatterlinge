@@ -126,10 +126,7 @@ void ParticleSystem::emitSpherical( const QVector3D & source, int toEmit, const 
 			continue;
 
 		--toEmit;
-		QVector3D direction;
-		do {
-			direction = QVector3D( RandomNumber::minMax( -1.0, 1.0 ), RandomNumber::minMax( -1.0, 1.0 ), RandomNumber::minMax( -1.0, 1.0 ) );
-		} while( direction.length() > 1.0f );
+		QVector3D direction = RandomNumber::inUnitSphere();
 		direction.normalize();
 		mParticles[i].rVelocity() = direction * RandomNumber::minMax( minVel, maxVel );
 		mParticles[i].rPosition() = source;

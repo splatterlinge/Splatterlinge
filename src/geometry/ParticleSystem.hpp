@@ -54,12 +54,12 @@ public:
 	const float & size() const { return mSize; }
 	const QVector3D & gravity() const { return mGravity; }
 	const int capacity() const { return mParticles.size(); }
-	void setMinLife( float minLife ) { mMinLife = minLife; }
-	void setMaxLife( float maxLife ) { mMaxLife = maxLife; }
-	void setDrag( float drag ) { mDrag = drag; }
-	void setSize( float size ) { mSize = size; }
-	void setGravity( QVector3D gravity ) { mGravity = gravity; }
-	void setCapacity( int capacity ) { mParticles.resize( capacity ); mParticleVertices.resize( capacity*4 ); }
+	void setMinLife( const float & minLife ) { mMinLife = minLife; }
+	void setMaxLife( const float & maxLife ) { mMaxLife = maxLife; }
+	void setDrag( const float & drag ) { mDrag = drag; }
+	void setSize( const float & size ) { mSize = size; }
+	void setGravity( const QVector3D & gravity ) { mGravity = gravity; }
+	void setCapacity( const int & capacity ) { mParticles.resize( capacity ); mParticleVertices.resize( capacity*4 ); }
 	void setInteractionCallback( Interactable * callback ) { mInteractionCallback = callback; }
 
 protected:

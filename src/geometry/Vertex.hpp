@@ -7,6 +7,45 @@
 #include <utility/glWrappers.hpp>
 
 
+class VertexP3f
+{
+public:
+	QVector3D position;
+
+	VertexP3f() :
+		position(0,0,0)
+	{}
+
+	~VertexP3f() {}
+
+	bool operator==( const VertexP3f & other )
+	{
+		return position == other.position;
+	}
+
+	bool operator!=( const VertexP3f & other )
+	{
+		return !(*this==other);
+	}
+
+	static size_t size() { return sizeof( VertexP3f ); }
+	static size_t positionOffset() { return offsetof( VertexP3f, position ); }
+	static void * positionOffsetPTR() { return (void*)positionOffset(); }
+	static void glEnableClientState()
+	{
+		::glEnableClientState( GL_VERTEX_ARRAY );
+	}
+	static void glDisableClientState()
+	{
+		::glDisableClientState( GL_VERTEX_ARRAY );
+	}
+	static void glPointerVBO()
+	{
+		glVertexPointer( 3, GL_FLOAT, size(), positionOffsetPTR() );
+	}
+};
+
+
 class VertexP3fT2f
 {
 public:

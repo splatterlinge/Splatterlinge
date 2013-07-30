@@ -4,6 +4,7 @@
 #include "glWrappers.hpp"
 
 #include <QVector4D>
+#include <QGLBuffer>
 
 
 /// Occlusion testing using hardware accelerated occlusion queries
@@ -13,10 +14,12 @@ public:
 	OcclusionTest();
 	~OcclusionTest();
 
-	bool pointVisible( QVector3D point=QVector3D(0,0,0) );
+	bool pointVisible( const QVector3D & point=QVector3D(0,0,0) );
+	unsigned char randomPointsInUnitSphereVisible( const unsigned char & numPoints );
 
 private:
 	GLuint mQuery;
+	static QGLBuffer sRandomVertexInSphereBuffer;
 };
 
 

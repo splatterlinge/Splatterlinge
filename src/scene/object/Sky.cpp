@@ -390,28 +390,39 @@ void Sky::drawSunFlare()
 {
 	if( TextureRenderer::isActive() )
 		return;
-	glPushMatrix();
+
 	QVector3D sunPoint( mSunDirection * scene()->eye()->farPlane() );
-	if( mOcclusionTest.pointVisible( sunPoint ) )
-	{
-		glRotate( mTimeOfDay*360.0f, mAxis );
-		glScalef( mSunFlareSize, mSunFlareSize, 1.0f );
-		glDisable( GL_LIGHTING );
-		glEnable( GL_BLEND );
-		glBlendFunc( GL_ONE, GL_ONE );
-		glEnable( GL_TEXTURE_2D );
-		glColor( mDiffuse/2.0f );
-		glBindTexture( GL_TEXTURE_2D, mSunFlareMap );
-		glPushMatrix();
-			glRotate( mTimeOfDay*360.0f*2.0f, 0,0,1 );
-			drawQuad( true );
-		glPopMatrix();
-		glPushMatrix();
-			glRotate( -mTimeOfDay*360.0f*3.0f, 0,0,1 );
-			drawQuad( true );
-		glPopMatrix();
-		glDisable( GL_BLEND );
-	}
+
+	const unsigned char samplingPoints = 32;
+	unsigned char visiblePoints;
+	float occlusionRadius = 0.04f * scene()->eye()->farPlane();
+	glPushMatrix();
+		glTranslate( sunPoint - mSunDirection.toVector3D()*occlusionRadius );
+		glScale( occlusionRadius );
+		visiblePoints = mOcclusionTest.randomPointsInUnitSphereVisible( samplingPoints );
+	glPopMatrix();
+	if( !visiblePoints )
+		return;
+
+	glColor( ((float)visiblePoints/(float)samplingPoints) * mDiffuse/2.0f );
+	glPushMatrix();
+	glRotate( mTimeOfDay*360.0f, mAxis );
+	glScalef( mSunFlareSize, mSunFlareSize, 1.0f );
+	glDisable( GL_LIGHTING );
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_ONE, GL_ONE );
+	glEnable( GL_TEXTURE_2D );
+	glBindTexture( GL_TEXTURE_2D, mSunFlareMap );
+	glPushMatrix();
+		glRotate( mTimeOfDay*360.0f*2.0f, 0,0,1 );
+		drawQuad( true );
+	glPopMatrix();
+	glPushMatrix();
+		glRotate( -mTimeOfDay*360.0f*3.0f, 0,0,1 );
+		drawQuad( true );
+	glPopMatrix();
+	glDisable( GL_BLEND );
+
 	glPopMatrix();
 }
 

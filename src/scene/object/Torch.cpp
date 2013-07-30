@@ -84,7 +84,14 @@ void Torch::draw2Self()
 	if( TextureRenderer::isActive() )
 		return;
 
-	if( !mOcclusionTest.pointVisible() )
+	const unsigned char samplingPoints = 16;
+	unsigned char visiblePoints;
+
+	glPushMatrix();
+	glScale( 0.5f );
+	visiblePoints = mOcclusionTest.randomPointsInUnitSphereVisible( samplingPoints );
+	glPopMatrix();
+	if( !visiblePoints )
 		return;
 
 	glPushAttrib( GL_VIEWPORT_BIT | GL_DEPTH_BUFFER_BIT );
@@ -97,7 +104,7 @@ void Torch::draw2Self()
 	glBlendFunc( GL_ONE, GL_ONE );
 	glEnable( GL_TEXTURE_2D );
 	glBindTexture( GL_TEXTURE_2D, mFlareMap );
-	glColor( mColor/2.0f );
+	glColor( ((float)visiblePoints/(float)samplingPoints)*mColor/2.0f );
 
 	sQuadVertexBuffer.bind();
 	glClientActiveTexture( GL_TEXTURE0 );
