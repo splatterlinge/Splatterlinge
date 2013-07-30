@@ -12,13 +12,17 @@ WavefrontObject::WavefrontObject( Scene * scene, QString filename, float scale )
 	setBoundingSphere( qMin( mModel->getSize().width(), mModel->getSize().height() )*(mScale*2) );
 }
 
+
 WavefrontObject::~WavefrontObject()
 {
+	delete mModel;
 }
+
 
 void WavefrontObject::updateSelf( const double & delta )
 {
 }
+
 
 void WavefrontObject::drawSelf()
 {
@@ -30,7 +34,7 @@ void WavefrontObject::drawSelf()
 
 	glPushMatrix();
 
-	glScalef( 1.0*mScale, 1.0*mScale, 1.0*mScale );
+	glScale( mScale );
 	glColor3f( 1.0f, 1.0f, 1.0f );
 
 	mModel->draw();

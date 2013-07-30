@@ -108,7 +108,7 @@ void Torch::draw2Self()
 	glTexCoordPointer( 2, GL_FLOAT, 5*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)) );
 
 	Bilboard::begin( modelViewMatrix() );
-	glScalef( mFlareSize, mFlareSize, 1 );
+	glScale( mFlareSize );
 	glRotate( mFlareRotation, QVector3D(0,0,1) );
 	glDrawArrays( GL_QUADS, 0, 4 );
 	glRotate( -mFlareRotation*2.7f, QVector3D(0,0,1) );

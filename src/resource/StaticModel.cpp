@@ -30,6 +30,14 @@ void StaticModelData::unload()
 		return;
 	qDebug() << "-" << this << "StaticModelData" << uid();
 
+	foreach( Part part, mParts )
+	{
+		if( part.material )
+		{
+			delete part.material;
+		}
+	}
+
 	mParts.clear();
 	mVertices.clear();
 	mIndices.clear();
@@ -40,7 +48,7 @@ void StaticModelData::unload()
 	mIndexBuffer.release();
 	mIndexBuffer.destroy();
 
-	StaticModelData::unload();
+	AResourceData::unload();
 }
 
 

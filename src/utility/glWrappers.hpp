@@ -107,9 +107,11 @@ inline void glTranslate( const GLfloat & x, const GLfloat & y, const GLfloat & z
 inline void glTranslate( const GLdouble & x, const GLdouble & y, const GLdouble & z )	{ glTranslated( x, y, z ); }
 inline void glTranslate( const QVector3D & translation )	{ glTranslated( translation.x(), translation.y(), translation.z() ); }
 
+inline void glScale( const GLfloat & s )	{ glScalef( s, s, s ); }
+inline void glScale( const GLdouble & s )	{ glScaled( s, s, s ); }
 inline void glScale( const GLfloat & x, const GLfloat & y, const GLfloat & z )		{ glScalef( x, y, z ); }
 inline void glScale( const GLdouble & x, const GLdouble & y, const GLdouble & z )	{ glScaled( x, y, z ); }
-inline void glScale( const QVector3D & scale )			{ glScale( scale.x(), scale.y(), scale.z() ); }
+inline void glScale( const QVector3D & scale )	{ glScale( scale.x(), scale.y(), scale.z() ); }
 
 inline void glColor( const GLbyte & red, const GLbyte & green, const GLbyte & blue )		{ glColor3b( red, green, blue ); }
 inline void glColor( const GLshort & red, const GLshort & green, const GLshort & blue )		{ glColor3s( red, green, blue ); }
