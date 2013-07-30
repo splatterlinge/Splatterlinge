@@ -11,7 +11,7 @@ OcclusionTest::OcclusionTest()
 	if( !sRandomVertexInSphereBuffer.isCreated() )
 	{
 		VertexP3f randomPointsInSphere[256];
-		for( size_t i=0; i<sizeof(randomPointsInSphere); i++ )
+		for( size_t i=0; i<sizeof(randomPointsInSphere)/sizeof(VertexP3f); i++ )
 			randomPointsInSphere[i].position = RandomNumber::inUnitSphere();
 		sRandomVertexInSphereBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
 		sRandomVertexInSphereBuffer.create();
