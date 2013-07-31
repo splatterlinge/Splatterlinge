@@ -106,6 +106,7 @@ void Landscape::drawSelfPost()
 
 void Landscape::renderReflection()
 {
+	mDrawingReflection = true;
 	mReflectionRenderer->bind();
 	glClear( GL_DEPTH_BUFFER_BIT );
 	glMatrixMode( GL_PROJECTION );	glPushMatrix();	glLoadIdentity();
@@ -140,11 +141,13 @@ void Landscape::renderReflection()
 	glMatrixMode( GL_PROJECTION ); glPopMatrix();
 	glMatrixMode( GL_MODELVIEW ); glPopMatrix();
 	mReflectionRenderer->release();
+	mDrawingReflection = false;
 }
 
 
 void Landscape::renderRefraction()
 {
+	mDrawingRefraction = true;
 	mRefractionRenderer->bind();
 	glClear( GL_DEPTH_BUFFER_BIT );
 	glMatrixMode( GL_PROJECTION );	glPushMatrix();	glLoadIdentity();
@@ -163,6 +166,7 @@ void Landscape::renderRefraction()
 	glMatrixMode( GL_PROJECTION );	glPopMatrix();
 	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
 	mRefractionRenderer->release();
+	mDrawingRefraction = false;
 }
 
 
@@ -173,12 +177,8 @@ void Landscape::draw2SelfPost()
 
 	MaterialQuality::Type defaultQuality = MaterialQuality::maximum();
 	MaterialQuality::setMaximum( MaterialQuality::LOW );
-	mDrawingReflection = true;
 	renderReflection();
-	mDrawingReflection = false;
-	mDrawingRefraction = true;
 	renderRefraction();
-	mDrawingRefraction = false;
 	MaterialQuality::setMaximum( defaultQuality );
 
 	glDisable( GL_CULL_FACE );

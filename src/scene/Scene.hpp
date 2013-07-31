@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include <QElapsedTimer>
 #include <QRectF>
+#include <QGLBuffer>
 
 
 class QPainter;
@@ -21,6 +22,8 @@ class DebugWindow;
 class StartMenuWindow;
 class AMouseListener;
 class AKeyListener;
+class TextureRenderer;
+class Shader;
 
 
 /// Scene manager and interface to Qt
@@ -37,6 +40,8 @@ public:
 	// Overrides:
 	void drawBackground( QPainter * painter, const QRectF & rect );
 	QGraphicsProxyWidget * addWidget( QWidget * widget, Qt::WindowFlags wFlags = 0 );
+	void setSceneRect( const QRectF & rect );
+	void setSceneRect( qreal x, qreal y, qreal w, qreal h ) { setSceneRect( QRectF( x, y, w, h ) ); }
 
 	GLWidget * glWidget() { return mGLWidget; }
 
@@ -73,6 +78,9 @@ protected:
 	void wheelEvent( QGraphicsSceneWheelEvent * event );
 
 private:
+	static const GLfloat sQuadVertices[];
+	static QGLBuffer sQuadVertexBuffer;
+
 	GLWidget * mGLWidget;
 
 	DebugWindow * mDebugWindow;
@@ -92,6 +100,10 @@ private:
 	QList<AKeyListener*> mKeyListeners;
 	Eye * mEye;
 	AObject * mRoot;
+
+	TextureRenderer * mTextureRenderer;
+	Shader * mPostProcShader;
+	int mPostProcShader_sourceMap;
 
 private slots:
 	void secondPassed();

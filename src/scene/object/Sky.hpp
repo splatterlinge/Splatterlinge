@@ -1,6 +1,7 @@
 #ifndef SCENE_OBJECT_SKY_INCLUDED
 #define SCENE_OBJECT_SKY_INCLUDED
 
+#include "AWorldObject.hpp"
 
 #include <GLWidget.hpp>
 
@@ -21,10 +22,10 @@ class Scene;
 /**
  * Simulates and renders a sky.
  */
-class Sky : public AObject
+class Sky : public AWorldObject
 {
 public:
-	Sky( Scene * scene, QString name );
+	Sky( World * world, QString name );
 	~Sky();
 
 	virtual void updateSelf( const double & delta );

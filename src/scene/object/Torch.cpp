@@ -81,7 +81,7 @@ void Torch::drawSelf()
 
 void Torch::draw2Self()
 {
-	if( TextureRenderer::isActive() )
+	if( world()->landscape()->drawingReflection() || world()->landscape()->drawingRefraction() )
 		return;
 
 	const unsigned char samplingPoints = 16;

@@ -63,7 +63,7 @@ World::World( Scene * scene, QString name ) :
 	mLandscape = QSharedPointer<Landscape>( new Landscape( scene, landscapeName ) );
 	add( mLandscape );
 
-	mSky = QSharedPointer<Sky>( new Sky( scene, skyName ) );
+	mSky = QSharedPointer<Sky>( new Sky( this, skyName ) );
 	add( mSky );
 
 	mPlayer = QSharedPointer<Player>( new Player( this ) );

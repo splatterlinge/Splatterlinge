@@ -10,6 +10,7 @@
 #include "AKeyListener.hpp"
 #include <GLWidget.hpp>
 #include <resource/Material.hpp>
+#include <resource/Shader.hpp>
 #include <utility/glWrappers.hpp>
 #include <utility/alWrappers.hpp>
 
@@ -20,6 +21,18 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsProxyWidget>
 #include <QCoreApplication>
+#include <QGLShaderProgram>
+
+
+const GLfloat Scene::sQuadVertices[] =
+{	// positions		texcoords
+	-1.0,  1.0,  0.0,	0.0, 1.0,
+	-1.0, -1.0,  0.0,	0.0, 0.0,
+	 1.0, -1.0,  0.0,	1.0, 0.0,
+	 1.0,  1.0,  0.0,	1.0, 1.0
+};
+
+QGLBuffer Scene::sQuadVertexBuffer;
 
 
 Scene::Scene( GLWidget * glWidget, QObject * parent ) :
@@ -33,6 +46,19 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mFrameCountSecond = 0;
 	mFramesPerSecond = 0;
 	mWireFrame = false;
+
+	if( !sQuadVertexBuffer.isCreated() )
+	{
+		sQuadVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
+		sQuadVertexBuffer.create();
+		sQuadVertexBuffer.bind();
+		sQuadVertexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
+		sQuadVertexBuffer.allocate( sQuadVertices, sizeof(sQuadVertices) );
+		sQuadVertexBuffer.release();
+	}
+	mPostProcShader = new Shader( glWidget, "postProc.poster" );
+	mPostProcShader_sourceMap = mPostProcShader->program()->uniformLocation( "sourceMap" );
+	mTextureRenderer = new TextureRenderer( glWidget, QSize(800,600), true );
 
 	mMultiSample = settings.value( "sampleBuffers", false ).toBool();
 
@@ -67,6 +93,7 @@ Scene::~Scene()
 	delete mEye;
 	delete mDebugWindow;
 	delete mStartMenuWindow;
+	delete mTextureRenderer;
 }
 
 
@@ -110,6 +137,8 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	glFrontFace( GL_CCW );
 	glEnable( GL_CULL_FACE );
 
+	mTextureRenderer->bind();
+
 	glClear( GL_DEPTH_BUFFER_BIT );
 
 	if( mWireFrame )
@@ -123,7 +152,32 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	mRoot->draw();
 	mRoot->draw2();
 
+	mTextureRenderer->release();
+
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+	glMatrixMode( GL_TEXTURE );	glLoadIdentity();
+	glMatrixMode( GL_PROJECTION );	glLoadIdentity();
+	glMatrixMode( GL_MODELVIEW );	glLoadIdentity();
+
+	sQuadVertexBuffer.bind();
+	glEnable( GL_TEXTURE_2D );
+	glDisable( GL_LIGHTING );
+	glColor4f( 1, 1, 1, 1 );
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, mTextureRenderer->texID() );
+	mPostProcShader->bind();
+	mPostProcShader->program()->setUniformValue( mPostProcShader_sourceMap, 0 );
+	glClientActiveTexture( GL_TEXTURE0 );
+	glEnableClientState( GL_VERTEX_ARRAY );
+	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	glVertexPointer( 3, GL_FLOAT, 5*sizeof(GLfloat), (void*)0 );
+	glTexCoordPointer( 2, GL_FLOAT, 5*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)) );
+	glDrawArrays( GL_QUADS, 0, 4 );
+	mPostProcShader->release();
+	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	glDisableClientState( GL_VERTEX_ARRAY );
+	sQuadVertexBuffer.release();
 
 	glMatrixMode( GL_TEXTURE );	glPopMatrix();
 	glMatrixMode( GL_PROJECTION );	glPopMatrix();
@@ -297,4 +351,12 @@ void Scene::keyReleaseEvent( QKeyEvent * event )
 	QList< AKeyListener* >::iterator i;
 	for( i = mKeyListeners.begin(); i != mKeyListeners.end(); ++i )
 		(*i)->keyReleaseEvent( event );
+}
+
+
+void Scene::setSceneRect( const QRectF & rect )
+{
+	QGraphicsScene::setSceneRect( rect );
+	delete mTextureRenderer;
+	mTextureRenderer = new TextureRenderer( mGLWidget, rect.size().toSize(), true );
 }

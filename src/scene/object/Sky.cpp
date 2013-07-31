@@ -1,8 +1,8 @@
 #include "Sky.hpp"
+#include "World.hpp"
 
 #include <utility/Interpolation.hpp>
 #include <resource/Shader.hpp>
-#include <scene/Scene.hpp>
 #include <scene/TextureRenderer.hpp>
 
 #include <QGLShaderProgram>
@@ -100,9 +100,9 @@ void Sky::drawQuad( bool texCoords )
 }
 
 
-Sky::Sky( Scene * scene, QString name ) :
-	AObject(scene),
-	mTimeOfDay(0)
+Sky::Sky( World * world, QString name ) :
+	AWorldObject( world ),
+	mTimeOfDay( 0 )
 {
 	QSettings s( "./data/sky/"+name+"/sky.ini", QSettings::IniFormat );
 
@@ -156,7 +156,7 @@ Sky::Sky( Scene * scene, QString name ) :
 	{
 		qFatal( "\"%s\" not found!", cloudMapPath.toLocal8Bit().constData() );
 	}
-	mCloudMap = scene->glWidget()->bindTexture( cloudImage );
+	mCloudMap = scene()->glWidget()->bindTexture( cloudImage );
 
 	mCloudPlaneRes = 10;
 	mCloudPlaneVertices.resize( mCloudPlaneRes * mCloudPlaneRes );
@@ -202,7 +202,7 @@ Sky::Sky( Scene * scene, QString name ) :
 	mCloudPlaneIndexBuffer.allocate( mCloudPlaneIndex.constData(), mCloudPlaneIndex.size()*sizeof(unsigned short) );
 	mCloudPlaneIndexBuffer.release();
 
-	mCloudShader = new Shader( scene->glWidget(), "cloud" );
+	mCloudShader = new Shader( scene()->glWidget(), "cloud" );
 	mCloudShader_cloudMap = mCloudShader->program()->uniformLocation( "cloudMap" );
 	mCloudShader_cloudiness = mCloudShader->program()->uniformLocation( "cloudiness" );
 	mCloudShader_smoothness = mCloudShader->program()->uniformLocation( "smoothness" );
@@ -228,7 +228,7 @@ Sky::Sky( Scene * scene, QString name ) :
 		sCubeIndexBuffer.release();
 	}
 
-	mDomeShader = new Shader( scene->glWidget(), "skydome" );
+	mDomeShader = new Shader( scene()->glWidget(), "skydome" );
 	mDomeShader_sunDir = mDomeShader->program()->uniformLocation( "sunDir" );
 	mDomeShader_timeOfDay = mDomeShader->program()->uniformLocation( "timeOfDay" );
 	mDomeShader_sunSpotPower = mDomeShader->program()->uniformLocation( "sunSpotPower" );
@@ -240,7 +240,7 @@ Sky::Sky( Scene * scene, QString name ) :
 		qFatal( "\"%s\" not found!", skyDomePath.toLocal8Bit().constData() );
 	}
 
-	mDomeMap = scene->glWidget()->bindTexture( mDomeImage );
+	mDomeMap = scene()->glWidget()->bindTexture( mDomeImage );
 	if( mDomeMap >= 0 )
 	{
 		glActiveTexture( GL_TEXTURE0 );
@@ -249,7 +249,7 @@ Sky::Sky( Scene * scene, QString name ) :
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	}
 
-	mStarCubeShader = new Shader( scene->glWidget(), "cube" );
+	mStarCubeShader = new Shader( scene()->glWidget(), "cube" );
 	mStarCubeShader_cubeMap = mDomeShader->program()->uniformLocation( "cubeMap" );
 
 	glGenTextures( 1, &mStarCubeMap );
@@ -259,19 +259,19 @@ Sky::Sky( Scene * scene, QString name ) :
 	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE );
 	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, starMapPathPX );
-	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_X, starMapPathNX );
-	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_POSITIVE_Y, starMapPathPY );
-	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, starMapPathNY );
-	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_POSITIVE_Z, starMapPathPZ );
-	TexImage( scene->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, starMapPathNZ );
+	TexImage( scene()->glWidget(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, starMapPathPX );
+	TexImage( scene()->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_X, starMapPathNX );
+	TexImage( scene()->glWidget(), GL_TEXTURE_CUBE_MAP_POSITIVE_Y, starMapPathPY );
+	TexImage( scene()->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, starMapPathNY );
+	TexImage( scene()->glWidget(), GL_TEXTURE_CUBE_MAP_POSITIVE_Z, starMapPathPZ );
+	TexImage( scene()->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, starMapPathNZ );
 
 	QImage sunFlareImage( sunFlarePath );
 	if( sunFlareImage.isNull() )
 	{
 		qFatal( "\"%s\" not found!", cloudMapPath.toLocal8Bit().constData() );
 	}
-	mSunFlareMap = scene->glWidget()->bindTexture( sunFlareImage );
+	mSunFlareMap = scene()->glWidget()->bindTexture( sunFlareImage );
 }
 
 
@@ -388,7 +388,7 @@ void Sky::draw2Self()
 
 void Sky::drawSunFlare()
 {
-	if( TextureRenderer::isActive() )
+	if( world()->landscape()->drawingReflection() || world()->landscape()->drawingRefraction() )
 		return;
 
 	QVector3D sunPoint( mSunDirection * scene()->eye()->farPlane() );

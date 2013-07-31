@@ -5,13 +5,13 @@
 
 
 TextureRenderer::TextureRenderer( GLWidget * glWidget, const QSize & size, bool depthBuffer ) :
-	mFrameBuffer(0),
-	mDepthBuffer(0),
-	mTex(0),
-	mDepth(0),
-	mGLWidget(glWidget),
-	mHasDepthBuffer(depthBuffer),
-	mSize(size)
+	mFrameBuffer( 0 ),
+	mDepthBuffer( 0 ),
+	mTex( 0 ),
+	mDepth( 0 ),
+	mGLWidget( glWidget ),
+	mHasDepthBuffer( depthBuffer ),
+	mSize( size )
 {
 	glGenTextures( 1, &mTex );
 	glBindTexture( GL_TEXTURE_2D, mTex );
@@ -21,7 +21,7 @@ TextureRenderer::TextureRenderer( GLWidget * glWidget, const QSize & size, bool 
 
 	glGenFramebuffers( 1, &mFrameBuffer );
 	glBindFramebuffer( GL_FRAMEBUFFER, mFrameBuffer );
-	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTex, 0);
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTex, 0 );
 
 	if( mHasDepthBuffer )
 	{
@@ -56,7 +56,7 @@ TextureRenderer::~TextureRenderer()
 	if( mDepthBuffer )
 		glDeleteRenderbuffers( 1,&mDepthBuffer );
 	if( mTex )
-		glDeleteTextures( 1,&mTex );
+		glDeleteTextures( 1, &mTex );
 	if( mDepth )
 		glDeleteTextures( 1, &mDepth );
 }
@@ -64,16 +64,18 @@ TextureRenderer::~TextureRenderer()
 
 void TextureRenderer::bind()
 {
+	glGetIntegerv( GL_FRAMEBUFFER_BINDING, (GLint*)&mLastFrameBuffer );
+	glGetIntegerv( GL_RENDERBUFFER_BINDING, (GLint*)&mLastRenderBuffer );
 	glBindFramebuffer( GL_FRAMEBUFFER, mFrameBuffer );
 	glBindRenderbuffer( GL_RENDERBUFFER, mDepthBuffer );
 	glPushAttrib( GL_VIEWPORT_BIT );
-	glViewport( 0, 0, size().width(), size().width() );
+	glViewport( 0, 0, size().width(), size().height() );
 }
 
 
 void TextureRenderer::release()
 {
 	glPopAttrib();
-	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-	glBindRenderbuffer( GL_RENDERBUFFER, 0 );
+	glBindFramebuffer( GL_FRAMEBUFFER, mLastFrameBuffer );
+	glBindRenderbuffer( GL_RENDERBUFFER, mLastRenderBuffer );
 }

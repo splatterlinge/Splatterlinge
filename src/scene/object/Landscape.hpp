@@ -42,7 +42,9 @@ public:
 
 	Terrain * terrain() { return mTerrain; }
 	const Terrain * terrain() const { return mTerrain; }
-	const float & waterHeight() { return mWaterHeight; }
+	const float & waterHeight() const { return mWaterHeight; }
+	const bool & drawingReflection() const { return mDrawingReflection; }
+	const bool & drawingRefraction() const { return mDrawingRefraction; }
 
 private:
 	/// Draws a part of the Terrain using another Material.

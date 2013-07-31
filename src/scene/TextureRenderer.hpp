@@ -9,6 +9,8 @@
 class TextureRenderer
 {
 	private:
+		GLuint mLastFrameBuffer;
+		GLuint mLastRenderBuffer;
 		GLuint mFrameBuffer;
 		GLuint mDepthBuffer;
 		GLuint mTex;
@@ -28,7 +30,7 @@ class TextureRenderer
 		GLuint depthID() const { return mDepth; }
 		bool hasDepthBuffer() const { return mHasDepthBuffer; }
 		const QSize & size() const { return mSize; }
-		
+
 		static bool isActive() { GLint val=0; glGetIntegerv( GL_RENDERBUFFER_BINDING, &val ); return val; }
 };
 
