@@ -196,6 +196,8 @@ void Landscape::draw2SelfPost()
 		glVertex3f(-scene()->eye()->farPlane(), 0,-scene()->eye()->farPlane() );
 	glEnd();
 	mWaterShader->release();
+	glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, 0 );
+	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, 0 );
 	glPopMatrix();
 	glEnable( GL_CULL_FACE );
 }

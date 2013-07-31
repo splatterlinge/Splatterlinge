@@ -5,6 +5,8 @@
 
 
 TextureRenderer::TextureRenderer( GLWidget * glWidget, const QSize & size, bool depthBuffer ) :
+	mLastFrameBuffer( 0 ),
+	mLastRenderBuffer( 0 ),
 	mFrameBuffer( 0 ),
 	mDepthBuffer( 0 ),
 	mTex( 0 ),
@@ -46,6 +48,7 @@ TextureRenderer::TextureRenderer( GLWidget * glWidget, const QSize & size, bool 
 	}
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	glBindRenderbuffer( GL_RENDERBUFFER, 0 );
+	glBindTexture( GL_TEXTURE_2D, 0 );
 }
 
 

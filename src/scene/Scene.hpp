@@ -64,6 +64,8 @@ public:
 	void setMultiSample( bool enable ) { mMultiSample = enable; }
 	bool multiSample() const { return mMultiSample; }
 
+	const QRect & viewport() const { return mViewport; }
+
 	StartMenuWindow * startMenuWindow() { return mStartMenuWindow; }
 	DebugWindow * debugWindow() { return mDebugWindow; }
 
@@ -104,6 +106,8 @@ private:
 	TextureRenderer * mTextureRenderer;
 	Shader * mPostProcShader;
 	int mPostProcShader_sourceMap;
+
+	QRect mViewport;
 
 private slots:
 	void secondPassed();

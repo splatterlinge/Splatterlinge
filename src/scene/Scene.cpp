@@ -46,6 +46,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mFrameCountSecond = 0;
 	mFramesPerSecond = 0;
 	mWireFrame = false;
+	mViewport = QRect( 0, 0, 0, 0 );
 
 	if( !sQuadVertexBuffer.isCreated() )
 	{
@@ -109,6 +110,7 @@ QGraphicsProxyWidget * Scene::addWidget( QWidget * widget, Qt::WindowFlags wFlag
 void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 {
 	mGLWidget->setUpdatesEnabled( false );
+
 	qint64 delta = mElapsedTimer.restart();
 	if( delta == 0 )
 	{
@@ -117,16 +119,15 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	}
 	mDelta = (double)delta/1000.0;
 
+	mRoot->update( mDelta );
+	mRoot->update2( mDelta );
+
+	mTextureRenderer->bind();
+
 	glPushAttrib( GL_ALL_ATTRIB_BITS );
 	glMatrixMode( GL_TEXTURE );	glPushMatrix();	glLoadIdentity();
 	glMatrixMode( GL_PROJECTION );	glPushMatrix();	glLoadIdentity();
 	glMatrixMode( GL_MODELVIEW );	glPushMatrix();	glLoadIdentity();
-
-	mRoot->update( mDelta );
-	mRoot->update2( mDelta );
-
-	mEye->applyGL();
-	mEye->applyAL( mDelta );
 
 	glDisable( GL_BLEND );
 	glDisable( GL_TEXTURE_2D );
@@ -137,7 +138,8 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	glFrontFace( GL_CCW );
 	glEnable( GL_CULL_FACE );
 
-	mTextureRenderer->bind();
+	mEye->applyGL();
+	mEye->applyAL( mDelta );
 
 	glClear( GL_DEPTH_BUFFER_BIT );
 
@@ -149,6 +151,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	else
 		glDisable( GL_MULTISAMPLE );
 
+	mViewport = QRect( 0, 0, width(), height() );
 	mRoot->draw();
 	mRoot->draw2();
 
@@ -161,6 +164,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	glMatrixMode( GL_MODELVIEW );	glLoadIdentity();
 
 	sQuadVertexBuffer.bind();
+	glDisable( GL_BLEND );
 	glEnable( GL_TEXTURE_2D );
 	glDisable( GL_LIGHTING );
 	glColor4f( 1, 1, 1, 1 );
@@ -175,6 +179,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	glTexCoordPointer( 2, GL_FLOAT, 5*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)) );
 	glDrawArrays( GL_QUADS, 0, 4 );
 	mPostProcShader->release();
+	glBindTexture( GL_TEXTURE_2D, 0 );
 	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 	glDisableClientState( GL_VERTEX_ARRAY );
 	sQuadVertexBuffer.release();

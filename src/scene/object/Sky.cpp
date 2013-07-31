@@ -394,7 +394,7 @@ void Sky::drawSunFlare()
 	QVector3D sunPoint( mSunDirection * scene()->eye()->farPlane() );
 
 	const unsigned char samplingPoints = 32;
-	unsigned char visiblePoints;
+	unsigned char visiblePoints = 0;
 	float occlusionRadius = 0.04f * scene()->eye()->farPlane();
 	glPushMatrix();
 		glTranslate( sunPoint - mSunDirection.toVector3D()*occlusionRadius );
@@ -422,7 +422,6 @@ void Sky::drawSunFlare()
 		drawQuad( true );
 	glPopMatrix();
 	glDisable( GL_BLEND );
-
 	glPopMatrix();
 }
 

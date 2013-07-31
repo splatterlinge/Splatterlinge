@@ -30,8 +30,6 @@ class TextureRenderer
 		GLuint depthID() const { return mDepth; }
 		bool hasDepthBuffer() const { return mHasDepthBuffer; }
 		const QSize & size() const { return mSize; }
-
-		static bool isActive() { GLint val=0; glGetIntegerv( GL_RENDERBUFFER_BINDING, &val ); return val; }
 };
 
 
