@@ -21,8 +21,10 @@ public:
 	Eye( Eye & other );
 	~Eye();
 
+	/// Updates position and rotation.
+	void update( const double & delta );
 	/// Applies position/velocity/orientation to OpenAL.
-	void applyAL( const double & delta );
+	void applyAL();
 	/// Applies OpenGL projection/modelview matrices and clipping planes.
 	void applyGL();
 
@@ -34,7 +36,12 @@ public:
 	/// Field of view in degrees.
 	float fov() const { return mFOV; }
 	/// Set field of view in degrees.
-	void setFOV( float fov ) { mFOV = fov; }
+	void setFOV( const float & fov ) { mFOV = fov; }
+
+	/// Aspect ratio
+	float aspect() const { return mAspect; }
+	/// Set aspect ratio
+	void setAspect( const float & aspect ) { mAspect = aspect; }
 
 	/// Near plane of projection matrix.
 	float nearPlane() const { return mNearPlane; }
@@ -68,7 +75,10 @@ public:
 	/// Sets the rotation
 	void setRotation( const QQuaternion & rotation ) { mRotation = rotation; }
 
+	/// Sets the scale
 	void setScale( const QVector3D & scale ) { mScale = scale; }
+
+	void setViewOffset( const QVector3D & offset ) { mViewOffset = offset; }
 
 	/// The object's position
 	const QVector3D & position() const { return mPosition; }
@@ -86,17 +96,20 @@ private:
 	Scene * mScene;
 	QVector3D mPosition;
 	QVector3D mLastPosition;
+	QVector3D mVelocity;
 	QQuaternion mRotation;
 	QVector3D mScale;
 	QWeakPointer<AObject> mAttached;
 	QMap<int,QVector4D> mClippingPlanes;
 	void applyClippingPlanes();
 	float mFOV;
+	float mAspect;
 	float mNearPlane;
 	float mFarPlane;
 	QMatrix4x4 mViewMatrix;
 	QMatrix4x4 mViewMatrixInverse;
 	QMatrix4x4 mProjectionMatrix;
+	QVector3D mViewOffset;
 };
 
 

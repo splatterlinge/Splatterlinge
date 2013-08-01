@@ -351,7 +351,10 @@ void Sky::drawSelf()
 	scene()->eye()->disableClippingPlanes();
 	glPushAttrib( GL_VIEWPORT_BIT | GL_DEPTH_BUFFER_BIT );
 	glPushMatrix();
-	glTranslatef( scene()->eye()->position().x(), scene()->eye()->position().y(), scene()->eye()->position().z() );
+
+	QMatrix4x4 eyeRotMat = scene()->eye()->viewMatrix();
+	eyeRotMat.setColumn( 3, QVector4D(0,0,0,1) );
+	glLoadMatrix( eyeRotMat );
 
 	glDepthMask( GL_FALSE );
 	glDepthFunc( GL_EQUAL );
@@ -373,7 +376,10 @@ void Sky::draw2Self()
 	scene()->eye()->disableClippingPlanes();
 	glPushAttrib( GL_VIEWPORT_BIT | GL_DEPTH_BUFFER_BIT );
 	glPushMatrix();
-	glTranslatef( scene()->eye()->position().x(), scene()->eye()->position().y(), scene()->eye()->position().z() );
+
+	QMatrix4x4 eyeRotMat = scene()->eye()->viewMatrix();
+	eyeRotMat.setColumn( 3, QVector4D(0,0,0,1) );
+	glLoadMatrix( eyeRotMat );
 
 	glDepthMask( GL_FALSE );
 	glDisable( GL_CULL_FACE );

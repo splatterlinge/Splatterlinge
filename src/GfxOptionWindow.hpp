@@ -33,6 +33,7 @@ private:
 	QLabel * mFarPlaneLabel;
 	QSlider * mFarPlane;
 	QCheckBox * mMultiSample;
+	QCheckBox * mStereo;
 
 public slots:
 	void setMaterialQuality( int q );
@@ -40,6 +41,7 @@ public slots:
 	void setMaterialFilterAnisotropy( int a );
 	void setFarPlane( int distance );
 	void setMultiSample( int state );
+	void setStereo( int state );
 };
 
 

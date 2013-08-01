@@ -74,6 +74,11 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	QObject::connect( mMultiSample, SIGNAL(stateChanged(int)), this, SLOT(setMultiSample(int)) );
 	mLayout->addWidget( mMultiSample );
 
+	mStereo = new QCheckBox( "Stereo Rendering" );
+	mStereo->setChecked( mScene->stereo() );
+	QObject::connect( mStereo, SIGNAL(stateChanged(int)), this, SLOT(setStereo(int)) );
+	mLayout->addWidget( mStereo );
+
 	setLayout( mLayout );
 
 	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint );
@@ -82,6 +87,7 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 
 GfxOptionWindow::~GfxOptionWindow()
 {
+	delete mStereo;
 	delete mMultiSample;
 	delete mFarPlaneLabel;
 	delete mMaterialAnisotropy;
@@ -143,4 +149,14 @@ void GfxOptionWindow::setMultiSample( int state )
 
 	QSettings settings;
 	settings.setValue( "sampleBuffers", enable );
+}
+
+
+void GfxOptionWindow::setStereo( int state )
+{
+	bool enable = state;
+	mScene->setStereo( enable );
+
+	QSettings settings;
+	settings.setValue( "stereo", enable );
 }

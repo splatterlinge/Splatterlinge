@@ -26,8 +26,19 @@
 
 const GLfloat Scene::sQuadVertices[] =
 {	// positions		texcoords
+	// FullScreenQuad
 	-1.0,  1.0,  0.0,	0.0, 1.0,
 	-1.0, -1.0,  0.0,	0.0, 0.0,
+	 1.0, -1.0,  0.0,	1.0, 0.0,
+	 1.0,  1.0,  0.0,	1.0, 1.0,
+	// LeftScreenQuad
+	-1.0,  1.0,  0.0,	0.0, 1.0,
+	-1.0, -1.0,  0.0,	0.0, 0.0,
+	 0.0, -1.0,  0.0,	1.0, 0.0,
+	 0.0,  1.0,  0.0,	1.0, 1.0,
+	// RightScreenQuad
+	 0.0,  1.0,  0.0,	0.0, 1.0,
+	 0.0, -1.0,  0.0,	0.0, 0.0,
 	 1.0, -1.0,  0.0,	1.0, 0.0,
 	 1.0,  1.0,  0.0,	1.0, 1.0
 };
@@ -38,7 +49,9 @@ QGLBuffer Scene::sQuadVertexBuffer;
 Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	QGraphicsScene( parent ),
 	mGLWidget( glWidget ),
-	mEye(0)
+	mEye( NULL ),
+	mLeftTextureRenderer( NULL ),
+	mRightTextureRenderer( NULL )
 {
 	QSettings settings;
 
@@ -46,7 +59,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mFrameCountSecond = 0;
 	mFramesPerSecond = 0;
 	mWireFrame = false;
-	mViewport = QRect( 0, 0, 0, 0 );
+	mStereo = false;
 
 	if( !sQuadVertexBuffer.isCreated() )
 	{
@@ -59,14 +72,16 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	}
 	mPostProcShader = new Shader( glWidget, "postProc.poster" );
 	mPostProcShader_sourceMap = mPostProcShader->program()->uniformLocation( "sourceMap" );
-	mTextureRenderer = new TextureRenderer( glWidget, QSize(800,600), true );
 
+	mStereo = settings.value( "stereo", false ).toBool();
 	mMultiSample = settings.value( "sampleBuffers", false ).toBool();
 
 	mEye = new Eye( this );
 	mEye->setFarPlane( settings.value( "farPlane", 500.0f ).toFloat() );
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
+
+	resizeFrameBuffers( QSize(400,600) );
 
 	mDebugWindow = new DebugWindow( this );
 	addWidget( mDebugWindow, mDebugWindow->windowFlags() );
@@ -94,7 +109,8 @@ Scene::~Scene()
 	delete mEye;
 	delete mDebugWindow;
 	delete mStartMenuWindow;
-	delete mTextureRenderer;
+	delete mLeftTextureRenderer;
+	delete mRightTextureRenderer;
 }
 
 
@@ -107,10 +123,63 @@ QGraphicsProxyWidget * Scene::addWidget( QWidget * widget, Qt::WindowFlags wFlag
 }
 
 
-void Scene::drawBackground( QPainter * painter, const QRectF & rect )
+void Scene::applyDefaultStatesGL()
 {
-	mGLWidget->setUpdatesEnabled( false );
+	glDisable( GL_BLEND );
+	glDisable( GL_TEXTURE_2D );
 
+	glDepthFunc( GL_LEQUAL );
+	glEnable( GL_DEPTH_TEST );
+
+	glCullFace( GL_BACK );
+	glFrontFace( GL_CCW );
+	glEnable( GL_CULL_FACE );
+
+	glShadeModel( GL_SMOOTH );
+	glEnable( GL_LIGHTING );
+
+	glDisable( GL_NORMALIZE );
+	glDisable( GL_AUTO_NORMAL );
+
+	glColor4f( 1, 1, 1, 1 );
+	glClearColor( 0, 0, 0, 0 );
+
+	if( mWireFrame )
+	{
+		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	} else {
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	}
+
+	if( mMultiSample )
+	{
+		glEnable( GL_MULTISAMPLE );
+	} else {
+		glDisable( GL_MULTISAMPLE );
+	}
+}
+
+
+void Scene::pushAllGL()
+{
+	glPushAttrib( GL_ALL_ATTRIB_BITS );
+	glMatrixMode( GL_TEXTURE );	glPushMatrix();	glLoadIdentity();
+	glMatrixMode( GL_PROJECTION );	glPushMatrix();	glLoadIdentity();
+	glMatrixMode( GL_MODELVIEW );	glPushMatrix();	glLoadIdentity();
+}
+
+
+void Scene::popAllGL()
+{
+	glMatrixMode( GL_TEXTURE );	glPopMatrix();
+	glMatrixMode( GL_PROJECTION );	glPopMatrix();
+	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
+	glPopAttrib();
+}
+
+
+void Scene::update()
+{
 	qint64 delta = mElapsedTimer.restart();
 	if( delta == 0 )
 	{
@@ -121,87 +190,94 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	mRoot->update( mDelta );
 	mRoot->update2( mDelta );
+	mEye->update( mDelta );
+	mEye->applyAL();
+}
 
-	mTextureRenderer->bind();
 
-	glPushAttrib( GL_ALL_ATTRIB_BITS );
-	glMatrixMode( GL_TEXTURE );	glPushMatrix();	glLoadIdentity();
-	glMatrixMode( GL_PROJECTION );	glPushMatrix();	glLoadIdentity();
-	glMatrixMode( GL_MODELVIEW );	glPushMatrix();	glLoadIdentity();
-
-	glDisable( GL_BLEND );
-	glDisable( GL_TEXTURE_2D );
-	glEnable( GL_DEPTH_TEST );
-	glDepthFunc( GL_LEQUAL );
-	glShadeModel( GL_SMOOTH );
-	glCullFace( GL_BACK );
-	glFrontFace( GL_CCW );
-	glEnable( GL_CULL_FACE );
-
+void Scene::drawScene( const QRectF & rect )
+{
 	mEye->applyGL();
-	mEye->applyAL( mDelta );
-
-	glClear( GL_DEPTH_BUFFER_BIT );
-
-	if( mWireFrame )
-		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
-	if( mMultiSample )
-		glEnable( GL_MULTISAMPLE );
-	else
-		glDisable( GL_MULTISAMPLE );
-
-	mViewport = QRect( 0, 0, width(), height() );
 	mRoot->draw();
 	mRoot->draw2();
+}
 
-	mTextureRenderer->release();
 
-	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-
-	glMatrixMode( GL_TEXTURE );	glLoadIdentity();
-	glMatrixMode( GL_PROJECTION );	glLoadIdentity();
-	glMatrixMode( GL_MODELVIEW );	glLoadIdentity();
-
+void Scene::drawFrameBuffers()
+{
 	sQuadVertexBuffer.bind();
-	glDisable( GL_BLEND );
-	glEnable( GL_TEXTURE_2D );
-	glDisable( GL_LIGHTING );
-	glColor4f( 1, 1, 1, 1 );
-	glActiveTexture( GL_TEXTURE0 );
-	glBindTexture( GL_TEXTURE_2D, mTextureRenderer->texID() );
-	mPostProcShader->bind();
-	mPostProcShader->program()->setUniformValue( mPostProcShader_sourceMap, 0 );
-	glClientActiveTexture( GL_TEXTURE0 );
 	glEnableClientState( GL_VERTEX_ARRAY );
 	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	glVertexPointer( 3, GL_FLOAT, 5*sizeof(GLfloat), (void*)0 );
 	glTexCoordPointer( 2, GL_FLOAT, 5*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)) );
-	glDrawArrays( GL_QUADS, 0, 4 );
-	mPostProcShader->release();
+
+//	mPostProcShader->bind();
+//	mPostProcShader->program()->setUniformValue( mPostProcShader_sourceMap, 0 );
+
+	glDisable( GL_BLEND );
+	glEnable( GL_TEXTURE_2D );
+	glDisable( GL_DEPTH_TEST );
+	glDisable( GL_CULL_FACE );
+	glDisable( GL_LIGHTING );
+	glColor4f( 1, 1, 1, 1 );
+	glActiveTexture( GL_TEXTURE0 );
+	glClientActiveTexture( GL_TEXTURE0 );
+
+	if( mStereo )
+	{
+		glBindTexture( GL_TEXTURE_2D, mLeftTextureRenderer->texID() );
+		glDrawArrays( GL_QUADS, 4, 4 );
+		glBindTexture( GL_TEXTURE_2D, mRightTextureRenderer->texID() );
+		glDrawArrays( GL_QUADS, 8, 4 );
+	} else {
+		glBindTexture( GL_TEXTURE_2D, mLeftTextureRenderer->texID() );
+		glDrawArrays( GL_QUADS, 0, 4 );
+	}
+
 	glBindTexture( GL_TEXTURE_2D, 0 );
+//	mPostProcShader->release();
+
 	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 	glDisableClientState( GL_VERTEX_ARRAY );
 	sQuadVertexBuffer.release();
+}
 
-	glMatrixMode( GL_TEXTURE );	glPopMatrix();
-	glMatrixMode( GL_PROJECTION );	glPopMatrix();
-	glMatrixMode( GL_MODELVIEW );	glPopMatrix();
 
-	glPopAttrib();
+void Scene::drawBackground( QPainter * painter, const QRectF & rect )
+{
+	mGLWidget->setUpdatesEnabled( false );
+	update();
 
-	glBindBuffer( GL_ARRAY_BUFFER, 0 );
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+	if( mStereo )
+		mEye->setViewOffset( QVector3D(-0.05,0,0) );
+	mEye->setAspect( (float)mLeftTextureRenderer->size().width()/mLeftTextureRenderer->size().height() );
+	mLeftTextureRenderer->bind();
+	pushAllGL();
+		applyDefaultStatesGL();
+		glClear( GL_DEPTH_BUFFER_BIT );
+		drawScene( rect );
+	popAllGL();
+	mLeftTextureRenderer->release();
 
-//	glFlush();
-//	glFinish();
+	if( mStereo )
+	{
+		mEye->setViewOffset( QVector3D(0.05,0,0) );
+		mEye->setAspect( (float)mRightTextureRenderer->size().width()/mRightTextureRenderer->size().height() );
+		mRightTextureRenderer->bind();
+		pushAllGL();
+			applyDefaultStatesGL();
+			glClear( GL_DEPTH_BUFFER_BIT );
+			drawScene( rect );
+		popAllGL();
+		mRightTextureRenderer->release();
+	}
 
+	pushAllGL();
+		drawFrameBuffers();
+	popAllGL();
 
 	mFrameCountSecond++;
-
-	painter->setPen( QColor(255,255,255) );
-	painter->setFont( mFont );
-	painter->drawText( rect, Qt::AlignTop | Qt::AlignRight, QString( tr("(%2s) %1 FPS") ).arg(mFramesPerSecond).arg(mDelta) );
+	drawFPS( painter, rect );
 
 	GLenum glError = glGetError();
 	if( glError  != GL_NO_ERROR )
@@ -212,6 +288,14 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 		qWarning() << "OpenAL error detected:" << alGetErrorString( alError );
 
 	mGLWidget->setUpdatesEnabled( true );
+}
+
+
+void Scene::drawFPS( QPainter * painter, const QRectF & rect )
+{
+	painter->setPen( QColor(255,255,255) );
+	painter->setFont( mFont );
+	painter->drawText( rect, Qt::AlignTop | Qt::AlignRight, QString( tr("(%2s) %1 FPS") ).arg(mFramesPerSecond).arg(mDelta) );
 }
 
 
@@ -343,7 +427,6 @@ void Scene::keyPressEvent( QKeyEvent * event )
 		return;
 	}
 	event->accept();
-
 }
 
 
@@ -362,6 +445,30 @@ void Scene::keyReleaseEvent( QKeyEvent * event )
 void Scene::setSceneRect( const QRectF & rect )
 {
 	QGraphicsScene::setSceneRect( rect );
-	delete mTextureRenderer;
-	mTextureRenderer = new TextureRenderer( mGLWidget, rect.size().toSize(), true );
+	resizeFrameBuffers( rect.size().toSize() );
+}
+
+
+void Scene::resizeFrameBuffers( const QSize & screenSize )
+{
+	delete mLeftTextureRenderer;
+	delete mRightTextureRenderer;
+	mLeftTextureRenderer = NULL;
+	mRightTextureRenderer = NULL;
+
+	QSize textureRendererSize;
+
+	if( mStereo )
+		textureRendererSize = QSize( screenSize.width()/2, screenSize.height() );
+	else
+		textureRendererSize = QSize( screenSize.width(), screenSize.height() );
+
+	if( textureRendererSize.width() < 1 )
+		textureRendererSize.setWidth( 1 );
+	if( textureRendererSize.height() < 1 )
+		textureRendererSize.setHeight( 1 );
+
+	mLeftTextureRenderer = new TextureRenderer( mGLWidget, textureRendererSize, true );
+	if( mStereo )
+		mRightTextureRenderer = new TextureRenderer( mGLWidget, textureRendererSize, true );
 }

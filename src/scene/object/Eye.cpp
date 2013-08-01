@@ -12,8 +12,10 @@ Eye::Eye( Scene * scene ) :
 	mRotation(),
 	mScale( 1, 1, 1 ),
 	mFOV( 60.0f ),
+	mAspect( 1.0f ),
 	mNearPlane( 0.1f ),
-	mFarPlane( 500.0f )
+	mFarPlane( 500.0f ),
+	mViewOffset()
 {
 }
 
@@ -24,8 +26,10 @@ Eye::Eye( Eye & other ) :
 	mRotation( other.mRotation ),
 	mScale( other.mScale ),
 	mFOV( other.mFOV ),
+	mAspect( other.mAspect ),
 	mNearPlane( other.mNearPlane ),
-	mFarPlane( other.mFarPlane )
+	mFarPlane( other.mFarPlane ),
+	mViewOffset( other.mViewOffset )
 {
 }
 
@@ -35,7 +39,19 @@ Eye::~Eye()
 }
 
 
-void Eye::applyAL( const double & delta )
+void Eye::update( const double & delta )
+{
+	if( !mAttached.isNull() )
+	{
+		mPosition = mAttached.data()->position();
+		mRotation = mAttached.data()->rotation();
+	}
+	mVelocity = (mPosition - mLastPosition) / delta;
+	mLastPosition = mPosition;
+}
+
+
+void Eye::applyAL()
 {
 	QVector3D up = mRotation.rotatedVector( QVector3D(0,1,0) );
 	QVector3D direction = mRotation.rotatedVector( QVector3D(0,0,1) );
@@ -45,31 +61,25 @@ void Eye::applyAL( const double & delta )
 	};
 	alListener( AL_POSITION, mPosition );
 	alListenerv( AL_ORIENTATION, listenerOri );
-	QVector3D velocity = (mPosition - mLastPosition) / delta;
-	mLastPosition = mPosition;
-	alListener( AL_VELOCITY, velocity );
+	alListener( AL_VELOCITY, mVelocity );
 }
 
 
 void Eye::applyGL()
 {
 	mProjectionMatrix.setToIdentity();
-	mProjectionMatrix.perspective( mFOV, (float)mScene->width()/mScene->height(), mNearPlane, mFarPlane );
-	glMatrixMode( GL_PROJECTION );
-	glLoadMatrix( mProjectionMatrix );
-
-	if( !mAttached.isNull() )
-	{
-		mPosition = mAttached.data()->position();
-		mRotation = mAttached.data()->rotation();
-	}
+	mProjectionMatrix.perspective( mFOV, mAspect, mNearPlane, mFarPlane );
 
 	mViewMatrixInverse.setToIdentity();
 	mViewMatrixInverse.translate( mPosition );
 	mViewMatrixInverse.rotate( mRotation );
 	mViewMatrixInverse.rotate( 180.0f, QVector3D( 0, 1, 0 ) );
+	mViewMatrixInverse.translate( mViewOffset );
 	mViewMatrixInverse.scale( mScale );
 	mViewMatrix = mViewMatrixInverse.inverted();
+
+	glMatrixMode( GL_PROJECTION );
+	glLoadMatrix( mProjectionMatrix );
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadMatrix( mViewMatrix );

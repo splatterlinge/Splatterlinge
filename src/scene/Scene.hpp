@@ -63,8 +63,8 @@ public:
 	bool wireFrame() const { return mWireFrame; }
 	void setMultiSample( bool enable ) { mMultiSample = enable; }
 	bool multiSample() const { return mMultiSample; }
-
-	const QRect & viewport() const { return mViewport; }
+	void setStereo( bool enable ) { mStereo = enable; resizeFrameBuffers(QSize(width(),height())); }
+	bool stereo() { return mStereo; }
 
 	StartMenuWindow * startMenuWindow() { return mStartMenuWindow; }
 	DebugWindow * debugWindow() { return mDebugWindow; }
@@ -95,6 +95,7 @@ private:
 	QFont mFont;
 	bool mWireFrame;
 	bool mMultiSample;
+	bool mStereo;
 
 	bool mMouseGrabbing;
 
@@ -103,11 +104,19 @@ private:
 	Eye * mEye;
 	AObject * mRoot;
 
-	TextureRenderer * mTextureRenderer;
+	TextureRenderer * mLeftTextureRenderer;
+	TextureRenderer * mRightTextureRenderer;
 	Shader * mPostProcShader;
 	int mPostProcShader_sourceMap;
 
-	QRect mViewport;
+	void update();
+	void resizeFrameBuffers( const QSize & screenSize );
+	void drawScene( const QRectF & rect );
+	void drawFrameBuffers();
+	void drawFPS( QPainter * painter, const QRectF & rect );
+	void applyDefaultStatesGL();
+	void pushAllGL();
+	void popAllGL();
 
 private slots:
 	void secondPassed();
