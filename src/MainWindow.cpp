@@ -6,6 +6,8 @@
 MainWindow::MainWindow( QWidget * parent ) :
 	QMainWindow( parent )
 {
+	resize( 800, 600 );
+
 	QSettings settings;
 	restoreGeometry( settings.value("geometry").toByteArray() );
 
