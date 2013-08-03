@@ -70,18 +70,18 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 		sQuadVertexBuffer.allocate( sQuadVertices, sizeof(sQuadVertices) );
 		sQuadVertexBuffer.release();
 	}
-	mPostProcShader = new Shader( glWidget, "postProc.poster" );
-	mPostProcShader_sourceMap = mPostProcShader->program()->uniformLocation( "sourceMap" );
 
 	mStereo = settings.value( "stereo", false ).toBool();
+	if( mStereo )
+		resizeStereoFrameBuffers( QSize(400,600) );
+
 	mMultiSample = settings.value( "sampleBuffers", false ).toBool();
 
 	mEye = new Eye( this );
 	mEye->setFarPlane( settings.value( "farPlane", 500.0f ).toFloat() );
+	mEye->setFOV(90);
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
-
-	resizeFrameBuffers( QSize(400,600) );
 
 	mDebugWindow = new DebugWindow( this );
 	addWidget( mDebugWindow, mDebugWindow->windowFlags() );
@@ -178,24 +178,16 @@ void Scene::popAllGL()
 }
 
 
-void Scene::update()
+void Scene::updateObjects( const double & delta )
 {
-	qint64 delta = mElapsedTimer.restart();
-	if( delta == 0 )
-	{
-		qWarning() << "Rendering too fast - cannot compute delta t!";
-		delta = 1;
-	}
-	mDelta = (double)delta/1000.0;
-
-	mRoot->update( mDelta );
-	mRoot->update2( mDelta );
-	mEye->update( mDelta );
+	mRoot->update( delta );
+	mRoot->update2( delta );
+	mEye->update( delta );
 	mEye->applyAL();
 }
 
 
-void Scene::drawScene( const QRectF & rect )
+void Scene::drawObjects()
 {
 	mEye->applyGL();
 	mRoot->draw();
@@ -203,16 +195,13 @@ void Scene::drawScene( const QRectF & rect )
 }
 
 
-void Scene::drawFrameBuffers()
+void Scene::drawStereoFrameBuffers()
 {
 	sQuadVertexBuffer.bind();
 	glEnableClientState( GL_VERTEX_ARRAY );
 	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 	glVertexPointer( 3, GL_FLOAT, 5*sizeof(GLfloat), (void*)0 );
 	glTexCoordPointer( 2, GL_FLOAT, 5*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)) );
-
-//	mPostProcShader->bind();
-//	mPostProcShader->program()->setUniformValue( mPostProcShader_sourceMap, 0 );
 
 	glDisable( GL_BLEND );
 	glEnable( GL_TEXTURE_2D );
@@ -223,19 +212,13 @@ void Scene::drawFrameBuffers()
 	glActiveTexture( GL_TEXTURE0 );
 	glClientActiveTexture( GL_TEXTURE0 );
 
-	if( mStereo )
-	{
-		glBindTexture( GL_TEXTURE_2D, mLeftTextureRenderer->texID() );
-		glDrawArrays( GL_QUADS, 4, 4 );
-		glBindTexture( GL_TEXTURE_2D, mRightTextureRenderer->texID() );
-		glDrawArrays( GL_QUADS, 8, 4 );
-	} else {
-		glBindTexture( GL_TEXTURE_2D, mLeftTextureRenderer->texID() );
-		glDrawArrays( GL_QUADS, 0, 4 );
-	}
+	glBindTexture( GL_TEXTURE_2D, mLeftTextureRenderer->texID() );
+	glDrawArrays( GL_QUADS, 4, 4 );
+
+	glBindTexture( GL_TEXTURE_2D, mRightTextureRenderer->texID() );
+	glDrawArrays( GL_QUADS, 8, 4 );
 
 	glBindTexture( GL_TEXTURE_2D, 0 );
-//	mPostProcShader->release();
 
 	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 	glDisableClientState( GL_VERTEX_ARRAY );
@@ -246,35 +229,53 @@ void Scene::drawFrameBuffers()
 void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 {
 	mGLWidget->setUpdatesEnabled( false );
-	update();
 
-	if( mStereo )
-		mEye->setViewOffset( QVector3D(-0.05,0,0) );
-	mEye->setAspect( (float)mLeftTextureRenderer->size().width()/mLeftTextureRenderer->size().height() );
-	mLeftTextureRenderer->bind();
-	pushAllGL();
-		applyDefaultStatesGL();
-		glClear( GL_DEPTH_BUFFER_BIT );
-		drawScene( rect );
-	popAllGL();
-	mLeftTextureRenderer->release();
+	qint64 delta = mElapsedTimer.restart();
+	if( delta == 0 )
+	{
+		qWarning() << "Rendering too fast - cannot compute delta t!";
+		delta = 1;
+	}
+	mDelta = (double)delta/1000.0;
+
+	updateObjects( mDelta );
 
 	if( mStereo )
 	{
+		mEye->setViewOffset( QVector3D(-0.05,0,0) );
+		mEye->setAspect( (float)mLeftTextureRenderer->size().width()/mLeftTextureRenderer->size().height() );
+		mLeftTextureRenderer->bind();
+		pushAllGL();
+			applyDefaultStatesGL();
+			glClear( GL_DEPTH_BUFFER_BIT );
+			drawObjects();
+		popAllGL();
+		mLeftTextureRenderer->release();
+
 		mEye->setViewOffset( QVector3D(0.05,0,0) );
 		mEye->setAspect( (float)mRightTextureRenderer->size().width()/mRightTextureRenderer->size().height() );
 		mRightTextureRenderer->bind();
 		pushAllGL();
 			applyDefaultStatesGL();
 			glClear( GL_DEPTH_BUFFER_BIT );
-			drawScene( rect );
+			drawObjects();
 		popAllGL();
 		mRightTextureRenderer->release();
-	}
 
-	pushAllGL();
-		drawFrameBuffers();
-	popAllGL();
+		pushAllGL();
+			drawStereoFrameBuffers();
+		popAllGL();
+	}
+	else
+	{
+		mEye->setViewOffset( QVector3D(0,0,0) );
+		mEye->setAspect( (float)width()/height() );
+		pushAllGL();
+			applyDefaultStatesGL();
+			glClear( GL_DEPTH_BUFFER_BIT );
+			drawObjects();
+		popAllGL();
+	}
 
 	mFrameCountSecond++;
 	drawFPS( painter, rect );
@@ -445,30 +446,25 @@ void Scene::keyReleaseEvent( QKeyEvent * event )
 void Scene::setSceneRect( const QRectF & rect )
 {
 	QGraphicsScene::setSceneRect( rect );
-	resizeFrameBuffers( rect.size().toSize() );
+	resizeStereoFrameBuffers( rect.size().toSize() );
 }
 
 
-void Scene::resizeFrameBuffers( const QSize & screenSize )
+void Scene::resizeStereoFrameBuffers( const QSize & screenSize )
 {
 	delete mLeftTextureRenderer;
 	delete mRightTextureRenderer;
 	mLeftTextureRenderer = NULL;
 	mRightTextureRenderer = NULL;
 
-	QSize textureRendererSize;
-
 	if( mStereo )
-		textureRendererSize = QSize( screenSize.width()/2, screenSize.height() );
-	else
-		textureRendererSize = QSize( screenSize.width(), screenSize.height() );
-
-	if( textureRendererSize.width() < 1 )
-		textureRendererSize.setWidth( 1 );
-	if( textureRendererSize.height() < 1 )
-		textureRendererSize.setHeight( 1 );
-
-	mLeftTextureRenderer = new TextureRenderer( mGLWidget, textureRendererSize, true );
-	if( mStereo )
+	{
+		QSize textureRendererSize = QSize( screenSize.width()/2, screenSize.height() );
+		if( textureRendererSize.width() < 1 )
+			textureRendererSize.setWidth( 1 );
+		if( textureRendererSize.height() < 1 )
+			textureRendererSize.setHeight( 1 );
+		mLeftTextureRenderer = new TextureRenderer( mGLWidget, textureRendererSize, true );
 		mRightTextureRenderer = new TextureRenderer( mGLWidget, textureRendererSize, true );
+	}
 }

@@ -33,14 +33,19 @@ OcclusionTest::~OcclusionTest()
 bool OcclusionTest::pointVisible( const QVector3D & point )
 {
 	GLuint sampleCount = 0;
+	GLuint samplesPerFragment;
+	glGetIntegerv( GL_SAMPLES_ARB, (GLint*)&samplesPerFragment );
+	if( samplesPerFragment == 0 )
+		samplesPerFragment = 1;
 
 	if( glIsQuery( mQuery ) )	// fetch the result of last frame
 		glGetQueryObjectuiv( mQuery, GL_QUERY_RESULT, &sampleCount );
 
-	glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
-	glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
-	glDepthMask( GL_FALSE );
-	glEnable( GL_DEPTH_TEST );
+	glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_ENABLE_BIT );
+	glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );	// don't draw anything
+	glDepthMask( GL_FALSE );	// don't write the depth of our testing points to the depth buffer
+	glEnable( GL_DEPTH_TEST );	// essential for occlusion query
+	glDisable( GL_MULTISAMPLE );	// multisampling would cause the query to report too many passed samples
 
 	glBeginQuery( GL_SAMPLES_PASSED, mQuery );
 	glBegin( GL_POINTS );
@@ -50,21 +55,26 @@ bool OcclusionTest::pointVisible( const QVector3D & point )
 
 	glPopAttrib();
 
-	return sampleCount;
+	return sampleCount/samplesPerFragment;
 }
 
 
 unsigned char OcclusionTest::randomPointsInUnitSphereVisible( const unsigned char & numPoints )
 {
 	GLuint sampleCount = 0;
+	GLuint samplesPerFragment;
+	glGetIntegerv( GL_SAMPLES_ARB, (GLint*)&samplesPerFragment );
+	if( samplesPerFragment == 0 )
+		samplesPerFragment = 1;
 
 	if( glIsQuery( mQuery ) )	// fetch the result of last frame
 		glGetQueryObjectuiv( mQuery, GL_QUERY_RESULT, &sampleCount );
 
-	glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
-	glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
-	glDepthMask( GL_FALSE );
-	glEnable( GL_DEPTH_TEST );
+	glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_ENABLE_BIT );
+	glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );	// don't draw anything
+	glDepthMask( GL_FALSE );	// don't write the depth of our testing points to the depth buffer
+	glEnable( GL_DEPTH_TEST );	// essential for occlusion query
+	glDisable( GL_MULTISAMPLE );	// multisampling would cause the query to report too many passed samples
 
 	glBeginQuery( GL_SAMPLES_PASSED, mQuery );
 	sRandomVertexInSphereBuffer.bind();
@@ -77,5 +87,5 @@ unsigned char OcclusionTest::randomPointsInUnitSphereVisible( const unsigned cha
 
 	glPopAttrib();
 
-	return sampleCount;
+	return sampleCount/samplesPerFragment;
 }

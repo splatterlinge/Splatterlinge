@@ -63,7 +63,7 @@ public:
 	bool wireFrame() const { return mWireFrame; }
 	void setMultiSample( bool enable ) { mMultiSample = enable; }
 	bool multiSample() const { return mMultiSample; }
-	void setStereo( bool enable ) { mStereo = enable; resizeFrameBuffers(QSize(width(),height())); }
+	void setStereo( bool enable ) { mStereo = enable; resizeStereoFrameBuffers(QSize(width(),height())); }
 	bool stereo() { return mStereo; }
 
 	StartMenuWindow * startMenuWindow() { return mStartMenuWindow; }
@@ -106,17 +106,15 @@ private:
 
 	TextureRenderer * mLeftTextureRenderer;
 	TextureRenderer * mRightTextureRenderer;
-	Shader * mPostProcShader;
-	int mPostProcShader_sourceMap;
 
-	void update();
-	void resizeFrameBuffers( const QSize & screenSize );
-	void drawScene( const QRectF & rect );
-	void drawFrameBuffers();
+	void resizeStereoFrameBuffers( const QSize & screenSize );
+	void drawStereoFrameBuffers();
 	void drawFPS( QPainter * painter, const QRectF & rect );
 	void applyDefaultStatesGL();
 	void pushAllGL();
 	void popAllGL();
+	void updateObjects( const double & delta );
+	void drawObjects();
 
 private slots:
 	void secondPassed();
