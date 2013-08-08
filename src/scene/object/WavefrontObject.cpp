@@ -15,6 +15,7 @@ WavefrontObject::WavefrontObject( Scene * scene, QString filename, QVector<QMatr
 WavefrontObject::~WavefrontObject()
 {
 	delete mModel;
+	mInstances->clear();
 	delete mInstances;
 }
 
