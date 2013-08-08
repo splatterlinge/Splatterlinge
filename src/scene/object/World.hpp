@@ -14,6 +14,8 @@
 #include "WavefrontObject.hpp"
 
 #include <QTime>
+#include <QVector>
+#include <QMatrix4x4>
 
 class Shader;
 class TextureRenderer;

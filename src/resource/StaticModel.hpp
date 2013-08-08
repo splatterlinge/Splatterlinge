@@ -1,14 +1,15 @@
 #ifndef RESOURCE_STATICMODEL_INCLUDED
 #define RESOURCE_STATICMODEL_INCLUDED
 
-#include "GLWidget.hpp"
 #include "AResource.hpp"
 #include "Material.hpp"
+#include <scene/Scene.hpp>
 #include <geometry/Vertex.hpp>
 
 #include <QGLBuffer>
 #include <QFile>
 #include <QFileInfo>
+#include <QMatrix4x4>
 
 class Face
 {
@@ -37,7 +38,7 @@ public:
 class StaticModelData : public AResourceData
 {
 public:
-	StaticModelData( GLWidget * widget, QString name );
+	StaticModelData( Scene * scene, QString name );
 	virtual ~StaticModelData();
 
 	const QString & name() const { return mName; }
@@ -53,7 +54,7 @@ public:
 	virtual void unload();
 
 protected:
-	GLWidget * mGLWidget;
+	Scene * mScene;
 	QString mName;
 	QSizeF mSize;
 	QVector<Part> mParts;
@@ -68,15 +69,17 @@ protected:
 class StaticModel : public AResource<StaticModelData>
 {
 public:
-	StaticModel( GLWidget * widget, QString name );
+	StaticModel( Scene * scene, QString name, QVector<QMatrix4x4> instances );
 	virtual ~StaticModel();
 
 	QSizeF getSize() { return data()->size(); }
+	QVector<QMatrix4x4> & instances() { return mInstances; }
 
 	void draw();
 
 private:
-	GLWidget * mGLWidget;
+	Scene * mScene;
+	QVector<QMatrix4x4> mInstances;
 };
 
 

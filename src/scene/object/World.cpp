@@ -77,19 +77,45 @@ World::World( Scene * scene, QString name ) :
 	mDummy = QSharedPointer<Dummy>( new Dummy( this ) );
 	add( mDummy );
 
+	/*
 	mTable = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/table01/table01.obj", 0.4f ) );
 	mTable->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 3 );
 	add( mTable );
+	*/
 
+	QVector<QMatrix4x4> instances;
+	QPointF min;
+	QPointF max;
 	for( float i=0; i<=100; i+=(float)rand()/( (float)RAND_MAX/3) )
 	{
+		QMatrix4x4 pos;
 		float j = (float)rand()/( (float)RAND_MAX/200);
-		mTree = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/tree/tree.obj", 0.3f+(float)rand()/( (float)RAND_MAX/0.3) ) );
-		mTree->setPositionX( 100+i );
-		mTree->setPositionZ( -j );
-		mTree->setPositionY( mLandscape->terrain()->getHeight( QPointF(100+i,-j) ) - 1 );
-		add( mTree );
+
+		float x = 100 + i;
+		float y = mLandscape->terrain()->getHeight( QPointF(100+i,-j) ) - 1;
+		float z = -j;
+
+		if( x < min.x() || i == 0 )
+			min.setX( x );
+		if( x > max.x() || i == 0 )
+			max.setX( x );
+		if( z < min.y() || i == 0 )
+			min.setY( z );
+		if( z > max.y() || i == 0 )
+			max.setY( z );
+
+		pos.translate(x, y, z);
+		pos.scale( 0.3f+(float)rand()/( (float)RAND_MAX/0.3 ) );
+		pos.rotate( (float)rand()/(float)RAND_MAX, 0.0, 1.0, 0.0 );
+		instances.append(pos);
 	}
+	mTree = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/tree/tree.obj", instances ) );
+	qDebug() << min;
+	qDebug() << max;
+	mTree->setPositionX( ( min.x() + max.x() ) / 2 );
+	mTree->setPositionZ( ( min.y() + max.y() ) / 2 );
+	mTree->setPositionY( ( 0 ) );
+	add( mTree );
 
 	scene->addKeyListener( this );
 

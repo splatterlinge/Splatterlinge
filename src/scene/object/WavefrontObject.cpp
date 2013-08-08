@@ -1,15 +1,14 @@
 #include "WavefrontObject.hpp"
 
-WavefrontObject::WavefrontObject( Scene * scene, QString filename, float scale ) :
+WavefrontObject::WavefrontObject( Scene * scene, QString filename, QVector<QMatrix4x4> instances ) :
 	AObject( scene )
 {
 	mScene = scene;
 	mFilename = filename;
-	mScale = scale;
 
-	mModel = new StaticModel( mScene->glWidget(), mFilename );
+	mModel = new StaticModel( mScene, mFilename, instances );
 
-	setBoundingSphere( qMin( mModel->getSize().width(), mModel->getSize().height() )*(mScale*2) );
+	setBoundingSphere( qMax( mModel->getSize().width(), mModel->getSize().height() ) );
 }
 
 
@@ -34,7 +33,6 @@ void WavefrontObject::drawSelf()
 
 	glPushMatrix();
 
-	glScale( mScale );
 	glColor3f( 1.0f, 1.0f, 1.0f );
 
 	mModel->draw();
