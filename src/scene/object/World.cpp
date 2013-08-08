@@ -86,10 +86,10 @@ World::World( Scene * scene, QString name ) :
 	QVector<QMatrix4x4> instances;
 	QPointF min;
 	QPointF max;
-	for( float i=0; i<=100; i+=(float)rand()/( (float)RAND_MAX/3) )
+	for( float i=0; i<=500; i+=(float)rand()/( (float)RAND_MAX/1) )
 	{
 		QMatrix4x4 pos;
-		float j = (float)rand()/( (float)RAND_MAX/200);
+		float j = (float)rand()/( (float)RAND_MAX/500);
 
 		float x = 100 + i;
 		float y = mLandscape->terrain()->getHeight( QPointF(100+i,-j) ) - 1;
@@ -110,8 +110,6 @@ World::World( Scene * scene, QString name ) :
 		instances.append(pos);
 	}
 	mTree = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/tree/tree.obj", instances ) );
-	qDebug() << min;
-	qDebug() << max;
 	mTree->setPositionX( ( min.x() + max.x() ) / 2 );
 	mTree->setPositionZ( ( min.y() + max.y() ) / 2 );
 	mTree->setPositionY( ( 0 ) );

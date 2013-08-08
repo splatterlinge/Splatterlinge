@@ -245,6 +245,8 @@ void StaticModel::draw()
 	VertexP3fN3fT2f::glEnableClientState();
 	VertexP3fN3fT2f::glPointerVBO();
 
+	glPushMatrix();
+
 	foreach( Part part, data()->parts() )
 	{
 		if( part.material )
@@ -254,8 +256,6 @@ void StaticModel::draw()
 
 		foreach( QMatrix4x4 instance, mInstances )
 		{
-			glPushMatrix();
-
 			glLoadMatrixd( ( mScene->eye()->viewMatrix() * instance ).constData() );
 
 			glDrawElements(
@@ -266,8 +266,6 @@ void StaticModel::draw()
 					part.start		// index to start
 				) ) )
 			);
-
-			glPopMatrix();
 		}
 
 		if( part.material )
@@ -275,6 +273,8 @@ void StaticModel::draw()
 			part.material->release();
 		}
 	}
+
+	glPopMatrix();
 
 	glDisableClientState( GL_INDEX_ARRAY );
 	VertexP3fN3fT2f::glDisableClientState();
