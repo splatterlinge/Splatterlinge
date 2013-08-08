@@ -69,17 +69,15 @@ protected:
 class StaticModel : public AResource<StaticModelData>
 {
 public:
-	StaticModel( Scene * scene, QString name, QVector<QMatrix4x4> instances );
+	StaticModel( Scene * scene, QString name );
 	virtual ~StaticModel();
 
 	QSizeF getSize() { return data()->size(); }
-	QVector<QMatrix4x4> & instances() { return mInstances; }
 
-	void draw();
+	void draw( const QVector<QMatrix4x4> * instances );
 
 private:
 	Scene * mScene;
-	QVector<QMatrix4x4> mInstances;
 };
 
 

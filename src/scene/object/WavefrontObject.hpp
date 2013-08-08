@@ -5,12 +5,14 @@
 #include <resource/StaticModel.hpp>
 
 #include <QString>
+#include <QVector>
+#include <QVectorIterator>
 #include <QMatrix4x4>
 
 class WavefrontObject : public AObject
 {
 public:
-	WavefrontObject( Scene * scene, QString filename, QVector<QMatrix4x4> instances );
+	WavefrontObject( Scene * scene, QString filename, QVector<QMatrix4x4> * instances );
 	virtual ~WavefrontObject();
 
 	virtual void updateSelf( const double & delta );
@@ -20,6 +22,7 @@ private:
 	StaticModel * mModel;
 	Scene * mScene;
 	QString mFilename;
+	QVector<QMatrix4x4> * mInstances;
 };
 
 #endif // WAVEFRONTOBJECT_HPP

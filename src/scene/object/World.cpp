@@ -83,7 +83,7 @@ World::World( Scene * scene, QString name ) :
 	add( mTable );
 	*/
 
-	QVector<QMatrix4x4> instances;
+	QVector<QMatrix4x4> * instances = new QVector<QMatrix4x4>();
 	QPointF min;
 	QPointF max;
 	for( float i=0; i<=500; i+=(float)rand()/( (float)RAND_MAX/1) )
@@ -107,7 +107,7 @@ World::World( Scene * scene, QString name ) :
 		pos.translate(x, y, z);
 		pos.scale( 0.3f+(float)rand()/( (float)RAND_MAX/0.3 ) );
 		pos.rotate( (float)rand()/(float)RAND_MAX, 0.0, 1.0, 0.0 );
-		instances.append(pos);
+		instances->append(pos);
 	}
 	mTree = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/tree/tree.obj", instances ) );
 	mTree->setPositionX( ( min.x() + max.x() ) / 2 );

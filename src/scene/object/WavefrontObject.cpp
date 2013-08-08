@@ -1,12 +1,12 @@
 #include "WavefrontObject.hpp"
 
-WavefrontObject::WavefrontObject( Scene * scene, QString filename, QVector<QMatrix4x4> instances ) :
-	AObject( scene )
+WavefrontObject::WavefrontObject( Scene * scene, QString filename, QVector<QMatrix4x4> * instances ) :
+	AObject( scene ),
+	mScene( scene ),
+	mFilename( filename ),
+	mInstances( instances)
 {
-	mScene = scene;
-	mFilename = filename;
-
-	mModel = new StaticModel( mScene, mFilename, instances );
+	mModel = new StaticModel( mScene, mFilename );
 
 	setBoundingSphere( qMax( mModel->getSize().width(), mModel->getSize().height() ) );
 }
@@ -15,6 +15,7 @@ WavefrontObject::WavefrontObject( Scene * scene, QString filename, QVector<QMatr
 WavefrontObject::~WavefrontObject()
 {
 	delete mModel;
+	delete mInstances;
 }
 
 
@@ -35,7 +36,7 @@ void WavefrontObject::drawSelf()
 
 	glColor3f( 1.0f, 1.0f, 1.0f );
 
-	mModel->draw();
+	mModel->draw( mInstances );
 
 	glPopMatrix();
 	glPopAttrib();

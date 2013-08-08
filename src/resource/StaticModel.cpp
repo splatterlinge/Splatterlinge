@@ -222,10 +222,9 @@ bool StaticModelData::parse()
 }
 
 
-StaticModel::StaticModel( Scene * scene, QString name, QVector<QMatrix4x4> instances ) :
+StaticModel::StaticModel( Scene * scene, QString name ) :
 	AResource(),
-	mScene( scene ),
-	mInstances( instances )
+	mScene( scene )
 {
 	QSharedPointer<StaticModelData> n( new StaticModelData( scene, name ) );
 	cache( n );
@@ -236,7 +235,7 @@ StaticModel::~StaticModel()
 {
 }
 
-void StaticModel::draw()
+void StaticModel::draw( const QVector<QMatrix4x4> * instances)
 {
 	data()->vertexBuffer().bind();
 	data()->indexBuffer().bind();
@@ -254,7 +253,7 @@ void StaticModel::draw()
 			part.material->bind();
 		}
 
-		foreach( QMatrix4x4 instance, mInstances )
+		foreach( QMatrix4x4 instance, * instances )
 		{
 			glLoadMatrixd( ( mScene->eye()->viewMatrix() * instance ).constData() );
 
