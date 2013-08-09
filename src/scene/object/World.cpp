@@ -94,6 +94,7 @@ World::World( Scene * scene, QString name ) :
 	mDummy = QSharedPointer<Dummy>( new Dummy( this ) );
 	add( mDummy );
 
+	qsrand( QTime::currentTime().msec() );
 	mForest = QSharedPointer<Forest>( new Forest( scene, mLandscape->terrain(), "data/object/tree/tree.obj", QPointF(200,0), 200, 500 ) );
 	mForest->setPositionX( 200 );
 	mForest->setPositionY( 0 );
