@@ -17,6 +17,15 @@
 
 #include "WavefrontObject.hpp"
 
+WavefrontObject::WavefrontObject( Scene * scene, QString filename ) :
+	AObject( scene ),
+	mScene( scene ),
+	mFilename( filename )
+{
+	mInstances = new QVector<QMatrix4x4>();
+	mModel = new StaticModel( mScene, mFilename );
+}
+
 WavefrontObject::WavefrontObject( Scene * scene, QString filename, QVector<QMatrix4x4> * instances ) :
 	AObject( scene ),
 	mScene( scene ),

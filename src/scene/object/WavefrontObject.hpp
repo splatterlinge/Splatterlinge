@@ -29,13 +29,14 @@
 class WavefrontObject : public AObject
 {
 public:
+	WavefrontObject( Scene * scene, QString filename );
 	WavefrontObject( Scene * scene, QString filename, QVector<QMatrix4x4> * instances );
 	virtual ~WavefrontObject();
 
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
-private:
+protected:
 	StaticModel * mModel;
 	Scene * mScene;
 	QString mFilename;

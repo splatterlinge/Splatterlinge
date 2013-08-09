@@ -94,12 +94,13 @@ World::World( Scene * scene, QString name ) :
 	mDummy = QSharedPointer<Dummy>( new Dummy( this ) );
 	add( mDummy );
 
-	/*
-	mTable = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/table01/table01.obj", 0.4f ) );
-	mTable->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) + 3 );
-	add( mTable );
-	*/
+	mForest = QSharedPointer<Forest>( new Forest( scene, mLandscape->terrain(), "data/object/tree/tree.obj", QPointF(200,0), 200, 500 ) );
+	mForest->setPositionX( 200 );
+	mForest->setPositionY( 0 );
+	mForest->setPositionZ( 0 );
+	add( mForest );
 
+	/*
 	QVector<QMatrix4x4> * instances = new QVector<QMatrix4x4>();
 	QPointF min;
 	QPointF max;
@@ -131,6 +132,7 @@ World::World( Scene * scene, QString name ) :
 	mTree->setPositionZ( ( min.y() + max.y() ) / 2 );
 	mTree->setPositionY( ( 0 ) );
 	add( mTree );
+	*/
 
 	scene->addKeyListener( this );
 
