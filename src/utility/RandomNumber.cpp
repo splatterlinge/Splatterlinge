@@ -26,3 +26,12 @@ QVector3D RandomNumber::inUnitSphere()
 	} while( vec.lengthSquared() > 1.0f );
 	return vec;
 }
+
+QVector2D RandomNumber::inUnitCircle()
+{
+	QVector2D vec;
+	do {
+		vec = QVector2D( RandomNumber::minMax( -1.0, 1.0 ), RandomNumber::minMax( -1.0, 1.0 ) );
+	} while( vec.lengthSquared() > 1.0f );
+	return vec;
+}

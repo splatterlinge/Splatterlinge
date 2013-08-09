@@ -20,15 +20,17 @@
 
 #include <stdlib.h>
 #include <QVector3D>
+#include <QVector2D>
 #include <QtGlobal>
 
 
 namespace RandomNumber
 {
 	inline float minMax( const float & min, const float & max)
-		{ return ( (float)qrand()/(float)RAND_MAX ) * (max-min) + min; }
+		{ return ( (float)qrand()/(float)RAND_MAX ) * (max-min+1) + min; }
 
 	QVector3D inUnitSphere();
+	QVector2D inUnitCircle();
 }
 
 
