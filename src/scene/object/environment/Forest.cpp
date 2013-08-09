@@ -41,10 +41,6 @@ Forest::Forest( Scene * scene, Terrain * terrain, QString filename, QPointF posi
 
 			mInstances->append(pos);
 		}
-		else
-		{
-			qDebug() << x << y;
-		}
 	}
 
 	setBoundingSphere( radius );
