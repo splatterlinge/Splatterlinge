@@ -21,6 +21,7 @@
 #include "../../Scene.hpp"
 #include "../WavefrontObject.hpp"
 #include "geometry/Terrain.hpp"
+#include "utility/RandomNumber.hpp"
 #include "qmath.h"
 
 #include <QPointF>

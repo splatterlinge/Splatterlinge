@@ -24,12 +24,10 @@ Forest::Forest( Scene * scene, Terrain * terrain, QString filename, QPointF posi
 	for( int i=0; i<number; i++ )
 	{
 		QMatrix4x4 pos;
-		float t = 2 * M_PI * qrand();
-		float u = qrand() % radius/2 + qrand() % radius/2;
-		float r = u>1 ? 2-u : u;
+		QVector2D random = RandomNumber::inUnitCircle();
 
-		float x = position.x() + r*cos(t);
-		float y = position.y() + r*sin(t);
+		float x = position.x() + random.x() * radius;
+		float y = position.y() + random.y() * radius;
 		float z = mTerrain->getHeight( QPointF(x,y) );
 
 		if( z >= -9 )
