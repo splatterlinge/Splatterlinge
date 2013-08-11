@@ -31,6 +31,7 @@ namespace RandomNumber
 
 	QVector3D inUnitSphere();
 	QVector2D inUnitCircle();
+	QVector2D inUnitSquare();
 }
 
 
