@@ -21,16 +21,20 @@
 #include <scene/Scene.hpp>
 #include <geometry/teapot.h>
 #include <resource/Material.hpp>
+#include <resource/StaticModel.hpp>
 #include <resource/AudioSample.hpp>
 #include <utility/Sphere.hpp>
 #include <utility/Capsule.hpp>
 
 
 Teapot::Teapot( Scene * scene, const float & size ) :
-	AObject( scene, size*1.5f ),
+	AObject( scene ),
 	mSize( size )
 {
 	mMaterial = new Material( scene->glWidget(), "KirksEntry" );
+
+//	mModel = new StaticModel( scene, "data/object/teapot/teapot.obj" );
+
 	mAudioSample = new AudioSample( "data/sound/test.ogg" );
 	mAudioSample->setLooping( true );
 	mAudioSample->setRolloffFactor( 0.1f );
@@ -41,6 +45,7 @@ Teapot::Teapot( Scene * scene, const float & size ) :
 Teapot::~Teapot()
 {
 	delete mMaterial;
+//	delete mModel;
 	delete mAudioSample;
 }
 
@@ -59,10 +64,14 @@ void Teapot::updateSelf( const double & delta )
 void Teapot::drawSelf()
 {
 	mMaterial->bind();
+
 	glPushMatrix();
 	glTranslatef( 0, mSize*0.6, 0 );
 	teapot( 6, mSize, GL_FILL );
 	glPopMatrix();
+
+//	mModel->draw();
+
 	mMaterial->release();
 }
 

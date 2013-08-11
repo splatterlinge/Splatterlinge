@@ -23,7 +23,6 @@
 #include <effect/SplatterSystem.hpp>
 #include "Landscape.hpp"
 #include "Teapot.hpp"
-#include "WavefrontObject.hpp"
 #include "Sky.hpp"
 
 #include <QPainter>
@@ -95,7 +94,7 @@ World::World( Scene * scene, QString name ) :
 	add( mDummy );
 
 	qsrand( QTime::currentTime().msec() );
-	mForest = QSharedPointer<Forest>( new Forest( scene, mLandscape->terrain(), "data/object/tree/tree.obj", QPointF(200,0), 200, 500 ) );
+	mForest = QSharedPointer<Forest>( new Forest( this, "data/object/tree/tree.obj", QPointF(200,0), 200, 500 ) );
 	mForest->setPositionX( 200 );
 	mForest->setPositionY( 0 );
 	mForest->setPositionZ( 0 );

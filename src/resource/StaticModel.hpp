@@ -55,7 +55,7 @@ public:
 class StaticModelData : public AResourceData
 {
 public:
-	StaticModelData( Scene * scene, QString name );
+	StaticModelData( GLWidget * glWidget, QString name );
 	virtual ~StaticModelData();
 
 	const QString & name() const { return mName; }
@@ -71,7 +71,7 @@ public:
 	virtual void unload();
 
 protected:
-	Scene * mScene;
+	GLWidget * mGLWidget;
 	QString mName;
 	QSizeF mSize;
 	QVector<Part> mParts;
@@ -91,7 +91,7 @@ public:
 
 	QSizeF getSize() { return data()->size(); }
 
-	void draw( const QVector<QMatrix4x4> * instances );
+	void draw( const QVector<QMatrix4x4> & instances );
 
 private:
 	Scene * mScene;

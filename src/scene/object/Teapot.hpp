@@ -22,6 +22,7 @@
 
 
 class Material;
+class StaticModel;
 class AudioSample;
 
 
@@ -42,6 +43,7 @@ public:
 
 private:
 	Material * mMaterial;
+	StaticModel * mModel;
 	AudioSample * mAudioSample;
 	float mSize;
 	QVector3D mLastWorldPosition;

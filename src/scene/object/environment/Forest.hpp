@@ -15,27 +15,38 @@
  * along with Splatterlinge. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FOREST_HPP
-#define FOREST_HPP
+#ifndef SCENE_OBJECT_ENVIRONMENT_FOREST_INCLUDED
+#define SCENE_OBJECT_ENVIRONMENT_FOREST_INCLUDED
 
+#include "../AWorldObject.hpp"
 #include "../../Scene.hpp"
-#include "../WavefrontObject.hpp"
-#include "geometry/Terrain.hpp"
-#include "utility/RandomNumber.hpp"
-#include "qmath.h"
+
+#include <resource/StaticModel.hpp>
+#include <geometry/Terrain.hpp>
+#include <utility/RandomNumber.hpp>
 
 #include <QPointF>
 #include <QVector>
 #include <QMatrix4x4>
 
-class Forest : public WavefrontObject
+
+class World;
+
+
+class Forest : public AWorldObject
 {
 public:
-	Forest( Scene * scene, Terrain * terrain, QString filename, QPointF position, int radius, int number );
-	~Forest();
+	Forest( World * world, QString filename, QPointF position, int radius, int number );
+	virtual ~Forest();
+
+	virtual void updateSelf( const double & delta );
+	virtual void drawSelf();
 
 private:
 	Terrain * mTerrain;
+	QVector<QMatrix4x4> mInstances;
+	StaticModel * mModel;
 };
 
-#endif // FOREST_HPP
+
+#endif

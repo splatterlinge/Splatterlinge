@@ -96,7 +96,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 
 	mEye = new Eye( this );
 	mEye->setFarPlane( settings.value( "farPlane", 500.0f ).toFloat() );
-	mEye->setFOV(90);
+	mEye->setFOV(60);
 
 	mFont = QFont( "Sans", 12, QFont::Normal );
 

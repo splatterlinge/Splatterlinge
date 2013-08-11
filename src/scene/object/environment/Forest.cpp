@@ -16,11 +16,15 @@
  */
 
 #include "Forest.hpp"
+#include <scene/object/World.hpp>
 
-Forest::Forest( Scene * scene, Terrain * terrain, QString filename, QPointF position, int radius, int number ) :
-	WavefrontObject( scene, filename ),
-	mTerrain( terrain )
+
+Forest::Forest( World * world, QString filename, QPointF position, int radius, int number ) :
+	AWorldObject( world ),
+	mTerrain( world->landscape()->terrain() )
 {
+	mModel = new StaticModel( world->scene(), filename );
+
 	for( int i=0; i<number; i++ )
 	{
 		QMatrix4x4 pos;
@@ -37,13 +41,26 @@ Forest::Forest( Scene * scene, Terrain * terrain, QString filename, QPointF posi
 			pos.rotate( qrand() % 360, 0.0, 1.0, 0.0 );
 			pos.rotate( qrand() % 5, 1.0, 0.0, 1.0 );
 
-			mInstances->append(pos);
+			mInstances.append(pos);
 		}
 	}
 
 	setBoundingSphere( radius );
 }
 
+
 Forest::~Forest()
 {
+	delete mModel;
+}
+
+
+void Forest::updateSelf( const double & delta )
+{
+}
+
+
+void Forest::drawSelf()
+{
+	mModel->draw( mInstances );
 }

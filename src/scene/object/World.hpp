@@ -28,7 +28,6 @@
 #include "creature/Dummy.hpp"
 #include "Sky.hpp"
 #include "Landscape.hpp"
-#include "WavefrontObject.hpp"
 #include "environment/Forest.hpp"
 
 #include <QTime>
@@ -114,7 +113,6 @@ private:
 	QSharedPointer<Player> mPlayer;
 	QSharedPointer<Dummy> mDummy;
 	QSharedPointer<Forest> mForest;
-	QSharedPointer<WavefrontObject> mTree;
 	QVector3D mTarget;
 	QVector3D mTargetNormal;
 	SplatterSystem * mSplatterSystem;

@@ -27,9 +27,9 @@
 RESOURCE_CACHE(StaticModelData);
 
 
-StaticModelData::StaticModelData( Scene * scene, QString name ) :
+StaticModelData::StaticModelData( GLWidget * glWidget, QString name ) :
 	AResourceData( name ),
-	mScene( scene ),
+	mGLWidget( glWidget ),
 	mName( name )
 {
 }
@@ -78,6 +78,7 @@ bool StaticModelData::load()
 
 	return AResourceData::load();
 }
+
 
 bool StaticModelData::parse()
 {
@@ -201,7 +202,7 @@ bool StaticModelData::parse()
 			Part p;
 			p.start = current - count;
 			p.count = count;
-			p.material = new Material( mScene->glWidget(), lastMat );
+			p.material = new Material( mGLWidget, lastMat );
 			mParts.append(p);
 
 			lastMat = face.material;
@@ -243,7 +244,7 @@ StaticModel::StaticModel( Scene * scene, QString name ) :
 	AResource(),
 	mScene( scene )
 {
-	QSharedPointer<StaticModelData> n( new StaticModelData( scene, name ) );
+	QSharedPointer<StaticModelData> n( new StaticModelData( scene->glWidget(), name ) );
 	cache( n );
 }
 
@@ -252,7 +253,7 @@ StaticModel::~StaticModel()
 {
 }
 
-void StaticModel::draw( const QVector<QMatrix4x4> * instances)
+void StaticModel::draw( const QVector<QMatrix4x4> & instances )
 {
 	data()->vertexBuffer().bind();
 	data()->indexBuffer().bind();
@@ -270,9 +271,9 @@ void StaticModel::draw( const QVector<QMatrix4x4> * instances)
 			part.material->bind();
 		}
 
-		foreach( QMatrix4x4 instance, * instances )
+		foreach( QMatrix4x4 instance, instances )
 		{
-			glLoadMatrixd( ( mScene->eye()->viewMatrix() * instance ).constData() );
+			glLoadMatrix( mScene->eye()->viewMatrix() * instance );
 
 			glDrawElements(
 				GL_TRIANGLES,
