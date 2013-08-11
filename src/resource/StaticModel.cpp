@@ -166,15 +166,22 @@ bool StaticModelData::parse()
 			while( !fields.isEmpty() )
 			{
 				points = fields.takeFirst().split( "/" );
-				while( !points.isEmpty() )
+
+				if( !points.isEmpty() )
 				{
 					vertex.position = positions.at( points.takeFirst().toInt()-1 );
-					vertex.texCoord = texCoords.at( points.takeFirst().toInt()-1 );
-					vertex.normal = normals.at( points.takeFirst().toInt()-1 );
-
-					face.points.append( vertex );
-					face.material = material;
 				}
+				if( !points.isEmpty() )
+				{
+					vertex.texCoord = texCoords.at( points.takeFirst().toInt()-1 );
+				}
+				if( !points.isEmpty() )
+				{
+					vertex.normal = normals.at( points.takeFirst().toInt()-1 );
+				}
+
+				face.points.append( vertex );
+				face.material = material;
 			}
 			faces.append( face );
 		}
