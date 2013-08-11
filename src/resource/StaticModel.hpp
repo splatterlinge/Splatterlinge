@@ -92,6 +92,7 @@ public:
 	QSizeF getSize() { return data()->size(); }
 
 	void draw( const QVector<QMatrix4x4> & instances );
+	void draw();
 
 private:
 	Scene * mScene;

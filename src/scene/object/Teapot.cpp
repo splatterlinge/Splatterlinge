@@ -33,7 +33,7 @@ Teapot::Teapot( Scene * scene, const float & size ) :
 {
 	mMaterial = new Material( scene->glWidget(), "KirksEntry" );
 
-//	mModel = new StaticModel( scene, "data/object/teapot/teapot.obj" );
+	mModel = new StaticModel( scene, "data/object/teapot/teapot.obj" );
 
 	mAudioSample = new AudioSample( "data/sound/test.ogg" );
 	mAudioSample->setLooping( true );
@@ -45,7 +45,7 @@ Teapot::Teapot( Scene * scene, const float & size ) :
 Teapot::~Teapot()
 {
 	delete mMaterial;
-//	delete mModel;
+	delete mModel;
 	delete mAudioSample;
 }
 
@@ -64,13 +64,16 @@ void Teapot::updateSelf( const double & delta )
 void Teapot::drawSelf()
 {
 	mMaterial->bind();
-
+/*
 	glPushMatrix();
 	glTranslatef( 0, mSize*0.6, 0 );
 	teapot( 6, mSize, GL_FILL );
 	glPopMatrix();
-
-//	mModel->draw();
+*/
+	glPushMatrix();
+	glScalef( mSize, mSize, mSize );
+	mModel->draw();
+	glPopMatrix();
 
 	mMaterial->release();
 }

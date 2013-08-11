@@ -299,3 +299,46 @@ void StaticModel::draw( const QVector<QMatrix4x4> & instances )
 	data()->vertexBuffer().release();
 	data()->indexBuffer().release();
 }
+
+
+void StaticModel::draw()
+{
+	data()->vertexBuffer().bind();
+	data()->indexBuffer().bind();
+
+	glEnableClientState( GL_INDEX_ARRAY );
+	VertexP3fN3fT2f::glEnableClientState();
+	VertexP3fN3fT2f::glPointerVBO();
+
+	glPushMatrix();
+
+	foreach( Part part, data()->parts() )
+	{
+		if( part.material )
+		{
+			part.material->bind();
+		}
+
+		glDrawElements(
+			GL_TRIANGLES,
+			part.count,
+			GL_UNSIGNED_INT,
+			(void*)((size_t)(sizeof(unsigned int)*(	// convert index to pointer
+				part.start		// index to start
+			) ) )
+		);
+
+		if( part.material )
+		{
+			part.material->release();
+		}
+	}
+
+	glPopMatrix();
+
+	glDisableClientState( GL_INDEX_ARRAY );
+	VertexP3fN3fT2f::glDisableClientState();
+
+	data()->vertexBuffer().release();
+	data()->indexBuffer().release();
+}
