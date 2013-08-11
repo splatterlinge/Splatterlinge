@@ -94,11 +94,15 @@ World::World( Scene * scene, QString name ) :
 	add( mDummy );
 
 	qsrand( QTime::currentTime().msec() );
-	mForest = QSharedPointer<Forest>( new Forest( this, "data/object/tree/tree.obj", QPointF(200,0), 200, 500 ) );
-	mForest->setPositionX( 200 );
-	mForest->setPositionY( 0 );
-	mForest->setPositionZ( 0 );
-	add( mForest );
+	foreach( Vegetation * v, mLandscape->vegetations() )
+	{
+		qDebug() << v->position();
+		QSharedPointer<Forest> f = QSharedPointer<Forest>( new Forest( this, v->name(), v->position(), v->radius(), v->number() ) );
+		f->setPositionX( v->position().x() );
+		f->setPositionY( 0 );
+		f->setPositionZ( v->position().y() );
+		add( f );
+	}
 
 	/*
 	QVector<QMatrix4x4> * instances = new QVector<QMatrix4x4>();

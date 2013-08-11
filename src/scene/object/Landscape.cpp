@@ -79,6 +79,15 @@ Landscape::Landscape( Scene * scene, QString name ) :
 		}
 	s.endArray();
 
+	int vegeNum = s.beginReadArray( "Vegetation" );
+		for( int i=0; i<vegeNum; i++ )
+		{
+			s.setArrayIndex( i );
+			Vegetation * v = new Vegetation( s.value("type").toString(), s.value("pos").toPoint(), s.value("radius").toInt(), s.value("number").toInt() );
+			mVegetations.append( v );
+		}
+	s.endArray();
+
 	mTerrain = new Terrain( "./data/landscape/"+name+"/"+heightMapPath, mTerrainSize, mTerrainOffset );
 	mTerrainFilter = new Filter( this, QSize( 3, 3 ) );
 	mTerrainMaterial = new Material( scene->glWidget(), terrainMaterial );
@@ -442,4 +451,12 @@ void Landscape::Filter::draw()
 			mLandscape->drawPatch( mergedRect );
 		}
 	}
+}
+
+Vegetation::Vegetation( QString name, QPointF position, int radius, int number ) :
+	mName( name ),
+	mPosition( position ),
+	mRadius( radius ),
+	mNumber( number )
+{
 }
