@@ -59,7 +59,7 @@ public:
 	virtual ~StaticModelData();
 
 	const QString & name() const { return mName; }
-	QSizeF size() { return mSize; }
+	const QSizeF & size() const { return mSize; }
 	int mode() { return mMode; }
 	QVector<Part> & parts() { return mParts; }
 	QGLBuffer & vertexBuffer() { return mVertexBuffer; }
@@ -91,7 +91,7 @@ public:
 	StaticModel( Scene * scene, QString name );
 	virtual ~StaticModel();
 
-	QSizeF getSize() { return data()->size(); }
+	const QSizeF & size() const { return constData()->size(); }
 
 	void draw( const QVector<QMatrix4x4> & instances );
 	void draw();

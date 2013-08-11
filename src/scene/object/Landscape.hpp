@@ -19,6 +19,7 @@
 #define SCENE_OBJECT_LANDSCAPE_INCLUDED
 
 #include "AObject.hpp"
+#include "environment/Forest.hpp"
 #include <geometry/Terrain.hpp>
 
 #include <QString>
@@ -33,28 +34,15 @@ class Shader;
 class TextureRenderer;
 class Material;
 
-class Vegetation
-{
-	QString mName;
-	QPointF mPosition;
-	int mRadius;
-	int mNumber;
-public:
-	Vegetation( QString name, QPointF position, int radius, int number );
-	const QString & name() const { return mName; }
-	const QPointF & position() const { return mPosition; }
-	const int & radius() const { return mRadius; }
-	const int & number() const { return mNumber; }
-};
 
 /// A Landscape consisting of terrain and water
 /**
  *
  */
-class Landscape : public AObject
+class Landscape : public AWorldObject
 {
 public:
-	Landscape( Scene * scene, QString rootDir );
+	Landscape( World * world, QString rootDir );
 	~Landscape();
 
 	virtual void updateSelf( const double & delta );
@@ -73,7 +61,7 @@ public:
 	Terrain * terrain() { return mTerrain; }
 	const Terrain * terrain() const { return mTerrain; }
 	const float & waterHeight() const { return mWaterHeight; }
-	const QVector<Vegetation*> vegetations() const { return mVegetations; }
+//	const QVector<Vegetation*> vegetation() const { return mVegetation; }
 	const bool & drawingReflection() const { return mDrawingReflection; }
 	const bool & drawingRefraction() const { return mDrawingRefraction; }
 
@@ -127,7 +115,7 @@ private:
 
 	QString mName;
 	QVector<Blob*> mBlobs;
-	QVector<Vegetation*> mVegetations;
+	QVector< QSharedPointer<AObject> > mVegetation;
 	Terrain * mTerrain;
 	Filter * mTerrainFilter;
 	Material * mTerrainMaterial;

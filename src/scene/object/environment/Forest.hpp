@@ -36,7 +36,7 @@ class World;
 class Forest : public AWorldObject
 {
 public:
-	Forest( World * world, QString filename, QPointF position, int radius, int number );
+	Forest( World * world, Terrain * terrain, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
 	virtual ~Forest();
 
 	virtual void updateSelf( const double & delta );
