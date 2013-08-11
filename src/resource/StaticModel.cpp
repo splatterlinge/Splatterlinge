@@ -32,6 +32,7 @@ StaticModelData::StaticModelData( GLWidget * glWidget, QString name ) :
 	mGLWidget( glWidget ),
 	mName( name )
 {
+	mMode = 0;
 }
 
 
@@ -204,6 +205,34 @@ bool StaticModelData::parse()
 
 	foreach( Face face, faces )
 	{
+		int mode = 0;
+		int size = face.points.size();
+
+		if( size < 3 )
+			qFatal( "Invalid number of points detected! Please check your OBJ file." );
+		else if( size == 3 )
+			mode = GL_TRIANGLES;
+		else if( size == 4 )
+			mode = GL_QUADS;
+		else
+			mode = GL_POLYGON;
+
+		if( mMode == 0 )
+		{
+			mMode = mode;
+		}
+		else
+		{
+			if( mMode == 0 )
+			{
+				mMode = mode;
+			}
+			else if( mMode != mode )
+			{
+				qFatal( "Different draw modes detected! Please check your OBJ file." );
+			}
+		}
+
 		if( face.material != lastMat || face == faces.last() )
 		{
 			Part p;
@@ -283,7 +312,7 @@ void StaticModel::draw( const QVector<QMatrix4x4> & instances )
 			glLoadMatrix( mScene->eye()->viewMatrix() * instance );
 
 			glDrawElements(
-				GL_TRIANGLES,
+				data()->mode(),
 				part.count,
 				GL_UNSIGNED_INT,
 				(void*)((size_t)(sizeof(unsigned int)*(	// convert index to pointer

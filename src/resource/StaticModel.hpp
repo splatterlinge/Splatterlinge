@@ -60,6 +60,7 @@ public:
 
 	const QString & name() const { return mName; }
 	QSizeF size() { return mSize; }
+	int mode() { return mMode; }
 	QVector<Part> & parts() { return mParts; }
 	QGLBuffer & vertexBuffer() { return mVertexBuffer; }
 	QGLBuffer & indexBuffer() { return mIndexBuffer; }
@@ -74,6 +75,7 @@ protected:
 	GLWidget * mGLWidget;
 	QString mName;
 	QSizeF mSize;
+	int mMode;
 	QVector<Part> mParts;
 	QVector<VertexP3fN3fT2f> mVertices;
 	QVector<unsigned int> mIndices;
