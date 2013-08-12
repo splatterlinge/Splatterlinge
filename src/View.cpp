@@ -32,6 +32,7 @@
 
 void View::initAL()
 {
+	qDebug( "* OpenAL:" );
 //	const ALCchar * extensionsALC = alcGetString( NULL, ALC_EXTENSIONS );
 //	qDebug() << "OpenAL: Supported context extensions:" << extensionsALC;
 #ifdef ALC_ALL_DEVICES_SPECIFIER
@@ -40,10 +41,10 @@ void View::initAL()
 		const ALCchar * devicesAL = alcGetString( NULL, ALC_ALL_DEVICES_SPECIFIER );
 		if( devicesAL )
 		{
-			qDebug() << "OpenAL: Available devices:";
+			qDebug( "\t* %s:", qPrintable(tr("Available devices")) );
 			for( const ALchar * d = devicesAL; *d; d += strlen(d)+1 )
 			{
-				qDebug() << " *" << d;
+				qDebug( "\t\t* %s", d );
 			}
 		}
 	}
@@ -53,10 +54,10 @@ void View::initAL()
 		const ALCchar * devicesAL = alcGetString( NULL, ALC_DEVICE_SPECIFIER );
 		if( devicesAL )
 		{
-			qDebug() << "OpenAL: Available devices:";
+			qDebug( "\t* %s:", qPrintable(tr("Available devices")) );
 			for( const ALchar * d = devicesAL; *d; d += strlen(d)+1 )
 			{
-				qDebug() << " *" << d;
+				qDebug( "\t\t* %s", d );
 			}
 		}
 	}
@@ -67,20 +68,20 @@ void View::initAL()
 #else
 	defaultDeviceNameAL = alcGetString( NULL, ALC_DEFAULT_DEVICE_SPECIFIER );
 #endif
-	qDebug() << "OpenAL: Opening default device:\t" << QString(defaultDeviceNameAL);
+	qDebug( "\t* %s:\t%s", qPrintable(tr("Opening default device")), defaultDeviceNameAL );
 	mALDevice = alcOpenDevice( defaultDeviceNameAL );
 	if( !mALDevice )
-		qFatal( "OpenAL: Could not open audio device!" );
+		qFatal( "\t\t! %s!", qPrintable(tr("Could not open audio device")) );
 	mALContext = alcCreateContext( mALDevice, NULL );
 	alcMakeContextCurrent( mALContext );
 	const ALCchar * vendorAL = alGetString( AL_VENDOR );
-	qDebug() << "OpenAL: Vendor:\t" << QString(vendorAL);
+	qDebug( "\t* %s:\t%s", qPrintable(tr("Vendor")), vendorAL );
 	const ALCchar * rendererAL = alGetString( AL_RENDERER );
-	qDebug() << "OpenAL: Renderer:\t" << QString(rendererAL);
+	qDebug( "\t* %s:\t%s", qPrintable(tr("Renderer")), rendererAL );
 	const ALCchar * versionAL = alGetString( AL_VERSION );
-	qDebug() << "OpenAL: Version:\t" << QString(versionAL);
+	qDebug( "\t* %s:\t%s", qPrintable(tr("Version")) , versionAL );
 //	const ALCchar * extensionsAL = alcGetString( NULL, AL_EXTENSIONS );
-//	qDebug() << "OpenAL: Supported extensions:" << extensionsAL;
+//	qDebug( "\t* %s:\t%s", qPrintable(tr("Supported extensions")), extensionsAL );
 
 	alDopplerFactor( 0.2f );
 }
@@ -88,6 +89,7 @@ void View::initAL()
 
 void View::initGL()
 {
+	qDebug( "* OpenGL:" );
 	setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
 	setFrameShape( QFrame::NoFrame );
 
@@ -102,15 +104,15 @@ void View::initGL()
 	setViewport( mGLWidget );
 
 	const GLubyte * vendorGL = glGetString( GL_VENDOR );
-	qDebug() << "OpenGL: Vendor:\t" << QString((const char*)vendorGL);
+	qDebug( "\t* %s:\t%s", qPrintable(tr("Vendor")), vendorGL );
 	const GLubyte * rendererGL = glGetString( GL_RENDERER );
-	qDebug() << "OpenGL: Renderer:\t" << QString((const char*)rendererGL);
+	qDebug( "\t* %s:\t%s", qPrintable(tr("Renderer")), rendererGL );
 	const GLubyte * versionGL = glGetString( GL_VERSION );
-	qDebug() << "OpenGL: Version:\t" << QString((const char*)versionGL);
+	qDebug( "\t* %s:\t%s", qPrintable(tr("Version")), versionGL );
 	const GLubyte * glslVersionGL = glGetString( GL_SHADING_LANGUAGE_VERSION );
-	qDebug() << "OpenGL: GLSL version:\t" << QString((const char*)glslVersionGL);
+	qDebug( "\t* %s:\t%s", qPrintable(tr("GLSL version")), glslVersionGL );
 //	const GLubyte * extensionsGL = glGetString( GL_EXTENSIONS );
-//	qDebug() << "OpenGL: Supported extensions:" << QString((const char*)extensionsGL);
+//	qDebug( "\t* %s:\t%s", qPrintable(tr("Supported extensions")), extensionsGL );
 }
 
 
