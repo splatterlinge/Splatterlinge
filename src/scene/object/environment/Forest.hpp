@@ -42,6 +42,8 @@ public:
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
+	virtual QVector<AObject*> collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal );
+
 private:
 	Terrain * mTerrain;
 	QVector<QMatrix4x4> mInstances;

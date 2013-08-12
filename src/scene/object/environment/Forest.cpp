@@ -17,6 +17,8 @@
 
 #include "Forest.hpp"
 #include <scene/object/World.hpp>
+#include <utility/Capsule.hpp>
+#include <utility/Sphere.hpp>
 
 
 Forest::Forest( World * world, Terrain * terrain, const QString & filename, const QPoint & mapPosition, int mapRadius, int number ) :
@@ -39,16 +41,17 @@ Forest::Forest( World * world, Terrain * terrain, const QString & filename, cons
 		if( y >= -9 )
 		{
 			pos.translate( x, y, z );
-			pos.scale( RandomNumber::minMax( 0.3, 0.4 ) );
-			pos.rotate( qrand() % 360, 0.0, 1.0, 0.0 );
-			pos.rotate( qrand() % 5, 1.0, 0.0, 1.0 );
+			pos.scale( RandomNumber::minMax( 0.4f, 0.8f ) );
+			pos.rotate( RandomNumber::minMax( -10.0f, 10.0f ), 1.0f, 0.0f, 0.0f );
+			pos.rotate( RandomNumber::minMax( 0.0f, 360.0f ), 0.0f, 1.0f, 0.0f );
+			pos.rotate( RandomNumber::minMax( -10.0f, 10.0f ), 1.0f, 0.0f, 0.0f );
 
 			mInstances.append(pos);
 		}
 	}
 
 	setPosition( QVector3D( position.x(), 0, position.y() ) );
-	setBoundingSphere( qMax(radi.width(),radi.height()) + qMax(mModel->size().width(),mModel->size().height()) * 0.4f * 2.0f );
+	setBoundingSphere( qMax(radi.width(),radi.height()) + qMax(mModel->size().width(),mModel->size().height()) * 0.8f * 1.5f );
 }
 
 
@@ -69,4 +72,31 @@ void Forest::drawSelf()
 	glDisable( GL_CULL_FACE );
 	mModel->draw( mInstances );
 	glPopAttrib();
+}
+
+
+QVector<AObject*> Forest::collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal )
+{
+	QVector<AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
+	float depth;
+	QVector3D tmpNormal;
+
+	if( !Sphere::intersectSphere( position(), boundingSphereRadius(), center, radius, &tmpNormal, &depth ) )
+		return collides;	// return if we aren't even near the forest
+
+	for( QVector<QMatrix4x4>::iterator i = mInstances.begin(); i != mInstances.end(); ++i )
+	{
+		float treeScale = (*i).column(0).length();
+		QVector3D treeBottom = (*i).column(3).toVector3D();
+		QVector3D treeTop = (*i).column(3).toVector3D() + (*i).mapVector( QVector3D(0,60,0) );
+		if( Capsule::intersectSphere( treeBottom, treeTop, treeScale, center, radius, &tmpNormal, &depth ) )
+		{
+			collides.append( this );
+			center += tmpNormal * depth;
+			if( normal )
+				*normal = tmpNormal;
+		}
+	}
+
+	return collides;
 }

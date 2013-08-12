@@ -27,7 +27,7 @@
 namespace RandomNumber
 {
 	inline float minMax( const float & min, const float & max)
-		{ return ( (float)qrand()/(float)RAND_MAX ) * (max-min+1) + min; }
+		{ return ( (float)qrand()/(float)RAND_MAX ) * (max-min) + min; }
 
 	QVector3D inUnitSphere();
 	QVector2D inUnitCircle();
