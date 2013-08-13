@@ -15,7 +15,7 @@
 
 
 static const GLsizeiptr PositionSize = 12 * 3 * sizeof(GLfloat);
-static const GLfloat PositionData[] =
+static GLfloat PositionData[] =
 {
     0.0f,0.0f,0.0f,
     8.0f,1.0f,-1.0f,
@@ -54,6 +54,8 @@ static const int BufferSize = 2;
 static GLuint BufferName[BufferSize];
 
 static const GLsizei BodyVertexCount = 6;
+static const int WingOneYPos = (BodyVertexCount*3)+4;
+static const int WingTwoYPos = (BodyVertexCount*3)+(3*3)+4;
 
 enum
 {
@@ -74,6 +76,7 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	mVelocityY = 0.0f;
     mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
     glGenBuffers(2, BufferName);
+    wingUpMovement = false;
 }
 
 
@@ -107,11 +110,13 @@ void Splatterling::updateSelf( const double & delta )
 
 		case ALIVE:
 		{
-			mTarget = world()->teapot()->worldPosition();
+/*			mTarget = world()->teapot()->worldPosition();
 			QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 			QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D(0,1,0) );
 			setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
-			setPosition( position() + direction()*delta*10.0 );
+            setPosition( position() + direction()*delta*10.0 );
+*/
+            recalculateWingPosition();
 			if( life() <= 0 )
 				setState( DYING );
 			break;
@@ -126,6 +131,7 @@ void Splatterling::updateSelf( const double & delta )
 			break;
 	}
 
+/*
 	mVelocityY += -3.0f * delta;	// apply some gravity
 	setPositionY( position().y() + mVelocityY * delta );
 
@@ -138,12 +144,13 @@ void Splatterling::updateSelf( const double & delta )
 			if( mVelocityY < 0.0f )
 				mVelocityY = 0.0f;
 		}
-	}
+    }*/
 }
 
 
 void Splatterling::drawSelf()
 {
+    glDisable(GL_LIGHTING);
     glBindBuffer(GL_ARRAY_BUFFER, BufferName[COLOR_OBJECT]);
     glBufferData(GL_ARRAY_BUFFER, ColorSize, ColorData, GL_STREAM_DRAW);
     glColorPointer(3, GL_UNSIGNED_BYTE, 0, 0);
@@ -156,11 +163,14 @@ void Splatterling::drawSelf()
     glEnableClientState(GL_COLOR_ARRAY);
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, BodyVertexCount);
+
     glDrawArrays(GL_TRIANGLES, 6, 3);
     glDrawArrays(GL_TRIANGLES, 9, 3);
 
     glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
+
+    glEnable(GL_LIGHTING);
 }
 
 
@@ -197,4 +207,24 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 		world()->splatterSystem()->spray( splatterSource, damage );
 	else
 		world()->splatterSystem()->spray( splatterSource, damage/2.0f );
+}
+
+void Splatterling::recalculateWingPosition(){
+    if(wingUpMovement){
+        PositionData[WingOneYPos]   += 0.02f;
+        PositionData[WingOneYPos+3] += 0.02f;
+        PositionData[WingTwoYPos]   += 0.02f;
+        PositionData[WingTwoYPos+3] += 0.02f;
+        if(PositionData[WingOneYPos] >= 4.0f){
+            wingUpMovement = false;
+        }
+    }else{
+        PositionData[WingOneYPos]   -= 0.02f;
+        PositionData[WingOneYPos+3] -= 0.02f;
+        PositionData[WingTwoYPos]   -= 0.02f;
+        PositionData[WingTwoYPos+3] -= 0.02f;
+        if(PositionData[WingOneYPos] <= 0.0f){
+            wingUpMovement = true;
+        }
+    }
 }

@@ -23,6 +23,7 @@ public:
 		float & length, QVector3D * normal = NULL );
 
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
+    virtual void recalculateWingPosition( );
 private:
 	GLUquadric * mQuadric;
 	Material * mMaterial;
@@ -30,6 +31,7 @@ private:
 	float mVelocityY;
 	float mHeightAboveGround;
     GLuint vboId;
+    bool wingUpMovement;
 };
 
 
