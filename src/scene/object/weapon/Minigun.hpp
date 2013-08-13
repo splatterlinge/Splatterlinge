@@ -18,7 +18,7 @@
 #ifndef SCENE_OBJECT_WEAPON_MINIGUN_INCLUDED
 #define SCENE_OBJECT_WEAPON_MINIGUN_INCLUDED
 
-
+#include <qmath.h>
 #include "AWeapon.hpp"
 #include "resource/AudioSample.hpp"
 
@@ -53,6 +53,7 @@ private:
 	float mTrailAlpha;
 	float mDamage;
 	float mRotation;
+	double mRPM;
 	QVector3D mTrailStart;
 	QVector3D mTrailDirection;
 	QVector3D mTrailEnd;
