@@ -247,13 +247,12 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 {
 	mGLWidget->setUpdatesEnabled( false );
 
-	qint64 delta = mElapsedTimer.restart();
+	qint64 delta = mElapsedTimer.nsecsElapsed();
+	mElapsedTimer.restart();
 	if( delta == 0 )
-	{
-		qWarning() << "Rendering too fast - cannot compute delta t!";
 		delta = 1;
-	}
-	mDelta = (double)delta/1000.0;
+	mDelta = (double)delta/1000000000.0;
+
 
 	updateObjects( mDelta );
 

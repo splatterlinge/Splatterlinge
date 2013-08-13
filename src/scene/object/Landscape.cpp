@@ -29,8 +29,8 @@
 #include <QGLShaderProgram>
 
 
-Landscape::Landscape( Scene * scene, QString name ) :
-	AObject( scene )
+Landscape::Landscape( World * world, QString name ) :
+	AWorldObject( world )
 {
 	mName = name;
 	mDrawingReflection = false;
@@ -56,11 +56,17 @@ Landscape::Landscape( Scene * scene, QString name ) :
 			s.value( "materialScaleT", 1.0f ).toFloat()
 		);
 	s.endGroup();
+	mTerrain = new Terrain( "./data/landscape/"+name+"/"+heightMapPath, mTerrainSize, mTerrainOffset );
+	mTerrainFilter = new Filter( this, QSize( 3, 3 ) );
+	mTerrainMaterial = new Material( scene()->glWidget(), terrainMaterial );
 
 	s.beginGroup( "Water" );
 		mWaterHeight = s.value( "height", 0.0f ).toFloat();
 		mWaterClippingPlaneOffset = s.value( "clippingPlaneOffset", 0.01f ).toFloat();
 	s.endGroup();
+	mWaterShader = new Shader( scene()->glWidget(), "water" );
+	mReflectionRenderer = new TextureRenderer( scene()->glWidget(), QSize(512,512), true );
+	mRefractionRenderer = new TextureRenderer( scene()->glWidget(), QSize(512,512), true );
 
 	int blobNum = s.beginReadArray( "Blob" );
 		for( int i=0; i<blobNum; i++ )
@@ -83,18 +89,13 @@ Landscape::Landscape( Scene * scene, QString name ) :
 		for( int i=0; i<vegeNum; i++ )
 		{
 			s.setArrayIndex( i );
-			Vegetation * v = new Vegetation( s.value("type").toString(), s.value("pos").toPoint(), s.value("radius").toInt(), s.value("number").toInt() );
-			mVegetations.append( v );
+			QSharedPointer<AObject> f = QSharedPointer<AObject>( new Forest( world, mTerrain,
+				s.value("model").toString(), s.value("position").toPoint(),
+				s.value("radius").toInt(), s.value("number").toInt() ) );
+			mVegetation.append( f );
+			add( f );
 		}
 	s.endArray();
-
-	mTerrain = new Terrain( "./data/landscape/"+name+"/"+heightMapPath, mTerrainSize, mTerrainOffset );
-	mTerrainFilter = new Filter( this, QSize( 3, 3 ) );
-	mTerrainMaterial = new Material( scene->glWidget(), terrainMaterial );
-
-	mWaterShader = new Shader( scene->glWidget(), "water" );
-	mReflectionRenderer = new TextureRenderer( scene->glWidget(), QSize(512,512), true );
-	mRefractionRenderer = new TextureRenderer( scene->glWidget(), QSize(512,512), true );
 }
 
 
@@ -451,12 +452,4 @@ void Landscape::Filter::draw()
 			mLandscape->drawPatch( mergedRect );
 		}
 	}
-}
-
-Vegetation::Vegetation( QString name, QPointF position, int radius, int number ) :
-	mName( name ),
-	mPosition( position ),
-	mRadius( radius ),
-	mNumber( number )
-{
 }

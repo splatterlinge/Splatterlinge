@@ -17,35 +17,41 @@
 
 #include "Forest.hpp"
 #include <scene/object/World.hpp>
+#include <utility/Capsule.hpp>
+#include <utility/Sphere.hpp>
 
 
-Forest::Forest( World * world, QString filename, QPointF position, int radius, int number ) :
+Forest::Forest( World * world, Terrain * terrain, const QString & filename, const QPoint & mapPosition, int mapRadius, int number ) :
 	AWorldObject( world ),
-	mTerrain( world->landscape()->terrain() )
+	mTerrain( terrain )
 {
-	mModel = new StaticModel( world->scene(), filename );
+	QPointF position = mTerrain->fromMap( mapPosition );
+	QSizeF radi = mTerrain->fromMap( QSize( mapRadius, mapRadius ) );
 
+	mModel = new StaticModel( world->scene(), filename );
 	for( int i=0; i<number; i++ )
 	{
 		QMatrix4x4 pos;
 		QVector2D random = RandomNumber::inUnitCircle();
 
-		float x = position.x() + random.x() * radius;
-		float y = position.y() + random.y() * radius;
-		float z = mTerrain->getHeight( QPointF(x,y) );
+		float x = position.x() + random.x() * radi.width();
+		float z = position.y() + random.y() * radi.height();
+		float y = mTerrain->getHeight( QPointF(x,z) ) - 1.0f;
 
-		if( z >= -9 )
+		if( y >= -9 )
 		{
-			pos.translate( x, z-1, y );
-			pos.scale( 0.3f+(float)rand()/( (float)RAND_MAX/0.3 ) );
-			pos.rotate( qrand() % 360, 0.0, 1.0, 0.0 );
-			pos.rotate( qrand() % 5, 1.0, 0.0, 1.0 );
+			pos.translate( x, y, z );
+			pos.scale( RandomNumber::minMax( 0.4f, 0.8f ) );
+			pos.rotate( RandomNumber::minMax( -10.0f, 10.0f ), 1.0f, 0.0f, 0.0f );
+			pos.rotate( RandomNumber::minMax( 0.0f, 360.0f ), 0.0f, 1.0f, 0.0f );
+			pos.rotate( RandomNumber::minMax( -10.0f, 10.0f ), 1.0f, 0.0f, 0.0f );
 
 			mInstances.append(pos);
 		}
 	}
 
-	setBoundingSphere( radius );
+	setPosition( QVector3D( position.x(), 0, position.y() ) );
+	setBoundingSphere( qMax(radi.width(),radi.height()) + qMax(mModel->size().width(),mModel->size().height()) * 0.8f * 1.5f );
 }
 
 
@@ -62,5 +68,35 @@ void Forest::updateSelf( const double & delta )
 
 void Forest::drawSelf()
 {
+	glPushAttrib( GL_ENABLE_BIT );
+	glDisable( GL_CULL_FACE );
 	mModel->draw( mInstances );
+	glPopAttrib();
+}
+
+
+QVector<AObject*> Forest::collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal )
+{
+	QVector<AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
+	float depth;
+	QVector3D tmpNormal;
+
+	if( !Sphere::intersectSphere( position(), boundingSphereRadius(), center, radius, &tmpNormal, &depth ) )
+		return collides;	// return if we aren't even near the forest
+
+	for( QVector<QMatrix4x4>::iterator i = mInstances.begin(); i != mInstances.end(); ++i )
+	{
+		float treeScale = (*i).column(0).length();
+		QVector3D treeBottom = (*i).column(3).toVector3D();
+		QVector3D treeTop = (*i).column(3).toVector3D() + (*i).mapVector( QVector3D(0,60,0) );
+		if( Capsule::intersectSphere( treeBottom, treeTop, treeScale, center, radius, &tmpNormal, &depth ) )
+		{
+			collides.append( this );
+			center += tmpNormal * depth;
+			if( normal )
+				*normal = tmpNormal;
+		}
+	}
+
+	return collides;
 }

@@ -73,10 +73,9 @@ World::World( Scene * scene, QString name ) :
 	mTimeReverse = false;
 	mTimeOfDay = 0.0f;
 
-	QTime time = QTime::currentTime();
-	qsrand((uint)time.msec());
+	qsrand( QTime::currentTime().msec() );
 
-	mLandscape = QSharedPointer<Landscape>( new Landscape( scene, landscapeName ) );
+	mLandscape = QSharedPointer<Landscape>( new Landscape( this, landscapeName ) );
 	add( mLandscape );
 
 	mSky = QSharedPointer<Sky>( new Sky( this, skyName ) );
@@ -92,51 +91,6 @@ World::World( Scene * scene, QString name ) :
 
 	mDummy = QSharedPointer<Dummy>( new Dummy( this ) );
 	add( mDummy );
-
-	qsrand( QTime::currentTime().msec() );
-	foreach( Vegetation * v, mLandscape->vegetations() )
-	{
-		qDebug() << v->position();
-		QSharedPointer<Forest> f = QSharedPointer<Forest>( new Forest( this, v->name(), v->position(), v->radius(), v->number() ) );
-		f->setPositionX( v->position().x() );
-		f->setPositionY( 0 );
-		f->setPositionZ( v->position().y() );
-		add( f );
-	}
-
-	/*
-	QVector<QMatrix4x4> * instances = new QVector<QMatrix4x4>();
-	QPointF min;
-	QPointF max;
-	for( float i=0; i<=500; i+=(float)rand()/( (float)RAND_MAX/1) )
-	{
-		QMatrix4x4 pos;
-		float j = (float)rand()/( (float)RAND_MAX/500);
-
-		float x = 100 + i;
-		float y = mLandscape->terrain()->getHeight( QPointF(100+i,-j) ) - 1;
-		float z = -j;
-
-		if( x < min.x() || i == 0 )
-			min.setX( x );
-		if( x > max.x() || i == 0 )
-			max.setX( x );
-		if( z < min.y() || i == 0 )
-			min.setY( z );
-		if( z > max.y() || i == 0 )
-			max.setY( z );
-
-		pos.translate(x, y, z);
-		pos.scale( 0.3f+(float)rand()/( (float)RAND_MAX/0.3 ) );
-		pos.rotate( (float)rand()/(float)RAND_MAX, 0.0, 1.0, 0.0 );
-		instances->append(pos);
-	}
-	mTree = QSharedPointer<WavefrontObject>( new WavefrontObject( scene, "data/object/tree/tree.obj", instances ) );
-	mTree->setPositionX( ( min.x() + max.x() ) / 2 );
-	mTree->setPositionZ( ( min.y() + max.y() ) / 2 );
-	mTree->setPositionY( ( 0 ) );
-	add( mTree );
-	*/
 
 	scene->addKeyListener( this );
 
