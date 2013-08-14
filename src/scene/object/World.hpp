@@ -111,10 +111,10 @@ private:
 	QSharedPointer<Sky> mSky;
 	QSharedPointer<Landscape> mLandscape;
 	QSharedPointer<Teapot> mTeapot;
-    QSharedPointer<Player> mPlayer;
-    QSharedPointer<Dummy> mDummy;
-    QSharedPointer<Splatterling> mSplatterling;
-    QSharedPointer<Splatterling> mSplatterlingSecond;
+	QSharedPointer<Player> mPlayer;
+	QSharedPointer<Dummy> mDummy;
+	QSharedPointer<Splatterling> mSplatterling;
+	QSharedPointer<Splatterling> mSplatterlingSecond;
 	QVector3D mTarget;
 	QVector3D mTargetNormal;
 	SplatterSystem * mSplatterSystem;

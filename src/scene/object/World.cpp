@@ -89,16 +89,16 @@ World::World( Scene * scene, QString name ) :
 	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) );
 	add( mTeapot );
 
-    /*
+	/*
 	mDummy = QSharedPointer<Dummy>( new Dummy( this ) );
 	add( mDummy );
-    */
+	*/
 
-    mSplatterling = QSharedPointer<Splatterling>( new Splatterling( this ) );
-    add( mSplatterling );
-    //TODO impl with list
-    mSplatterlingSecond = QSharedPointer<Splatterling>( new Splatterling( this ) );
-    add( mSplatterlingSecond );
+	mSplatterling = QSharedPointer<Splatterling>( new Splatterling( this ) );
+	add( mSplatterling );
+	//TODO impl with list
+	mSplatterlingSecond = QSharedPointer<Splatterling>( new Splatterling( this ) );
+	add( mSplatterlingSecond );
 
 	scene->addKeyListener( this );
 
