@@ -282,7 +282,6 @@ void Player::updateSelf( const double & delta )
 		}
 
 		move( finalMove*speed*delta );
-		qDebug() << delta*1000.0f;
 
 		mVelocityY += -80.0f * delta;	// apply gravity
 

@@ -35,3 +35,9 @@ QVector2D RandomNumber::inUnitCircle()
 	} while( vec.lengthSquared() > 1.0f );
 	return vec;
 }
+
+QVector2D RandomNumber::inUnitSquare()
+{
+	QVector2D vec = QVector2D( RandomNumber::minMax( -1.0, 1.0 ), RandomNumber::minMax( -1.0, 1.0 ) );
+	return vec;
+}

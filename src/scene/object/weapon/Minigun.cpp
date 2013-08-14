@@ -95,19 +95,17 @@ void Minigun::updateSelf( const double & delta )
 			}
 		}
 
-		if( mRotation == 0.0f )
+		if( mRPM < 6000.0f )
 		{
-			mRotation = 0.1f;
-		}
-		else if( mRotation < 60.0f )
-		{
-			mRotation *= 1.2f;
+			mRPM += (mRPM+1) * delta * 7;
 		}
 		else
 		{
-			mRotation += 25.0f;
+			mRPM = 6000.0f;
+		}
 
-			qDebug() << "fire";
+		if( mRPM >= 600.0f )
+		{
 			if( !mFireSound->isPlaying() )
 			{
 				mFireSound->play();
@@ -116,16 +114,19 @@ void Minigun::updateSelf( const double & delta )
 	}
 	else
 	{
-		if( mRotation >= 0.1f )
+		if( mRPM >= 0.1f )
 		{
-			mRotation *= 0.8f;
+			mRPM -= mRPM * delta * 3;
 		}
 		else
 		{
-			mRotation = 0.0f;
-			mFireSound->stop();
+			mRPM = 0.0f;
 		}
+
+		mFireSound->stop();
 	}
+
+	mRotation += mRPM * delta;
 
 	if( mCoolDown > delta )
 		mCoolDown -= delta * 0.5;

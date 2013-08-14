@@ -208,14 +208,12 @@ bool StaticModelData::parse()
 		int mode = 0;
 		int size = face.points.size();
 
-		if( size < 3 )
-			qFatal( "Invalid number of points detected! Please check your OBJ file." );
-		else if( size == 3 )
+		if( size == 3 )
 			mode = GL_TRIANGLES;
 		else if( size == 4 )
 			mode = GL_QUADS;
 		else
-			mode = GL_POLYGON;
+			qFatal( "Invalid number of points detected! Please check your OBJ file." );
 
 		if( mMode == 0 )
 		{

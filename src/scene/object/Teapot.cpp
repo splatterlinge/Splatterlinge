@@ -19,7 +19,7 @@
 #include "World.hpp"
 
 #include <scene/Scene.hpp>
-#include <geometry/teapot.h>
+//#include <geometry/teapot.h>
 #include <resource/Material.hpp>
 #include <resource/StaticModel.hpp>
 #include <resource/AudioSample.hpp>
