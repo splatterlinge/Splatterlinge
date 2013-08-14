@@ -64,12 +64,12 @@ void Splatterling::updateSelf( const double & delta )
 
 		case ALIVE:
 		{
-/*            mTarget = world()->teapot()->worldPosition();
+            mTarget = world()->player()->worldPosition();
 			QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 			QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D(0,1,0) );
             setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
             setPosition( position() + direction()*delta*10.0 );
-*/
+
             recalculateWingPosition();
 			if( life() <= 0 )
 				setState( DYING );
