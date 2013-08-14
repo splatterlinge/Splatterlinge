@@ -5,6 +5,55 @@
 #include "ACreature.hpp"
 
 
+static const GLfloat GlobalPositionData[] =
+{
+    0.0f,0.0f,0.0f,
+    8.0f,1.0f,-1.0f,
+    8.0f,1.0f,1.0f,
+    8.0f,-1.0f,1.0f,
+    8.0f,-1.0f,-1.0f,
+    8.0f,1.0f,-1.0f,
+
+    //face
+    8.0f,1.0f,-1.0f,
+    8.0f,1.0f,1.0f,
+    8.0f,-1.0f,-1.0f,
+    8.0f,-1.0f,1.0f,
+
+    //wingOne
+    4.0f,0.5f,0.0f,
+    0.0f,4.0f,8.0f,
+    8.0f,4.0f,8.0f,
+
+    //wingTwo
+    4.0f,0.5f,0.0f,
+    0.0f,4.0f,-8.0f,
+    8.0f,4.0f,-8.0f,
+};
+
+
+static const GLubyte ColorData[] =
+{
+    255,255,0,
+    255,255,0,
+    255,255,0,
+    255,255,0,
+    255,255,0,
+    255,255,0,
+
+    0,255,255,
+    0,255,255,
+    0,255,255,
+    0,255,255,
+
+    0,0,255,
+    0,0,255,
+    0,0,255,
+    0,0,255,
+    0,0,255,
+    0,0,255,
+};
+
 struct GLUquadric;
 class Material;
 
@@ -13,6 +62,25 @@ class Material;
 class Splatterling : public ACreature
 {
 public:
+
+    static const GLsizeiptr PositionSize = 16 * 3 * sizeof(GLfloat);
+    static const GLsizeiptr ColorSize = 16 * 3 * sizeof(GLubyte);
+
+    static const int BufferSize = 2;
+
+    static const GLsizei BodyVertexCount = 6;
+    static const GLsizei HeadVertexCount = 4;
+    static const int WingOneYPos = ((BodyVertexCount+HeadVertexCount)*3)+4;
+    static const int WingTwoYPos = ((BodyVertexCount+HeadVertexCount)*3)+(3*3)+4;
+    enum
+    {
+        POSITION_OBJECT = 0,
+        COLOR_OBJECT = 1
+    };
+
+    GLuint BufferName[BufferSize];
+
+
     Splatterling( World * world );
     ~Splatterling();
 
@@ -32,6 +100,7 @@ private:
 	float mHeightAboveGround;
     GLuint vboId;
     bool wingUpMovement;
+    GLfloat PositionData[48];
 };
 
 
