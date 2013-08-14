@@ -30,7 +30,6 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
         PositionData[i] = GlobalPositionData[i];
     }
 
-
 }
 
 
@@ -64,11 +63,26 @@ void Splatterling::updateSelf( const double & delta )
 
 		case ALIVE:
 		{
-            mTarget = world()->player()->worldPosition();
-			QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
-			QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D(0,1,0) );
-            setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
-            setPosition( position() + direction()*delta*10.0 );
+            GLfloat dist = (world()->player()->worldPosition() - worldPosition()).length();
+
+            if(dist < 12){
+                //Player in front of player
+                //Player near get him
+                mTarget = world()->player()->worldPosition();
+                QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+                QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D(0,1,0) );
+                setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
+                world()->player()->setLife(world()->player()->life()-1);
+            }else if(dist < 200){
+                //Player near get him
+                mTarget = world()->player()->worldPosition();
+                QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+                QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D(0,1,0) );
+                setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
+                setPosition( position() + direction()*delta*10.0 );
+            } else{
+                //player not in near, just move
+            }
 
             recalculateWingPosition();
 			if( life() <= 0 )
