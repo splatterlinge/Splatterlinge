@@ -92,6 +92,7 @@ public:
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
     virtual void recalculateWingPosition( );
 private:
+    virtual void randomDestinationPoint();
 	GLUquadric * mQuadric;
 	Material * mMaterial;
 	QVector3D mTarget;
@@ -100,6 +101,7 @@ private:
     GLuint vboId;
     bool wingUpMovement;
     GLfloat PositionData[48];
+    QVector3D destinationPoint;
 };
 
 

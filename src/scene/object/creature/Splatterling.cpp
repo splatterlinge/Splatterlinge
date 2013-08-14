@@ -29,7 +29,6 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
     for(unsigned int i = 0; i < PositionSize/sizeof(GLfloat); i++){
         PositionData[i] = GlobalPositionData[i];
     }
-
 }
 
 
@@ -42,9 +41,15 @@ Splatterling::~Splatterling()
 
 static QVector3D randomPointOnWorld( World * world )
 {
-	QVector3D pos( RandomNumber::minMax(-100,100), 0, RandomNumber::minMax(-100,100) );
+    QVector3D pos( RandomNumber::minMax(-500,500), 0, RandomNumber::minMax(-500,500) );
 	pos.setY( world->landscape()->terrain()->getHeight( pos ) );
 	return pos;
+}
+
+void Splatterling::randomDestinationPoint(){
+    QVector3D pos( RandomNumber::minMax(this->position().x()-100,this->position().x()+100), 0, RandomNumber::minMax(this->position().z()-100,this->position().z()+100) );
+    pos.setY( this->world()->landscape()->terrain()->getHeight( pos ) + 20);
+    destinationPoint = pos;
 }
 
 
@@ -54,10 +59,13 @@ void Splatterling::updateSelf( const double & delta )
 	{
 		case SPAWNING:
 		{
-            setPosition( randomPointOnWorld( world() ) + QVector3D(0,100,0) );
+            setPosition( randomPointOnWorld( world() ) + QVector3D(0,20,0) );
 			setState( ALIVE );
-			setLife( 100 );
+            setLife( 100 );
 			mHeightAboveGround = 6.0f;
+
+            randomDestinationPoint();
+
 			break;
 		}
 
@@ -73,15 +81,27 @@ void Splatterling::updateSelf( const double & delta )
                 QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D(0,1,0) );
                 setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
                 world()->player()->setLife(world()->player()->life()-1);
+                qDebug() << world()->player()->life();
             }else if(dist < 200){
                 //Player near get him
                 mTarget = world()->player()->worldPosition();
                 QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
                 QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D(0,1,0) );
                 setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
-                setPosition( position() + direction()*delta*10.0 );
+                setPosition( position() + direction()*delta*25.0 );
             } else{
-                //player not in near, just move
+                //player not in near, just move somehow
+
+                dist = (destinationPoint - worldPosition()).length();
+                if(dist > 5){
+                    mTarget = destinationPoint;
+                    QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+                    QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D(0,1,0) );
+                    setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
+                    setPosition( position() + direction()*delta*10.0 );
+                }else{
+                    randomDestinationPoint();
+                }
             }
 
             recalculateWingPosition();
@@ -90,30 +110,31 @@ void Splatterling::updateSelf( const double & delta )
 			break;
 		}
 
-		case DYING:
-			setState( DEAD );
+        case DYING:
 			mHeightAboveGround = 3.0f;
+
+            mVelocityY += -6.0f * delta;	// apply some gravity
+            setPositionY( position().y() + mVelocityY * delta );
+
+            float landscapeHeight;
+            if( world()->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
+            {
+                if( landscapeHeight + mHeightAboveGround > position().y() )
+                {
+                    setPositionY( landscapeHeight + mHeightAboveGround );
+                    if( mVelocityY < 0.0f )
+                        mVelocityY = 0.0f;
+                }
+            }
+
+            if(!(position().y() > 0.0)){
+                setState( DEAD );
+            }
 			break;
 
 		case DEAD:
 			break;
 	}
-
-
-/*	mVelocityY += -3.0f * delta;	// apply some gravity
-    setPositionY( position().y() + mVelocityY * delta );
-
-	float landscapeHeight;
-	if( world()->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
-	{
-		if( landscapeHeight + mHeightAboveGround > position().y() )
-		{
-			setPositionY( landscapeHeight + mHeightAboveGround );
-			if( mVelocityY < 0.0f )
-				mVelocityY = 0.0f;
-		}
-    }
-*/
 }
 
 
