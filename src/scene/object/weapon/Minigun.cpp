@@ -98,10 +98,12 @@ void Minigun::updateSelf( const double & delta )
 		if( mRPM < 6000.0f )
 		{
 			mRPM += (mRPM+1) * delta * 7;
+			mCoolDown = 0.1f;
 		}
 		else
 		{
 			mRPM = 6000.0f;
+			mCoolDown = 0.0f;
 		}
 
 		if( mRPM >= 600.0f )
