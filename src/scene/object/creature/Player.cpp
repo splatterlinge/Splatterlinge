@@ -274,7 +274,7 @@ void Player::updateSelf( const double & delta )
 				finalMove += left() * control.x();
 			}
 			finalMove.normalize();
-            finalMove -= mGroundNormal * qMin( 0.0f, QVector3D::dotProduct( finalMove, mGroundNormal ) );
+			finalMove -= mGroundNormal * qMin( 0.0, QVector3D::dotProduct( finalMove, mGroundNormal ) );
 		} else {
 			finalMove += QVector3D::crossProduct( left(), QVector3D(0,1,0) ) * control.z();
 			finalMove += left() * control.x();
