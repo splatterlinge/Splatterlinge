@@ -94,14 +94,14 @@ Landscape::Landscape( World * world, QString name ) :
 			if( type == "forest" )
 			{
 				f = QSharedPointer<AObject>( new Forest( world, mTerrain,
-														 s.value("model").toString(), s.value("position").toPoint(),
-														 s.value("radius").toInt(), s.value("number").toInt() ) );
+					s.value("model").toString(), s.value("position").toPoint(),
+					s.value("radius").toInt(), s.value("number").toInt() ) );
 			}
 			else if( type == "grass" )
 			{
 				f = QSharedPointer<AObject>( new Grass( world, mTerrain,
-														s.value("model").toString(), s.value("position").toPoint(),
-														s.value("radius").toInt(), s.value("number").toInt() ) );
+					s.value("model").toString(), s.value("position").toPoint(),
+					s.value("radius").toInt(), s.value("number").toInt() ) );
 			}
 
 			mVegetation.append( f );

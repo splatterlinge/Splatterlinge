@@ -1,7 +1,9 @@
 #include "Grass.hpp"
+
 #include <scene/object/World.hpp>
 #include <utility/Capsule.hpp>
 #include <utility/Sphere.hpp>
+
 
 Grass::Grass( World * world, Terrain * terrain, const QString & filename, const QPoint & mapPosition, int mapRadius, int number ) :
 	AWorldObject( world ),
@@ -34,9 +36,11 @@ Grass::Grass( World * world, Terrain * terrain, const QString & filename, const 
 	setBoundingSphere( qMax(radi.width(),radi.height()) + qMax(mModel->size().width(),mModel->size().height()) * 0.8f * 1.5f );
 }
 
+
 Grass::~Grass()
 {
 }
+
 
 void Grass::updateSelf( const double & delta )
 {
@@ -45,8 +49,5 @@ void Grass::updateSelf( const double & delta )
 
 void Grass::drawSelf()
 {
-	glPushAttrib( GL_ENABLE_BIT );
-	glDisable( GL_CULL_FACE );
 	mModel->draw( mInstances );
-	glPopAttrib();
 }
