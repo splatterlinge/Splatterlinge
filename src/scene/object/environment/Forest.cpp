@@ -41,7 +41,7 @@ Forest::Forest( World * world, Terrain * terrain, const QString & filename, cons
 		if( y >= -9 )
 		{
 			pos.translate( x, y, z );
-			pos.scale( RandomNumber::minMax( 0.4f, 0.8f ) );
+			pos.scale( RandomNumber::minMax( 0.1f, 0.25f ) );
 			pos.rotate( RandomNumber::minMax( -10.0f, 10.0f ), 1.0f, 0.0f, 0.0f );
 			pos.rotate( RandomNumber::minMax( 0.0f, 360.0f ), 0.0f, 1.0f, 0.0f );
 			pos.rotate( RandomNumber::minMax( -10.0f, 10.0f ), 1.0f, 0.0f, 0.0f );
