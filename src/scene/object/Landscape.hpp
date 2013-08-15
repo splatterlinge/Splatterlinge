@@ -20,6 +20,7 @@
 
 #include "AObject.hpp"
 #include "environment/Forest.hpp"
+#include "environment/Grass.hpp"
 #include <geometry/Terrain.hpp>
 
 #include <QString>
