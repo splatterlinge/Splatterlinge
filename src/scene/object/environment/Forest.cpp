@@ -68,10 +68,7 @@ void Forest::updateSelf( const double & delta )
 
 void Forest::drawSelf()
 {
-	glPushAttrib( GL_ENABLE_BIT );
-	glDisable( GL_CULL_FACE );
 	mModel->draw( mInstances );
-	glPopAttrib();
 }
 
 

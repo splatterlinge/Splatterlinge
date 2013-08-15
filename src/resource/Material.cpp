@@ -274,6 +274,7 @@ void Material::bind()
 	{
 		glAlphaFunc( data()->alphaTestFunction(), data()->alphaTestReferenceValue() );
 		glEnable( GL_ALPHA_TEST );
+		glDisable( GL_CULL_FACE );
 	}
 
 	glMaterial( GL_FRONT_AND_BACK, GL_AMBIENT, data()->ambient() );
