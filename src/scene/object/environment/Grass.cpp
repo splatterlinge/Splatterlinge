@@ -6,14 +6,14 @@
 #include <utility/Sphere.hpp>
 
 
-Grass::Grass( World * world, Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number ) :
-	AWorldObject( world ),
+Grass::Grass( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number ) :
+	AWorldObject( landscape->world() ),
 	mLandscape( landscape )
 {
 	QPointF position = mLandscape->terrain()->fromMap( mapPosition );
 	QSizeF radi = mLandscape->terrain()->fromMap( QSize( mapRadius, mapRadius ) );
 
-	mModel = new StaticModel( world->scene(), filename );
+	mModel = new StaticModel( world()->scene(), filename );
 	for( int i=0; i<number; i++ )
 	{
 		QVector3D treePos;

@@ -96,13 +96,13 @@ Landscape::Landscape( World * world, QString name ) :
 			QString type = s.value("type").toString();
 			if( type == "forest" )
 			{
-				f = QSharedPointer<AObject>( new Forest( world, this,
+				f = QSharedPointer<AObject>( new Forest( this,
 					s.value("model").toString(), s.value("position").toPoint(),
 					s.value("radius").toInt(), s.value("number").toInt() ) );
 			}
 			else if( type == "grass" )
 			{
-				f = QSharedPointer<AObject>( new Grass( world, this,
+				f = QSharedPointer<AObject>( new Grass( this,
 					s.value("model").toString(), s.value("position").toPoint(),
 					s.value("radius").toInt(), s.value("number").toInt() ) );
 			}

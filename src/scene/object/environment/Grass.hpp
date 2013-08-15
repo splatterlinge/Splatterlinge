@@ -36,7 +36,7 @@ class Landscape;
 class Grass : public AWorldObject
 {
 public:
-	Grass( World * world, Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
+	Grass( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
 	virtual ~Grass();
 
 	virtual void updateSelf( const double & delta );

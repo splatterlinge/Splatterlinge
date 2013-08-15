@@ -29,14 +29,13 @@
 #include <QMatrix4x4>
 
 
-class World;
 class Landscape;
 
 
 class Forest : public AWorldObject
 {
 public:
-	Forest( World * world, Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
+	Forest( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
 	virtual ~Forest();
 
 	virtual void updateSelf( const double & delta );
