@@ -15,8 +15,8 @@
  * along with Splatterlinge. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SCENE_OBJECT_ENVIRONMENT_GRASS_HPP
-#define SCENE_OBJECT_ENVIRONMENT_GRASS_HPP
+#ifndef SCENE_OBJECT_ENVIRONMENT_GRASS_INCLUDED
+#define SCENE_OBJECT_ENVIRONMENT_GRASS_INCLUDED
 
 #include "../AWorldObject.hpp"
 #include "../../Scene.hpp"
@@ -29,19 +29,24 @@
 #include <QVector>
 #include <QMatrix4x4>
 
+
+class Landscape;
+
+
 class Grass : public AWorldObject
 {
 public:
-	Grass( World * world, Terrain * terrain, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
+	Grass( World * world, Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
 	virtual ~Grass();
 
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
 private:
-	Terrain * mTerrain;
+	Landscape * mLandscape;
 	QVector<QMatrix4x4> mInstances;
 	StaticModel * mModel;
 };
 
-#endif // SCENE_OBJECT_ENVIRONMENT_GRASS_HPP
+
+#endif

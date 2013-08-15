@@ -1,35 +1,35 @@
 #include "Grass.hpp"
 
 #include <scene/object/World.hpp>
+#include <scene/object/Landscape.hpp>
 #include <utility/Capsule.hpp>
 #include <utility/Sphere.hpp>
 
 
-Grass::Grass( World * world, Terrain * terrain, const QString & filename, const QPoint & mapPosition, int mapRadius, int number ) :
+Grass::Grass( World * world, Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number ) :
 	AWorldObject( world ),
-	mTerrain( terrain )
+	mLandscape( landscape )
 {
-	QPointF position = mTerrain->fromMap( mapPosition );
-	QSizeF radi = mTerrain->fromMap( QSize( mapRadius, mapRadius ) );
+	QPointF position = mLandscape->terrain()->fromMap( mapPosition );
+	QSizeF radi = mLandscape->terrain()->fromMap( QSize( mapRadius, mapRadius ) );
 
 	mModel = new StaticModel( world->scene(), filename );
 	for( int i=0; i<number; i++ )
 	{
+		QVector3D treePos;
+		do {
+			QVector2D random = RandomNumber::inUnitCircle();
+			treePos.setX( position.x() + random.x() * radi.width() );
+			treePos.setZ( position.y() + random.y() * radi.height() );
+			treePos.setY( mLandscape->terrain()->getHeight( QPointF( treePos.x(),treePos.z()) ) - 1.0f );
+		} while( treePos.y() < mLandscape->waterHeight() );
+
 		QMatrix4x4 pos;
-		QVector2D random = RandomNumber::inUnitCircle();
+		pos.translate( treePos );
+		pos.scale( RandomNumber::minMax( 0.5f, 1.0f ) );
+		pos.rotate( mLandscape->terrain()->getNormalRotation( treePos ) );
 
-		float x = position.x() + random.x() * radi.width();
-		float z = position.y() + random.y() * radi.height();
-		float y = mTerrain->getHeight( QPointF(x,z) ) - 1.0f;
-
-		if( y >= -9 )
-		{
-			pos.translate( x, y, z );
-			pos.scale( RandomNumber::minMax( 0.5f, 0.9f ) );
-			pos.rotate( QQuaternion::nlerp( rotation(), terrain->getNormalRotation( mapPosition ), -90.0 ) );
-
-			mInstances.append(pos);
-		}
+		mInstances.append(pos);
 	}
 
 	setPosition( QVector3D( position.x(), 0, position.y() ) );

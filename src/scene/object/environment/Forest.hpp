@@ -22,7 +22,6 @@
 #include "../../Scene.hpp"
 
 #include <resource/StaticModel.hpp>
-#include <geometry/Terrain.hpp>
 #include <utility/RandomNumber.hpp>
 
 #include <QPointF>
@@ -31,12 +30,13 @@
 
 
 class World;
+class Landscape;
 
 
 class Forest : public AWorldObject
 {
 public:
-	Forest( World * world, Terrain * terrain, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
+	Forest( World * world, Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
 	virtual ~Forest();
 
 	virtual void updateSelf( const double & delta );
@@ -45,7 +45,7 @@ public:
 	virtual QVector<AObject*> collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal );
 
 private:
-	Terrain * mTerrain;
+	Landscape * mLandscape;
 	QVector<QMatrix4x4> mInstances;
 	StaticModel * mModel;
 };

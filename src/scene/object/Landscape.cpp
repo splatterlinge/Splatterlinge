@@ -17,6 +17,9 @@
 
 #include "Landscape.hpp"
 
+#include "environment/Forest.hpp"
+#include "environment/Grass.hpp"
+
 #include <scene/Scene.hpp>
 #include <scene/TextureRenderer.hpp>
 #include <geometry/Terrain.hpp>
@@ -93,13 +96,13 @@ Landscape::Landscape( World * world, QString name ) :
 			QString type = s.value("type").toString();
 			if( type == "forest" )
 			{
-				f = QSharedPointer<AObject>( new Forest( world, mTerrain,
+				f = QSharedPointer<AObject>( new Forest( world, this,
 					s.value("model").toString(), s.value("position").toPoint(),
 					s.value("radius").toInt(), s.value("number").toInt() ) );
 			}
 			else if( type == "grass" )
 			{
-				f = QSharedPointer<AObject>( new Grass( world, mTerrain,
+				f = QSharedPointer<AObject>( new Grass( world, this,
 					s.value("model").toString(), s.value("position").toPoint(),
 					s.value("radius").toInt(), s.value("number").toInt() ) );
 			}
