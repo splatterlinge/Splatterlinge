@@ -18,8 +18,7 @@
 #ifndef SCENE_OBJECT_LANDSCAPE_INCLUDED
 #define SCENE_OBJECT_LANDSCAPE_INCLUDED
 
-#include "AObject.hpp"
-#include "environment/Forest.hpp"
+#include "AWorldObject.hpp"
 #include <geometry/Terrain.hpp>
 
 #include <QString>
@@ -61,7 +60,6 @@ public:
 	Terrain * terrain() { return mTerrain; }
 	const Terrain * terrain() const { return mTerrain; }
 	const float & waterHeight() const { return mWaterHeight; }
-//	const QVector<Vegetation*> vegetation() const { return mVegetation; }
 	const bool & drawingReflection() const { return mDrawingReflection; }
 	const bool & drawingRefraction() const { return mDrawingRefraction; }
 

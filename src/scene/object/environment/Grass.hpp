@@ -15,13 +15,14 @@
  * along with Splatterlinge. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SCENE_OBJECT_ENVIRONMENT_FOREST_INCLUDED
-#define SCENE_OBJECT_ENVIRONMENT_FOREST_INCLUDED
+#ifndef SCENE_OBJECT_ENVIRONMENT_GRASS_INCLUDED
+#define SCENE_OBJECT_ENVIRONMENT_GRASS_INCLUDED
 
 #include "../AWorldObject.hpp"
 #include "../../Scene.hpp"
 
 #include <resource/StaticModel.hpp>
+#include <geometry/Terrain.hpp>
 #include <utility/RandomNumber.hpp>
 
 #include <QPointF>
@@ -32,16 +33,14 @@
 class Landscape;
 
 
-class Forest : public AWorldObject
+class Grass : public AWorldObject
 {
 public:
-	Forest( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
-	virtual ~Forest();
+	Grass( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
+	virtual ~Grass();
 
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
-
-	virtual QVector<AObject*> collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal );
 
 private:
 	Landscape * mLandscape;

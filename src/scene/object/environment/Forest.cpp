@@ -16,38 +16,39 @@
  */
 
 #include "Forest.hpp"
+
 #include <scene/object/World.hpp>
+#include <scene/object/Landscape.hpp>
 #include <utility/Capsule.hpp>
 #include <utility/Sphere.hpp>
 
 
-Forest::Forest( World * world, Terrain * terrain, const QString & filename, const QPoint & mapPosition, int mapRadius, int number ) :
-	AWorldObject( world ),
-	mTerrain( terrain )
+Forest::Forest( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number ) :
+	AWorldObject( landscape->world() ),
+	mLandscape( landscape )
 {
-	QPointF position = mTerrain->fromMap( mapPosition );
-	QSizeF radi = mTerrain->fromMap( QSize( mapRadius, mapRadius ) );
+	QPointF position = mLandscape->terrain()->fromMap( mapPosition );
+	QSizeF radi = mLandscape->terrain()->fromMap( QSize( mapRadius, mapRadius ) );
 
-	mModel = new StaticModel( world->scene(), filename );
+	mModel = new StaticModel( world()->scene(), filename );
 	for( int i=0; i<number; i++ )
 	{
+		QVector3D treePos;
+		do {
+			QVector2D random = RandomNumber::inUnitCircle();
+			treePos.setX( position.x() + random.x() * radi.width() );
+			treePos.setZ( position.y() + random.y() * radi.height() );
+			treePos.setY( mLandscape->terrain()->getHeight( QPointF( treePos.x(),treePos.z()) ) - 1.0f );
+		} while( treePos.y() < mLandscape->waterHeight() );
+
 		QMatrix4x4 pos;
-		QVector2D random = RandomNumber::inUnitCircle();
+		pos.translate( treePos );
+		pos.scale( RandomNumber::minMax( 0.1f, 0.25f ) );
+		pos.rotate( RandomNumber::minMax( -10.0f, 10.0f ), 1.0f, 0.0f, 0.0f );
+		pos.rotate( RandomNumber::minMax( 0.0f, 360.0f ), 0.0f, 1.0f, 0.0f );
+		pos.rotate( RandomNumber::minMax( -10.0f, 10.0f ), 1.0f, 0.0f, 0.0f );
 
-		float x = position.x() + random.x() * radi.width();
-		float z = position.y() + random.y() * radi.height();
-		float y = mTerrain->getHeight( QPointF(x,z) ) - 1.0f;
-
-		if( y >= -9 )
-		{
-			pos.translate( x, y, z );
-			pos.scale( RandomNumber::minMax( 0.4f, 0.8f ) );
-			pos.rotate( RandomNumber::minMax( -10.0f, 10.0f ), 1.0f, 0.0f, 0.0f );
-			pos.rotate( RandomNumber::minMax( 0.0f, 360.0f ), 0.0f, 1.0f, 0.0f );
-			pos.rotate( RandomNumber::minMax( -10.0f, 10.0f ), 1.0f, 0.0f, 0.0f );
-
-			mInstances.append(pos);
-		}
+		mInstances.append( pos );
 	}
 
 	setPosition( QVector3D( position.x(), 0, position.y() ) );
@@ -68,10 +69,7 @@ void Forest::updateSelf( const double & delta )
 
 void Forest::drawSelf()
 {
-	glPushAttrib( GL_ENABLE_BIT );
-	glDisable( GL_CULL_FACE );
 	mModel->draw( mInstances );
-	glPopAttrib();
 }
 
 

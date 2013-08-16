@@ -30,6 +30,7 @@
 #include "Sky.hpp"
 #include "Landscape.hpp"
 #include "environment/Forest.hpp"
+#include "environment/Grass.hpp"
 
 #include <QTime>
 #include <QVector>

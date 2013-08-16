@@ -307,7 +307,7 @@ void Player::updateSelf( const double & delta )
 		if( !( world()->collideSphere( this, mHeightAboveGround, newPosition, &mGroundNormal ) ).isEmpty() )
 		{
 			setPosition( newPosition );
-			if( mVelocityY < 0.0f )
+			if( mGroundNormal.y() > 0.7 && mVelocityY < 0.0f )	// ground flat enough to stop vertical movement
 				mVelocityY = 0.0f;
 		}
 	} else {
