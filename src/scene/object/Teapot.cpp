@@ -83,7 +83,7 @@ QVector<AObject*> Teapot::collideSphere( const AObject * exclude, const float & 
 {
 	QVector<AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
 	float depth;
-	QVector3D tmpNormal;
+	QVector3D tmpNormal(0,1,0);
 	/*
 	if( Sphere::intersectSphere( position(), boundingSphereRadius(), center, radius, &tmpNormal, &depth ) )
 	{

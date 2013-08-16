@@ -18,6 +18,7 @@
 #include "Capsule.hpp"
 
 #include <math.h>
+#include <float.h>
 
 
 // http://stackoverflow.com/questions/15310239/collision-detection-response-between-a-moving-sphere-and-a-circular-cylinder
@@ -37,7 +38,7 @@ bool Capsule::intersectSphere( const QVector3D & startCapsule, const QVector3D &
 
 	if( distance < radi )
 	{
-		if( normal )
+		if( normal && distance > FLT_EPSILON )
 			*normal = collisionVector / distance;
 		if( depth )
 			*depth = -(distance - radi);

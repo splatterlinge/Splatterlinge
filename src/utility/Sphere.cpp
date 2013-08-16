@@ -18,6 +18,7 @@
 #include "Sphere.hpp"
 
 #include <math.h>
+#include <float.h>
 
 
 bool Sphere::intersectSphere( const QVector3D & centerA, const float & radiusA,
@@ -37,7 +38,7 @@ bool Sphere::intersectSphere( const QVector3D & centerA, const float & radiusA,
 	if( depth )
 		*depth = sqrtf( squaredRadi ) - sqrtf( squaredDistance );
 
-	if( normal )
+	if( normal && squaredDistance > FLT_EPSILON )
 		*normal = relPos.normalized();
 
 	return true;
