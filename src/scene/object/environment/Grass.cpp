@@ -14,14 +14,23 @@ Grass::Grass( Landscape * landscape, const QString & filename, const QPoint & ma
 	QSizeF radi = mLandscape->terrain()->fromMap( QSize( mapRadius, mapRadius ) );
 
 	mModel = new StaticModel( world()->scene(), filename );
+	setPosition( QVector3D( position.x(), 0, position.y() ) );
+	setBoundingSphere( qMax(radi.width(),radi.height()) + qMax(mModel->size().width(),mModel->size().height()) * 0.8f * 1.5f );
+
 	for( int i=0; i<number; i++ )
 	{
 		QVector3D treePos;
+		int tries = 0;
 		do {
 			QVector2D random = RandomNumber::inUnitCircle();
 			treePos.setX( position.x() + random.x() * radi.width() );
 			treePos.setZ( position.y() + random.y() * radi.height() );
 			treePos.setY( mLandscape->terrain()->getHeight( QPointF( treePos.x(),treePos.z()) ) - 1.0f );
+			if( tries > 1000 )
+			{
+				qWarning() << QObject::tr("Giving up placing grass - no suitable position found");
+				return;
+			}
 		} while( treePos.y() < mLandscape->waterHeight() );
 
 		QMatrix4x4 pos;
@@ -31,9 +40,6 @@ Grass::Grass( Landscape * landscape, const QString & filename, const QPoint & ma
 
 		mInstances.append(pos);
 	}
-
-	setPosition( QVector3D( position.x(), 0, position.y() ) );
-	setBoundingSphere( qMax(radi.width(),radi.height()) + qMax(mModel->size().width(),mModel->size().height()) * 0.8f * 1.5f );
 }
 
 
