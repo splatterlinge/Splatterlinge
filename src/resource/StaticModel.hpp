@@ -18,6 +18,8 @@
 #ifndef RESOURCE_STATICMODEL_INCLUDED
 #define RESOURCE_STATICMODEL_INCLUDED
 
+#include <QtDebug>
+
 #include "AResource.hpp"
 #include "Material.hpp"
 #include <scene/Scene.hpp>

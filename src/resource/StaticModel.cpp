@@ -128,7 +128,15 @@ bool StaticModelData::parse()
 		fields = line.split( " ", QString::SkipEmptyParts );
 		keyword = fields.takeFirst();
 
-		if( keyword == "v" )
+		if( keyword == "g" )
+		{
+			continue;
+		}
+		else if( keyword == "s" )
+		{
+			continue;
+		}
+		else if( keyword == "v" )
 		{
 			x = fields.takeFirst().toFloat();
 			if( x > maxX )
@@ -186,10 +194,26 @@ bool StaticModelData::parse()
 			}
 			faces.append( face );
 		}
+		else if( keyword == "mtllib" )
+		{
+			continue;
+		}
 		else if( keyword == "usemtl" )
 		{
 			QFileInfo fileinfo( file );
-			material = fileinfo.baseName()+"_"+fields.takeFirst();
+			QFileInfo mat( "./data/material/"+fileinfo.baseName()+"_"+fields.takeFirst() );
+			if( mat.exists() )
+			{
+				material = mat.fileName();
+			}
+			else
+			{
+				qWarning() << "?" << this << "Material" << mat.fileName() << "not found.";
+			}
+		}
+		else
+		{
+			qWarning() << "?" << this << "Unknown keyword" << fields.takeFirst() << "detected.";
 		}
 	}
 
@@ -213,7 +237,7 @@ bool StaticModelData::parse()
 		else if( size == 4 )
 			mode = GL_QUADS;
 		else
-			qFatal( "Invalid number of points detected! Please check your OBJ file." );
+			qCritical() << "!" << this << "Invalid number of points detected! Please check your OBJ file.";
 
 		if( mMode == 0 )
 		{
@@ -227,7 +251,7 @@ bool StaticModelData::parse()
 			}
 			else if( mMode != mode )
 			{
-				qFatal( "Different draw modes detected! Please check your OBJ file." );
+				qCritical() << "!" << this << "Different draw modes detected! Please check your OBJ file." ;
 			}
 		}
 
