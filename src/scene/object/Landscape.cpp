@@ -284,14 +284,13 @@ QVector<AObject*> Landscape::collideSphere( const AObject * exclude, const float
 	float landscapeHeight;
 	if( mTerrain->getHeight( center, landscapeHeight ) )
 	{
-		if( landscapeHeight + radius > center.y() )
+		float depth = landscapeHeight + radius - center.y();
+		if( depth > 0.0f )
 		{
 			collides.append( this );
-			center.setY( landscapeHeight + radius );
+			center += QVector3D( 0, depth, 0 );
 			if( normal )
-			{
-				*normal = mTerrain->getNormal( center );
-			}
+				*normal += mTerrain->getNormal( center );
 		}
 	}
 	return collides;

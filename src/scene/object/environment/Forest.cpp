@@ -92,14 +92,14 @@ QVector<AObject*> Forest::collideSphere( const AObject * exclude, const float & 
 	for( QVector<QMatrix4x4>::iterator i = mInstances.begin(); i != mInstances.end(); ++i )
 	{
 		float treeScale = (*i).column(0).length();
-		QVector3D treeBottom = (*i).column(3).toVector3D();
+		QVector3D treeBottom = (*i).column(3).toVector3D() + (*i).mapVector( QVector3D(0,-10,0) );
 		QVector3D treeTop = (*i).column(3).toVector3D() + (*i).mapVector( QVector3D(0,60,0) );
 		if( Capsule::intersectSphere( treeBottom, treeTop, treeScale, center, radius, &tmpNormal, &depth ) )
 		{
 			collides.append( this );
 			center += tmpNormal * depth;
 			if( normal )
-				*normal = tmpNormal;
+				*normal += tmpNormal;
 		}
 	}
 

@@ -300,16 +300,13 @@ void Player::updateSelf( const double & delta )
 	}
 
 	QVector3D newPosition = position();
-	if( !( world()->collideSphere( this, mHeightAboveGround+0.1f, newPosition, &mGroundNormal ) ).isEmpty() )
+	if( !( world()->collideSphere( this, mHeightAboveGround, newPosition, &mGroundNormal ) ).isEmpty() )
 	{
 		mOnGround = true;
-		newPosition = position();
-		if( !( world()->collideSphere( this, mHeightAboveGround, newPosition, &mGroundNormal ) ).isEmpty() )
-		{
-			setPosition( newPosition );
-			if( mGroundNormal.y() > 0.7 && mVelocityY < 0.0f )	// ground flat enough to stop vertical movement
-				mVelocityY = 0.0f;
-		}
+		mGroundNormal.normalize();
+		if( mGroundNormal.y() > 0.7 && mVelocityY < 0.0f )
+			mVelocityY = 0.0f;
+		setPosition( newPosition );
 	} else {
 		mOnGround = false;
 	}
