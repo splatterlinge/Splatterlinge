@@ -25,6 +25,7 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	glGenBuffers( 2, this->BufferName );
 
 	wingUpMovement = false;
+    playerDetected = false;
 
 
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
@@ -48,6 +49,57 @@ static QVector3D randomPointOnWorld( World * world )
 	return pos;
 }
 
+static bool rayIntersectsTriangle(const QVector3D & origin, const QVector3D & direction, const QVector3D & v0, const QVector3D & v1, const QVector3D & v2) {
+    QVector3D e1 = v1 - v0;
+    QVector3D e2 = v2 - v0;
+
+    QVector3D pvec = QVector3D::crossProduct(direction, e2);
+    qreal det = QVector3D::dotProduct(e1, pvec);
+    qDebug() << "det = " << det;
+
+    //det near zero
+    if (det > -0.00001 && det < 0.00001){
+        return(false);
+    }
+
+    qreal invDet = 1.0/det;
+    QVector3D tvec = origin - v0;
+    qreal u = QVector3D::dotProduct(tvec,pvec) * invDet;
+    qDebug() << "u=" << u;
+
+    if (u < 0.0 || u > 1.0){
+        return(false);
+    }
+
+    QVector3D qvec = QVector3D::crossProduct(tvec,e1);
+    qreal v = QVector3D::dotProduct(direction,qvec) * invDet;
+
+    if (v < 0.0 || u + v > 1.0){
+        return(false);
+    }
+
+
+    // at this stage we can compute t to find out where
+    // the intersection point is on the line
+
+    qreal t = QVector3D::dotProduct(e2,qvec) * invDet;
+    qDebug() << "t = " << t;
+
+/*    if (t > 0.00001){ // ray intersection
+        qDebug() << "t true";
+        return(true);
+    } else {
+        // this means that there is a line intersection
+        // but not a ray intersection
+
+        qDebug() << "else false";
+        return (false);
+    }
+    */
+    return true;
+
+}
+
 void Splatterling::randomDestinationPoint()
 {
 	QVector3D pos( RandomNumber::minMax( this->position().x() - 100, this->position().x() + 100 ), 0, RandomNumber::minMax( this->position().z() - 100, this->position().z() + 100 ) );
@@ -64,7 +116,7 @@ void Splatterling::updateSelf( const double & delta )
 	{
 		setPosition( randomPointOnWorld( world() ) + QVector3D( 0, 20, 0 ) );
 		setState( ALIVE );
-		setLife( 100 );
+        setLife( 1000 );
 		mHeightAboveGround = 6.0f;
 
 		randomDestinationPoint();
@@ -88,7 +140,7 @@ void Splatterling::updateSelf( const double & delta )
 			qDebug() << world()->player()->life();
 		}
 		else
-			if( dist < 200 )
+            if( dist < 200 || playerDetected)
 			{
 				//Player near get him
 				mTarget = world()->player()->worldPosition();
@@ -96,6 +148,7 @@ void Splatterling::updateSelf( const double & delta )
 				QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
 				setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
 				setPosition( position() + direction()*delta * 25.0 );
+                playerDetected = true;
 			}
 			else
 			{
@@ -159,28 +212,29 @@ void Splatterling::updateSelf( const double & delta )
 
 void Splatterling::drawSelf()
 {
-	glDisable( GL_LIGHTING );
-	glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[COLOR_OBJECT] );
-	glBufferData( GL_ARRAY_BUFFER, Splatterling::ColorSize, ColorData, GL_STREAM_DRAW );
-	glColorPointer( 3, GL_UNSIGNED_BYTE, 0, 0 );
+    glDisable( GL_LIGHTING );
+    glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[COLOR_OBJECT] );
+    glBufferData( GL_ARRAY_BUFFER, Splatterling::ColorSize, ColorData, GL_STREAM_DRAW );
+    glColorPointer( 3, GL_UNSIGNED_BYTE, 0, 0 );
 
-	glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[POSITION_OBJECT] );
-	glBufferData( GL_ARRAY_BUFFER, Splatterling::PositionSize, PositionData, GL_STREAM_DRAW );
-	glVertexPointer( 3, GL_FLOAT, 0, 0 );
+    glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[POSITION_OBJECT] );
+    glBufferData( GL_ARRAY_BUFFER, Splatterling::PositionSize, PositionData, GL_STREAM_DRAW );
+    glVertexPointer( 3, GL_FLOAT, 0, 0 );
 
-	glEnableClientState( GL_VERTEX_ARRAY );
-	glEnableClientState( GL_COLOR_ARRAY );
+    glEnableClientState( GL_VERTEX_ARRAY );
+    glEnableClientState( GL_COLOR_ARRAY );
 
-	glDrawArrays( GL_TRIANGLE_FAN, 0, Splatterling::BodyVertexCount );
-	glDrawArrays( GL_TRIANGLE_STRIP, 6, Splatterling::HeadVertexCount );
+    glDrawArrays( GL_TRIANGLE_FAN, 0, Splatterling::BodyVertexCount );
+    glDrawArrays( GL_TRIANGLE_STRIP, 6, Splatterling::HeadVertexCount );
 
-	glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount, 3 );
-	glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount + 3, 3 );
+    glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount, 3 );
+    glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount + 3, 3 );
 
-	glDisableClientState( GL_COLOR_ARRAY );
-	glDisableClientState( GL_VERTEX_ARRAY );
+    glDisableClientState( GL_COLOR_ARRAY );
+    glDisableClientState( GL_VERTEX_ARRAY );
 
-	glEnable( GL_LIGHTING );
+    glEnable( GL_LIGHTING );
+
 }
 
 
@@ -190,7 +244,17 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 
 	float rayLength;
 
-	if( Sphere::intersectRay( worldPosition(), 4, origin, direction, &rayLength ) )
+    QVector3D worldPos = worldPosition();
+
+    const QVector3D v0(PositionData[0]+worldPos.x(), PositionData[1]+worldPos.y(), PositionData[2]+worldPos.z());
+    const QVector3D v1(PositionData[3]+worldPos.x(), PositionData[4]+worldPos.y(), PositionData[5]+worldPos.z());
+    const QVector3D v2(PositionData[6]+worldPos.x(), PositionData[7]+worldPos.y(), PositionData[8]+worldPos.z());
+
+
+
+    qDebug() << rayIntersectsTriangle(origin, direction, v0, v1, v2 );
+
+    if( Sphere::intersectRay(worldPos, 8, origin, direction, &rayLength ) )
 	{
 		if( rayLength < length )
 		{
@@ -202,7 +266,7 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 
 			nearestTarget = this;
 		}
-	}
+    }
 
 	return nearestTarget;
 }

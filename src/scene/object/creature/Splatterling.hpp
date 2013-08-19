@@ -7,8 +7,8 @@
 static const GLfloat GlobalPositionData[] =
 {
 	0.0f, 0.0f, 0.0f,
-	-1.0f, 1.0f, 8.0f,
-	1.0f, 1.0f, 8.0f,
+    -100.0f, 100.0f, 800.0f,
+    100.0f, 100.0f, 800.0f,
 	1.0f, -1.0f, 8.0f,
 	-1.0f, -1.0f, 8.0f,
 	-1.0f, 1.0f, 8.0f,
@@ -98,10 +98,11 @@ private:
 	QVector3D mTarget;
 	float mVelocityY;
 	float mHeightAboveGround;
-	GLuint vboId;
-	bool wingUpMovement;
+    GLuint vboId;
 	GLfloat PositionData[48];
-	QVector3D destinationPoint;
+    QVector3D destinationPoint;
+    bool wingUpMovement;
+    bool playerDetected;
 };
 
 

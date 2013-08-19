@@ -74,7 +74,7 @@ void StartMenuWindow::initMenu()
     buttonFont.setBold( true );
 	buttonFont.setPixelSize( 24 );
 
-	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
+    QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
 
 	mNewGame = new QPushButton( "New Game", this );
 //	mNewGame->setPalette( pal );
