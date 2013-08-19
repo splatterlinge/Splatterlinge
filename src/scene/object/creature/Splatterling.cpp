@@ -26,6 +26,7 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 
 	wingUpMovement = false;
 
+
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
 	{
 		PositionData[i] = GlobalPositionData[i];
