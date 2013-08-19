@@ -23,6 +23,7 @@
 #include <QStyleFactory>
 #include <QKeyEvent>
 #include <QSettings>
+#include <QFontDatabase>
 
 
 class View;
