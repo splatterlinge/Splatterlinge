@@ -127,6 +127,7 @@ private:
 	void resizeStereoFrameBuffers( const QSize & screenSize );
 	void drawStereoFrameBuffers();
 	void drawFPS( QPainter * painter, const QRectF & rect );
+	void drawHUD( QPainter * painter, const QRectF & rect );
 	void applyDefaultStatesGL();
 	void pushAllGL();
 	void popAllGL();

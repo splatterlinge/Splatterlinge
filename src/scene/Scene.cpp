@@ -295,6 +295,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	mFrameCountSecond++;
 	drawFPS( painter, rect );
+	drawHUD( painter, rect );
 
 	GLenum glError = glGetError();
 	if( glError  != GL_NO_ERROR )
@@ -313,6 +314,17 @@ void Scene::drawFPS( QPainter * painter, const QRectF & rect )
 	painter->setPen( QColor(255,255,255) );
 	painter->setFont( mFont );
 	painter->drawText( rect, Qt::AlignTop | Qt::AlignRight, QString( tr("(%2s) %1 FPS") ).arg(mFramesPerSecond).arg(mDelta) );
+}
+
+
+void Scene::drawHUD( QPainter * painter, const QRectF & rect )
+{
+	painter->setPen( QColor(255,255,255) );
+	painter->setFont( mFont );
+
+	painter->drawText( rect, Qt::AlignBottom | Qt::AlignLeft, QString( tr("Health: %1%\nArmor: %2%").arg("100", "20") ) );
+
+	painter->drawText( rect, Qt::AlignBottom | Qt::AlignRight, QString( tr("%1: %2 | %3 ").arg("Minigun", "1000", "10000") ) );
 }
 
 
