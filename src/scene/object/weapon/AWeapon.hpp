@@ -38,6 +38,11 @@ public:
 	virtual void triggerReleased() = 0;
 	virtual void holster() = 0;
 	virtual void pull() = 0;
+
+	const QString name() const { return mName; }
+
+protected:
+	QString mName;
 };
 
 

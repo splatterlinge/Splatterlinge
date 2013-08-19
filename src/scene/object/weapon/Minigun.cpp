@@ -29,6 +29,7 @@ Minigun::Minigun( World * world ) :
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
 
+	mName = "Minigun";
 	mDrawn = false;
 	mCoolDown = 0.0f;
 	mTrailAlpha = 0.0f;

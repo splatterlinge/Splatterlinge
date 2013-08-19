@@ -29,6 +29,7 @@ Laser::Laser( World * world ) :
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
 
+	mName = "Laser";
 	mDrawn = false;
 	mTrailVisibilityDuration = 1.0f;
 	mCoolDown = 2.0f;

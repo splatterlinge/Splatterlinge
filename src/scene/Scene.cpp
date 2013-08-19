@@ -319,12 +319,13 @@ void Scene::drawFPS( QPainter * painter, const QRectF & rect )
 
 void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 {
+	mPlayer = ((World *)mRoot)->player();
+
 	painter->setPen( QColor(255,255,255) );
 	painter->setFont( mFont );
 
-	painter->drawText( rect, Qt::AlignBottom | Qt::AlignLeft, QString( tr("Health: %1%\nArmor: %2%").arg("100", "20") ) );
-
-	painter->drawText( rect, Qt::AlignBottom | Qt::AlignRight, QString( tr("%1: %2 | %3 ").arg("Minigun", "1000", "10000") ) );
+	painter->drawText( rect, Qt::AlignBottom | Qt::AlignLeft, QString( tr("Health: %1%\nArmor: %2%").arg(mPlayer->life()).arg("0") ) );
+	painter->drawText( rect, Qt::AlignBottom | Qt::AlignRight, QString( tr("%1: %2 | %3 ").arg(mPlayer->weapon()->name()).arg("1000").arg("10000") ) );
 }
 
 

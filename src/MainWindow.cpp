@@ -28,8 +28,8 @@ MainWindow::MainWindow( QWidget * parent ) :
 	QSettings settings;
 	restoreGeometry( settings.value("geometry").toByteArray() );
 
-	qDebug() << QFontDatabase::addApplicationFont( "./data/font/xolonium/Xolonium-Regular.otf");
-	qDebug() << QFontDatabase::addApplicationFont( "./data/font/xolonium/Xolonium-Bold.otf");
+	QFontDatabase::addApplicationFont( "./data/font/xolonium/Xolonium-Regular.otf");
+	QFontDatabase::addApplicationFont( "./data/font/xolonium/Xolonium-Bold.otf");
 
 	mView = new View( this );
 	this->setCentralWidget( mView );

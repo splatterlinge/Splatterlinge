@@ -29,6 +29,8 @@
 Player::Player( World * world ) :
 	ACreature( world )
 {
+	setLife( 100 );
+
 	mForwardPressed = false;
 	mLeftPressed = false;
 	mBackwardPressed = false;
@@ -274,7 +276,7 @@ void Player::updateSelf( const double & delta )
 				finalMove += left() * control.x();
 			}
 			finalMove.normalize();
-            finalMove -= mGroundNormal * qMin( 0.0f, ((float)QVector3D::dotProduct( finalMove, mGroundNormal )) );
+			finalMove -= mGroundNormal * qMin( 0.0f, ((float)QVector3D::dotProduct( finalMove, mGroundNormal )) );
 		} else {
 			finalMove += QVector3D::crossProduct( left(), QVector3D(0,1,0) ) * control.z();
 			finalMove += left() * control.x();

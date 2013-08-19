@@ -19,6 +19,8 @@
 #define SCENE_INCLUDED
 
 #include "object/Eye.hpp"
+#include "scene/object/World.hpp"
+#include "scene/object/creature/Player.hpp"
 
 #include <QGraphicsScene>
 #include <QElapsedTimer>
@@ -120,6 +122,7 @@ private:
 	QList<AKeyListener*> mKeyListeners;
 	Eye * mEye;
 	AObject * mRoot;
+	QSharedPointer<Player> mPlayer;
 
 	TextureRenderer * mLeftTextureRenderer;
 	TextureRenderer * mRightTextureRenderer;
