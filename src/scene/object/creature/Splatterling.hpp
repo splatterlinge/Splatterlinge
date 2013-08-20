@@ -3,6 +3,7 @@
 
 
 #include "ACreature.hpp"
+#include "resource/AudioSample.hpp"
 
 static const GLfloat GlobalPositionData[] =
 {
@@ -107,6 +108,7 @@ private:
     QVector3D destinationPoint;
     bool wingUpMovement;
     bool playerDetected;
+    AudioSample * mWingSound;
 };
 
 

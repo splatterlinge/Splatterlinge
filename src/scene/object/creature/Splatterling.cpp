@@ -27,6 +27,9 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	wingUpMovement = false;
     playerDetected = false;
 
+    mWingSound = new AudioSample( "./data/sound/butterfly.wav" );
+    mWingSound->setLooping( true );
+    mWingSound->play();
 
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
 	{
@@ -128,6 +131,7 @@ void Splatterling::updateSelf( const double & delta )
 	}
 
 	case DYING:
+        mWingSound->stop();
 		mHeightAboveGround = 3.0f;
 
 		mVelocityY += -6.0f * delta;	// apply some gravity
