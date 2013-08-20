@@ -29,6 +29,7 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 
 	mWingSound = new AudioSample( "./data/sound/butterfly.wav" );
 	mWingSound->setLooping( true );
+	mWingSound->setRolloffFactor(0.01f);
 	mWingSound->play();
 
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
@@ -78,6 +79,7 @@ void Splatterling::updateSelf( const double & delta )
 
 	case ALIVE:
 	{
+        mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
         GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
 
 		if( dist < 12 )
@@ -252,7 +254,6 @@ bool Splatterling::intersectWing(const QVector3D & origin, const QVector3D & dir
 	//SecondWing
 	for (int i = 0; i < 3; i++) {
 		v[i] = QVector3D(PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+1], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+2]);
-		qDebug() << v[i];
 	}
 	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
 		Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
