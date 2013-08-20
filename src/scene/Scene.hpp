@@ -124,6 +124,7 @@ private:
 	Shader * mOVRShader;
 
 	bool mMouseGrabbing;
+	bool mBlinkingState;
 
 	QList<AMouseListener*> mMouseListeners;
 	QList<AKeyListener*> mKeyListeners;
@@ -145,6 +146,7 @@ private:
 
 private slots:
 	void secondPassed();
+	void halfSecondPassed();
 };
 
 

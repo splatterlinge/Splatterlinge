@@ -102,6 +102,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mEye->setFOV(60);
 
 	mFont = QFont( "Xolonium", 12, QFont::Normal );
+	mBlinkingState = false;
 
 	mDebugWindow = new DebugWindow( this );
 	addWidget( mDebugWindow, mDebugWindow->windowFlags() );
@@ -117,6 +118,11 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	QObject::connect( secondTimer, SIGNAL(timeout()), this, SLOT(secondPassed()) );
 	secondTimer->setInterval( 1000 );
 	secondTimer->start();
+
+	QTimer * halfSecondTimer = new QTimer( this );
+	QObject::connect( halfSecondTimer, SIGNAL( timeout() ), this, SLOT( halfSecondPassed() ) );
+	halfSecondTimer->setInterval( 500 );
+	halfSecondTimer->start();
 
 	mElapsedTimer.start();
 
@@ -367,7 +373,7 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	painter->drawEllipse( radarRect.center(), 7, 7 );
 
 	// player armor
-	QRect armorRect( rect.left()+10, rect.bottom()-80, 100*3, 30 );
+	QRect armorRect( rect.left()+10, rect.bottom()-74, 100*3, 30 );
 	painter->setPen( QColor(0,0,0,0) );
 	painter->setBrush( QBrush( QColor(11,110,240,80) ) );
 	painter->drawRect( armorRect );
@@ -391,17 +397,35 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 						QString( tr("%1%").arg(player->life()) ) );
 
 	// weapon status
-	QRect weaponRect( rect.right()-310, rect.bottom()-40, 300, 30 );
+	QRect weaponNameRect( rect.right()-210, rect.bottom()-75, 200, 30 );
+	QRect weaponStatusRect( rect.right()-210, rect.bottom()-40, 200, 30 );
 	painter->setPen( QColor(0,0,0,0) );
 	painter->setBrush( QBrush( QColor(11,110,240,80) ) );
-	painter->drawRect( weaponRect );
+	painter->drawRect( weaponNameRect );
+	painter->drawRect( weaponStatusRect );
 	painter->setPen( QColor(255,255,255,255) );
-	painter->drawText( weaponRect,
+	painter->drawText( weaponNameRect,
 						Qt::AlignCenter | Qt::AlignHCenter,
-						QString( tr("%1: %2 | %3 ")
-									.arg(player->weapon()->name())
-									.arg(player->weapon()->ammoclip())
-									.arg(player->weapon()->ammo()) ) );
+						QString( tr("%1").arg(player->weapon()->name()) ) );
+	if( player->weapon()->ammoclip() == 0 )
+	{
+		if( !mBlinkingState )
+		{
+			painter->drawText( weaponStatusRect,
+								Qt::AlignCenter | Qt::AlignHCenter,
+								QString( tr("%2 | %3 ")
+											.arg(player->weapon()->ammoclip())
+											.arg(player->weapon()->ammo()) ) );
+		}
+	}
+	else
+	{
+		painter->drawText( weaponStatusRect,
+							Qt::AlignCenter | Qt::AlignHCenter,
+							QString( tr("%2 | %3 ")
+										.arg(player->weapon()->ammoclip())
+										.arg(player->weapon()->ammo()) ) );
+	}
 }
 
 
@@ -409,6 +433,12 @@ void Scene::secondPassed()
 {
 	mFramesPerSecond = mFrameCountSecond;
 	mFrameCountSecond = 0;
+}
+
+
+void Scene::halfSecondPassed()
+{
+	mBlinkingState = !mBlinkingState;
 }
 
 
