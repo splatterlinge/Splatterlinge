@@ -49,57 +49,6 @@ static QVector3D randomPointOnWorld( World * world )
 	return pos;
 }
 
-static bool rayIntersectsTriangle(const QVector3D & origin, const QVector3D & direction, const QVector3D & v0, const QVector3D & v1, const QVector3D & v2) {
-    QVector3D e1 = v1 - v0;
-    QVector3D e2 = v2 - v0;
-
-    QVector3D pvec = QVector3D::crossProduct(direction, e2);
-    qreal det = QVector3D::dotProduct(e1, pvec);
-    qDebug() << "det = " << det;
-
-    //det near zero
-    if (det > -0.00001 && det < 0.00001){
-        return(false);
-    }
-
-    qreal invDet = 1.0/det;
-    QVector3D tvec = origin - v0;
-    qreal u = QVector3D::dotProduct(tvec,pvec) * invDet;
-    qDebug() << "u=" << u;
-
-    if (u < 0.0 || u > 1.0){
-        return(false);
-    }
-
-    QVector3D qvec = QVector3D::crossProduct(tvec,e1);
-    qreal v = QVector3D::dotProduct(direction,qvec) * invDet;
-
-    if (v < 0.0 || u + v > 1.0){
-        return(false);
-    }
-
-
-    // at this stage we can compute t to find out where
-    // the intersection point is on the line
-
-    qreal t = QVector3D::dotProduct(e2,qvec) * invDet;
-    qDebug() << "t = " << t;
-
-/*    if (t > 0.00001){ // ray intersection
-        qDebug() << "t true";
-        return(true);
-    } else {
-        // this means that there is a line intersection
-        // but not a ray intersection
-
-        qDebug() << "else false";
-        return (false);
-    }
-    */
-    return true;
-
-}
-
 void Splatterling::randomDestinationPoint()
 {
 	QVector3D pos( RandomNumber::minMax( this->position().x() - 100, this->position().x() + 100 ), 0, RandomNumber::minMax( this->position().z() - 100, this->position().z() + 100 ) );
@@ -126,7 +75,7 @@ void Splatterling::updateSelf( const double & delta )
 
 	case ALIVE:
 	{
-		GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
+        GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
 
 		if( dist < 12 )
 		{
@@ -234,28 +183,17 @@ void Splatterling::drawSelf()
     glDisableClientState( GL_VERTEX_ARRAY );
 
     glEnable( GL_LIGHTING );
-
 }
 
 
 AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal )
 {
 	AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
+    float rayLength;
 
-	float rayLength;
+    if(intersectHead(origin, direction, &rayLength) || intersectWing(origin, direction, &rayLength)
+            || intersectBody(origin, direction, &rayLength)){
 
-    QVector3D worldPos = worldPosition();
-
-    const QVector3D v0(PositionData[0]+worldPos.x(), PositionData[1]+worldPos.y(), PositionData[2]+worldPos.z());
-    const QVector3D v1(PositionData[3]+worldPos.x(), PositionData[4]+worldPos.y(), PositionData[5]+worldPos.z());
-    const QVector3D v2(PositionData[6]+worldPos.x(), PositionData[7]+worldPos.y(), PositionData[8]+worldPos.z());
-
-
-
-    qDebug() << rayIntersectsTriangle(origin, direction, v0, v1, v2 );
-
-    if( Sphere::intersectRay(worldPos, 8, origin, direction, &rayLength ) )
-	{
 		if( rayLength < length )
 		{
 			// intersection closer than previous intersections?
@@ -269,6 +207,74 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
     }
 
 	return nearestTarget;
+}
+bool Splatterling::intersectBody(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance){
+
+    QVector3D v0(PositionData[0], PositionData[1], PositionData[2]);
+    QVector3D v1(PositionData[3], PositionData[4], PositionData[5]);
+    QVector3D v2;
+
+    for(int i = 2; i < 6; i++){
+
+        if(i != 2){
+            v1 = v2;
+        }
+
+        v2 = QVector3D(PositionData[i*3], PositionData[i*3+1], PositionData[i*3+2]);
+
+        if( Triangle::intersectRay(this->pointToWorld(v0), this->pointToWorld(v1), this->pointToWorld(v2), origin, direction, intersectionDistance) )
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Splatterling::intersectWing(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance){
+
+    QVector3D v[3];
+
+
+    //FirstWing
+    for (int i = 0; i < 3; i++) {
+        v[i] = QVector3D(PositionData[(BodyVertexCount+HeadVertexCount+i)*3], PositionData[(BodyVertexCount+HeadVertexCount+i)*3+1], PositionData[(BodyVertexCount+HeadVertexCount+i)*3+2]);
+    }
+    if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
+            Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
+    {
+        return true;
+    }
+
+    //SecondWing
+    for (int i = 0; i < 3; i++) {
+        v[i] = QVector3D(PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+1], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+2]);
+        qDebug() << v[i];
+    }
+    if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
+            Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool Splatterling::intersectHead(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance){
+
+    QVector3D v[4];
+
+
+    for (int i = 0; i < 4; i++) {
+        v[i] = QVector3D(PositionData[(BodyVertexCount+i)*3], PositionData[(BodyVertexCount+i)*3+1], PositionData[(BodyVertexCount+i)*3+2]);
+    }
+    if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
+            Triangle::intersectRay(this->pointToWorld(v[1]), this->pointToWorld(v[3]), this->pointToWorld(v[2]), origin, direction, intersectionDistance))
+    {
+        qDebug() << "HEADSHOT";
+        return true;
+    }
+
+    return false;
 }
 
 
