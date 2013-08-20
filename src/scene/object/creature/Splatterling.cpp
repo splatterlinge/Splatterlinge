@@ -29,6 +29,7 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 
 	mWingSound = new AudioSample( "./data/sound/butterfly.wav" );
 	mWingSound->setLooping( true );
+	mWingSound->setRolloffFactor(0.01f);
 	mWingSound->play();
 
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
@@ -68,7 +69,7 @@ void Splatterling::updateSelf( const double & delta )
 	{
 		setPosition( randomPointOnWorld( world() ) + QVector3D( 0, 20, 0 ) );
 		setState( ALIVE );
-        setLife( 50 );
+		setLife( 50 );
 		mHeightAboveGround = 6.0f;
 
 		randomDestinationPoint();
@@ -78,7 +79,8 @@ void Splatterling::updateSelf( const double & delta )
 
 	case ALIVE:
 	{
-        GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
+		mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
+		GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
 
 		if( dist < 12 )
 		{
@@ -88,10 +90,10 @@ void Splatterling::updateSelf( const double & delta )
 			QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 			QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
 			setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
-            world()->player()->setLife( world()->player()->life() - 1 );
+			world()->player()->setLife( world()->player()->life() - 1 );
 		}
 		else
-            if( dist < 200 || playerDetected)
+			if( dist < 200 || playerDetected)
 			{
 				//Player near get him
 				mTarget = world()->player()->worldPosition();
@@ -99,7 +101,7 @@ void Splatterling::updateSelf( const double & delta )
 				QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
 				setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
 				setPosition( position() + direction()*delta * 25.0 );
-                playerDetected = true;
+				playerDetected = true;
 			}
 			else
 			{
@@ -130,7 +132,7 @@ void Splatterling::updateSelf( const double & delta )
 	}
 
 	case DYING:
-        mWingSound->stop();
+		mWingSound->stop();
 		mHeightAboveGround = 3.0f;
 
 		mVelocityY += -6.0f * delta;	// apply some gravity
@@ -207,7 +209,7 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 
 			nearestTarget = this;
 		}
-    }
+	}
 
 	return nearestTarget;
 }
@@ -252,7 +254,6 @@ bool Splatterling::intersectWing(const QVector3D & origin, const QVector3D & dir
 	//SecondWing
 	for (int i = 0; i < 3; i++) {
 		v[i] = QVector3D(PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+1], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+2]);
-		qDebug() << v[i];
 	}
 	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
 		Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
