@@ -96,6 +96,11 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	QObject::connect( mStereo, SIGNAL(stateChanged(int)), this, SLOT(setStereo(int)) );
 	mLayout->addWidget( mStereo );
 
+	mStereoUseOVR = new QCheckBox( "OVR" );
+	mStereoUseOVR->setChecked( mScene->stereoUseOVR() );
+	QObject::connect( mStereoUseOVR, SIGNAL(stateChanged(int)), this, SLOT(setStereoUseOVR(int)) );
+	mLayout->addWidget( mStereoUseOVR );
+
 	setLayout( mLayout );
 
 	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint );
@@ -105,6 +110,7 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 GfxOptionWindow::~GfxOptionWindow()
 {
 	delete mStereo;
+	delete mStereoUseOVR;
 	delete mMultiSample;
 	delete mFarPlaneLabel;
 	delete mMaterialAnisotropy;
@@ -176,4 +182,14 @@ void GfxOptionWindow::setStereo( int state )
 
 	QSettings settings;
 	settings.setValue( "stereo", enable );
+}
+
+
+void GfxOptionWindow::setStereoUseOVR( int state )
+{
+	bool enable = state;
+	mScene->setStereoUseOVR( enable );
+
+	QSettings settings;
+	settings.setValue( "stereoUseOVR", enable );
 }

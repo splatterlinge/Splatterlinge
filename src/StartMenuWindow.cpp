@@ -53,12 +53,6 @@ StartMenuWindow::StartMenuWindow( Scene * scene, QWidget * parent ) :
 
 StartMenuWindow::~StartMenuWindow()
 {
-/*	delete mHelpWindow;
-	delete mGfxOptionWindow;
-	delete mNewGame;
-	delete mOptions;
-    delete mEnd;*/
-    delete this->parent();
 }
 
 
@@ -71,7 +65,7 @@ void StartMenuWindow::initMenu()
 	pal.setColor( QPalette::ButtonText, Qt::white );
 */
 	QFont buttonFont = font();
-    buttonFont.setBold( true );
+	buttonFont.setBold( true );
 	buttonFont.setPixelSize( 24 );
 
 	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
@@ -113,5 +107,5 @@ void StartMenuWindow::handleOptionsButton()
 
 void StartMenuWindow::handleEndGameButton()
 {
-    QCoreApplication::quit();
+	QCoreApplication::quit();
 }

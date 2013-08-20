@@ -51,6 +51,7 @@ private:
 	QSlider * mFarPlane;
 	QCheckBox * mMultiSample;
 	QCheckBox * mStereo;
+	QCheckBox * mStereoUseOVR;
 
 public slots:
 	void setMaterialQuality( int q );
@@ -59,6 +60,7 @@ public slots:
 	void setFarPlane( int distance );
 	void setMultiSample( int state );
 	void setStereo( int state );
+	void setStereoUseOVR( int state );
 };
 
 

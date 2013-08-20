@@ -83,7 +83,11 @@ public:
 	void setMultiSample( bool enable ) { mMultiSample = enable; }
 	bool multiSample() const { return mMultiSample; }
 	void setStereo( bool enable ) { mStereo = enable; resizeStereoFrameBuffers(QSize(width(),height())); }
-	bool stereo() { return mStereo; }
+	bool stereo() const { return mStereo; }
+	void setStereoEyeDistance( float distance ) { mStereoEyeDistance = distance; }
+	float stereoEyeDistance() const { return mStereoEyeDistance; }
+	void setStereoUseOVR( bool useOVR ) { mStereoUseOVR = useOVR; }
+	bool stereoUseOVR() const { return mStereoUseOVR; }
 
 	StartMenuWindow * startMenuWindow() { return mStartMenuWindow; }
 	DebugWindow * debugWindow() { return mDebugWindow; }
@@ -115,6 +119,9 @@ private:
 	bool mWireFrame;
 	bool mMultiSample;
 	bool mStereo;
+	float mStereoEyeDistance;
+	bool mStereoUseOVR;
+	Shader * mOVRShader;
 
 	bool mMouseGrabbing;
 
@@ -122,7 +129,6 @@ private:
 	QList<AKeyListener*> mKeyListeners;
 	Eye * mEye;
 	AObject * mRoot;
-	QSharedPointer<Player> mPlayer;
 
 	TextureRenderer * mLeftTextureRenderer;
 	TextureRenderer * mRightTextureRenderer;
