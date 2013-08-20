@@ -25,11 +25,11 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	glGenBuffers( 2, this->BufferName );
 
 	wingUpMovement = false;
-    playerDetected = false;
+	playerDetected = false;
 
-    mWingSound = new AudioSample( "./data/sound/butterfly.wav" );
-    mWingSound->setLooping( true );
-    mWingSound->play();
+	mWingSound = new AudioSample( "./data/sound/butterfly.wav" );
+	mWingSound->setLooping( true );
+	mWingSound->play();
 
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
 	{
@@ -164,38 +164,38 @@ void Splatterling::updateSelf( const double & delta )
 
 void Splatterling::drawSelf()
 {
-    glDisable( GL_LIGHTING );
-    glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[COLOR_OBJECT] );
-    glBufferData( GL_ARRAY_BUFFER, Splatterling::ColorSize, ColorData, GL_STREAM_DRAW );
-    glColorPointer( 3, GL_UNSIGNED_BYTE, 0, 0 );
+	glDisable( GL_LIGHTING );
+	glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[COLOR_OBJECT] );
+	glBufferData( GL_ARRAY_BUFFER, Splatterling::ColorSize, ColorData, GL_STREAM_DRAW );
+	glColorPointer( 3, GL_UNSIGNED_BYTE, 0, 0 );
 
-    glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[POSITION_OBJECT] );
-    glBufferData( GL_ARRAY_BUFFER, Splatterling::PositionSize, PositionData, GL_STREAM_DRAW );
-    glVertexPointer( 3, GL_FLOAT, 0, 0 );
+	glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[POSITION_OBJECT] );
+	glBufferData( GL_ARRAY_BUFFER, Splatterling::PositionSize, PositionData, GL_STREAM_DRAW );
+	glVertexPointer( 3, GL_FLOAT, 0, 0 );
 
-    glEnableClientState( GL_VERTEX_ARRAY );
-    glEnableClientState( GL_COLOR_ARRAY );
+	glEnableClientState( GL_VERTEX_ARRAY );
+	glEnableClientState( GL_COLOR_ARRAY );
 
-    glDrawArrays( GL_TRIANGLE_FAN, 0, Splatterling::BodyVertexCount );
-    glDrawArrays( GL_TRIANGLE_STRIP, 6, Splatterling::HeadVertexCount );
+	glDrawArrays( GL_TRIANGLE_FAN, 0, Splatterling::BodyVertexCount );
+	glDrawArrays( GL_TRIANGLE_STRIP, 6, Splatterling::HeadVertexCount );
 
-    glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount, 3 );
-    glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount + 3, 3 );
+	glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount, 3 );
+	glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount + 3, 3 );
 
-    glDisableClientState( GL_COLOR_ARRAY );
-    glDisableClientState( GL_VERTEX_ARRAY );
+	glDisableClientState( GL_COLOR_ARRAY );
+	glDisableClientState( GL_VERTEX_ARRAY );
 
-    glEnable( GL_LIGHTING );
+	glEnable( GL_LIGHTING );
 }
 
 
 AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal )
 {
 	AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
-    float rayLength;
+	float rayLength;
 
-    if(intersectHead(origin, direction, &rayLength) || intersectWing(origin, direction, &rayLength)
-            || intersectBody(origin, direction, &rayLength)){
+	if(intersectHead(origin, direction, &rayLength) || intersectWing(origin, direction, &rayLength)
+		|| intersectBody(origin, direction, &rayLength)){
 
 		if( rayLength < length )
 		{
@@ -211,73 +211,75 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 
 	return nearestTarget;
 }
-bool Splatterling::intersectBody(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance){
 
-    QVector3D v0(PositionData[0], PositionData[1], PositionData[2]);
-    QVector3D v1(PositionData[3], PositionData[4], PositionData[5]);
-    QVector3D v2;
+bool Splatterling::intersectBody(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance)
+{
+	QVector3D v0(PositionData[0], PositionData[1], PositionData[2]);
+	QVector3D v1(PositionData[3], PositionData[4], PositionData[5]);
+	QVector3D v2;
 
-    for(int i = 2; i < 6; i++){
+	for(int i = 2; i < 6; i++)
+	{
+		if(i != 2)
+		{
+			v1 = v2;
+		}
 
-        if(i != 2){
-            v1 = v2;
-        }
+		v2 = QVector3D(PositionData[i*3], PositionData[i*3+1], PositionData[i*3+2]);
 
-        v2 = QVector3D(PositionData[i*3], PositionData[i*3+1], PositionData[i*3+2]);
-
-        if( Triangle::intersectRay(this->pointToWorld(v0), this->pointToWorld(v1), this->pointToWorld(v2), origin, direction, intersectionDistance) )
-        {
-            return true;
-        }
-    }
-    return false;
+		if( Triangle::intersectRay(this->pointToWorld(v0), this->pointToWorld(v1), this->pointToWorld(v2), origin, direction, intersectionDistance) )
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
-bool Splatterling::intersectWing(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance){
+bool Splatterling::intersectWing(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance)
+{
+	QVector3D v[3];
 
-    QVector3D v[3];
+	//FirstWing
+	for (int i = 0; i < 3; i++) {
+		v[i] = QVector3D(PositionData[(BodyVertexCount+HeadVertexCount+i)*3], PositionData[(BodyVertexCount+HeadVertexCount+i)*3+1], PositionData[(BodyVertexCount+HeadVertexCount+i)*3+2]);
+	}
+	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
+		Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
+	{
+		return true;
+	}
 
+	//SecondWing
+	for (int i = 0; i < 3; i++) {
+		v[i] = QVector3D(PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+1], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+2]);
+		qDebug() << v[i];
+	}
+	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
+		Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
+	{
+		return true;
+	}
 
-    //FirstWing
-    for (int i = 0; i < 3; i++) {
-        v[i] = QVector3D(PositionData[(BodyVertexCount+HeadVertexCount+i)*3], PositionData[(BodyVertexCount+HeadVertexCount+i)*3+1], PositionData[(BodyVertexCount+HeadVertexCount+i)*3+2]);
-    }
-    if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
-            Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
-    {
-        return true;
-    }
-
-    //SecondWing
-    for (int i = 0; i < 3; i++) {
-        v[i] = QVector3D(PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+1], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+2]);
-        qDebug() << v[i];
-    }
-    if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
-            Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
-    {
-        return true;
-    }
-
-    return false;
+	return false;
 }
 
-bool Splatterling::intersectHead(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance){
 
-    QVector3D v[4];
+bool Splatterling::intersectHead(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance)
+{
+	QVector3D v[4];
 
 
-    for (int i = 0; i < 4; i++) {
-        v[i] = QVector3D(PositionData[(BodyVertexCount+i)*3], PositionData[(BodyVertexCount+i)*3+1], PositionData[(BodyVertexCount+i)*3+2]);
-    }
-    if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
-            Triangle::intersectRay(this->pointToWorld(v[1]), this->pointToWorld(v[3]), this->pointToWorld(v[2]), origin, direction, intersectionDistance))
-    {
-        qDebug() << "HEADSHOT";
-        return true;
-    }
+	for (int i = 0; i < 4; i++) {
+		v[i] = QVector3D(PositionData[(BodyVertexCount+i)*3], PositionData[(BodyVertexCount+i)*3+1], PositionData[(BodyVertexCount+i)*3+2]);
+	}
+	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
+		Triangle::intersectRay(this->pointToWorld(v[1]), this->pointToWorld(v[3]), this->pointToWorld(v[2]), origin, direction, intersectionDistance))
+	{
+		qDebug() << "HEADSHOT";
+		return true;
+	}
 
-    return false;
+	return false;
 }
 
 

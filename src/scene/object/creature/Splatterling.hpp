@@ -8,16 +8,16 @@
 static const GLfloat GlobalPositionData[] =
 {
 	0.0f, 0.0f, 0.0f,
-    -1.0f, 1.0f, 8.0f,
-    1.0f, 1.0f, 8.0f,
+	-1.0f, 1.0f, 8.0f,
+	1.0f, 1.0f, 8.0f,
 	1.0f, -1.0f, 8.0f,
 	-1.0f, -1.0f, 8.0f,
 	-1.0f, 1.0f, 8.0f,
 
 	//face
 	-1.0f, 1.0f, 8.0f,
-    -1.0f, -1.0f, 8.0f,
-    1.0f, 1.0f, 8.0f,
+	-1.0f, -1.0f, 8.0f,
+	1.0f, 1.0f, 8.0f,
 	1.0f, -1.0f, 8.0f,
 
 	//wingOne
@@ -93,9 +93,10 @@ public:
 	virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL );
 	virtual void recalculateWingPosition( );
 
-    virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
-    virtual bool intersectWing(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
-    virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
+	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
+	virtual bool intersectWing(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
+	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
+
 private:
 	virtual void randomDestinationPoint();
 	GLUquadric * mQuadric;
@@ -103,12 +104,12 @@ private:
 	QVector3D mTarget;
 	float mVelocityY;
 	float mHeightAboveGround;
-    GLuint vboId;
+	GLuint vboId;
 	GLfloat PositionData[48];
-    QVector3D destinationPoint;
-    bool wingUpMovement;
-    bool playerDetected;
-    AudioSample * mWingSound;
+	QVector3D destinationPoint;
+	bool wingUpMovement;
+	bool playerDetected;
+	AudioSample * mWingSound;
 };
 
 
