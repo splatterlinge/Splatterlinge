@@ -128,6 +128,7 @@ void Minigun::updateSelf( const double & delta )
 			mRPM = 0.0f;
 		}
 
+		mCoolDown = 0.1f;
 		mFireSound->stop();
 	}
 
