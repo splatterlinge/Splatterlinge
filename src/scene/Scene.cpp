@@ -347,16 +347,61 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 {
 	QSharedPointer<Player> player = ((World *)mRoot)->player();
 
-	painter->setPen( QColor(255,255,255) );
 	painter->setFont( mFont );
+	painter->setRenderHints(
+				QPainter::Antialiasing |
+				QPainter::SmoothPixmapTransform |
+				QPainter::TextAntialiasing |
+				QPainter::HighQualityAntialiasing );
 
-	painter->fillRect( QRectF( rect.left(), rect.bottom()-20, rect.left()+150, rect.bottom() ), QColor( 0, 0, 0, 100 ) );
-	painter->drawText( rect, Qt::AlignBottom | Qt::AlignLeft, QString( tr("Health: %1%")
-						.arg(player->life()) ) );
-	painter->drawText( rect, Qt::AlignBottom | Qt::AlignRight, QString( tr("%1: %2 | %3 ")
-						.arg(player->weapon()->name())
-						.arg(player->weapon()->ammoclip())
-						.arg(player->weapon()->ammo()) ) );
+	// radar radius
+	QRect radarRect( rect.width()-160, 10, 150, 150 );
+	painter->setPen( QColor(0,0,0,0) );
+	painter->setBrush( QBrush( QColor(11,110,240,80) ) );
+	painter->drawEllipse( radarRect.center(), 75, 75 );
+
+	// radar player point
+	painter->setBrush( QBrush( QColor(255,255,255,50) ) );
+	painter->drawPie( radarRect, 45*16, 90*16 );
+	painter->setBrush( QBrush( QColor(255,255,255,200) ) );
+	painter->drawEllipse( radarRect.center(), 7, 7 );
+
+	// player armor
+	QRect armorRect( rect.left()+10, rect.bottom()-80, 100*3, 30 );
+	painter->setPen( QColor(0,0,0,0) );
+	painter->setBrush( QBrush( QColor(11,110,240,80) ) );
+	painter->drawRect( armorRect );
+	painter->setBrush( QBrush( QColor(26,121,245,200) ) );
+	painter->drawRect( armorRect.left(), armorRect.top(), player->life()*3, armorRect.height() );
+	painter->setPen( QColor(255,255,255,255) );
+	painter->drawText( armorRect,
+						Qt::AlignCenter | Qt::AlignHCenter,
+						QString( tr("%1%").arg(player->life()) ) );
+
+	// player health
+	QRect healthRect( rect.left()+10, rect.bottom()-40, 100*3, 30 );
+	painter->setPen( QColor(0,0,0,0) );
+	painter->setBrush( QBrush( QColor(255,14,14,80) ) );
+	painter->drawRect( healthRect );
+	painter->setBrush( QBrush( QColor(230,0,0,200) ) );
+	painter->drawRect( healthRect.left(), healthRect.top(), player->life()*3, healthRect.height() );
+	painter->setPen( QColor(255,255,255,255) );
+	painter->drawText( healthRect,
+						Qt::AlignCenter | Qt::AlignHCenter,
+						QString( tr("%1%").arg(player->life()) ) );
+
+	// weapon status
+	QRect weaponRect( rect.right()-310, rect.bottom()-40, 300, 30 );
+	painter->setPen( QColor(0,0,0,0) );
+	painter->setBrush( QBrush( QColor(11,110,240,80) ) );
+	painter->drawRect( weaponRect );
+	painter->setPen( QColor(255,255,255,255) );
+	painter->drawText( weaponRect,
+						Qt::AlignCenter | Qt::AlignHCenter,
+						QString( tr("%1: %2 | %3 ")
+									.arg(player->weapon()->name())
+									.arg(player->weapon()->ammoclip())
+									.arg(player->weapon()->ammo()) ) );
 }
 
 
