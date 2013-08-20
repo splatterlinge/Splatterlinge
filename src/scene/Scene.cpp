@@ -325,8 +325,12 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	painter->setFont( mFont );
 
 	painter->fillRect( QRectF( rect.left(), rect.bottom()-20, rect.left()+150, rect.bottom() ), QColor( 0, 0, 0, 100 ) );
-	painter->drawText( rect, Qt::AlignBottom | Qt::AlignLeft, QString( tr("Health: %1%").arg(mPlayer->life()) ) );
-	painter->drawText( rect, Qt::AlignBottom | Qt::AlignRight, QString( tr("%1: %2 | %3 ").arg(mPlayer->weapon()->name()).arg("1000").arg("10000") ) );
+	painter->drawText( rect, Qt::AlignBottom | Qt::AlignLeft, QString( tr("Health: %1%")
+						.arg(mPlayer->life()) ) );
+	painter->drawText( rect, Qt::AlignBottom | Qt::AlignRight, QString( tr("%1: %2 | %3 ")
+						.arg(mPlayer->weapon()->name())
+						.arg(mPlayer->weapon()->ammoclip())
+						.arg(mPlayer->weapon()->ammo()) ) );
 }
 
 

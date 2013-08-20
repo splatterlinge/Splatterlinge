@@ -89,6 +89,9 @@ void Player::keyPressEvent( QKeyEvent * event )
 	case Qt::Key_D:
 		mRightPressed = true;
 		break;
+	case Qt::Key_R:
+		weapon()->reload();
+		break;
 	case Qt::Key_Space:
 		mUpPressed = true;
 		break;

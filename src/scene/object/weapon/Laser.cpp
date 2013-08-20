@@ -42,6 +42,9 @@ Laser::Laser( World * world ) :
 	mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
 	mFireSound = new AudioSample( "./data/sound/laser.ogg" );
 	mFireSound->setLooping( false );
+	mAmmo = 20;
+	mAmmoClip = 1;
+	mClipSize = 1;
 }
 
 
@@ -81,7 +84,7 @@ void Laser::updateSelf( const double & delta )
 {
 	if( mFired )
 	{
-		if( mHeat <= 0.0f )
+		if( mHeat <= 0.0f && mAmmoClip > 0 )
 		{
 			mHeat = 1.0f;
 			mTrailAlpha = 1.0f;
@@ -97,13 +100,19 @@ void Laser::updateSelf( const double & delta )
 			}
 
 			mFireSound->play();
+			mAmmoClip--;
 		}
 	}
 
 	if( mHeat > delta )
+	{
 		mHeat -= delta / mCoolDown;
+	}
 	else
+	{
 		mHeat = 0.0f;
+		reload();
+	}
 
 	if( mTrailAlpha > delta )
 		mTrailAlpha -= delta / mTrailVisibilityDuration;

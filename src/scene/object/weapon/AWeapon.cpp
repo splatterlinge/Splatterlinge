@@ -27,3 +27,21 @@ AWeapon::AWeapon( World * world ) :
 AWeapon::~AWeapon()
 {
 }
+
+
+void AWeapon::reload()
+{
+	if( mAmmoClip < mClipSize )
+	{
+		if( mAmmo > mClipSize )
+		{
+			mAmmoClip = mClipSize;
+			mAmmo -= mClipSize;
+		}
+		else
+		{
+			mAmmoClip = mAmmo;
+			mAmmo -= mAmmo;
+		}
+	}
+}

@@ -60,6 +60,7 @@ private:
 	bool mRightPressed;
 	bool mUpPressed;
 	bool mDownPressed;
+	bool mReloadPressed;
 	bool mSpeedPressed;
 	bool mGodMode;
 	bool mOnGround;
