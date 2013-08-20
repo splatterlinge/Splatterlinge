@@ -24,7 +24,7 @@
 
 
 Minigun::Minigun( World * world ) :
-	AWeapon( world )
+	AWeapon( world, 10000, 200, 200 )
 {
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
@@ -41,9 +41,6 @@ Minigun::Minigun( World * world ) :
 	mMaterial = new Material( scene()->glWidget(), "BlackSteel" );
 	mFireSound = new AudioSample( "./data/sound/minigun.ogg" );
 	mFireSound->setLooping( true );
-	mAmmo = 20000;
-	mAmmoClip = 100;
-	mClipSize = 200;
 }
 
 

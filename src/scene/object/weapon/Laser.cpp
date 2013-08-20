@@ -24,7 +24,7 @@
 
 
 Laser::Laser( World * world ) :
-	AWeapon( world )
+	AWeapon( world, 20, 1, 1 )
 {
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
@@ -42,9 +42,6 @@ Laser::Laser( World * world ) :
 	mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
 	mFireSound = new AudioSample( "./data/sound/laser.ogg" );
 	mFireSound->setLooping( false );
-	mAmmo = 20;
-	mAmmoClip = 1;
-	mClipSize = 1;
 }
 
 

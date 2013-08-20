@@ -31,6 +31,7 @@ class AWeapon : public AWorldObject
 public:
 	/// Creates a weapon for the given world
 	AWeapon( World * world );
+	AWeapon( World * world, int ammo, int ammoclip, int clipsize );
 	/// Frees this object
 	virtual ~AWeapon();
 

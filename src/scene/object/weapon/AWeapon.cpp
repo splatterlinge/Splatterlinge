@@ -24,6 +24,15 @@ AWeapon::AWeapon( World * world ) :
 }
 
 
+AWeapon::AWeapon( World *world, int ammo, int ammoclip, int clipsize ) :
+	AWorldObject::AWorldObject( world ),
+	mAmmo( ammo ),
+	mAmmoClip( ammoclip ),
+	mClipSize( clipsize )
+{
+}
+
+
 AWeapon::~AWeapon()
 {
 }
