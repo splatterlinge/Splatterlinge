@@ -35,7 +35,7 @@ Grass::Grass( Landscape * landscape, const QString & filename, const QPoint & ma
 
 		QMatrix4x4 pos;
 		pos.translate( treePos );
-		pos.scale( RandomNumber::minMax( 0.5f, 1.0f ) );
+		pos.scale( RandomNumber::minMax( 0.4f, 0.7f ) );
 		pos.rotate( mLandscape->terrain()->getNormalRotation( treePos ) );
 
 		mInstances.append(pos);
