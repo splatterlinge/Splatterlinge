@@ -68,7 +68,7 @@ void Splatterling::updateSelf( const double & delta )
 	{
 		setPosition( randomPointOnWorld( world() ) + QVector3D( 0, 20, 0 ) );
 		setState( ALIVE );
-        setLife( 1000 );
+        setLife( 50 );
 		mHeightAboveGround = 6.0f;
 
 		randomDestinationPoint();
@@ -88,8 +88,7 @@ void Splatterling::updateSelf( const double & delta )
 			QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 			QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
 			setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
-			world()->player()->setLife( world()->player()->life() - 1 );
-			qDebug() << world()->player()->life();
+            world()->player()->setLife( world()->player()->life() - 1 );
 		}
 		else
             if( dist < 200 || playerDetected)
