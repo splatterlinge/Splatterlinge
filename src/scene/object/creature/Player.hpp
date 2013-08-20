@@ -48,6 +48,8 @@ public:
 	virtual void mouseMoveEvent( MouseMoveEvent * event );
 	virtual void mouseWheelEvent( QGraphicsSceneWheelEvent * event );
 
+	QSharedPointer<AWeapon> weapon() { return *mCurrentWeapon; }
+
 private:
 	QVector3D mTarget;
 	QVector3D mTargetNormal;
@@ -58,6 +60,7 @@ private:
 	bool mRightPressed;
 	bool mUpPressed;
 	bool mDownPressed;
+	bool mReloadPressed;
 	bool mSpeedPressed;
 	bool mGodMode;
 	bool mOnGround;

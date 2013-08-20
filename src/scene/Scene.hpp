@@ -19,6 +19,8 @@
 #define SCENE_INCLUDED
 
 #include "object/Eye.hpp"
+#include "scene/object/World.hpp"
+#include "scene/object/creature/Player.hpp"
 
 #include <QGraphicsScene>
 #include <QElapsedTimer>
@@ -81,7 +83,11 @@ public:
 	void setMultiSample( bool enable ) { mMultiSample = enable; }
 	bool multiSample() const { return mMultiSample; }
 	void setStereo( bool enable ) { mStereo = enable; resizeStereoFrameBuffers(QSize(width(),height())); }
-	bool stereo() { return mStereo; }
+	bool stereo() const { return mStereo; }
+	void setStereoEyeDistance( float distance ) { mStereoEyeDistance = distance; }
+	float stereoEyeDistance() const { return mStereoEyeDistance; }
+	void setStereoUseOVR( bool useOVR ) { mStereoUseOVR = useOVR; }
+	bool stereoUseOVR() const { return mStereoUseOVR; }
 
 	StartMenuWindow * startMenuWindow() { return mStartMenuWindow; }
 	DebugWindow * debugWindow() { return mDebugWindow; }
@@ -113,6 +119,9 @@ private:
 	bool mWireFrame;
 	bool mMultiSample;
 	bool mStereo;
+	float mStereoEyeDistance;
+	bool mStereoUseOVR;
+	Shader * mOVRShader;
 
 	bool mMouseGrabbing;
 
@@ -127,6 +136,7 @@ private:
 	void resizeStereoFrameBuffers( const QSize & screenSize );
 	void drawStereoFrameBuffers();
 	void drawFPS( QPainter * painter, const QRectF & rect );
+	void drawHUD( QPainter * painter, const QRectF & rect );
 	void applyDefaultStatesGL();
 	void pushAllGL();
 	void popAllGL();

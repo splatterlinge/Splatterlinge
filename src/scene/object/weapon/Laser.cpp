@@ -24,11 +24,12 @@
 
 
 Laser::Laser( World * world ) :
-	AWeapon( world )
+	AWeapon( world, 20, 1, 1 )
 {
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
 
+	mName = "Laser";
 	mDrawn = false;
 	mTrailVisibilityDuration = 1.0f;
 	mCoolDown = 2.0f;
@@ -80,7 +81,7 @@ void Laser::updateSelf( const double & delta )
 {
 	if( mFired )
 	{
-		if( mHeat <= 0.0f )
+		if( mHeat <= 0.0f && mAmmoClip > 0 )
 		{
 			mHeat = 1.0f;
 			mTrailAlpha = 1.0f;
@@ -96,13 +97,19 @@ void Laser::updateSelf( const double & delta )
 			}
 
 			mFireSound->play();
+			mAmmoClip--;
 		}
 	}
 
 	if( mHeat > delta )
+	{
 		mHeat -= delta / mCoolDown;
+	}
 	else
+	{
 		mHeat = 0.0f;
+		reload();
+	}
 
 	if( mTrailAlpha > delta )
 		mTrailAlpha -= delta / mTrailVisibilityDuration;

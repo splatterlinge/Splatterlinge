@@ -77,6 +77,9 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mFramesPerSecond = 0;
 	mWireFrame = false;
 	mStereo = false;
+	mStereoEyeDistance = 0.1f;
+	mStereoUseOVR = settings.value( "stereoUseOVR", false ).toBool();;
+	mOVRShader = new Shader( glWidget, "postProc.OVR" );
 
 	if( !sQuadVertexBuffer.isCreated() )
 	{
@@ -98,7 +101,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mEye->setFarPlane( settings.value( "farPlane", 500.0f ).toFloat() );
 	mEye->setFOV(60);
 
-	mFont = QFont( "Sans", 12, QFont::Normal );
+	mFont = QFont( "Xolonium", 12, QFont::Normal );
 
 	mDebugWindow = new DebugWindow( this );
 	addWidget( mDebugWindow, mDebugWindow->windowFlags() );
@@ -123,6 +126,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 
 Scene::~Scene()
 {
+	delete mOVRShader;
 	delete mEye;
 	delete mDebugWindow;
 	delete mStartMenuWindow;
@@ -229,11 +233,33 @@ void Scene::drawStereoFrameBuffers()
 	glActiveTexture( GL_TEXTURE0 );
 	glClientActiveTexture( GL_TEXTURE0 );
 
+	if( mStereoUseOVR )
+	{
+		mOVRShader->bind();
+		mOVRShader->program()->setUniformValue( "lensCenter", QVector2D( 0.6, 0.5 ) );
+		mOVRShader->program()->setUniformValue( "scale", QVector2D( 0.3, 0.3 ) );
+		mOVRShader->program()->setUniformValue( "scaleIn", QVector2D( 2.0, 2.0 ) );
+		QVector4D distortion7Inch( 1.0, 0.22, 0.24, 0.0 );
+//		QVector4D distortion( 1.0, 0.18, 0.115, 0.0 );
+		mOVRShader->program()->setUniformValue( "hmdWarpParam", distortion7Inch );
+		QVector4D chromAb( 0.996, -0.004, 1.014, 0 );
+		mOVRShader->program()->setUniformValue( "chromAbParam", chromAb );
+		mOVRShader->program()->setUniformValue( "sourceMap", 0 );
+	}
 	glBindTexture( GL_TEXTURE_2D, mLeftTextureRenderer->texID() );
 	glDrawArrays( GL_QUADS, 4, 4 );
 
+	if( mStereoUseOVR )
+	{
+		mOVRShader->program()->setUniformValue( "lensCenter", QVector2D( 0.4, 0.5 ) );
+	}
 	glBindTexture( GL_TEXTURE_2D, mRightTextureRenderer->texID() );
 	glDrawArrays( GL_QUADS, 8, 4 );
+
+	if( mStereoUseOVR )
+	{
+		mOVRShader->release();
+	}
 
 	glBindTexture( GL_TEXTURE_2D, 0 );
 
@@ -258,7 +284,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	if( mStereo )
 	{
-		mEye->setViewOffset( QVector3D(-0.05,0,0) );
+		mEye->setViewOffset( QVector3D(-mStereoEyeDistance/2.0f,0,0) );
 		mEye->setAspect( (float)mLeftTextureRenderer->size().width()/mLeftTextureRenderer->size().height() );
 		mLeftTextureRenderer->bind();
 		pushAllGL();
@@ -268,7 +294,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 		popAllGL();
 		mLeftTextureRenderer->release();
 
-		mEye->setViewOffset( QVector3D(0.05,0,0) );
+		mEye->setViewOffset( QVector3D(mStereoEyeDistance/2.0f,0,0) );
 		mEye->setAspect( (float)mRightTextureRenderer->size().width()/mRightTextureRenderer->size().height() );
 		mRightTextureRenderer->bind();
 		pushAllGL();
@@ -295,6 +321,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	mFrameCountSecond++;
 	drawFPS( painter, rect );
+	drawHUD( painter, rect );
 
 	GLenum glError = glGetError();
 	if( glError  != GL_NO_ERROR )
@@ -316,6 +343,23 @@ void Scene::drawFPS( QPainter * painter, const QRectF & rect )
 }
 
 
+void Scene::drawHUD( QPainter * painter, const QRectF & rect )
+{
+	QSharedPointer<Player> player = ((World *)mRoot)->player();
+
+	painter->setPen( QColor(255,255,255) );
+	painter->setFont( mFont );
+
+	painter->fillRect( QRectF( rect.left(), rect.bottom()-20, rect.left()+150, rect.bottom() ), QColor( 0, 0, 0, 100 ) );
+	painter->drawText( rect, Qt::AlignBottom | Qt::AlignLeft, QString( tr("Health: %1%")
+						.arg(player->life()) ) );
+	painter->drawText( rect, Qt::AlignBottom | Qt::AlignRight, QString( tr("%1: %2 | %3 ")
+						.arg(player->weapon()->name())
+						.arg(player->weapon()->ammoclip())
+						.arg(player->weapon()->ammo()) ) );
+}
+
+
 void Scene::secondPassed()
 {
 	mFramesPerSecond = mFrameCountSecond;
@@ -326,7 +370,7 @@ void Scene::secondPassed()
 void Scene::setMouseGrabbing( bool enable )
 {
 	//HACK: this fixes mouse movements on entering grabbing mode - unfortunately it may produce stack overflows
-	// in QGestureManager::filterEvent(QGraphicsObject*, QEvent*)
+	// in QGestureManager::filterEvent( QGraphicsObject *, QEvent * )
 	QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
 	//HACK: this used to prevent the cursor from beeing visible after enabling grabbing mode when the mouse is on a widget
 	//QCoreApplication::processEvents( QEventLoop::AllEvents );

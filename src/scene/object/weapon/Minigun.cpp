@@ -24,13 +24,14 @@
 
 
 Minigun::Minigun( World * world ) :
-	AWeapon( world )
+	AWeapon( world, 10000, 200, 200 )
 {
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
 
+	mName = "Minigun";
 	mDrawn = false;
-	mCoolDown = 0.0f;
+	mCoolDown = 0.1f;
 	mTrailAlpha = 0.0f;
 	mFired = false;
 	mRange = 100.0f;
@@ -79,7 +80,7 @@ void Minigun::updateSelf( const double & delta )
 {
 	if( mFired )
 	{
-		if( mCoolDown <= 0.0f )
+		if( mCoolDown <= 0.0f && mAmmoClip > 0 )
 		{
 			mCoolDown = 0.1f;
 			mTrailAlpha = 1.0f;
@@ -93,6 +94,16 @@ void Minigun::updateSelf( const double & delta )
 			{
 				victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
 			}
+
+			if( !mFireSound->isPlaying() )
+			{
+				mFireSound->play();
+			}
+			mAmmoClip--;
+		}
+		else
+		{
+			mFireSound->stop();
 		}
 
 		if( mRPM < 6000.0f )
@@ -104,14 +115,6 @@ void Minigun::updateSelf( const double & delta )
 		{
 			mRPM = 6000.0f;
 			mCoolDown = 0.0f;
-		}
-
-		if( mRPM >= 600.0f )
-		{
-			if( !mFireSound->isPlaying() )
-			{
-				mFireSound->play();
-			}
 		}
 	}
 	else
@@ -129,11 +132,6 @@ void Minigun::updateSelf( const double & delta )
 	}
 
 	mRotation += mRPM * delta;
-
-	if( mCoolDown > delta )
-		mCoolDown -= delta * 0.5;
-	else
-		mCoolDown = 0.0f;
 
 	if( mTrailAlpha > delta )
 		mTrailAlpha -= delta * 2.0;

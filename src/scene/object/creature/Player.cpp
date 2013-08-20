@@ -29,6 +29,8 @@
 Player::Player( World * world ) :
 	ACreature( world )
 {
+	setLife( 100 );
+
 	mForwardPressed = false;
 	mLeftPressed = false;
 	mBackwardPressed = false;
@@ -86,6 +88,9 @@ void Player::keyPressEvent( QKeyEvent * event )
 		break;
 	case Qt::Key_D:
 		mRightPressed = true;
+		break;
+	case Qt::Key_R:
+		weapon()->reload();
 		break;
 	case Qt::Key_Space:
 		mUpPressed = true;
@@ -274,7 +279,7 @@ void Player::updateSelf( const double & delta )
 				finalMove += left() * control.x();
 			}
 			finalMove.normalize();
-            finalMove -= mGroundNormal * qMin( 0.0f, ((float)QVector3D::dotProduct( finalMove, mGroundNormal )) );
+			finalMove -= mGroundNormal * qMin( 0.0f, ((float)QVector3D::dotProduct( finalMove, mGroundNormal )) );
 		} else {
 			finalMove += QVector3D::crossProduct( left(), QVector3D(0,1,0) ) * control.z();
 			finalMove += left() * control.x();
