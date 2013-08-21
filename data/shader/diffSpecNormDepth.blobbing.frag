@@ -22,9 +22,9 @@ void main()
 
 	// calculate tangent space matrix
 	vec3 dpx = dFdx( vVertex );
-	vec3 dpy = dFdy( vVertex );
+	vec3 dpy = dFdy( vVertex ); 			// BUG on ATI/AMD graphic cards (only Linux?).
 	vec2 dtx = dFdx( gl_TexCoord[0].st );
-	vec2 dty = dFdy( gl_TexCoord[0].st );
+	vec2 dty = dFdy( gl_TexCoord[0].st ); 	// BUG on ATI/AMD graphic cards (only Linux?).
 	vec3 tangent = normalize( dpx * dty.t - dpy * dtx.t );
 	vec3 binormal = normalize( -dpx * dty.s + dpy * dtx.s );
 	mat3 TBN = mat3( tangent, binormal, normal );	// the transpose of texture-to-eye space matrix
