@@ -248,7 +248,7 @@ void Landscape::draw2SelfPost()
 void Landscape::drawPatch( const QRectF & rect )
 {
 	mTerrainMaterial->bind();
-	glMatrixMode( GL_TEXTURE );	glPushMatrix();
+	glMatrixMode( GL_TEXTURE );	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
 		glScalef( mTerrainMaterialScale.x(), -mTerrainMaterialScale.y(), 1.0f );
 		glMatrixMode( GL_MODELVIEW );
 		mTerrain->drawPatch( rect );
