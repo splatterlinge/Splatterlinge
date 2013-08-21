@@ -26,11 +26,16 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 
 	wingUpMovement = false;
 	playerDetected = false;
+	targetBodyPart = TARGET_BODY;
 
 	mWingSound = new AudioSample( "./data/sound/butterfly.wav" );
 	mWingSound->setLooping( true );
 	mWingSound->setRolloffFactor(0.01f);
 	mWingSound->play();
+
+	damageMultiplicationFactor[TARGET_BODY] = 1.0f;
+	damageMultiplicationFactor[TARGET_HEAD] = 2.0f;
+	damageMultiplicationFactor[TARGET_WING] = 0.5f;
 
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
 	{
@@ -231,6 +236,7 @@ bool Splatterling::intersectBody(const QVector3D & origin, const QVector3D & dir
 
 		if( Triangle::intersectRay(this->pointToWorld(v0), this->pointToWorld(v1), this->pointToWorld(v2), origin, direction, intersectionDistance) )
 		{
+			targetBodyPart = TARGET_BODY;
 			return true;
 		}
 	}
@@ -248,6 +254,7 @@ bool Splatterling::intersectWing(const QVector3D & origin, const QVector3D & dir
 	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
 		Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
 	{
+		targetBodyPart = TARGET_WING;
 		return true;
 	}
 
@@ -258,6 +265,7 @@ bool Splatterling::intersectWing(const QVector3D & origin, const QVector3D & dir
 	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
 		Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
 	{
+		targetBodyPart = TARGET_WING;
 		return true;
 	}
 
@@ -276,7 +284,7 @@ bool Splatterling::intersectHead(const QVector3D & origin, const QVector3D & dir
 	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
 		Triangle::intersectRay(this->pointToWorld(v[1]), this->pointToWorld(v[3]), this->pointToWorld(v[2]), origin, direction, intersectionDistance))
 	{
-		qDebug() << "HEADSHOT";
+		targetBodyPart = TARGET_HEAD;
 		return true;
 	}
 
@@ -286,6 +294,8 @@ bool Splatterling::intersectHead(const QVector3D & origin, const QVector3D & dir
 
 void Splatterling::receiveDamage( int damage, const QVector3D * position, const QVector3D * direction )
 {
+	damage *= damageMultiplicationFactor[targetBodyPart];
+	qDebug() << damage;
 	ACreature::receiveDamage( damage, direction );
 	QVector3D splatterSource;
 

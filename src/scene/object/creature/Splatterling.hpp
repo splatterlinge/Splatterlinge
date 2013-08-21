@@ -77,6 +77,12 @@ public:
 		POSITION_OBJECT = 0,
 		COLOR_OBJECT = 1
 	};
+	enum
+	{
+		TARGET_BODY = 0,
+		TARGET_HEAD = 1,
+		TARGET_WING = 2
+	};
 
 	GLuint BufferName[BufferSize];
 
@@ -110,6 +116,8 @@ private:
 	bool wingUpMovement;
 	bool playerDetected;
 	AudioSample * mWingSound;
+	int targetBodyPart;
+	float damageMultiplicationFactor[3];
 };
 
 
