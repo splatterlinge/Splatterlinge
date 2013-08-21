@@ -122,6 +122,9 @@ private:
 	float mStereoEyeDistance;
 	bool mStereoUseOVR;
 	Shader * mOVRShader;
+	float mOVRLensCenter;
+	float mOVRScale;
+	float mOVRScaleIn;
 
 	bool mMouseGrabbing;
 	bool mBlinkingState;

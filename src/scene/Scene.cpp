@@ -99,10 +99,13 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 
 	mEye = new Eye( this );
 	mEye->setFarPlane( settings.value( "farPlane", 500.0f ).toFloat() );
-	mEye->setFOV(60);
+	mEye->setFOV(90);
 
 	mFont = QFont( "Xolonium", 12, QFont::Normal );
 	mBlinkingState = false;
+	mOVRLensCenter = 0.635;
+	mOVRScale = 0.2;
+	mOVRScaleIn = 2.0;
 
 	mDebugWindow = new DebugWindow( this );
 	addWidget( mDebugWindow, mDebugWindow->windowFlags() );
@@ -242,9 +245,9 @@ void Scene::drawStereoFrameBuffers()
 	if( mStereoUseOVR )
 	{
 		mOVRShader->bind();
-		mOVRShader->program()->setUniformValue( "lensCenter", QVector2D( 0.6, 0.5 ) );
-		mOVRShader->program()->setUniformValue( "scale", QVector2D( 0.3, 0.3 ) );
-		mOVRShader->program()->setUniformValue( "scaleIn", QVector2D( 2.0, 2.0 ) );
+		mOVRShader->program()->setUniformValue( "lensCenter", QVector2D( 1-mOVRLensCenter, 0.5 ) );
+		mOVRShader->program()->setUniformValue( "scale", QVector2D( mOVRScale, mOVRScale ) );
+		mOVRShader->program()->setUniformValue( "scaleIn", QVector2D( mOVRScaleIn, mOVRScaleIn ) );
 		QVector4D distortion7Inch( 1.0, 0.22, 0.24, 0.0 );
 //		QVector4D distortion( 1.0, 0.18, 0.115, 0.0 );
 		mOVRShader->program()->setUniformValue( "hmdWarpParam", distortion7Inch );
@@ -257,7 +260,7 @@ void Scene::drawStereoFrameBuffers()
 
 	if( mStereoUseOVR )
 	{
-		mOVRShader->program()->setUniformValue( "lensCenter", QVector2D( 0.4, 0.5 ) );
+		mOVRShader->program()->setUniformValue( "lensCenter", QVector2D( mOVRLensCenter, 0.5 ) );
 	}
 	glBindTexture( GL_TEXTURE_2D, mRightTextureRenderer->texID() );
 	glDrawArrays( GL_QUADS, 8, 4 );
@@ -558,6 +561,24 @@ void Scene::keyPressEvent( QKeyEvent * event )
 		break;
 	case Qt::Key_F3:
 		mDebugWindow->setVisible( mDebugWindow->isHidden() );
+		break;
+	case Qt::Key_Plus:
+		mOVRLensCenter += 0.01;
+		break;
+	case Qt::Key_Minus:
+		mOVRLensCenter -= 0.01;
+		break;
+	case Qt::Key_F8:
+		mOVRScale += 0.01;
+		break;
+	case Qt::Key_F9:
+		mOVRScale -= 0.01;
+		break;
+	case Qt::Key_Home:
+		mOVRScaleIn += 0.01;
+		break;
+	case Qt::Key_End:
+		mOVRScaleIn -= 0.01;
 		break;
 	default:
 		return;
