@@ -172,6 +172,8 @@ void Splatterling::updateSelf( const double & delta )
 void Splatterling::drawSelf()
 {
 	mMaterial->bind();
+	/*@Workaround need next line because the last pixel is clamped to the border*/
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
 
 	glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[COLOR_OBJECT] );
 	glBufferData( GL_ARRAY_BUFFER, Splatterling::ColorSize, ColorData, GL_STREAM_DRAW );
