@@ -101,6 +101,13 @@ bool MaterialData::load()
 
 	QSettings s( "./data/material/"+mName+"/material.ini", QSettings::IniFormat );
 
+	s.beginGroup( "Param" );
+	{
+		mWrapS = glGetTextureWrapFromString( s.value( "wrapS", "GL_REPEAT" ).toString() );
+		mWrapT = glGetTextureWrapFromString( s.value( "wrapT", "GL_REPEAT" ).toString() );
+	}
+	s.endGroup();
+
 	s.beginGroup( "Textures" );
 	{
 		QStringList textures = s.allKeys();
@@ -118,6 +125,8 @@ bool MaterialData::load()
 			}
 			GLuint texture =  mGLWidget->bindTexture( map );
 			glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, Material::filterAnisotropy() );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mWrapS );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mWrapT );
 			mTextures[(*i)] = texture;
 		}
 	}

@@ -106,6 +106,8 @@ private:
 	bool mAlphaTestEnabled;
 	GLclampf mAlphaTestReferenceValue;
 	GLenum mAlphaTestFunction;
+	GLint mWrapS;
+	GLint mWrapT;
 };
 
 
@@ -148,8 +150,6 @@ private:
 
 	GLWidget * mGLWidget;
 	QString mName;
-
-	float mOpacity;
 
 	GLuint mBlobMap;
 	GLuint mCubeMap;
