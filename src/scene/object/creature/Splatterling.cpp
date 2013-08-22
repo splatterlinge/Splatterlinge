@@ -182,7 +182,7 @@ void Splatterling::drawSelf()
 	glVertexPointer( 3, GL_FLOAT, 0, 0 );
 
 	glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[TEXTURE_OBJECT] );
-	glBufferData( GL_ARRAY_BUFFER, Splatterling::TexSize, TextureCoords, GL_STREAM_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, Splatterling::TexSize, TextureCoordData, GL_STREAM_DRAW );
 	glTexCoordPointer( 2, GL_FLOAT, 0, 0 );
 
 	glEnableClientState( GL_VERTEX_ARRAY );

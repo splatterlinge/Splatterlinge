@@ -22,39 +22,40 @@ static const GLfloat GlobalPositionData[] =
 
 	//wingOne
 	0.0f, 0.5f, 4.0f,
-	8.0f, 4.0f, 0.0f,
-	8.0f, 4.0f, 8.0f,
+	8.0f, 4.0f, -2.0f,
+	8.0f, 4.0f, 10.0f,
 
 	//wingTwo
 	0.0f, 0.5f, 4.0f,
-	-8.0f, 4.0f, 0.0f,
-	-8.0f, 4.0f, 8.0f,
+	-8.0f, 4.0f, -2.0f,
+	-8.0f, 4.0f, 10.0f,
 };
 
-static const GLfloat TextureCoords[] =
+static const GLfloat TextureCoordData[] =
 {
-	0.667f, 0.391f,
-	0.667f, 0.391f,
-	0.667f, 0.391f,
-	0.667f, 0.391f,
-	0.667f, 0.391f,
-	0.667f, 0.391f,
+	0.0f, 0.0f,
+	0.5f, 0.0f,
+	0.5f, 0.5f,
+	0.5f, 0.0f,
+	0.5f, 0.5f,
+	0.5f, 0.0f,
 
 	//face
-	0.0f, 0.0f,
-	0.0f, 0.0f,
-	0.0f, 0.0f,
-	0.0f, 0.0f,
+	0.0f, 1.0f,
+	0.0f, 0.5f,
+	0.5f, 1.0f,
+	0.5f, 0.5f,
 
 	//wingOne
-	0.5f, 0.658f,
-	1.0f, 0.658f,
+	0.5f, 0.65f,
+	1.0f, 0.25f,
 	1.0f, 1.0f,
 
 	//wingTwo
-	0.5f, 0.342f,
-	1.0f, 0.342f,
+	0.5f, 0.65f,
+	1.0f, 0.25f,
 	1.0f, 1.0f,
+
 };
 
 
@@ -91,7 +92,7 @@ public:
 
 	static const GLsizeiptr PositionSize = 16 * 3 * sizeof( GLfloat );
 	static const GLsizeiptr ColorSize = 16 * 3 * sizeof( GLubyte );
-	static const GLsizeiptr TexSize = 16 * 2 * sizeof( GLubyte );
+	static const GLsizeiptr TexSize = 16 * 2 * sizeof( GLfloat );
 
 	static const int BufferSize = 3;
 
