@@ -106,8 +106,6 @@ private:
 	bool mAlphaTestEnabled;
 	GLclampf mAlphaTestReferenceValue;
 	GLenum mAlphaTestFunction;
-	GLint mWrapS;
-	GLint mWrapT;
 };
 
 
