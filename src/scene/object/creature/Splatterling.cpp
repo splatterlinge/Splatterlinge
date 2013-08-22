@@ -21,8 +21,8 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 
 	mHeightAboveGround = 6.0f;
 	mVelocityY = 0.0f;
-	mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
-	glGenBuffers( 2, this->BufferName );
+	mMaterial = new Material( scene()->glWidget(), "Splatterling" );
+	glGenBuffers( BufferSize, this->BufferName );
 
 	wingUpMovement = false;
 	playerDetected = false;
@@ -171,7 +171,8 @@ void Splatterling::updateSelf( const double & delta )
 
 void Splatterling::drawSelf()
 {
-	glDisable( GL_LIGHTING );
+	mMaterial->bind();
+
 	glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[COLOR_OBJECT] );
 	glBufferData( GL_ARRAY_BUFFER, Splatterling::ColorSize, ColorData, GL_STREAM_DRAW );
 	glColorPointer( 3, GL_UNSIGNED_BYTE, 0, 0 );
@@ -180,8 +181,13 @@ void Splatterling::drawSelf()
 	glBufferData( GL_ARRAY_BUFFER, Splatterling::PositionSize, PositionData, GL_STREAM_DRAW );
 	glVertexPointer( 3, GL_FLOAT, 0, 0 );
 
+	glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[TEXTURE_OBJECT] );
+	glBufferData( GL_ARRAY_BUFFER, Splatterling::TexSize, TextureCoords, GL_STREAM_DRAW );
+	glTexCoordPointer( 2, GL_FLOAT, 0, 0 );
+
 	glEnableClientState( GL_VERTEX_ARRAY );
-	glEnableClientState( GL_COLOR_ARRAY );
+	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+//	glEnableClientState( GL_COLOR_ARRAY );
 
 	glDrawArrays( GL_TRIANGLE_FAN, 0, Splatterling::BodyVertexCount );
 	glDrawArrays( GL_TRIANGLE_STRIP, 6, Splatterling::HeadVertexCount );
@@ -189,10 +195,11 @@ void Splatterling::drawSelf()
 	glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount, 3 );
 	glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount + 3, 3 );
 
-	glDisableClientState( GL_COLOR_ARRAY );
+//	glDisableClientState( GL_COLOR_ARRAY );
+	glDisableClientState( GL_TEXTURE_COORD_ARRAY );
 	glDisableClientState( GL_VERTEX_ARRAY );
 
-	glEnable( GL_LIGHTING );
+	mMaterial->release();
 }
 
 
@@ -315,9 +322,9 @@ void Splatterling::recalculateWingPosition()
 	if( wingUpMovement )
 	{
 		PositionData[Splatterling::WingOneYPos]   += 0.02f;
-		PositionData[Splatterling::WingOneYPos + 3] += 0.02f;
+		PositionData[Splatterling::WingOneYPos + 3] += 0.03f;
 		PositionData[Splatterling::WingTwoYPos]   += 0.02f;
-		PositionData[Splatterling::WingTwoYPos + 3] += 0.02f;
+		PositionData[Splatterling::WingTwoYPos + 3] += 0.03f;
 
 		if( PositionData[Splatterling::WingOneYPos] >= 4.0f )
 		{
@@ -327,9 +334,9 @@ void Splatterling::recalculateWingPosition()
 	else
 	{
 		PositionData[Splatterling::WingOneYPos]   -= 0.02f;
-		PositionData[Splatterling::WingOneYPos + 3] -= 0.02f;
+		PositionData[Splatterling::WingOneYPos + 3] -= 0.03f;
 		PositionData[Splatterling::WingTwoYPos]   -= 0.02f;
-		PositionData[Splatterling::WingTwoYPos + 3] -= 0.02f;
+		PositionData[Splatterling::WingTwoYPos + 3] -= 0.03f;
 
 		if( PositionData[Splatterling::WingOneYPos] <= 0.0f )
 		{

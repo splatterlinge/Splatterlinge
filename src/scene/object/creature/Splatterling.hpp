@@ -31,6 +31,32 @@ static const GLfloat GlobalPositionData[] =
 	-8.0f, 4.0f, 8.0f,
 };
 
+static const GLfloat TextureCoords[] =
+{
+	0.667f, 0.391f,
+	0.667f, 0.391f,
+	0.667f, 0.391f,
+	0.667f, 0.391f,
+	0.667f, 0.391f,
+	0.667f, 0.391f,
+
+	//face
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+
+	//wingOne
+	0.5f, 0.658f,
+	1.0f, 0.658f,
+	1.0f, 1.0f,
+
+	//wingTwo
+	0.5f, 0.342f,
+	1.0f, 0.342f,
+	1.0f, 1.0f,
+};
+
 
 static const GLubyte ColorData[] =
 {
@@ -65,8 +91,9 @@ public:
 
 	static const GLsizeiptr PositionSize = 16 * 3 * sizeof( GLfloat );
 	static const GLsizeiptr ColorSize = 16 * 3 * sizeof( GLubyte );
+	static const GLsizeiptr TexSize = 16 * 2 * sizeof( GLubyte );
 
-	static const int BufferSize = 2;
+	static const int BufferSize = 3;
 
 	static const GLsizei BodyVertexCount = 6;
 	static const GLsizei HeadVertexCount = 4;
@@ -75,7 +102,8 @@ public:
 	enum
 	{
 		POSITION_OBJECT = 0,
-		COLOR_OBJECT = 1
+		COLOR_OBJECT = 1,
+		TEXTURE_OBJECT = 2
 	};
 	enum
 	{
