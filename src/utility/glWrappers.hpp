@@ -188,6 +188,7 @@ inline void glMaterial( const GLenum & face, const GLenum & pname, const QVector
 
 QString glGetErrorString( const GLenum & error );
 GLenum glGetAlphaTestFunctionFromString( const QString & name );
+GLint glGetTextureWrapFromString( const QString & name );
 
 
 #endif

@@ -57,3 +57,12 @@ GLenum glGetAlphaTestFunctionFromString( const QString & name )
 	else if( name == "GL_ALWAYS" ) return GL_ALWAYS;
 	else return GL_ALWAYS;
 }
+
+
+GLint glGetTextureWrapFromString( const QString & name )
+{
+	if( name == "GL_CLAMP_TO_EDGE" ) return GL_CLAMP_TO_EDGE;
+	else if( name == "GL_CLAMP_TO_BORDER" ) return GL_CLAMP_TO_BORDER;
+	else if( name == "GL_MIRRORED_REPEAT" ) return GL_MIRRORED_REPEAT;
+	else return GL_REPEAT;
+}

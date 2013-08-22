@@ -149,8 +149,6 @@ private:
 	GLWidget * mGLWidget;
 	QString mName;
 
-	float mOpacity;
-
 	GLuint mBlobMap;
 	GLuint mCubeMap;
 

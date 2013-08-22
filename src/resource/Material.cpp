@@ -101,6 +101,18 @@ bool MaterialData::load()
 
 	QSettings s( "./data/material/"+mName+"/material.ini", QSettings::IniFormat );
 
+	GLint wrapS;
+	GLint wrapT;
+	bool mipmap;
+
+	s.beginGroup( "Param" );
+	{
+		wrapS = glGetTextureWrapFromString( s.value( "wrapS", "GL_REPEAT" ).toString() );
+		wrapT = glGetTextureWrapFromString( s.value( "wrapT", "GL_REPEAT" ).toString() );
+		mipmap = s.value( "mipmap", true ).toBool();
+	}
+	s.endGroup();
+
 	s.beginGroup( "Textures" );
 	{
 		QStringList textures = s.allKeys();
@@ -116,8 +128,13 @@ bool MaterialData::load()
 					mapPath.toLocal8Bit().constData()
 				);
 			}
-			GLuint texture =  mGLWidget->bindTexture( map );
+			QGLContext::BindOptions options = QGLContext::InvertedYBindOption | QGLContext::LinearFilteringBindOption;
+			if( mipmap )
+				options |= QGLContext::MipmapBindOption;
+			GLuint texture =  mGLWidget->bindTexture( map, GL_TEXTURE_2D, GL_RGBA, options );
 			glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, Material::filterAnisotropy() );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT );
 			mTextures[(*i)] = texture;
 		}
 	}

@@ -86,13 +86,10 @@ void SplatterSystem::update( const double & delta )
 void SplatterSystem::draw( const QMatrix4x4 & modelView )
 {
 	mParticleMaterial->bind();
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	mParticleSystem->draw( modelView );
 	mParticleMaterial->release();
 
 	mSplatterMaterial->bind();
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 	glEnable( GL_BLEND );
 	glBlendFunc( GL_DST_COLOR, GL_ZERO );
 	glMatrixMode( GL_TEXTURE );
