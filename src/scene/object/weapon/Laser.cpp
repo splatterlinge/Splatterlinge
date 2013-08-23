@@ -138,7 +138,9 @@ void Laser::drawSelf()
 	if( mDrawn )
 	{
 		mMaterial->bind();
-		gluCylinder( mQuadric, 0.1f, 0.1f, 0.4f, 16, 16 );
+		glTranslatef( 0.0f, 0.0f, -0.2f );
+		gluCylinder( mQuadric, 0.08f, 0.08f, 0.4f, 16, 16 );
+		gluCylinder( mQuadric, 0.15f, 0.10f, 0.2f, 16, 16 );
 		mMaterial->release();
 	}
 }
