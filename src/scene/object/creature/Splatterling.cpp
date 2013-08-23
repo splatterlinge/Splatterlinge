@@ -12,6 +12,81 @@
 #include <QDebug>
 
 
+static const GLfloat GlobalPositionData[] =
+{
+	0.0f, 0.0f, 0.0f,
+	-1.0f, 1.0f, 8.0f,
+	1.0f, 1.0f, 8.0f,
+	1.0f, -1.0f, 8.0f,
+	-1.0f, -1.0f, 8.0f,
+	-1.0f, 1.0f, 8.0f,
+
+	//face
+	-1.0f, 1.0f, 8.0f,
+	-1.0f, -1.0f, 8.0f,
+	1.0f, 1.0f, 8.0f,
+	1.0f, -1.0f, 8.0f,
+
+	//wingOne
+	0.0f, 0.5f, 4.0f,
+	8.0f, 4.0f, -2.0f,
+	8.0f, 4.0f, 10.0f,
+
+	//wingTwo
+	0.0f, 0.5f, 4.0f,
+	-8.0f, 4.0f, -2.0f,
+	-8.0f, 4.0f, 10.0f,
+};
+
+static const GLfloat TextureCoordData[] =
+{
+	0.0f, 0.0f,
+	0.5f, 0.0f,
+	0.5f, 0.5f,
+	0.5f, 0.0f,
+	0.5f, 0.5f,
+	0.5f, 0.0f,
+
+	//face
+	0.0f, 1.0f,
+	0.0f, 0.5f,
+	0.5f, 1.0f,
+	0.5f, 0.5f,
+
+	//wingOne
+	0.5f, 0.65f,
+	1.0f, 0.25f,
+	1.0f, 1.0f,
+
+	//wingTwo
+	0.5f, 0.65f,
+	1.0f, 0.25f,
+	1.0f, 1.0f,
+
+};
+
+
+static const GLubyte ColorData[] =
+{
+	255, 255, 0,
+	255, 255, 0,
+	255, 255, 0,
+	255, 255, 0,
+	255, 255, 0,
+	255, 255, 0,
+
+	0, 255, 255,
+	0, 255, 255,
+	0, 255, 255,
+	0, 255, 255,
+
+	0, 0, 255,
+	0, 0, 255,
+	0, 0, 255,
+	0, 0, 255,
+	0, 0, 255,
+	0, 0, 255,
+};
 
 
 Splatterling::Splatterling( World * world ) : ACreature( world )
@@ -95,7 +170,7 @@ void Splatterling::updateSelf( const double & delta )
 			QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 			QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
 			setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
-			world()->player()->setLife( world()->player()->life() - 1 );
+			world()->player()->receiveDamage( 1 );	//TODO: do not call this once per frame - use a counter based on delta to call receiveDamage in a fixed timestep!
 		}
 		else
 			if( dist < 200 || playerDetected)
@@ -301,7 +376,7 @@ bool Splatterling::intersectHead(const QVector3D & origin, const QVector3D & dir
 
 void Splatterling::receiveDamage( int damage, const QVector3D * position, const QVector3D * direction )
 {
-	damage *= damageMultiplicationFactor[targetBodyPart];
+	damage *= damageMultiplicationFactor[targetBodyPart];	//BUG: This assumes the player's weapon is the only object calling intersectLine - only rely on the parameters position and direction!
 	qDebug() << damage;
 	ACreature::receiveDamage( damage, direction );
 	QVector3D splatterSource;

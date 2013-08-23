@@ -77,9 +77,8 @@ private:
 	QList< QSharedPointer<AWeapon> > mWeapons;
 	QList< QSharedPointer<AWeapon> >::iterator mCurrentWeapon;
 
-	void performRotate();
-	void performMove( const double & delta );
-	void performPosition();
+	void updateRotation( const double & delta );
+	void updatePosition( const double & delta );
 
 	void drawCrosshair();
 };

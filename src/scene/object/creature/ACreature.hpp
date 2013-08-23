@@ -45,13 +45,13 @@ public:
 	const State & state() const { return mState; }
 
 	const int & life() const { return mLife; }
-	void setLife( const int & life ) { mLife = life; }
 
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL )
-		{ mLife -= damage; if( mLife<0 ) mLife=0; };
+		{ mLife -= damage; if( mLife<0 ) mLife=0; }
 
 protected:
 	void setState( const State & state ) { mState = state; }
+	void setLife( const int & life ) { mLife = life; }
 
 private:
 	State mState;

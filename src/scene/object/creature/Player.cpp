@@ -221,14 +221,15 @@ void Player::updateSelf( const double & delta )
 			setState( ALIVE );
 			break;
 		case ALIVE:
-		case DYING:
-			performRotate();
+			updateRotation( delta );
+			updatePosition( delta );
 
 			if( mCurrentWeapon != mWeapons.end() )
 				(*mCurrentWeapon)->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
 
-			performMove( delta );
-			performPosition();
+			break;
+		case DYING:
+			setState( DEAD );
 			break;
 		case DEAD:
 			break;
@@ -280,8 +281,9 @@ void Player::draw2Self()
 		case SPAWNING:
 			break;
 		case ALIVE:
-		case DYING:
 			drawCrosshair();
+			break;
+		case DYING:
 			break;
 		case DEAD:
 			break;
@@ -301,18 +303,15 @@ void Player::receiveDamage( int damage, const QVector3D * position, const QVecto
 
 		if( life() <= 0 )
 		{
-			setState( DEAD );
+			if( state() == ALIVE )
+				setState( DYING );
 			setLife( 0 );
-		}
-		else if( life() < 25 )
-		{
-			setState( DYING );
 		}
 	}
 
 }
 
-void Player::performRotate()
+void Player::updateRotation( const double & delta )
 {
 	mAxisRotationY += -mMouseDelta.x()/5.0f;
 	mAxisRotationX += mMouseDelta.y()/5.0f;
@@ -327,7 +326,7 @@ void Player::performRotate()
 }
 
 
-void Player::performMove( const double & delta )
+void Player::updatePosition( const double & delta )
 {
 	QVector3D control( 0.0f, 0.0f, 0.0f );
 	float speed;
@@ -401,11 +400,7 @@ void Player::performMove( const double & delta )
 
 		moveY( mVelocityY * delta );
 	}
-}
 
-
-void Player::performPosition()
-{
 	QVector3D newPosition = position();
 	if( !( world()->collideSphere( this, mHeightAboveGround, newPosition, &mGroundNormal ) ).isEmpty() )
 	{
