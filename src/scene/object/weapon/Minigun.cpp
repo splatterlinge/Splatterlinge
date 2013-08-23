@@ -74,6 +74,7 @@ void Minigun::pull()
 void Minigun::holster()
 {
 	mDrawn = false;
+	mFired = false;
 }
 
 
@@ -151,20 +152,21 @@ void Minigun::drawSelf()
 
 	glColor3f( 0.7f, 0.7f, 0.7f );
 
-	glTranslatef( 0.05f, 0.0f, -0.4f );
+	glTranslatef( 0.0f, 0.0f, -0.4f );
 	glRotatef( mRotation, 0.0f, 0.0f, 1.0f );
 
 	glPushMatrix();
 	glTranslatef( 0.0f, 0.0f, -0.0f );
-	gluCylinder( mQuadric, 0.08f, 0.08f, 0.25f, 16, 1 );
+	gluCylinder( mQuadric, 0.08f, 0.08f, 0.3f, 16, 1 );
 
-	glTranslatef( 0.0f, 0.0f, 0.65f );
-	gluCylinder( mQuadric, 0.08f, 0.08f, 0.05f, 16, 1 );
+	glTranslatef( 0.0f, 0.0f, 0.5f );
+	gluCylinder( mQuadric, 0.08f, 0.08f, 0.02f, 16, 1 );
 	gluDisk( mQuadric, 0.0f, 0.08f, 16, 1 );
 
-	glTranslatef( 0.0f, 0.0f, 0.2f );
+	glTranslatef( 0.0f, 0.0f, 0.1f );
 	gluCylinder( mQuadric, 0.08f, 0.08f, 0.15f, 16, 1 );
 	gluDisk( mQuadric, 0.0f, 0.08f, 16, 1 );
+
 	glPopMatrix();
 
 	for( int i=0; i<=360; i+=60 )
@@ -172,13 +174,15 @@ void Minigun::drawSelf()
 		glPushMatrix();
 		glRotatef( i, 0.0f, 0.0f, 1.0f );
 		glTranslatef( 0.05f, 0.0f, 0.0f );
-		gluCylinder( mQuadric, 0.02f, 0.02f, 1.0f, 16, 1 );
+		gluCylinder( mQuadric, 0.02f, 0.02f, 0.6f, 16, 1 );
 		glPopMatrix();
 	}
 
-	glPopMatrix();
-
 	mMaterial->release();
+
+	glEnable( GL_LIGHTING );
+
+	glPopMatrix();
 }
 
 
