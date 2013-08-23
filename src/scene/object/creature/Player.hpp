@@ -70,6 +70,8 @@ private:
 	float mHeightAboveGround;
 	float mAxisRotationX;
 	float mAxisRotationY;
+	float mSpeedCounter;
+	float mSpeedCooldown;
 	bool mDragTeapot;
 	bool mDragTorch;
 	QVector3D mGroundNormal;

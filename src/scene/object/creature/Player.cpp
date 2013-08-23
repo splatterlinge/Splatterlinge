@@ -47,6 +47,9 @@ Player::Player( World * world ) :
 	mAxisRotationX = 0.0f;
 	mAxisRotationY = 0.0f;
 
+	mSpeedCounter = 0.0f;
+	mSpeedCooldown = 0.0f;
+
 	mTarget = QVector3D(0,0,0);
 	mDragTeapot = false;
 
@@ -355,12 +358,23 @@ void Player::updatePosition( const double & delta )
 		move( finalMove*speed*delta );
 	} else {
 		control.normalize();
-		if( mSpeedPressed )
+		if( mSpeedPressed && mSpeedCooldown <= 0.0f )
 		{
-			speed = 20.0;
+			speed = 15.0;
+			mSpeedCounter += delta;
 		} else {
-			speed = 10.0;
+			speed = 8.0;
 		}
+
+		if( mSpeedCounter >= 3.0f )
+		{
+			mSpeedPressed = false;
+			mSpeedCooldown = 2.0f;
+			mSpeedCounter = 0.0f;
+		}
+
+		if( mSpeedCooldown > 0.0f )
+			mSpeedCooldown -= delta;
 
 		QVector3D finalMove(0,0,0);
 		if( mOnGround )
