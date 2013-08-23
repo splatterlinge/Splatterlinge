@@ -36,7 +36,7 @@ Minigun::Minigun( World * world ) :
 	mFired = false;
 	mRange = 100.0f;
 	mTrailRadius = 0.01f;
-	mDamage = 5.0f;
+	mDamage = 1.0f;
 	mRotation = 0.0f;
 	mMaterial = new Material( scene()->glWidget(), "BlackSteel" );
 	mFireSound = new AudioSample( "minigun" );
@@ -80,9 +80,12 @@ void Minigun::updateSelf( const double & delta )
 {
 	if( mFired )
 	{
-		if( mCoolDown <= 0.0f && mAmmoClip > 0 )
+		if( mAmmoClip == 0 )
 		{
-			mCoolDown = 0.1f;
+			mFireSound->stop();
+		}
+		else if( mCoolDown <= 0.0f && mRPM >= 600.0f )
+		{
 			mTrailAlpha = 1.0f;
 			mTrailStart = worldPosition();
 			mTrailDirection = worldDirection();
@@ -100,39 +103,40 @@ void Minigun::updateSelf( const double & delta )
 				mFireSound->play();
 			}
 			mAmmoClip--;
-		}
-		else
-		{
-			mFireSound->stop();
-		}
-
-		if( mRPM < 6000.0f )
-		{
-			mRPM += (mRPM+1) * delta * 7;
 			mCoolDown = 0.1f;
 		}
+
+		if( mRPM < 600.0f )
+		{
+			mRPM += (mRPM+1) * delta * 3;
+		}
 		else
 		{
-			mRPM = 6000.0f;
-			mCoolDown = 0.0f;
+			mRPM = 600.0f;
 		}
 	}
 	else
 	{
 		if( mRPM >= 0.1f )
 		{
-			mRPM -= mRPM * delta * 3;
+			mRPM -= mRPM * delta * 2;
 		}
 		else
 		{
 			mRPM = 0.0f;
 		}
 
-		mCoolDown = 0.1f;
 		mFireSound->stop();
 	}
 
 	mRotation += mRPM * delta;
+
+	if( mCoolDown > delta )
+		mCoolDown -= delta;
+	else
+		mCoolDown = 0.0f;
+
+	qDebug() << mCoolDown << mRPM;
 
 	if( mTrailAlpha > delta )
 		mTrailAlpha -= delta * 2.0;
