@@ -30,7 +30,7 @@ Player::Player( World * world ) :
 	ACreature( world )
 {
 	setLife( 100 );
-	setState( ALIVE );
+	setState( SPAWNING );
 
 	mForwardPressed = false;
 	mLeftPressed = false;
@@ -209,23 +209,19 @@ void Player::mouseWheelEvent( QGraphicsSceneWheelEvent * event )
 
 void Player::updateSelf( const double & delta )
 {
+	if( mGodMode )
+	{
+		setState( ALIVE );
+		setLife( 100 );
+	}
+
 	switch( state() )
 	{
 		case SPAWNING:
+			setState( ALIVE );
 			break;
 		case ALIVE:
 		case DYING:
-		case DEAD:
-			if( life() == 0 )
-			{
-				setState( DEAD );
-				break;
-			}
-			else if( life() < 25 )
-			{
-				setState( DYING );
-			}
-
 			performRotate();
 
 			if( mCurrentWeapon != mWeapons.end() )
@@ -233,6 +229,8 @@ void Player::updateSelf( const double & delta )
 
 			performMove( delta );
 			performPosition();
+			break;
+		case DEAD:
 			break;
 	}
 }
@@ -277,23 +275,42 @@ void Player::draw2Self()
 	glPushMatrix();
 	glLoadIdentity();
 
-	glColor3f( 0.0f, 1.0f, 0.0f );
-	glBegin( GL_LINES );
-	glVertex3f( 0.0f, 0.05f, -1.0f);
-	glVertex3f( 0.0f, 0.1f, -1.0f);
-	glVertex3f( 0.0f,-0.05f, -1.0f);
-	glVertex3f( 0.0f,-0.1f, -1.0f);
-	glVertex3f( 0.05f, 0.0f, -1.0f);
-	glVertex3f( 0.15f, 0.0f, -1.0f);
-	glVertex3f(-0.05f, 0.0f, -1.0f);
-	glVertex3f(-0.15f, 0.0f, -1.0f);
-	glEnd();
+	switch( state() )
+	{
+		case SPAWNING:
+			break;
+		case ALIVE:
+		case DYING:
+			drawCrosshair();
+			break;
+		case DEAD:
+			break;
+	}
 
 	glPopMatrix();
 
 	glPopAttrib();
 }
 
+
+void Player::receiveDamage( int damage, const QVector3D * position, const QVector3D * direction )
+{
+	if( !mGodMode )
+	{
+		setLife( life() - damage );
+
+		if( life() <= 0 )
+		{
+			setState( DEAD );
+			setLife( 0 );
+		}
+		else if( life() < 25 )
+		{
+			setState( DYING );
+		}
+	}
+
+}
 
 void Player::performRotate()
 {
@@ -400,4 +417,20 @@ void Player::performPosition()
 	} else {
 		mOnGround = false;
 	}
+}
+
+
+void Player::drawCrosshair()
+{
+	glColor3f( 0.0f, 1.0f, 0.0f );
+	glBegin( GL_LINES );
+	glVertex3f( 0.0f, 0.05f, -1.0f);
+	glVertex3f( 0.0f, 0.1f, -1.0f);
+	glVertex3f( 0.0f,-0.05f, -1.0f);
+	glVertex3f( 0.0f,-0.1f, -1.0f);
+	glVertex3f( 0.05f, 0.0f, -1.0f);
+	glVertex3f( 0.15f, 0.0f, -1.0f);
+	glVertex3f(-0.05f, 0.0f, -1.0f);
+	glVertex3f(-0.15f, 0.0f, -1.0f);
+	glEnd();
 }

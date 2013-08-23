@@ -48,6 +48,8 @@ public:
 	virtual void mouseMoveEvent( MouseMoveEvent * event );
 	virtual void mouseWheelEvent( QGraphicsSceneWheelEvent * event );
 
+	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
+
 	QSharedPointer<AWeapon> weapon() { return *mCurrentWeapon; }
 
 private:
@@ -78,6 +80,8 @@ private:
 	void performRotate();
 	void performMove( const double & delta );
 	void performPosition();
+
+	void drawCrosshair();
 };
 
 
