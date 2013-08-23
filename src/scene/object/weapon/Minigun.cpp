@@ -136,8 +136,6 @@ void Minigun::updateSelf( const double & delta )
 	else
 		mCoolDown = 0.0f;
 
-	qDebug() << mCoolDown << mRPM;
-
 	if( mTrailAlpha > delta )
 		mTrailAlpha -= delta * 2.0;
 	else
