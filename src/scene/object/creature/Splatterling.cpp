@@ -123,6 +123,7 @@ Splatterling::~Splatterling()
 {
 	gluDeleteQuadric( mQuadric );
 	delete mMaterial;
+	delete mWingSound;
 }
 
 
