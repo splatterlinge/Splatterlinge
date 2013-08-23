@@ -80,7 +80,7 @@ void Minigun::holster()
 void Minigun::reload()
 {
 	mReload = true;
-	mCoolDown = 2.0f;
+	mCoolDown = 5.0f;
 }
 
 
