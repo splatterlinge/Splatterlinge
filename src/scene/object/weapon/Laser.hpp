@@ -61,6 +61,7 @@ private:
 	QVector3D mTrailEnd;
 	Material * mMaterial;
 	AudioSample * mFireSound;
+	AudioSample * mReloadSound;
 };
 
 
