@@ -94,7 +94,7 @@ QVector<AObject*> Forest::collideSphere( const AObject * exclude, const float & 
 		float treeScale = (*i).column(0).length();
 		QVector3D treeBottom = (*i).column(3).toVector3D() + (*i).mapVector( QVector3D(0,-10,0) );
 		QVector3D treeTop = (*i).column(3).toVector3D() + (*i).mapVector( QVector3D(0,60,0) );
-		if( Capsule::intersectSphere( treeBottom, treeTop, treeScale, center, radius, &tmpNormal, &depth ) )
+		if( Capsule::intersectSphere( treeBottom, treeTop, treeScale, center, radius/3, &tmpNormal, &depth ) )
 		{
 			collides.append( this );
 			center += tmpNormal * depth;
