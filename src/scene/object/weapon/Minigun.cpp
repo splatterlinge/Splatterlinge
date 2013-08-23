@@ -151,11 +151,11 @@ void Minigun::drawSelf()
 
 	glColor3f( 0.7f, 0.7f, 0.7f );
 
-	glTranslatef( 0.05f, 0.0f, 0.0f );
+	glTranslatef( 0.05f, 0.0f, -0.4f );
 	glRotatef( mRotation, 0.0f, 0.0f, 1.0f );
 
 	glPushMatrix();
-	glTranslatef( 0.0f, 0.0f, 0.0f );
+	glTranslatef( 0.0f, 0.0f, -0.0f );
 	gluCylinder( mQuadric, 0.08f, 0.08f, 0.25f, 16, 1 );
 
 	glTranslatef( 0.0f, 0.0f, 0.65f );
@@ -163,7 +163,7 @@ void Minigun::drawSelf()
 	gluDisk( mQuadric, 0.0f, 0.08f, 16, 1 );
 
 	glTranslatef( 0.0f, 0.0f, 0.2f );
-	gluCylinder( mQuadric, 0.08f, 0.08f, 0.05f, 16, 1 );
+	gluCylinder( mQuadric, 0.08f, 0.08f, 0.15f, 16, 1 );
 	gluDisk( mQuadric, 0.0f, 0.08f, 16, 1 );
 	glPopMatrix();
 
@@ -192,7 +192,7 @@ void Minigun::spinUp( const double & delta )
 {
 	if( mRPM < 600.0f )
 	{
-		mRPM += (mRPM+1) * delta * 3;
+		mRPM += (mRPM+1) * delta * 4;
 	}
 	else
 	{
