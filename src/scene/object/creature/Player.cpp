@@ -30,6 +30,7 @@ Player::Player( World * world ) :
 	ACreature( world )
 {
 	setLife( 100 );
+	setState( ALIVE );
 
 	mForwardPressed = false;
 	mLeftPressed = false;
@@ -208,112 +209,31 @@ void Player::mouseWheelEvent( QGraphicsSceneWheelEvent * event )
 
 void Player::updateSelf( const double & delta )
 {
-	mAxisRotationY += -mMouseDelta.x()/5.0f;
-	mAxisRotationX += mMouseDelta.y()/5.0f;
-	if( mAxisRotationX > 80 )
-		mAxisRotationX = 80;
-	if( mAxisRotationX < -80)
-		mAxisRotationX = -80;
-	mMouseDelta = QPointF( 0, 0 );
-	QQuaternion qX = QQuaternion::fromAxisAndAngle( 1,0,0, mAxisRotationX );
-	QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, mAxisRotationY );
-	setRotation( qY * qX );
-
-	if( mCurrentWeapon != mWeapons.end() )
-		(*mCurrentWeapon)->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
-
-	if( mGodMode )
+	switch( state() )
 	{
-		QVector3D control( 0.0f, 0.0f, 0.0f );
-		float speed;
-		if( mForwardPressed )
-			control.setZ( control.z() + 1.0f );
-		if( mBackwardPressed )
-			control.setZ( control.z() - 1.0f );
-		if( mLeftPressed )
-			control.setX( control.x() + 1.0f );
-		if( mRightPressed )
-			control.setX( control.x() - 1.0f );
-		if( mUpPressed )
-			control.setY( control.y() + 1.0f );
-		if( mDownPressed )
-			control.setY( control.y() - 1.0f );
-		if( mSpeedPressed )
-		{
-			speed = 300.0;
-		} else {
-			speed = 50.0;
-		}
-		QVector3D finalMove( control.x()*left() + control.y()*up() + control.z()*direction() );
-		move( finalMove*speed*delta );
-	} else {
-		QVector3D control( 0.0f, 0.0f, 0.0f );
-		float speed;
-		if( mForwardPressed )
-			control.setZ( control.z() + 1.0f );
-		if( mBackwardPressed )
-			control.setZ( control.z() - 1.0f );
-		if( mLeftPressed )
-			control.setX( control.x() + 1.0f );
-		if( mRightPressed )
-			control.setX( control.x() - 1.0f );
-		control.normalize();
-		if( mSpeedPressed )
-		{
-			speed = 20.0;
-		} else {
-			speed = 10.0;
-		}
-
-		QVector3D finalMove(0,0,0);
-		if( mOnGround )
-		{
-			QVector3D groundDirection = QVector3D::crossProduct( left(), mGroundNormal );
-			QVector3D groundLeft = QVector3D::crossProduct( mGroundNormal, groundDirection );
-			if( mGroundNormal.y() > 0.7 )
-			{	// if the terrain is flat enough, move along the ground
-				finalMove += groundDirection * control.z();
-				finalMove += groundLeft * control.x();
-			} else {
-				finalMove += QVector3D::crossProduct( left(), QVector3D(0,1,0) ) * control.z();
-				finalMove += left() * control.x();
+		case SPAWNING:
+			break;
+		case ALIVE:
+		case DYING:
+		case DEAD:
+			if( life() == 0 )
+			{
+				setState( DEAD );
+				break;
 			}
-			finalMove.normalize();
-			finalMove -= mGroundNormal * qMin( 0.0f, ((float)QVector3D::dotProduct( finalMove, mGroundNormal )) );
-		} else {
-			finalMove += QVector3D::crossProduct( left(), QVector3D(0,1,0) ) * control.z();
-			finalMove += left() * control.x();
-			finalMove.normalize();
-		}
+			else if( life() < 25 )
+			{
+				setState( DYING );
+			}
 
-		move( finalMove*speed*delta );
+			performRotate();
 
-		mVelocityY += -80.0f * delta;	// apply gravity
+			if( mCurrentWeapon != mWeapons.end() )
+				(*mCurrentWeapon)->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
 
-		if( mUpPressed && mOnGround && mGroundNormal.y() > 0.7 )	// jump if key is pressed and player touches ground
-			mVelocityY = 20.0f;
-
-		if( mDownPressed )	// duck by lowering the player's height above ground
-		{
-			mHeightAboveGround = 1.0f;
-		} else {
-			if( mHeightAboveGround < 2.0f )
-				mHeightAboveGround += 10.0f * delta;
-		}
-
-		moveY( mVelocityY * delta );
-	}
-
-	QVector3D newPosition = position();
-	if( !( world()->collideSphere( this, mHeightAboveGround, newPosition, &mGroundNormal ) ).isEmpty() )
-	{
-		mOnGround = true;
-		mGroundNormal.normalize();
-		if( mGroundNormal.y() > 0.7 && mVelocityY < 0.0f )
-			mVelocityY = 0.0f;
-		setPosition( newPosition );
-	} else {
-		mOnGround = false;
+			performMove( delta );
+			performPosition();
+			break;
 	}
 }
 
@@ -372,4 +292,112 @@ void Player::draw2Self()
 	glPopMatrix();
 
 	glPopAttrib();
+}
+
+
+void Player::performRotate()
+{
+	mAxisRotationY += -mMouseDelta.x()/5.0f;
+	mAxisRotationX += mMouseDelta.y()/5.0f;
+	if( mAxisRotationX > 80 )
+		mAxisRotationX = 80;
+	if( mAxisRotationX < -80)
+		mAxisRotationX = -80;
+	mMouseDelta = QPointF( 0, 0 );
+	QQuaternion qX = QQuaternion::fromAxisAndAngle( 1,0,0, mAxisRotationX );
+	QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, mAxisRotationY );
+	setRotation( qY * qX );
+}
+
+
+void Player::performMove( const double & delta )
+{
+	QVector3D control( 0.0f, 0.0f, 0.0f );
+	float speed;
+	if( mForwardPressed )
+		control.setZ( control.z() + 1.0f );
+	if( mBackwardPressed )
+		control.setZ( control.z() - 1.0f );
+	if( mLeftPressed )
+		control.setX( control.x() + 1.0f );
+	if( mRightPressed )
+		control.setX( control.x() - 1.0f );
+
+	if( mGodMode )
+	{
+		if( mUpPressed )
+			control.setY( control.y() + 1.0f );
+		if( mDownPressed )
+			control.setY( control.y() - 1.0f );
+		if( mSpeedPressed )
+		{
+			speed = 300.0;
+		} else {
+			speed = 50.0;
+		}
+		QVector3D finalMove( control.x()*left() + control.y()*up() + control.z()*direction() );
+		move( finalMove*speed*delta );
+	} else {
+		control.normalize();
+		if( mSpeedPressed )
+		{
+			speed = 20.0;
+		} else {
+			speed = 10.0;
+		}
+
+		QVector3D finalMove(0,0,0);
+		if( mOnGround )
+		{
+			QVector3D groundDirection = QVector3D::crossProduct( left(), mGroundNormal );
+			QVector3D groundLeft = QVector3D::crossProduct( mGroundNormal, groundDirection );
+			if( mGroundNormal.y() > 0.7 )
+			{	// if the terrain is flat enough, move along the ground
+				finalMove += groundDirection * control.z();
+				finalMove += groundLeft * control.x();
+			} else {
+				finalMove += QVector3D::crossProduct( left(), QVector3D(0,1,0) ) * control.z();
+				finalMove += left() * control.x();
+			}
+			finalMove.normalize();
+			finalMove -= mGroundNormal * qMin( 0.0f, ((float)QVector3D::dotProduct( finalMove, mGroundNormal )) );
+		} else {
+			finalMove += QVector3D::crossProduct( left(), QVector3D(0,1,0) ) * control.z();
+			finalMove += left() * control.x();
+			finalMove.normalize();
+		}
+
+		move( finalMove*speed*delta );
+
+		mVelocityY += -80.0f * delta;	// apply gravity
+
+		if( mUpPressed && mOnGround && mGroundNormal.y() > 0.7 )	// jump if key is pressed and player touches ground
+			mVelocityY = 20.0f;
+
+		if( mDownPressed )	// duck by lowering the player's height above ground
+		{
+			mHeightAboveGround = 1.0f;
+		} else {
+			if( mHeightAboveGround < 2.0f )
+				mHeightAboveGround += 10.0f * delta;
+		}
+
+		moveY( mVelocityY * delta );
+	}
+}
+
+
+void Player::performPosition()
+{
+	QVector3D newPosition = position();
+	if( !( world()->collideSphere( this, mHeightAboveGround, newPosition, &mGroundNormal ) ).isEmpty() )
+	{
+		mOnGround = true;
+		mGroundNormal.normalize();
+		if( mGroundNormal.y() > 0.7 && mVelocityY < 0.0f )
+			mVelocityY = 0.0f;
+		setPosition( newPosition );
+	} else {
+		mOnGround = false;
+	}
 }

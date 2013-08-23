@@ -74,6 +74,10 @@ private:
 	QSharedPointer<Torch> mTorch;
 	QList< QSharedPointer<AWeapon> > mWeapons;
 	QList< QSharedPointer<AWeapon> >::iterator mCurrentWeapon;
+
+	void performRotate();
+	void performMove( const double & delta );
+	void performPosition();
 };
 
 
