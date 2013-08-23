@@ -31,8 +31,8 @@ Minigun::Minigun( World * world ) :
 
 	mName = "Minigun";
 	mDrawn = false;
+	mReload = false;
 	mCoolDown = 0.1f;
-	mTrailAlpha = 0.0f;
 	mFired = false;
 	mRange = 100.0f;
 	mTrailRadius = 0.01f;
@@ -67,6 +67,7 @@ void Minigun::triggerReleased()
 void Minigun::pull()
 {
 	mDrawn = true;
+	mRPM = 0.0f;
 }
 
 
@@ -76,17 +77,34 @@ void Minigun::holster()
 }
 
 
+void Minigun::reload()
+{
+	mReload = true;
+	mCoolDown = 2.0f;
+}
+
+
 void Minigun::updateSelf( const double & delta )
 {
-	if( mFired )
+	if( mReload )
 	{
-		if( mAmmoClip == 0 )
+		if( mCoolDown <= 0.0f )
+		{
+			reloadClip();
+
+			mReload = false;
+		}
+
+		spinDown( delta );
+	}
+	else if( mFired )
+	{
+		if( mClipAmmo == 0 )
 		{
 			mFireSound->stop();
 		}
 		else if( mCoolDown <= 0.0f && mRPM >= 600.0f )
 		{
-			mTrailAlpha = 1.0f;
 			mTrailStart = worldPosition();
 			mTrailDirection = worldDirection();
 			mTrailLength = mRange;
@@ -102,31 +120,15 @@ void Minigun::updateSelf( const double & delta )
 			{
 				mFireSound->play();
 			}
-			mAmmoClip--;
+			mClipAmmo--;
 			mCoolDown = 0.1f;
 		}
 
-		if( mRPM < 600.0f )
-		{
-			mRPM += (mRPM+1) * delta * 3;
-		}
-		else
-		{
-			mRPM = 600.0f;
-		}
+		spinUp( delta );
 	}
 	else
 	{
-		if( mRPM >= 0.1f )
-		{
-			mRPM -= mRPM * delta * 2;
-		}
-		else
-		{
-			mRPM = 0.0f;
-		}
-
-		mFireSound->stop();
+		spinDown( delta );
 	}
 
 	mRotation += mRPM * delta;
@@ -135,11 +137,6 @@ void Minigun::updateSelf( const double & delta )
 		mCoolDown -= delta;
 	else
 		mCoolDown = 0.0f;
-
-	if( mTrailAlpha > delta )
-		mTrailAlpha -= delta * 2.0;
-	else
-		mTrailAlpha = 0.0f;
 }
 
 
@@ -188,4 +185,50 @@ void Minigun::drawSelf()
 void Minigun::draw2Self()
 {
 	// TODO
+}
+
+
+void Minigun::spinUp( const double & delta )
+{
+	if( mRPM < 600.0f )
+	{
+		mRPM += (mRPM+1) * delta * 3;
+	}
+	else
+	{
+		mRPM = 600.0f;
+	}
+}
+
+
+void Minigun::spinDown( const double & delta )
+{
+	if( mRPM >= 0.1f )
+	{
+		mRPM -= mRPM * delta * 3;
+	}
+	else
+	{
+		mRPM = 0.0f;
+	}
+
+	mFireSound->stop();
+}
+
+
+void Minigun::reloadClip()
+{
+	if( mClipAmmo < mClipSize )
+	{
+		if( mAmmo > mClipSize )
+		{
+			mClipAmmo = mClipSize;
+			mAmmo -= mClipSize;
+		}
+		else
+		{
+			mClipAmmo = mAmmo;
+			mAmmo -= mAmmo;
+		}
+	}
 }

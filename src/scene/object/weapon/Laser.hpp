@@ -41,11 +41,13 @@ public:
 	virtual void triggerReleased();
 	virtual void holster();
 	virtual void pull();
+	virtual void reload();
 
 private:
 	GLUquadric * mQuadric;
 	bool mDrawn;
 	bool mFired;
+	bool mReload;
 	float mHeat;
 	float mCoolDown;
 	float mRange;

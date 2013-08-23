@@ -39,17 +39,17 @@ public:
 	virtual void triggerReleased() = 0;
 	virtual void holster() = 0;
 	virtual void pull() = 0;
-	virtual void reload();
+	virtual void reload() = 0;
 
 	const QString name() const { return mName; }
 	const int ammo() const { return mAmmo; }
-	const int ammoclip() const { return mAmmoClip; }
+	const int ammoclip() const { return mClipAmmo; }
 	const int clipsize() const { return mClipSize; }
 
 protected:
 	QString mName;
 	int mAmmo;
-	int mAmmoClip;
+	int mClipAmmo;
 	int mClipSize;
 };
 

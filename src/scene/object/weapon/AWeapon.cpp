@@ -27,7 +27,7 @@ AWeapon::AWeapon( World * world ) :
 AWeapon::AWeapon( World *world, int ammo, int ammoclip, int clipsize ) :
 	AWorldObject::AWorldObject( world ),
 	mAmmo( ammo ),
-	mAmmoClip( ammoclip ),
+	mClipAmmo( ammoclip ),
 	mClipSize( clipsize )
 {
 }
@@ -35,22 +35,4 @@ AWeapon::AWeapon( World *world, int ammo, int ammoclip, int clipsize ) :
 
 AWeapon::~AWeapon()
 {
-}
-
-
-void AWeapon::reload()
-{
-	if( mAmmoClip < mClipSize )
-	{
-		if( mAmmo > mClipSize )
-		{
-			mAmmoClip = mClipSize;
-			mAmmo -= mClipSize;
-		}
-		else
-		{
-			mAmmoClip = mAmmo;
-			mAmmo -= mAmmo;
-		}
-	}
 }
