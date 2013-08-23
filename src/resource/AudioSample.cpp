@@ -21,6 +21,7 @@
 #include <scene/object/AObject.hpp>
 
 #include <QDebug>
+#include <QDir>
 #include <QVector3D>
 #include <AL/al.h>
 #include <float.h>
@@ -29,9 +30,9 @@
 RESOURCE_CACHE( AudioSampleData );
 
 
-AudioSampleData::AudioSampleData( QString file ) :
-	AResourceData( file ),
-	mFile( file ),
+AudioSampleData::AudioSampleData( QString name ) :
+	AResourceData( name ),
+	mName( name ),
 	mBuffer( 0 )
 {
 }
@@ -61,7 +62,24 @@ bool AudioSampleData::load()
 	unload();
 	qDebug() << "+" << this << "AudioSampleData" << uid();
 
-	if( audioLoader( mFile.toLocal8Bit().constData(), &mBuffer, &mFrequency, &mFormat ) != 0 )
+	QDir soundDir( baseDirectory() );
+	QStringList candidateNameFilter;
+	candidateNameFilter << (mName+".*");
+	soundDir.setNameFilters( candidateNameFilter );
+	QStringList candidates = soundDir.entryList( candidateNameFilter, QDir::Files | QDir::Readable, QDir::Name );
+	if( candidates.size() > 1 )
+		qWarning() << "!" << this << "AudioSampleData" << uid() << "found multiple candidates with the same name: " << candidates;
+
+	bool validFileLoaded = false;
+	foreach( QString file, candidates )
+	{
+		if( audioLoader( (baseDirectory()+file).toLocal8Bit().constData(), &mBuffer, &mFrequency, &mFormat ) == 0 )
+		{
+			validFileLoaded = true;
+			break;
+		}
+	}
+	if( !validFileLoaded )
 		return false;
 
 	if( mFormat == AL_FORMAT_STEREO8 || mFormat == AL_FORMAT_STEREO16 )

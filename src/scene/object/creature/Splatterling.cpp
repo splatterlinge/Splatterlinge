@@ -28,7 +28,7 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	playerDetected = false;
 	targetBodyPart = TARGET_BODY;
 
-	mWingSound = new AudioSample( "./data/sound/butterfly.wav" );
+	mWingSound = new AudioSample( "butterfly" );
 	mWingSound->setLooping( true );
 	mWingSound->setRolloffFactor(0.01f);
 	mWingSound->play();

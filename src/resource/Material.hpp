@@ -90,6 +90,8 @@ public:
 	virtual bool load();
 	virtual void unload();
 
+	static QString baseDirectory() { return AResourceData::baseDirectory()+"material/"; }
+
 private:
 	GLWidget * mGLWidget;
 	QString mName;

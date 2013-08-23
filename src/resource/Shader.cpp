@@ -60,8 +60,8 @@ bool ShaderData::load()
 	qDebug() << "+" << this << "ShaderData" << uid();
 
 	mProgram = new QGLShaderProgram( mGLWidget );
-	mProgram->addShaderFromSourceFile( QGLShader::Vertex, "./data/shader/"+mName+".vert" );
-	mProgram->addShaderFromSourceFile( QGLShader::Fragment, "./data/shader/"+mName+".frag" );
+	mProgram->addShaderFromSourceFile( QGLShader::Vertex, baseDirectory()+mName+".vert" );
+	mProgram->addShaderFromSourceFile( QGLShader::Fragment, baseDirectory()+mName+".frag" );
 	if( !mProgram->link() )
 	{
 		qWarning() << mProgram->log();

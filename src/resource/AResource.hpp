@@ -51,6 +51,8 @@ public:
 	virtual bool operator==( const AResourceData & rhs ) const { return mUID==rhs.mUID; }
 	virtual bool operator!=( const AResourceData & rhs ) const { return !(*this==rhs); }
 
+	static QString baseDirectory() { return "data/"; }
+
 private:
 	QString mUID;
 	bool mLoaded;

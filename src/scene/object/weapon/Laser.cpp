@@ -40,7 +40,7 @@ Laser::Laser( World * world ) :
 	mTrailRadius = 0.04f;
 	mDamage = 50.0f;
 	mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
-	mFireSound = new AudioSample( "./data/sound/laser.ogg" );
+	mFireSound = new AudioSample( "laser" );
 	mFireSound->setLooping( false );
 }
 

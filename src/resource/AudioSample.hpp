@@ -34,10 +34,10 @@ class AObject;
 class AudioSampleData : public AResourceData
 {
 public:
-	AudioSampleData( QString file );
+	AudioSampleData( QString name );
 	virtual ~AudioSampleData();
 
-	const QString & file() const { return mFile; }
+	const QString & name() const { return mName; }
 
 	ALuint buffer() const { return mBuffer; }
 	ALsizei frequency() const { return mFrequency; }
@@ -47,8 +47,10 @@ public:
 	virtual bool load();
 	virtual void unload();
 
+	static QString baseDirectory() { return AResourceData::baseDirectory()+"sound/"; }
+
 private:
-	QString mFile;
+	QString mName;
 	ALuint mBuffer;
 	ALsizei mFrequency;
 	ALenum mFormat;

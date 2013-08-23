@@ -83,7 +83,7 @@ bool StaticModelData::load()
 
 bool StaticModelData::parse()
 {
-	QFile file( mName );
+	QFile file( baseDirectory()+mName+"/"+mName+".obj" );
 	QString line;
 	QString keyword;
 	QStringList fields;
@@ -101,7 +101,7 @@ bool StaticModelData::parse()
 	float maxY = 0;
 
 	if( !file.open( QIODevice::ReadOnly ) ) {
-		qDebug() << file.errorString();
+		qCritical() << "!!" << this << "StaticModelData" << uid() << "Could not open "<< file.fileName() << ": " << file.errorString();
 		return false;
 	}
 
@@ -201,19 +201,20 @@ bool StaticModelData::parse()
 		else if( keyword == "usemtl" )
 		{
 			QFileInfo fileinfo( file );
-			QFileInfo mat( "./data/material/"+fileinfo.baseName()+"_"+fields.takeFirst() );
+			QFileInfo mat( MaterialData::baseDirectory()+fileinfo.baseName()+"_"+fields.takeFirst() );
 			if( mat.exists() )
 			{
 				material = mat.fileName();
 			}
 			else
 			{
-				qWarning() << "?" << this << "Material" << mat.fileName() << "not found.";
+				qWarning() << "!" << this << "StaticModelData" << uid() << "Material" << mat.fileName() << "not found.";
+				material = "";
 			}
 		}
 		else
 		{
-			qWarning() << "?" << this << "Unknown keyword" << fields.takeFirst() << "detected.";
+			qWarning() << "!" << this << "StaticModelData" << uid() << "Unknown keyword" << fields.takeFirst() << "detected.";
 		}
 	}
 
@@ -237,7 +238,7 @@ bool StaticModelData::parse()
 		else if( size == 4 )
 			mode = GL_QUADS;
 		else
-			qCritical() << "!" << this << "Invalid number of points detected! Please check your OBJ file.";
+			qCritical() << "!!" << this << "StaticModelData" << uid() << "Only 3 or 4 vertices per face are supported!";
 
 		if( mMode == 0 )
 		{
@@ -251,7 +252,7 @@ bool StaticModelData::parse()
 			}
 			else if( mMode != mode )
 			{
-				qCritical() << "!" << this << "Different draw modes detected! Please check your OBJ file." ;
+				qCritical() << "!!" << this << "StaticModelData" << uid() << "Switching between different counts of vertices per face is unsupported!" ;
 			}
 		}
 
@@ -260,7 +261,10 @@ bool StaticModelData::parse()
 			Part p;
 			p.start = current - count;
 			p.count = count;
-			p.material = new Material( mGLWidget, lastMat );
+			if( !lastMat.isEmpty() )
+				p.material = new Material( mGLWidget, lastMat );
+			else
+				p.material = NULL;
 			mParts.append(p);
 
 			lastMat = face.material;
