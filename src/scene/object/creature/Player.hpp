@@ -53,7 +53,6 @@ public:
 	virtual void receivePowerUp( int power, int value=0 );
 
 	const int & armor() const { return mArmor; }
-
 	QSharedPointer<AWeapon> weapon() { return *mCurrentWeapon; }
 
 protected:

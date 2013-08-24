@@ -129,6 +129,7 @@ private:
 	bool mDrawingReflection;
 	bool mDrawingRefraction;
 
+	void drawInfinitePlane( const float & height );
 	void renderReflection();
 	void renderRefraction();
 };

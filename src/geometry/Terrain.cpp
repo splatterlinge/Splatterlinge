@@ -27,7 +27,7 @@
 #include <stddef.h>
 
 
-Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
+Terrain::Terrain( const QString & heightMapPath, const QVector3D & size, const QVector3D & offset, const int & smoothingPasses )
 {
 	QImage heightMap( heightMapPath );
 	if( heightMap.isNull() )
@@ -54,33 +54,17 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 			) );
 		}
 	}
+
 	// smoothed positions
-#define rawPosition(x,y) (rawPositions[(x)+(y)*mMapSize.width()])
-	for( int w=0; w<mMapSize.width(); w++ )
-		vertex( w, 0 ).position = rawPosition( w, 0 );
-	for( int h=1; h<mMapSize.height()-1; h++ )
+	for( int i=0; i<smoothingPasses; i++ )
+		rawPositions = smoothedPositions( rawPositions, mMapSize );
+
+	// copy smoothed positions to vertex array
+	for( int i=0; i<mVertices.size(); i++ )
 	{
-		vertex( 0, h ).position = rawPosition( 0, h );
-		for( int w=1; w<mMapSize.width()-1; w++ )
-		{
-			QVector3D smoothed = QVector3D(0,0,0);
-			smoothed += rawPosition( w-1, h-1 );
-			smoothed += rawPosition( w  , h-1 );
-			smoothed += rawPosition( w+1, h-1 );
-			smoothed += rawPosition( w-1, h   );
-			smoothed += rawPosition( w  , h   );
-			smoothed += rawPosition( w+1, h   );
-			smoothed += rawPosition( w-1, h+1 );
-			smoothed += rawPosition( w  , h+1 );
-			smoothed += rawPosition( w+1, h+1 );
-			smoothed /= 9.0f;
-			vertex( w, h ).position = smoothed;
-		}
-		vertex( mMapSize.width()-1, h ).position = rawPosition( mMapSize.width()-1, h );
+		mVertices[i].position = rawPositions[i];
 	}
-	for( int w=0; w<mMapSize.width(); w++ )
-		vertex( w, mMapSize.height()-1 ).position = rawPosition( w,  mMapSize.height()-1 );
-#undef rawPosition
+
 	// normals
 	for( int h=0; h<mMapSize.height()-1; h++ )
 	{
@@ -98,6 +82,7 @@ Terrain::Terrain( QString heightMapPath, QVector3D size, QVector3D offset )
 	{
 		vertex( w, mMapSize.height()-1 ).normal = QVector3D(0,1,0);	// last row
 	}
+
 	// texture coordinates
 	for( int h=0; h<mMapSize.height(); h++ )
 	{
@@ -137,6 +122,42 @@ Terrain::~Terrain()
 	mVertices.clear();
 	mVertexBuffer.destroy();
 	mIndexBuffer.destroy();
+}
+
+
+QVector< QVector3D > Terrain::smoothedPositions( const QVector< QVector3D > & in, const QSize & size )
+{
+	QVector< QVector3D > out( in.size() );
+
+#define inPosition(x,y) (in[(x)+(y)*size.width()])
+#define outPosition(x,y) (out[(x)+(y)*size.width()])
+	for( int w=0; w<mMapSize.width(); w++ )
+		outPosition( w, 0 ) = inPosition( w, 0 );
+	for( int h=1; h<mMapSize.height()-1; h++ )
+	{
+		outPosition( 0, h ) = inPosition( 0, h );
+		for( int w=1; w<mMapSize.width()-1; w++ )
+		{
+			QVector3D smoothed = QVector3D(0,0,0);
+			smoothed += inPosition( w-1, h-1 );
+			smoothed += inPosition( w  , h-1 );
+			smoothed += inPosition( w+1, h-1 );
+			smoothed += inPosition( w-1, h   );
+			smoothed += inPosition( w  , h   )*4.0;
+			smoothed += inPosition( w+1, h   );
+			smoothed += inPosition( w-1, h+1 );
+			smoothed += inPosition( w  , h+1 );
+			smoothed += inPosition( w+1, h+1 );
+			smoothed /= 12.0f;
+			outPosition( w, h ) = smoothed;
+		}
+		outPosition( mMapSize.width()-1, h ) = inPosition( mMapSize.width()-1, h );
+	}
+	for( int w=0; w<mMapSize.width(); w++ )
+		outPosition( w, mMapSize.height()-1 ) = inPosition( w,  mMapSize.height()-1 );
+#undef inPosition
+#undef outPosition
+	return out;
 }
 
 
