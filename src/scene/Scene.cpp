@@ -138,7 +138,7 @@ Scene::~Scene()
 	delete mOVRShader;
 	delete mEye;
 	delete mDebugWindow;
-	delete mStartMenuWindow;
+	//delete mStartMenuWindow; // SIGSEGV
 	delete mLeftTextureRenderer;
 	delete mRightTextureRenderer;
 }
