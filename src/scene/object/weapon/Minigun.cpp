@@ -196,7 +196,7 @@ void Minigun::spinUp( const double & delta )
 {
 	if( mRPM < 600.0f )
 	{
-		mRPM += (mRPM+1) * delta * 4;
+		mRPM += delta * 300;
 	}
 	else
 	{
@@ -209,7 +209,7 @@ void Minigun::spinDown( const double & delta )
 {
 	if( mRPM >= 0.1f )
 	{
-		mRPM -= mRPM * delta * 3;
+		mRPM -= delta * 300;
 	}
 	else
 	{
