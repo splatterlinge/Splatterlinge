@@ -159,6 +159,39 @@ void Landscape::drawSelf()
 void Landscape::drawSelfPost()
 {
 	mTerrainFilter->draw();
+
+	mTerrainMaterial->bind();
+	drawInfinitePlane( mTerrainOffset.y() );
+	mTerrainMaterial->release();
+}
+
+
+void Landscape::drawInfinitePlane( const float & height )
+{
+	QVector2D groundPlaneFrom
+	(
+		scene()->eye()->position().x() - scene()->eye()->farPlane(),
+		scene()->eye()->position().z() - scene()->eye()->farPlane()
+	);
+	QVector2D groundPlaneTo
+	(
+		scene()->eye()->position().x() + scene()->eye()->farPlane(),
+		scene()->eye()->position().z() + scene()->eye()->farPlane()
+	);
+	glMatrixMode( GL_TEXTURE );	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
+	glScalef( mTerrainMaterialScale.x()*mTerrain->toMapFactor().width(), -mTerrainMaterialScale.y()*mTerrain->toMapFactor().width(), 1.0f );
+	glMatrixMode( GL_MODELVIEW );
+
+	glNormal3f( 0, 1, 0 );
+	glBegin( GL_QUADS );
+		glTexCoord2f( groundPlaneFrom.x(),   groundPlaneTo.y() );	glVertex3f( groundPlaneFrom.x(), height,   groundPlaneTo.y() );
+		glTexCoord2f(   groundPlaneTo.x(),   groundPlaneTo.y() );	glVertex3f(   groundPlaneTo.x(), height,   groundPlaneTo.y() );
+		glTexCoord2f(   groundPlaneTo.x(), groundPlaneFrom.y() );	glVertex3f(   groundPlaneTo.x(), height, groundPlaneFrom.y() );
+		glTexCoord2f( groundPlaneFrom.x(), groundPlaneFrom.y() );	glVertex3f( groundPlaneFrom.x(), height, groundPlaneFrom.y() );
+	glEnd();
+
+	glMatrixMode( GL_TEXTURE );	glPopMatrix();
+	glMatrixMode( GL_MODELVIEW );
 }
 
 
@@ -240,23 +273,15 @@ void Landscape::draw2SelfPost()
 	MaterialQuality::setMaximum( defaultQuality );
 
 	glDisable( GL_CULL_FACE );
-	glPushMatrix();
-	glTranslatef( scene()->eye()->position().x(), mWaterHeight, scene()->eye()->position().z() );
 	mWaterShader->bind();
 	mWaterShader->program()->setUniformValue( "reflectionMap", 0 );
 	mWaterShader->program()->setUniformValue( "refractionMap", 1 );
 	glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, mRefractionRenderer->texID() );
 	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, mReflectionRenderer->texID() );
-	glBegin( GL_QUADS );
-		glVertex3f(-scene()->eye()->farPlane(), 0, scene()->eye()->farPlane() );
-		glVertex3f( scene()->eye()->farPlane(), 0, scene()->eye()->farPlane() );
-		glVertex3f( scene()->eye()->farPlane(), 0,-scene()->eye()->farPlane() );
-		glVertex3f(-scene()->eye()->farPlane(), 0,-scene()->eye()->farPlane() );
-	glEnd();
+	drawInfinitePlane( mWaterHeight );
 	mWaterShader->release();
 	glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, 0 );
 	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, 0 );
-	glPopMatrix();
 	glEnable( GL_CULL_FACE );
 }
 
@@ -307,6 +332,17 @@ QVector<AObject*> Landscape::collideSphere( const AObject * exclude, const float
 			center += QVector3D( 0, depth, 0 );
 			if( normal )
 				*normal += mTerrain->getNormal( center );
+		}
+	}
+	else
+	{
+		float depth = mTerrainOffset.y() + radius - center.y();
+		if( depth > 0.0f )
+		{
+			collides.append( this );
+			center += QVector3D( 0, depth, 0 );
+			if( normal )
+				*normal += QVector3D( 0, 1, 0 );
 		}
 	}
 	return collides;

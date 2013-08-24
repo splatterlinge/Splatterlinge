@@ -100,6 +100,8 @@ public:
 	 */
 	void drawPatchMap( const QRect & rect );
 
+	const QSizeF & toMapFactor() const { return mToMapFactor; }
+
 	QPointF toMapF( const QVector3D & point ) const;	///< Converts a vector in world coordinates to heightmap coordinates.
 	QPointF toMapF( const QPointF & point ) const;		///< Converts a point in world coordinates to heightmap coordinates.
 	QSizeF toMapF( const QSizeF & size ) const;		///< Converts a size in world coordinates to heightmap coordinates.
