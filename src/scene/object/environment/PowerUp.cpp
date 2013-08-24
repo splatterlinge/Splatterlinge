@@ -36,6 +36,11 @@ PowerUp::PowerUp( Landscape * landscape, QString type, const QPoint & mapPositio
 		mPowerType = HEALTH;
 		mMaterial = new Material( landscape->scene()->glWidget(), "PowerUp_Health" );
 	}
+	else if( type == "armor" )
+	{
+		mPowerType = ARMOR;
+		mMaterial = new Material( landscape->scene()->glWidget(), "PowerUp_Armor" );
+	}
 }
 
 
@@ -71,6 +76,8 @@ void PowerUp::updateSelf( const double &delta )
 				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
 				break;
 			case ARMOR:
+				mLandscape->world()->player()->receivePowerUp( ARMOR, 40 );
+				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
 				break;
 		}
 	}
@@ -108,9 +115,9 @@ void PowerUp::drawSelf()
 				glRotatef( mRotation, 0.0f, 1.0f, 0.0f );
 				glScalef( 0.7f, 0.7f, 0.7f );
 				glBegin( GL_QUADS );
-				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -1.0f,  1.0f, 0.0 );
+				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -1.0f,  1.0f, 0.0 );
 				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -1.0f, -1.0f, 0.0 );
-				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 0.0f, 1.0f ); glVertex3f(  1.0f, -1.0f, 0.0 );
+				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  1.0f, -1.0f, 0.0 );
 				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 1.0f, 1.0f );	glVertex3f(  1.0f,  1.0f, 0.0 );
 				glEnd();
 

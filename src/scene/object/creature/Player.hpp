@@ -52,7 +52,12 @@ public:
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
 	virtual void receivePowerUp( int power, int value );
 
+	const int & armor() const { return mArmor; }
+
 	QSharedPointer<AWeapon> weapon() { return *mCurrentWeapon; }
+
+protected:
+	void setArmor( const int & armor ) { mArmor = armor; }
 
 private:
 	QVector3D mTarget;
@@ -68,6 +73,7 @@ private:
 	bool mSpeedPressed;
 	bool mGodMode;
 	bool mOnGround;
+	int mArmor;
 	float mVelocityY;
 	float mHeightAboveGround;
 	float mAxisRotationX;
