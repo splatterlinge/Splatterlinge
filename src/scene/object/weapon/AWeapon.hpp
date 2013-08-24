@@ -31,7 +31,7 @@ class AWeapon : public AWorldObject
 public:
 	/// Creates a weapon for the given world
 	AWeapon( World * world );
-	AWeapon( World * world, int ammo, int ammoclip, int clipsize );
+	AWeapon( World * world, int ammo, int clipammo, int clipsize );
 	/// Frees this object
 	virtual ~AWeapon();
 
@@ -43,8 +43,10 @@ public:
 
 	const QString name() const { return mName; }
 	const int ammo() const { return mAmmo; }
-	const int ammoclip() const { return mClipAmmo; }
+	const int clipammo() const { return mClipAmmo; }
 	const int clipsize() const { return mClipSize; }
+
+	void setAmmo( const int & ammo ) { mAmmo = ammo; }
 
 protected:
 	QString mName;

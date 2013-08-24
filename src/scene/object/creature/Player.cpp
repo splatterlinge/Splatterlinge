@@ -55,7 +55,6 @@ Player::Player( World * world ) :
 	mDragTeapot = false;
 
 	mWeapons.append( QSharedPointer<Minigun>( new Minigun( world ) ) );
-	mWeapons.append( QSharedPointer<Laser>( new Laser( world ) ) );
 	mCurrentWeapon = mWeapons.begin();
 	foreach( QSharedPointer<AWeapon> w, mWeapons )
 	{
@@ -327,6 +326,7 @@ void Player::receiveDamage( int damage, const QVector3D * position, const QVecto
 
 void Player::receivePowerUp( int power, int value )
 {
+	bool found;
 	switch( power )
 	{
 		case PowerUp::HEALTH:
@@ -336,6 +336,52 @@ void Player::receivePowerUp( int power, int value )
 		case PowerUp::ARMOR:
 			setArmor( armor() + value );
 			setArmor( qMin( armor(), 100 ) );
+			break;
+		case PowerUp::WEAPON_LASER:
+			found = false;
+			foreach( QSharedPointer<AWeapon> w, mWeapons )
+			{
+				if( w->name() == "Laser" )
+				{
+					found = true;
+					w->setAmmo( w->ammo() + 1 );
+					break;
+				}
+			}
+
+			if( !found )
+			{
+				QSharedPointer<AWeapon> w = QSharedPointer<AWeapon>( new Laser( world() ) );
+				mWeapons.push_front( w );
+				add( w );
+
+				(*mCurrentWeapon)->holster();
+				mCurrentWeapon = mWeapons.begin();
+				(*mCurrentWeapon)->pull();
+			}
+			break;
+		case PowerUp::WEAPON_MINIGUN:
+			found = false;
+			foreach( QSharedPointer<AWeapon> w, mWeapons )
+			{
+				if( w->name() == "Minigun" )
+				{
+					found = true;
+					w->setAmmo( w->ammo() + 200 );
+					break;
+				}
+			}
+
+			if( !found )
+			{
+				QSharedPointer<AWeapon> w = QSharedPointer<AWeapon>( new Minigun( world() ) );
+				mWeapons.push_front( w );
+				add( w );
+
+				(*mCurrentWeapon)->holster();
+				mCurrentWeapon = mWeapons.begin();
+				(*mCurrentWeapon)->pull();
+			}
 			break;
 	}
 }

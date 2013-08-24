@@ -41,6 +41,16 @@ PowerUp::PowerUp( Landscape * landscape, QString type, const QPoint & mapPositio
 		mPowerType = ARMOR;
 		mMaterial = new Material( landscape->scene()->glWidget(), "PowerUp_Armor" );
 	}
+	else if( type == "weapon_laser" )
+	{
+		mPowerType = WEAPON_LASER;
+		mMaterial = new Material( landscape->scene()->glWidget(), "PowerUp_Weapon_Laser" );
+	}
+	else if( type == "weapon_minigun" )
+	{
+		mPowerType = WEAPON_MINIGUN;
+		mMaterial = new Material( landscape->scene()->glWidget(), "PowerUp_Weapon_Minigun" );
+	}
 }
 
 
@@ -79,6 +89,14 @@ void PowerUp::updateSelf( const double &delta )
 				mLandscape->world()->player()->receivePowerUp( ARMOR, 40 );
 				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
 				break;
+			case WEAPON_LASER:
+				mLandscape->world()->player()->receivePowerUp( WEAPON_LASER );
+				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
+				break;
+			case WEAPON_MINIGUN:
+				mLandscape->world()->player()->receivePowerUp( WEAPON_MINIGUN );
+				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
+				break;
 		}
 	}
 
@@ -105,6 +123,8 @@ void PowerUp::drawSelf()
 		{
 			case HEALTH:
 			case ARMOR:
+			case WEAPON_LASER:
+			case WEAPON_MINIGUN:
 				glPushMatrix();
 
 				glDisable( GL_CULL_FACE );

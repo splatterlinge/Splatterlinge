@@ -50,7 +50,7 @@ public:
 	virtual void mouseWheelEvent( QGraphicsSceneWheelEvent * event );
 
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
-	virtual void receivePowerUp( int power, int value );
+	virtual void receivePowerUp( int power, int value=0 );
 
 	const int & armor() const { return mArmor; }
 
