@@ -114,6 +114,7 @@ private:
 	QString mName;
 	QVector<Blob*> mBlobs;
 	QVector< QSharedPointer<AObject> > mVegetation;
+	QVector< QSharedPointer<AObject> > mPowerUps;
 	Terrain * mTerrain;
 	Filter * mTerrainFilter;
 	Material * mTerrainMaterial;

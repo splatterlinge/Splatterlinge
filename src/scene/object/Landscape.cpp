@@ -19,6 +19,7 @@
 
 #include "environment/Forest.hpp"
 #include "environment/Grass.hpp"
+#include "environment/PowerUp.hpp"
 
 #include <scene/Scene.hpp>
 #include <scene/TextureRenderer.hpp>
@@ -108,6 +109,22 @@ Landscape::Landscape( World * world, QString name ) :
 			}
 
 			mVegetation.append( f );
+			add( f );
+		}
+	s.endArray();
+
+	int powerNum = s.beginReadArray( "PowerUp" );
+		for( int i=0; i<powerNum; i++ )
+		{
+			s.setArrayIndex( i );
+			QSharedPointer<AObject> f;
+			QString type = s.value("type").toString();
+			if( type == "health" )
+			{
+				f = QSharedPointer<AObject>( new PowerUp( this, s.value("position").toPoint() ) );
+			}
+
+			mPowerUps.append( f );
 			add( f );
 		}
 	s.endArray();
