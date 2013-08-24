@@ -109,6 +109,7 @@ void Laser::updateSelf( const double & delta )
 			mFireSound->play();
 			mReloadSound->play();
 			mClipAmmo--;
+			mAmmo--;
 		}
 	}
 
