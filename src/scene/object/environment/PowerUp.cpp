@@ -77,7 +77,7 @@ void PowerUp::updateSelf( const double &delta )
 
 	float dist = ( mLandscape->world()->player()->worldPosition() - worldPosition() ).length();
 
-	if( dist <= 1 && mCoolDown == -1.0f )
+	if( dist <= 2 && mCoolDown == -1.0f )
 	{
 		switch( mPowerType )
 		{
