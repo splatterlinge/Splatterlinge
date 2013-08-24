@@ -31,6 +31,7 @@ Player::Player( World * world ) :
 {
 	setLife( 100 );
 	setState( SPAWNING );
+	mArmor = 25;
 
 	mForwardPressed = false;
 	mLeftPressed = false;
@@ -302,13 +303,23 @@ void Player::receiveDamage( int damage, const QVector3D * position, const QVecto
 {
 	if( !mGodMode )
 	{
-		setLife( life() - damage );
-
-		if( life() <= 0 )
+		if( mArmor >= damage )
 		{
-			if( state() == ALIVE )
-				setState( DYING );
-			setLife( 0 );
+			mArmor -= damage;
+		}
+		else
+		{
+			int admg = damage - mArmor;
+			mArmor -= (damage - admg);
+
+			setLife( life() - admg );
+
+			if( life() <= 0 )
+			{
+				if( state() == ALIVE )
+					setState( DYING );
+				setLife( 0 );
+			}
 		}
 	}
 }
@@ -320,8 +331,11 @@ void Player::receivePowerUp( int power, int value )
 	{
 		case PowerUp::HEALTH:
 			setLife( life() + value );
+			setLife( qMin( life(), 100 ) );
 			break;
 		case PowerUp::ARMOR:
+			setArmor( armor() + value );
+			setArmor( qMin( armor(), 100 ) );
 			break;
 	}
 }

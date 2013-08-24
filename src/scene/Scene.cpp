@@ -381,11 +381,11 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	painter->setBrush( QBrush( QColor(11,110,240,80) ) );
 	painter->drawRect( armorRect );
 	painter->setBrush( QBrush( QColor(26,121,245,200) ) );
-	painter->drawRect( armorRect.left(), armorRect.top(), player->life()*3, armorRect.height() );
+	painter->drawRect( armorRect.left(), armorRect.top(), player->armor()*3, armorRect.height() );
 	painter->setPen( QColor(255,255,255,255) );
 	painter->drawText( armorRect,
 						Qt::AlignCenter | Qt::AlignHCenter,
-						QString( tr("%1%").arg(player->life()) ) );
+						QString( tr("%1%").arg(player->armor()) ) );
 
 	// player health
 	QRect healthRect( rect.left()+10, rect.bottom()-40, 100*3, 30 );
