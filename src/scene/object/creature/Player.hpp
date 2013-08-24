@@ -23,6 +23,7 @@
 #include "../Teapot.hpp"
 #include "../Torch.hpp"
 #include "../weapon/AWeapon.hpp"
+#include "../environment/PowerUp.hpp"
 #include <scene/AKeyListener.hpp>
 #include <scene/AMouseListener.hpp>
 
@@ -49,6 +50,7 @@ public:
 	virtual void mouseWheelEvent( QGraphicsSceneWheelEvent * event );
 
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
+	virtual void receivePowerUp( int power, int value );
 
 	QSharedPointer<AWeapon> weapon() { return *mCurrentWeapon; }
 

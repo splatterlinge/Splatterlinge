@@ -98,14 +98,14 @@ Landscape::Landscape( World * world, QString name ) :
 			if( type == "forest" )
 			{
 				f = QSharedPointer<AObject>( new Forest( this,
-					s.value("model").toString(), s.value("position").toPoint(),
-					s.value("radius").toInt(), s.value("number").toInt() ) );
+						s.value("model").toString(), s.value("position").toPoint(),
+						s.value("radius").toInt(), s.value("number").toInt() ) );
 			}
 			else if( type == "grass" )
 			{
 				f = QSharedPointer<AObject>( new Grass( this,
-					s.value("model").toString(), s.value("position").toPoint(),
-					s.value("radius").toInt(), s.value("number").toInt() ) );
+						s.value("model").toString(), s.value("position").toPoint(),
+						s.value("radius").toInt(), s.value("number").toInt() ) );
 			}
 
 			mVegetation.append( f );
@@ -118,11 +118,10 @@ Landscape::Landscape( World * world, QString name ) :
 		{
 			s.setArrayIndex( i );
 			QSharedPointer<AObject> f;
-			QString type = s.value("type").toString();
-			if( type == "health" )
-			{
-				f = QSharedPointer<AObject>( new PowerUp( this, s.value("position").toPoint() ) );
-			}
+			f = QSharedPointer<AObject>( new PowerUp( this,
+					s.value("type").toString(),
+					s.value("position").toPoint(),
+					s.value("radius").toInt() ) );
 
 			mPowerUps.append( f );
 			add( f );

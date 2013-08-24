@@ -311,7 +311,19 @@ void Player::receiveDamage( int damage, const QVector3D * position, const QVecto
 			setLife( 0 );
 		}
 	}
+}
 
+
+void Player::receivePowerUp( int power, int value )
+{
+	switch( power )
+	{
+		case PowerUp::HEALTH:
+			setLife( life() + value );
+			break;
+		case PowerUp::ARMOR:
+			break;
+	}
 }
 
 void Player::updateRotation( const double & delta )

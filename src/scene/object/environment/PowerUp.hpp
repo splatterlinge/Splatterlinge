@@ -25,14 +25,28 @@
 class PowerUp : public AWorldObject
 {
 public:
-	PowerUp( Landscape * landscape, const QPoint & mapPosition );
+	PowerUp( Landscape * landscape, QString type, const QPoint & mapPosition, int mapRadius );
 	~PowerUp();
 
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
+	void respawn();
+
+	enum PowerType
+	{
+		HEALTH,
+		ARMOR
+	};
+
 private:
+	Landscape * mLandscape;
+	Material * mMaterial;
+	QPoint mPosition;
+	int mRadius;
 	float mRotation;
+	float mCoolDown;
+	PowerType mPowerType;
 };
 
 #endif // SCENE_OBJECT_ENVIRONMENT_POWERUP_HPP

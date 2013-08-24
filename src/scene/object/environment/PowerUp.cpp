@@ -17,15 +17,25 @@
 
 #include "PowerUp.hpp"
 
+#include <scene/Scene.hpp>
 
-PowerUp::PowerUp( Landscape * landscape, const QPoint & mapPosition ) :
-	AWorldObject( landscape->world() )
+
+PowerUp::PowerUp( Landscape * landscape, QString type, const QPoint & mapPosition, int mapRadius ) :
+	AWorldObject( landscape->world() ),
+	mLandscape( landscape ),
+	mPosition( mapPosition ),
+	mRadius( mapRadius )
 {
-	setPositionX( mapPosition.x() );
-	setPositionY( landscape->terrain()->getHeight( mapPosition )+1.5 );
-	setPositionZ( mapPosition.y() );
+	mCoolDown = -1.0f;
+	respawn();
 
 	setBoundingSphere( 1.0f );
+
+	if( type == "health" )
+	{
+		mPowerType = HEALTH;
+		mMaterial = new Material( landscape->scene()->glWidget(), "PowerUp_Health" );
+	}
 }
 
 
@@ -34,28 +44,79 @@ PowerUp::~PowerUp()
 }
 
 
+void PowerUp::respawn()
+{
+	QVector2D random = RandomNumber::inUnitCircle();
+	QVector3D pos( mPosition.x() + random.x() * mRadius, 0, mPosition.y() + random.y() * mRadius );
+	pos.setY( mLandscape->terrain()->getHeight( pos ) + 1.5 );
+
+	setPosition( pos );
+	mCoolDown = -1.0f;
+}
+
+
 void PowerUp::updateSelf( const double &delta )
 {
 	mRotation += delta * 50;
+
+	float dist = ( mLandscape->world()->player()->worldPosition() - worldPosition() ).length();
+
+	if( dist <= 1 && mCoolDown == -1.0f )
+	{
+		switch( mPowerType )
+		{
+			case HEALTH:
+				mLandscape->world()->player()->receivePowerUp( HEALTH, 25 );
+				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
+				break;
+			case ARMOR:
+				break;
+		}
+	}
+
+	if( mCoolDown != -1.0f )
+	{
+		if( mCoolDown > delta )
+			mCoolDown -= delta;
+		else
+			mCoolDown = 0.0f;
+	}
+
+	if( mCoolDown == 0.0f )
+	{
+		respawn();
+	}
 }
 
 
 void PowerUp::drawSelf()
 {
-	glPushMatrix();
+	if( mCoolDown == -1.0f )
+	{
+		switch( mPowerType )
+		{
+			case HEALTH:
+			case ARMOR:
+				glPushMatrix();
 
-	glEnable( GL_COLOR_MATERIAL );
-	glDisable( GL_CULL_FACE );
+				glDisable( GL_CULL_FACE );
 
-	glColor3f( 1.0f, 0.0f, 0.0f );
-	glRotatef( mRotation, 0.0f, 1.0f, 0.0f );
-	glScalef( 0.7f, 0.7f, 0.7f );
-	glBegin( GL_QUADS );
-	glVertex3f( -1.0f,  1.0f, 0.0 );
-	glVertex3f( -1.0f, -1.0f, 0.0 );
-	glVertex3f(  1.0f, -1.0f, 0.0 );
-	glVertex3f(  1.0f,  1.0f, 0.0 );
-	glEnd();
+				mMaterial->bind();
 
-	glPopMatrix();
+				glColor3f( 1.0f, 0.0f, 0.0f );
+				glRotatef( mRotation, 0.0f, 1.0f, 0.0f );
+				glScalef( 0.7f, 0.7f, 0.7f );
+				glBegin( GL_QUADS );
+				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 1.0f, 0.0f ); glVertex3f( -1.0f,  1.0f, 0.0 );
+				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -1.0f, -1.0f, 0.0 );
+				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 0.0f, 1.0f ); glVertex3f(  1.0f, -1.0f, 0.0 );
+				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 1.0f, 1.0f );	glVertex3f(  1.0f,  1.0f, 0.0 );
+				glEnd();
+
+				mMaterial->release();
+
+				glPopMatrix();
+				break;
+		}
+	}
 }
