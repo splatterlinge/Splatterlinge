@@ -59,8 +59,9 @@ Landscape::Landscape( World * world, QString name ) :
 			s.value( "materialScaleS", 1.0f ).toFloat(),
 			s.value( "materialScaleT", 1.0f ).toFloat()
 		);
+		int smoothingPasses = s.value( "smoothingPasses", 1 ).toInt();
 	s.endGroup();
-	mTerrain = new Terrain( "./data/landscape/"+name+"/"+heightMapPath, mTerrainSize, mTerrainOffset );
+	mTerrain = new Terrain( "./data/landscape/"+name+"/"+heightMapPath, mTerrainSize, mTerrainOffset, smoothingPasses );
 	mTerrainFilter = new Filter( this, QSize( 3, 3 ) );
 	mTerrainMaterial = new Material( scene()->glWidget(), terrainMaterial );
 

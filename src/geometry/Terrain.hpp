@@ -52,7 +52,7 @@ public:
 	 * @param size The volume occupied by this terrain.
 	 * @param offset Where to put the origin of the terrain.
 	 */
-	Terrain( QString heightMapPath, QVector3D size = QVector3D(1,1,1), QVector3D offset = QVector3D(0,0,0) );
+	Terrain( const QString & heightMapPath, const QVector3D & size = QVector3D(1,1,1), const QVector3D & offset = QVector3D(0,0,0), const int & smoothingPasses = 1 );
 
 	/// Frees terrain data
 	~Terrain();
@@ -153,6 +153,8 @@ protected:
 private:
 	VertexP3fN3fT2f & vertex( const int & x, const int & y );
 	VertexP3fN3fT2f & vertex( const QPoint & p );
+
+	QVector<QVector3D> smoothedPositions( const QVector< QVector3D > & in, const QSize & size );
 
 	bool getLineQuadIntersection( const QVector3D & origin, const QVector3D & direction, const QPoint & quadMapCoord, float & length ) const;
 
