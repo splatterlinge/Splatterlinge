@@ -116,6 +116,8 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	{
 		PositionData[i] = GlobalPositionData[i];
 	}
+
+	mCoolDown = 0.0f;
 }
 
 
@@ -146,102 +148,111 @@ void Splatterling::updateSelf( const double & delta )
 {
 	switch( state() )
 	{
-	case SPAWNING:
-	{
-		setPosition( randomPointOnWorld( world() ) + QVector3D( 0, 20, 0 ) );
-		setState( ALIVE );
-		setLife( 50 );
-		mHeightAboveGround = 6.0f;
-
-		randomDestinationPoint();
-
-		break;
-	}
-
-	case ALIVE:
-	{
-		mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
-		GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
-
-		if( dist < 12 )
+		case SPAWNING:
 		{
-			//Player in front of player
-			//Player near get him
-			mTarget = world()->player()->worldPosition();
-			QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
-			QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
-			setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
-			world()->player()->receiveDamage( 1 );	//TODO: do not call this once per frame - use a counter based on delta to call receiveDamage in a fixed timestep!
+			setPosition( randomPointOnWorld( world() ) + QVector3D( 0, 20, 0 ) );
+			setState( ALIVE );
+			setLife( 50 );
+			mHeightAboveGround = 6.0f;
+
+			randomDestinationPoint();
+
+			break;
 		}
-		else
-			if( dist < 200 || playerDetected)
+		case ALIVE:
+		{
+			mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
+			GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
+
+			if( dist < 12 )
 			{
+				//Player in front of player
 				//Player near get him
 				mTarget = world()->player()->worldPosition();
 				QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 				QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
 				setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
-				setPosition( position() + direction()*delta * 25.0 );
-				playerDetected = true;
+
+				if( mCoolDown == 0.0f )
+				{
+					world()->player()->receiveDamage( 1 );
+					mCoolDown = 0.1f;
+				}
 			}
 			else
-			{
-				//player not in near, just move somehow
-
-				dist = ( destinationPoint - worldPosition() ).length();
-
-				if( dist > 5 )
+				if( dist < 200 || playerDetected)
 				{
-					mTarget = destinationPoint;
+					//Player near get him
+					mTarget = world()->player()->worldPosition();
 					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 					QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
 					setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
-					setPosition( position() + direction()*delta * 10.0 );
+					setPosition( position() + direction()*delta * 25.0 );
+					playerDetected = true;
 				}
 				else
 				{
-					randomDestinationPoint();
+					//player not in near, just move somehow
+
+					dist = ( destinationPoint - worldPosition() ).length();
+
+					if( dist > 5 )
+					{
+						mTarget = destinationPoint;
+						QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+						QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
+						setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
+						setPosition( position() + direction()*delta * 10.0 );
+					}
+					else
+					{
+						randomDestinationPoint();
+					}
+				}
+
+			recalculateWingPosition();
+
+			if( life() <= 0 )
+				setState( DYING );
+
+			break;
+		}
+		case DYING:
+		{
+			mWingSound->stop();
+			mHeightAboveGround = 3.0f;
+
+			mVelocityY += -6.0f * delta;	// apply some gravity
+			setPositionY( position().y() + mVelocityY * delta );
+
+			float landscapeHeight;
+
+			if( world()->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
+			{
+				if( landscapeHeight + mHeightAboveGround > position().y() )
+				{
+					setPositionY( landscapeHeight + mHeightAboveGround );
+
+					if( mVelocityY < 0.0f )
+						mVelocityY = 0.0f;
 				}
 			}
 
-		recalculateWingPosition();
-
-		if( life() <= 0 )
-			setState( DYING );
-
-		break;
-	}
-
-	case DYING:
-		mWingSound->stop();
-		mHeightAboveGround = 3.0f;
-
-		mVelocityY += -6.0f * delta;	// apply some gravity
-		setPositionY( position().y() + mVelocityY * delta );
-
-		float landscapeHeight;
-
-		if( world()->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
-		{
-			if( landscapeHeight + mHeightAboveGround > position().y() )
+			if( !( position().y() > 0.0 ) )
 			{
-				setPositionY( landscapeHeight + mHeightAboveGround );
-
-				if( mVelocityY < 0.0f )
-					mVelocityY = 0.0f;
+				setState( DEAD );
 			}
+
+			break;
 		}
-
-		if( !( position().y() > 0.0 ) )
-		{
-			setState( DEAD );
-		}
-
-		break;
-
-	case DEAD:
-		break;
+		case DEAD:
+			break;
 	}
+
+	if( mCoolDown > delta )
+		mCoolDown -= delta;
+	else
+		mCoolDown = 0.0f;
 }
 
 

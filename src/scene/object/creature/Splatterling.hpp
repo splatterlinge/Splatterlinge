@@ -72,6 +72,7 @@ private:
 	AudioSample * mWingSound;
 	int targetBodyPart;
 	float damageMultiplicationFactor[3];
+	float mCoolDown;
 };
 
 
