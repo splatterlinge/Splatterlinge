@@ -41,6 +41,7 @@ PowerUp::PowerUp( Landscape * landscape, QString type, const QPoint & mapPositio
 
 PowerUp::~PowerUp()
 {
+	delete mMaterial;
 }
 
 
