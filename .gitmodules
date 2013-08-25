@@ -1,3 +1,6 @@
 [submodule "tools/converter"]
 	path = tools/converter
 	url = https://github.com/splatterlinge/converter
+[submodule "tools/MapEditor"]
+	path = tools/MapEditor
+	url = https://github.com/splatterlinge/MapEditor.git
