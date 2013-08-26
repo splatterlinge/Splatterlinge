@@ -11,6 +11,8 @@
 #include <float.h>
 #include <QDebug>
 
+#define PI 3.14159265
+
 
 static const GLfloat GlobalPositionData[] =
 {
@@ -118,7 +120,8 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	}
 
 	mCoolDown = 0.0f;
-	rotationAroundPlayer = 0.0f;
+	recalculationOfRotationAngle = true;
+	rotationAroundPlayer = -1000.0f;
 }
 
 
@@ -169,13 +172,25 @@ void Splatterling::updateSelf( const double & delta )
 			{
 				//Player in front of player
 				//Player near get him
+
+				if(recalculationOfRotationAngle){
+					rotationAroundPlayer = asin((worldPosition().x() - world()->player()->worldPosition().x())/dist);
+					rotationAroundPlayer = rotationAroundPlayer * 180.0 / PI;
+					recalculationOfRotationAngle = false;
+				}
+
 				if(mCoolDown == 0.0f){
 					rotationAroundPlayer += RotationStepSize;
-					if(rotationAroundPlayer == 360.0f){
+					if(rotationAroundPlayer >= 360.0f){
 						rotationAroundPlayer = 0.0f;
 					}
-					setPositionX(world()->player()->worldPosition().x() + sin(rotationAroundPlayer)*11.5);
-					setPositionZ(world()->player()->worldPosition().z() + cos(rotationAroundPlayer)*11.5);
+
+					if(mTarget == world()->player()->worldPosition()){
+						setPositionX(world()->player()->worldPosition().x() + sin(rotationAroundPlayer*PI/180.0)*(12.8));
+						setPositionZ(world()->player()->worldPosition().z() + cos(rotationAroundPlayer*PI/180.0)*(12.8));
+					}else{
+						recalculationOfRotationAngle = true;
+					}
 
 					mTarget = world()->player()->worldPosition();
 					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
@@ -194,7 +209,8 @@ void Splatterling::updateSelf( const double & delta )
 					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 					QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
 					setRotation( QQuaternion::slerp( rotation(), targetRotation, 5*delta ) );
-					setPosition( position() + direction()*delta * 25.0 );
+					setPosition( position() + direction()*delta * 12.0 );
+					recalculationOfRotationAngle = true;
 					playerDetected = true;
 				}
 				else
@@ -202,6 +218,7 @@ void Splatterling::updateSelf( const double & delta )
 					//player not in near, just move somehow
 
 					dist = ( destinationPoint - worldPosition() ).length();
+					recalculationOfRotationAngle = true;
 
 					if( dist > 5 )
 					{
