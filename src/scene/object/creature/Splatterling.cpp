@@ -118,6 +118,7 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	}
 
 	mCoolDown = 0.0f;
+	rotationAroundPlayer = 0.0f;
 }
 
 
@@ -164,17 +165,23 @@ void Splatterling::updateSelf( const double & delta )
 			mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
 			GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
 
-			if( dist < 12 )
+			if( dist < 13 )
 			{
 				//Player in front of player
 				//Player near get him
-				mTarget = world()->player()->worldPosition();
-				QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
-				QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
-				setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
+				if(mCoolDown == 0.0f){
+					rotationAroundPlayer += RotationStepSize;
+					if(rotationAroundPlayer == 360.0f){
+						rotationAroundPlayer = 0.0f;
+					}
+					setPositionX(world()->player()->worldPosition().x() + sin(rotationAroundPlayer)*11.5);
+					setPositionZ(world()->player()->worldPosition().z() + cos(rotationAroundPlayer)*11.5);
 
-				if( mCoolDown == 0.0f )
-				{
+					mTarget = world()->player()->worldPosition();
+					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+					QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
+					setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.5 ) );
+
 					world()->player()->receiveDamage( 1 );
 					mCoolDown = 0.1f;
 				}
@@ -186,7 +193,7 @@ void Splatterling::updateSelf( const double & delta )
 					mTarget = world()->player()->worldPosition();
 					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 					QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
-					setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
+					setRotation( QQuaternion::slerp( rotation(), targetRotation, 5*delta ) );
 					setPosition( position() + direction()*delta * 25.0 );
 					playerDetected = true;
 				}
@@ -201,7 +208,7 @@ void Splatterling::updateSelf( const double & delta )
 						mTarget = destinationPoint;
 						QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 						QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
-						setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
+						setRotation( QQuaternion::slerp( rotation(), targetRotation, 5*delta ) );
 						setPosition( position() + direction()*delta * 10.0 );
 					}
 					else
