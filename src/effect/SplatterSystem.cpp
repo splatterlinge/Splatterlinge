@@ -133,12 +133,14 @@ void SplatterSystem::draw( const QMatrix4x4 & modelView )
 
 void SplatterSystem::spray( const QVector3D & source, float size )
 {
-	int numToEmit = 0.05f*size*size;
+	if( size < 10.0f ) size = 10.0f;
+	if( size > 100.0f ) size = 100.0f;
+	int numToEmit = 0.5f * size;
 	if( numToEmit < 1 ) numToEmit = 1;
-	mParticleSystem->emitSpherical( source, numToEmit, 1.0f*size, 1.75f*size );
+	mParticleSystem->emitSpherical( source, numToEmit, 0.25f*size, 1.0f*size );
 
 	if( mSplatBelow && mTerrain->getHeightAboveGround( source ) < size*0.5f )
-		splat( source, size * RandomNumber::minMax( 0.75f, 1.0f ) );
+		splat( source, size * RandomNumber::minMax( 0.2f, 0.3f ) );
 
 	int maxSecOffset = 0;
 	for( int i=0; i<mBurstSampleSources.size(); ++i )
