@@ -114,6 +114,7 @@ private:
 	QString mName;
 	QVector<Blob*> mBlobs;
 	QVector< QSharedPointer<AObject> > mVegetation;
+	QVector< QSharedPointer<AObject> > mPowerUps;
 	Terrain * mTerrain;
 	Filter * mTerrainFilter;
 	Material * mTerrainMaterial;
@@ -128,6 +129,7 @@ private:
 	bool mDrawingReflection;
 	bool mDrawingRefraction;
 
+	void drawInfinitePlane( const float & height );
 	void renderReflection();
 	void renderRefraction();
 };

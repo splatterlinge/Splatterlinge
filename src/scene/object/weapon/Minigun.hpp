@@ -41,16 +41,21 @@ public:
 	virtual void triggerReleased();
 	virtual void holster();
 	virtual void pull();
+	virtual void reload();
 
 private:
+	void spinUp( const double & delta );
+	void spinDown( const double & delta );
+	void reloadClip();
+
 	GLUquadric * mQuadric;
 	bool mDrawn;
 	bool mFired;
+	bool mReload;
 	float mCoolDown;
 	float mRange;
 	float mTrailRadius;
 	float mTrailLength;
-	float mTrailAlpha;
 	float mDamage;
 	float mRotation;
 	double mRPM;

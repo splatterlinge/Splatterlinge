@@ -31,15 +31,15 @@ Minigun::Minigun( World * world ) :
 
 	mName = "Minigun";
 	mDrawn = false;
+	mReload = false;
 	mCoolDown = 0.1f;
-	mTrailAlpha = 0.0f;
 	mFired = false;
 	mRange = 100.0f;
 	mTrailRadius = 0.01f;
-	mDamage = 5.0f;
+	mDamage = 1.0f;
 	mRotation = 0.0f;
 	mMaterial = new Material( scene()->glWidget(), "BlackSteel" );
-	mFireSound = new AudioSample( "./data/sound/minigun.ogg" );
+	mFireSound = new AudioSample( "minigun" );
 	mFireSound->setLooping( true );
 }
 
@@ -67,23 +67,45 @@ void Minigun::triggerReleased()
 void Minigun::pull()
 {
 	mDrawn = true;
+	mRPM = 0.0f;
 }
 
 
 void Minigun::holster()
 {
 	mDrawn = false;
+	mFired = false;
+}
+
+
+void Minigun::reload()
+{
+	mReload = true;
+	mCoolDown = 5.0f;
 }
 
 
 void Minigun::updateSelf( const double & delta )
 {
-	if( mFired )
+	if( mReload )
 	{
-		if( mCoolDown <= 0.0f && mAmmoClip > 0 )
+		if( mCoolDown <= 0.0f )
 		{
-			mCoolDown = 0.1f;
-			mTrailAlpha = 1.0f;
+			reloadClip();
+
+			mReload = false;
+		}
+
+		spinDown( delta );
+	}
+	else if( mFired )
+	{
+		if( mClipAmmo == 0 )
+		{
+			mFireSound->stop();
+		}
+		else if( mCoolDown <= 0.0f && mRPM >= 600.0f )
+		{
 			mTrailStart = worldPosition();
 			mTrailDirection = worldDirection();
 			mTrailLength = mRange;
@@ -99,45 +121,23 @@ void Minigun::updateSelf( const double & delta )
 			{
 				mFireSound->play();
 			}
-			mAmmoClip--;
-		}
-		else
-		{
-			mFireSound->stop();
-		}
-
-		if( mRPM < 6000.0f )
-		{
-			mRPM += (mRPM+1) * delta * 7;
+			mClipAmmo--;
 			mCoolDown = 0.1f;
 		}
-		else
-		{
-			mRPM = 6000.0f;
-			mCoolDown = 0.0f;
-		}
+
+		spinUp( delta );
 	}
 	else
 	{
-		if( mRPM >= 0.1f )
-		{
-			mRPM -= mRPM * delta * 3;
-		}
-		else
-		{
-			mRPM = 0.0f;
-		}
-
-		mCoolDown = 0.1f;
-		mFireSound->stop();
+		spinDown( delta );
 	}
 
 	mRotation += mRPM * delta;
 
-	if( mTrailAlpha > delta )
-		mTrailAlpha -= delta * 2.0;
+	if( mCoolDown > delta )
+		mCoolDown -= delta;
 	else
-		mTrailAlpha = 0.0f;
+		mCoolDown = 0.0f;
 }
 
 
@@ -152,20 +152,21 @@ void Minigun::drawSelf()
 
 	glColor3f( 0.7f, 0.7f, 0.7f );
 
-	glTranslatef( 0.05f, 0.0f, 0.0f );
+	glTranslatef( 0.0f, 0.0f, -0.4f );
 	glRotatef( mRotation, 0.0f, 0.0f, 1.0f );
 
 	glPushMatrix();
-	glTranslatef( 0.0f, 0.0f, 0.0f );
-	gluCylinder( mQuadric, 0.08f, 0.08f, 0.25f, 16, 1 );
+	glTranslatef( 0.0f, 0.0f, -0.0f );
+	gluCylinder( mQuadric, 0.08f, 0.08f, 0.3f, 16, 1 );
 
-	glTranslatef( 0.0f, 0.0f, 0.65f );
-	gluCylinder( mQuadric, 0.08f, 0.08f, 0.05f, 16, 1 );
+	glTranslatef( 0.0f, 0.0f, 0.5f );
+	gluCylinder( mQuadric, 0.08f, 0.08f, 0.02f, 16, 1 );
 	gluDisk( mQuadric, 0.0f, 0.08f, 16, 1 );
 
-	glTranslatef( 0.0f, 0.0f, 0.2f );
-	gluCylinder( mQuadric, 0.08f, 0.08f, 0.05f, 16, 1 );
+	glTranslatef( 0.0f, 0.0f, 0.1f );
+	gluCylinder( mQuadric, 0.08f, 0.08f, 0.15f, 16, 1 );
 	gluDisk( mQuadric, 0.0f, 0.08f, 16, 1 );
+
 	glPopMatrix();
 
 	for( int i=0; i<=360; i+=60 )
@@ -173,17 +174,65 @@ void Minigun::drawSelf()
 		glPushMatrix();
 		glRotatef( i, 0.0f, 0.0f, 1.0f );
 		glTranslatef( 0.05f, 0.0f, 0.0f );
-		gluCylinder( mQuadric, 0.02f, 0.02f, 1.0f, 16, 1 );
+		gluCylinder( mQuadric, 0.02f, 0.02f, 0.6f, 16, 1 );
 		glPopMatrix();
 	}
 
-	glPopMatrix();
-
 	mMaterial->release();
+
+	glEnable( GL_LIGHTING );
+
+	glPopMatrix();
 }
 
 
 void Minigun::draw2Self()
 {
 	// TODO
+}
+
+
+void Minigun::spinUp( const double & delta )
+{
+	if( mRPM < 600.0f )
+	{
+		mRPM += delta * 300;
+	}
+	else
+	{
+		mRPM = 600.0f;
+	}
+}
+
+
+void Minigun::spinDown( const double & delta )
+{
+	if( mRPM >= 0.1f )
+	{
+		mRPM -= delta * 300;
+	}
+	else
+	{
+		mRPM = 0.0f;
+	}
+
+	mFireSound->stop();
+}
+
+
+void Minigun::reloadClip()
+{
+	if( mClipAmmo < mClipSize )
+	{
+		if( mAmmo > mClipSize )
+		{
+			mClipAmmo = mClipSize;
+			mAmmo -= mClipSize;
+		}
+		else
+		{
+			mClipAmmo = mAmmo;
+			mAmmo -= mAmmo;
+		}
+	}
 }

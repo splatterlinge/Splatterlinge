@@ -110,7 +110,7 @@ World::World( Scene * scene, QString name ) :
 		mLandscape->terrain(),
 		"SplatterBig",
 		"Splatter",
-		"./data/sound/splatter.ogg"
+		"splatter"
 	);
 	mSplatterInteractor = new SplatterInteractor( *this );
 	mSplatterSystem->particleSystem()->setInteractionCallback( mSplatterInteractor );

@@ -99,7 +99,7 @@ bool MaterialData::load()
 	unload();
 	qDebug() << "+" << this << "MaterialData" << uid();
 
-	QSettings s( "./data/material/"+mName+"/material.ini", QSettings::IniFormat );
+	QSettings s( baseDirectory()+mName+"/material.ini", QSettings::IniFormat );
 
 	GLint wrapS;
 	GLint wrapT;
@@ -118,7 +118,7 @@ bool MaterialData::load()
 		QStringList textures = s.allKeys();
 		for( QStringList::const_iterator i = textures.constBegin(); i != textures.constEnd(); ++i )
 		{
-			QString mapPath = "./data/material/"+mName+"/" + s.value( (*i) ).toString();
+			QString mapPath = baseDirectory()+mName+"/" + s.value( (*i) ).toString();
 			QImage map = QImage( mapPath );
 			if( map.isNull() )
 			{
@@ -351,7 +351,7 @@ void Material::setShader( MaterialQuality::Type quality, QString shaderFullName 
 	delete mShaderSet[quality].shader;
 	mShaderSet[quality].shader = 0;
 
-	if( access( QString("./data/shader/"+shaderFullName+".vert").toLocal8Bit().constData(), R_OK ) != 0 )
+	if( access( QString(ShaderData::baseDirectory()+shaderFullName+".vert").toLocal8Bit().constData(), R_OK ) != 0 )
 		return;
 
 	mShaderSet[quality].shader = new Shader( mGLWidget, shaderFullName );

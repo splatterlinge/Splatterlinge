@@ -30,6 +30,8 @@ Player::Player( World * world ) :
 	ACreature( world )
 {
 	setLife( 100 );
+	setState( SPAWNING );
+	mArmor = 25;
 
 	mForwardPressed = false;
 	mLeftPressed = false;
@@ -46,11 +48,13 @@ Player::Player( World * world ) :
 	mAxisRotationX = 0.0f;
 	mAxisRotationY = 0.0f;
 
+	mSpeedCounter = 0.0f;
+	mSpeedCooldown = 0.0f;
+
 	mTarget = QVector3D(0,0,0);
 	mDragTeapot = false;
 
 	mWeapons.append( QSharedPointer<Minigun>( new Minigun( world ) ) );
-	mWeapons.append( QSharedPointer<Laser>( new Laser( world ) ) );
 	mCurrentWeapon = mWeapons.begin();
 	foreach( QSharedPointer<AWeapon> w, mWeapons )
 	{
@@ -208,6 +212,182 @@ void Player::mouseWheelEvent( QGraphicsSceneWheelEvent * event )
 
 void Player::updateSelf( const double & delta )
 {
+	if( mGodMode )
+	{
+		setState( ALIVE );
+		setLife( 100 );
+	}
+
+	switch( state() )
+	{
+		case SPAWNING:
+			setState( ALIVE );
+			break;
+		case ALIVE:
+			updateRotation( delta );
+			updatePosition( delta );
+
+			if( mCurrentWeapon != mWeapons.end() )
+				(*mCurrentWeapon)->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
+
+			break;
+		case DYING:
+			setState( DEAD );
+			break;
+		case DEAD:
+			break;
+	}
+}
+
+
+void Player::update2Self( const double & delta )
+{
+	float length = 300.0f;
+	if( mDragTeapot || mDragTorch )
+	{
+		if( world()->intersectLine( this, position(), direction(), length, &mTargetNormal ) )
+		{
+			mTarget = position() + direction() * length;
+			if( mDragTeapot )
+			{
+				world()->teapot()->setPosition( mTarget );
+			}
+			if( mDragTorch )
+			{
+				mTorch->setPosition( mTarget );
+				mTorch->moveY( 1 );
+			}
+		}
+	}
+}
+
+
+void Player::drawSelf()
+{
+
+}
+
+
+void Player::draw2Self()
+{
+	glDisable( GL_LIGHTING );
+	glDisable( GL_TEXTURE_2D );
+
+	glPushAttrib( GL_DEPTH_BUFFER_BIT );
+	glDisable( GL_DEPTH_TEST );
+
+	glPushMatrix();
+	glLoadIdentity();
+
+	switch( state() )
+	{
+		case SPAWNING:
+			break;
+		case ALIVE:
+			drawCrosshair();
+			break;
+		case DYING:
+			break;
+		case DEAD:
+			break;
+	}
+
+	glPopMatrix();
+
+	glPopAttrib();
+}
+
+
+void Player::receiveDamage( int damage, const QVector3D * position, const QVector3D * direction )
+{
+	if( !mGodMode )
+	{
+		if( mArmor >= damage )
+		{
+			mArmor -= damage;
+		}
+		else
+		{
+			int admg = damage - mArmor;
+			mArmor -= (damage - admg);
+
+			setLife( life() - admg );
+
+			if( life() <= 0 )
+			{
+				if( state() == ALIVE )
+					setState( DYING );
+				setLife( 0 );
+			}
+		}
+	}
+}
+
+
+void Player::receivePowerUp( int power, int value )
+{
+	bool found;
+	switch( power )
+	{
+		case PowerUp::HEALTH:
+			setLife( life() + value );
+			setLife( qMin( life(), 100 ) );
+			break;
+		case PowerUp::ARMOR:
+			setArmor( armor() + value );
+			setArmor( qMin( armor(), 100 ) );
+			break;
+		case PowerUp::WEAPON_LASER:
+			found = false;
+			foreach( QSharedPointer<AWeapon> w, mWeapons )
+			{
+				if( w->name() == "Laser" )
+				{
+					found = true;
+					w->setAmmo( w->ammo() + 1 );
+					break;
+				}
+			}
+
+			if( !found )
+			{
+				QSharedPointer<AWeapon> w = QSharedPointer<AWeapon>( new Laser( world() ) );
+				mWeapons.push_front( w );
+				add( w );
+
+				(*mCurrentWeapon)->holster();
+				mCurrentWeapon = mWeapons.begin();
+				(*mCurrentWeapon)->pull();
+			}
+			break;
+		case PowerUp::WEAPON_MINIGUN:
+			found = false;
+			foreach( QSharedPointer<AWeapon> w, mWeapons )
+			{
+				if( w->name() == "Minigun" )
+				{
+					found = true;
+					w->setAmmo( w->ammo() + 200 );
+					break;
+				}
+			}
+
+			if( !found )
+			{
+				QSharedPointer<AWeapon> w = QSharedPointer<AWeapon>( new Minigun( world() ) );
+				mWeapons.push_front( w );
+				add( w );
+
+				(*mCurrentWeapon)->holster();
+				mCurrentWeapon = mWeapons.begin();
+				(*mCurrentWeapon)->pull();
+			}
+			break;
+	}
+}
+
+void Player::updateRotation( const double & delta )
+{
 	mAxisRotationY += -mMouseDelta.x()/5.0f;
 	mAxisRotationX += mMouseDelta.y()/5.0f;
 	if( mAxisRotationX > 80 )
@@ -218,22 +398,24 @@ void Player::updateSelf( const double & delta )
 	QQuaternion qX = QQuaternion::fromAxisAndAngle( 1,0,0, mAxisRotationX );
 	QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, mAxisRotationY );
 	setRotation( qY * qX );
+}
 
-	if( mCurrentWeapon != mWeapons.end() )
-		(*mCurrentWeapon)->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
+
+void Player::updatePosition( const double & delta )
+{
+	QVector3D control( 0.0f, 0.0f, 0.0f );
+	float speed;
+	if( mForwardPressed )
+		control.setZ( control.z() + 1.0f );
+	if( mBackwardPressed )
+		control.setZ( control.z() - 1.0f );
+	if( mLeftPressed )
+		control.setX( control.x() + 1.0f );
+	if( mRightPressed )
+		control.setX( control.x() - 1.0f );
 
 	if( mGodMode )
 	{
-		QVector3D control( 0.0f, 0.0f, 0.0f );
-		float speed;
-		if( mForwardPressed )
-			control.setZ( control.z() + 1.0f );
-		if( mBackwardPressed )
-			control.setZ( control.z() - 1.0f );
-		if( mLeftPressed )
-			control.setX( control.x() + 1.0f );
-		if( mRightPressed )
-			control.setX( control.x() - 1.0f );
 		if( mUpPressed )
 			control.setY( control.y() + 1.0f );
 		if( mDownPressed )
@@ -247,23 +429,24 @@ void Player::updateSelf( const double & delta )
 		QVector3D finalMove( control.x()*left() + control.y()*up() + control.z()*direction() );
 		move( finalMove*speed*delta );
 	} else {
-		QVector3D control( 0.0f, 0.0f, 0.0f );
-		float speed;
-		if( mForwardPressed )
-			control.setZ( control.z() + 1.0f );
-		if( mBackwardPressed )
-			control.setZ( control.z() - 1.0f );
-		if( mLeftPressed )
-			control.setX( control.x() + 1.0f );
-		if( mRightPressed )
-			control.setX( control.x() - 1.0f );
 		control.normalize();
-		if( mSpeedPressed )
+		if( mSpeedPressed && mSpeedCooldown <= 0.0f )
 		{
-			speed = 20.0;
+			speed = 15.0;
+			mSpeedCounter += delta;
 		} else {
-			speed = 10.0;
+			speed = 8.0;
 		}
+
+		if( mSpeedCounter >= 3.0f )
+		{
+			mSpeedPressed = false;
+			mSpeedCooldown = 2.0f;
+			mSpeedCounter = 0.0f;
+		}
+
+		if( mSpeedCooldown > 0.0f )
+			mSpeedCooldown -= delta;
 
 		QVector3D finalMove(0,0,0);
 		if( mOnGround )
@@ -318,45 +501,8 @@ void Player::updateSelf( const double & delta )
 }
 
 
-void Player::update2Self( const double & delta )
+void Player::drawCrosshair()
 {
-	float length = 300.0f;
-	if( mDragTeapot || mDragTorch )
-	{
-		if( world()->intersectLine( this, position(), direction(), length, &mTargetNormal ) )
-		{
-			mTarget = position() + direction() * length;
-			if( mDragTeapot )
-			{
-				world()->teapot()->setPosition( mTarget );
-			}
-			if( mDragTorch )
-			{
-				mTorch->setPosition( mTarget );
-				mTorch->moveY( 1 );
-			}
-		}
-	}
-}
-
-
-void Player::drawSelf()
-{
-
-}
-
-
-void Player::draw2Self()
-{
-	glDisable( GL_LIGHTING );
-	glDisable( GL_TEXTURE_2D );
-
-	glPushAttrib( GL_DEPTH_BUFFER_BIT );
-	glDisable( GL_DEPTH_TEST );
-
-	glPushMatrix();
-	glLoadIdentity();
-
 	glColor3f( 0.0f, 1.0f, 0.0f );
 	glBegin( GL_LINES );
 	glVertex3f( 0.0f, 0.05f, -1.0f);
@@ -368,8 +514,4 @@ void Player::draw2Self()
 	glVertex3f(-0.05f, 0.0f, -1.0f);
 	glVertex3f(-0.15f, 0.0f, -1.0f);
 	glEnd();
-
-	glPopMatrix();
-
-	glPopAttrib();
 }

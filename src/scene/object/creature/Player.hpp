@@ -23,6 +23,7 @@
 #include "../Teapot.hpp"
 #include "../Torch.hpp"
 #include "../weapon/AWeapon.hpp"
+#include "../environment/PowerUp.hpp"
 #include <scene/AKeyListener.hpp>
 #include <scene/AMouseListener.hpp>
 
@@ -48,7 +49,14 @@ public:
 	virtual void mouseMoveEvent( MouseMoveEvent * event );
 	virtual void mouseWheelEvent( QGraphicsSceneWheelEvent * event );
 
+	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
+	virtual void receivePowerUp( int power, int value=0 );
+
+	const int & armor() const { return mArmor; }
 	QSharedPointer<AWeapon> weapon() { return *mCurrentWeapon; }
+
+protected:
+	void setArmor( const int & armor ) { mArmor = armor; }
 
 private:
 	QVector3D mTarget;
@@ -64,16 +72,24 @@ private:
 	bool mSpeedPressed;
 	bool mGodMode;
 	bool mOnGround;
+	int mArmor;
 	float mVelocityY;
 	float mHeightAboveGround;
 	float mAxisRotationX;
 	float mAxisRotationY;
+	float mSpeedCounter;
+	float mSpeedCooldown;
 	bool mDragTeapot;
 	bool mDragTorch;
 	QVector3D mGroundNormal;
 	QSharedPointer<Torch> mTorch;
 	QList< QSharedPointer<AWeapon> > mWeapons;
 	QList< QSharedPointer<AWeapon> >::iterator mCurrentWeapon;
+
+	void updateRotation( const double & delta );
+	void updatePosition( const double & delta );
+
+	void drawCrosshair();
 };
 
 

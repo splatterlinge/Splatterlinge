@@ -15,24 +15,40 @@
  * along with Splatterlinge. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AWeapon.hpp"
+#ifndef SCENE_OBJECT_ENVIRONMENT_POWERUP_HPP
+#define SCENE_OBJECT_ENVIRONMENT_POWERUP_HPP
+
+#include "../AWorldObject.hpp"
+#include "../../object/Landscape.hpp"
 
 
-AWeapon::AWeapon( World * world ) :
-	AWorldObject::AWorldObject( world )
+class PowerUp : public AWorldObject
 {
-}
+public:
+	PowerUp( Landscape * landscape, QString type, const QPoint & mapPosition, int mapRadius );
+	~PowerUp();
 
+	virtual void updateSelf( const double & delta );
+	virtual void drawSelf();
 
-AWeapon::AWeapon( World *world, int ammo, int ammoclip, int clipsize ) :
-	AWorldObject::AWorldObject( world ),
-	mAmmo( ammo ),
-	mClipAmmo( ammoclip ),
-	mClipSize( clipsize )
-{
-}
+	void respawn();
 
+	enum PowerType
+	{
+		HEALTH,
+		ARMOR,
+		WEAPON_LASER,
+		WEAPON_MINIGUN
+	};
 
-AWeapon::~AWeapon()
-{
-}
+private:
+	Landscape * mLandscape;
+	Material * mMaterial;
+	QPoint mPosition;
+	int mRadius;
+	float mRotation;
+	float mCoolDown;
+	PowerType mPowerType;
+};
+
+#endif // SCENE_OBJECT_ENVIRONMENT_POWERUP_HPP

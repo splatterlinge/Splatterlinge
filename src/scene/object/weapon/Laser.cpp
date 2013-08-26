@@ -40,8 +40,10 @@ Laser::Laser( World * world ) :
 	mTrailRadius = 0.04f;
 	mDamage = 50.0f;
 	mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
-	mFireSound = new AudioSample( "./data/sound/laser.ogg" );
+	mFireSound = new AudioSample( "laser" );
 	mFireSound->setLooping( false );
+	mReloadSound = new AudioSample( "laser_reload" );
+	mReloadSound->setLooping( false );
 }
 
 
@@ -50,6 +52,7 @@ Laser::~Laser()
 	gluDeleteQuadric( mQuadric );
 	delete mMaterial;
 	delete mFireSound;
+	delete mReloadSound;
 }
 
 
@@ -74,16 +77,23 @@ void Laser::pull()
 void Laser::holster()
 {
 	mDrawn = false;
+
+	mFireSound->stop();
+	mReloadSound->stop();
 }
 
+
+void Laser::reload()
+{
+}
 
 void Laser::updateSelf( const double & delta )
 {
 	if( mFired )
 	{
-		if( mHeat <= 0.0f && mAmmoClip > 0 )
+		if( mHeat <= 0.0f && mClipAmmo > 0 )
 		{
-			mHeat = 1.0f;
+			mHeat = 3.0f;
 			mTrailAlpha = 1.0f;
 			mTrailStart = worldPosition();
 			mTrailDirection = worldDirection();
@@ -97,18 +107,24 @@ void Laser::updateSelf( const double & delta )
 			}
 
 			mFireSound->play();
-			mAmmoClip--;
+			mReloadSound->play();
+			mClipAmmo--;
+			mAmmo--;
 		}
 	}
 
 	if( mHeat > delta )
 	{
-		mHeat -= delta / mCoolDown;
+		mHeat -= delta;
 	}
 	else
 	{
 		mHeat = 0.0f;
-		reload();
+
+		mClipAmmo = mClipSize;
+
+		if( mReloadSound->isPlaying() )
+			mReloadSound->stop();
 	}
 
 	if( mTrailAlpha > delta )
@@ -123,7 +139,9 @@ void Laser::drawSelf()
 	if( mDrawn )
 	{
 		mMaterial->bind();
-		gluCylinder( mQuadric, 0.1f, 0.1f, 0.4f, 16, 16 );
+		glTranslatef( 0.0f, 0.0f, -0.2f );
+		gluCylinder( mQuadric, 0.08f, 0.08f, 0.4f, 16, 16 );
+		gluCylinder( mQuadric, 0.15f, 0.10f, 0.2f, 16, 16 );
 		mMaterial->release();
 	}
 }

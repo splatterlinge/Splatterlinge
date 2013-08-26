@@ -45,6 +45,7 @@ Grass::Grass( Landscape * landscape, const QString & filename, const QPoint & ma
 
 Grass::~Grass()
 {
+	delete mModel;
 }
 
 

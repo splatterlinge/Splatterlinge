@@ -11,3 +11,8 @@ Ununoctium.kdev4
 .kdev4/
 doc/
 *.*~
+
+# Kate project files
+.directory
+.kateproject
+.kateproject.d/

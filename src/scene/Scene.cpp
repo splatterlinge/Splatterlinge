@@ -138,7 +138,7 @@ Scene::~Scene()
 	delete mOVRShader;
 	delete mEye;
 	delete mDebugWindow;
-	delete mStartMenuWindow;
+	//delete mStartMenuWindow; // SIGSEGV
 	delete mLeftTextureRenderer;
 	delete mRightTextureRenderer;
 }
@@ -381,11 +381,11 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	painter->setBrush( QBrush( QColor(11,110,240,80) ) );
 	painter->drawRect( armorRect );
 	painter->setBrush( QBrush( QColor(26,121,245,200) ) );
-	painter->drawRect( armorRect.left(), armorRect.top(), player->life()*3, armorRect.height() );
+	painter->drawRect( armorRect.left(), armorRect.top(), player->armor()*3, armorRect.height() );
 	painter->setPen( QColor(255,255,255,255) );
 	painter->drawText( armorRect,
 						Qt::AlignCenter | Qt::AlignHCenter,
-						QString( tr("%1%").arg(player->life()) ) );
+						QString( tr("%1%").arg(player->armor()) ) );
 
 	// player health
 	QRect healthRect( rect.left()+10, rect.bottom()-40, 100*3, 30 );
@@ -410,14 +410,14 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	painter->drawText( weaponNameRect,
 						Qt::AlignCenter | Qt::AlignHCenter,
 						QString( tr("%1").arg(player->weapon()->name()) ) );
-	if( player->weapon()->ammoclip() == 0 )
+	if( player->weapon()->clipammo() == 0 )
 	{
 		if( !mBlinkingState )
 		{
 			painter->drawText( weaponStatusRect,
 								Qt::AlignCenter | Qt::AlignHCenter,
 								QString( tr("%2 | %3 ")
-											.arg(player->weapon()->ammoclip())
+											.arg(player->weapon()->clipammo())
 											.arg(player->weapon()->ammo()) ) );
 		}
 	}
@@ -426,7 +426,7 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 		painter->drawText( weaponStatusRect,
 							Qt::AlignCenter | Qt::AlignHCenter,
 							QString( tr("%2 | %3 ")
-										.arg(player->weapon()->ammoclip())
+										.arg(player->weapon()->clipammo())
 										.arg(player->weapon()->ammo()) ) );
 	}
 }
