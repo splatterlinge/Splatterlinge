@@ -259,8 +259,6 @@ void Splatterling::updateSelf( const double & delta )
 void Splatterling::drawSelf()
 {
 	mMaterial->bind();
-	/*@Workaround need next line because the last pixel is clamped to the border*/
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
 
 	glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[COLOR_OBJECT] );
 	glBufferData( GL_ARRAY_BUFFER, Splatterling::ColorSize, ColorData, GL_STREAM_DRAW );
@@ -390,20 +388,25 @@ bool Splatterling::intersectHead(const QVector3D & origin, const QVector3D & dir
 
 void Splatterling::receiveDamage( int damage, const QVector3D * position, const QVector3D * direction )
 {
-	damage *= damageMultiplicationFactor[targetBodyPart];	//BUG: This assumes the player's weapon is the only object calling intersectLine - only rely on the parameters position and direction!
-	qDebug() << damage;
-	ACreature::receiveDamage( damage, direction );
-	QVector3D splatterSource;
+	float rayLength;
+	if(intersectHead(*position, *direction, &rayLength) || intersectWing(*position, *direction, &rayLength)
+		|| intersectBody(*position, *direction, &rayLength)){
 
-	if( position )
-		splatterSource = *position;
-	else
-		splatterSource = worldPosition();
+		qDebug() << damageMultiplicationFactor[targetBodyPart];
+		damage *= damageMultiplicationFactor[targetBodyPart];
+		ACreature::receiveDamage( damage, direction );
+		QVector3D splatterSource;
 
-	if( state() != DEAD )
-		world()->splatterSystem()->spray( splatterSource, damage );
-	else
-		world()->splatterSystem()->spray( splatterSource, damage / 2.0f );
+		if( position )
+			splatterSource = *position;
+		else
+			splatterSource = worldPosition();
+
+		if( state() != DEAD )
+			world()->splatterSystem()->spray( splatterSource, damage );
+		else
+			world()->splatterSystem()->spray( splatterSource, damage / 2.0f );
+	}
 }
 
 void Splatterling::recalculateWingPosition()
