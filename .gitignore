@@ -11,7 +11,7 @@ Ununoctium.kdev4
 .kdev4/
 doc/
 *.*~
-build-*
+tools/
 
 # Kate project files
 .directory
