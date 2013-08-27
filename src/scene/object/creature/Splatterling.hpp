@@ -19,12 +19,14 @@ public:
 	static const GLsizeiptr ColorSize = 16 * 3 * sizeof( GLubyte );
 	static const GLsizeiptr TexSize = 16 * 2 * sizeof( GLfloat );
 
+
 	static const int BufferSize = 3;
 
 	static const GLsizei BodyVertexCount = 6;
 	static const GLsizei HeadVertexCount = 4;
 	static const int WingOneYPos = ( ( BodyVertexCount + HeadVertexCount ) * 3 ) + 4;
 	static const int WingTwoYPos = ( ( BodyVertexCount + HeadVertexCount ) * 3 ) + ( 3 * 3 ) + 4;
+	static const double RotationStepSize = 2.0;
 	enum
 	{
 		POSITION_OBJECT = 0,
@@ -73,6 +75,8 @@ private:
 	int targetBodyPart;
 	float damageMultiplicationFactor[3];
 	float mCoolDown;
+	bool recalculationOfRotationAngle;
+	float rotationAroundPlayer;
 };
 
 

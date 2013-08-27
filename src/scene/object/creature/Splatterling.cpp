@@ -11,6 +11,8 @@
 #include <float.h>
 #include <QDebug>
 
+#define PI 3.14159265
+
 
 static const GLfloat GlobalPositionData[] =
 {
@@ -118,6 +120,8 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	}
 
 	mCoolDown = 0.0f;
+	recalculationOfRotationAngle = true;
+	rotationAroundPlayer = -1000.0f;
 }
 
 
@@ -164,17 +168,35 @@ void Splatterling::updateSelf( const double & delta )
 			mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
 			GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
 
-			if( dist < 12 )
+			if( dist < 13 )
 			{
 				//Player in front of player
 				//Player near get him
-				mTarget = world()->player()->worldPosition();
-				QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
-				QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
-				setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
 
-				if( mCoolDown == 0.0f )
-				{
+				if(recalculationOfRotationAngle){
+					rotationAroundPlayer = asin((worldPosition().x() - world()->player()->worldPosition().x())/dist);
+					rotationAroundPlayer = rotationAroundPlayer * 180.0 / PI;
+					recalculationOfRotationAngle = false;
+				}
+
+				if(mCoolDown == 0.0f){
+					rotationAroundPlayer += RotationStepSize;
+					if(rotationAroundPlayer >= 360.0f){
+						rotationAroundPlayer = 0.0f;
+					}
+
+					if(mTarget == world()->player()->worldPosition()){
+						setPositionX(world()->player()->worldPosition().x() + sin(rotationAroundPlayer*PI/180.0)*(12.8));
+						setPositionZ(world()->player()->worldPosition().z() + cos(rotationAroundPlayer*PI/180.0)*(12.8));
+					}else{
+						recalculationOfRotationAngle = true;
+					}
+
+					mTarget = world()->player()->worldPosition();
+					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+					QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
+					setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.5 ) );
+
 					world()->player()->receiveDamage( 1 );
 					mCoolDown = 0.1f;
 				}
@@ -186,8 +208,9 @@ void Splatterling::updateSelf( const double & delta )
 					mTarget = world()->player()->worldPosition();
 					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 					QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
-					setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
-					setPosition( position() + direction()*delta * 25.0 );
+					setRotation( QQuaternion::slerp( rotation(), targetRotation, 5*delta ) );
+					setPosition( position() + direction()*delta * 12.0 );
+					recalculationOfRotationAngle = true;
 					playerDetected = true;
 				}
 				else
@@ -195,13 +218,14 @@ void Splatterling::updateSelf( const double & delta )
 					//player not in near, just move somehow
 
 					dist = ( destinationPoint - worldPosition() ).length();
+					recalculationOfRotationAngle = true;
 
 					if( dist > 5 )
 					{
 						mTarget = destinationPoint;
 						QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 						QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
-						setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
+						setRotation( QQuaternion::slerp( rotation(), targetRotation, 5*delta ) );
 						setPosition( position() + direction()*delta * 10.0 );
 					}
 					else
@@ -388,20 +412,25 @@ bool Splatterling::intersectHead(const QVector3D & origin, const QVector3D & dir
 
 void Splatterling::receiveDamage( int damage, const QVector3D * position, const QVector3D * direction )
 {
-	damage *= damageMultiplicationFactor[targetBodyPart];	//BUG: This assumes the player's weapon is the only object calling intersectLine - only rely on the parameters position and direction!
-	qDebug() << damage;
-	ACreature::receiveDamage( damage, direction );
-	QVector3D splatterSource;
+	float rayLength;
+	if(intersectHead(*position, *direction, &rayLength) || intersectWing(*position, *direction, &rayLength)
+		|| intersectBody(*position, *direction, &rayLength)){
 
-	if( position )
-		splatterSource = *position;
-	else
-		splatterSource = worldPosition();
+		qDebug() << damageMultiplicationFactor[targetBodyPart];
+		damage *= damageMultiplicationFactor[targetBodyPart];
+		ACreature::receiveDamage( damage, direction );
+		QVector3D splatterSource;
 
-	if( state() != DEAD )
-		world()->splatterSystem()->spray( splatterSource, damage );
-	else
-		world()->splatterSystem()->spray( splatterSource, damage / 2.0f );
+		if( position )
+			splatterSource = *position;
+		else
+			splatterSource = worldPosition();
+
+		if( state() != DEAD )
+			world()->splatterSystem()->spray( splatterSource, damage );
+		else
+			world()->splatterSystem()->spray( splatterSource, damage / 2.0f );
+	}
 }
 
 void Splatterling::recalculateWingPosition()
