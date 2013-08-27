@@ -1,4 +1,4 @@
-project( Ununoctium )
+project( Splatterlinge )
 cmake_minimum_required( VERSION 2.8.0 )
 
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/" )
@@ -29,11 +29,11 @@ endif( DOXYGEN_FOUND )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ./bin )
 
 # Collect all source and header files
-file( GLOB_RECURSE Ununoctium_SRCS src/*.c src/*.cpp)
-file( GLOB_RECURSE Ununoctium_HDRS src/*.h src/*.hpp)
+file( GLOB_RECURSE Splatterlinge_SRCS src/*.c src/*.cpp)
+file( GLOB_RECURSE Splatterlinge_HDRS src/*.h src/*.hpp)
 
 # Just in case you need additional libraries - add them here
-set( Ununoctium_LIBS
+set( Splatterlinge_LIBS
 	${QT_LIBRARIES}
 	${OPENGL_LIBRARIES}
 	${GLEW_LIBRARY}
@@ -42,7 +42,7 @@ set( Ununoctium_LIBS
 )
 
 # Additional include directories
-set( Ununoctium_INCS
+set( Splatterlinge_INCS
 	${QT_INCLUDES}
 	${GLEW_INCLUDE_DIR}
 	${OPENAL_INCLUDE_DIR}
@@ -50,32 +50,32 @@ set( Ununoctium_INCS
 )
 
 # Additional compiler definitions
-set( Ununoctium_DEFS
+set( Splatterlinge_DEFS
 	${QT_DEFINITIONS}
 	-Wall
 )
 
 # Create a list of header files containing classes that
 #  require Qt's Meta Object Compiler (all headers containing Q_OBJECT)
-set( Ununoctium_HDRS_MOC )
-foreach( header ${Ununoctium_HDRS} )
+set( Splatterlinge_HDRS_MOC )
+foreach( header ${Splatterlinge_HDRS} )
 	file( STRINGS "${header}" lines REGEX "Q_OBJECT" )
 	if( lines )
-		list( APPEND Ununoctium_HDRS_MOC "${header}" )
+		list( APPEND Splatterlinge_HDRS_MOC "${header}" )
 	endif()
 endforeach()
 # Run the MOC
 if( USE_QT5 )
-    qt5_wrap_cpp( Ununoctium_SRCS ${Ununoctium_HDRS_MOC} )
+	qt5_wrap_cpp( Splatterlinge_SRCS ${Splatterlinge_HDRS_MOC} )
 else( USE_QT5 )
-    qt4_wrap_cpp( Ununoctium_SRCS ${Ununoctium_HDRS_MOC} )
+	qt4_wrap_cpp( Splatterlinge_SRCS ${Splatterlinge_HDRS_MOC} )
 endif( USE_QT5 )
 
-include_directories( ${Ununoctium_INCS} )
-add_definitions( ${Ununoctium_DEFS} )
-add_executable( Ununoctium ${Ununoctium_SRCS} )
-target_link_libraries( Ununoctium ${Ununoctium_LIBS} )
+include_directories( ${Splatterlinge_INCS} )
+add_definitions( ${Splatterlinge_DEFS} )
+add_executable( Splatterlinge ${Splatterlinge_SRCS} )
+target_link_libraries( Splatterlinge ${Splatterlinge_LIBS} )
 
 if( USE_QT5 )
-    qt5_use_modules( Ununoctium Core Gui Widgets OpenGL )
+	qt5_use_modules( Splatterlinge Core Gui Widgets OpenGL )
 endif( USE_QT5 )

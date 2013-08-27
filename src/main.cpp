@@ -53,8 +53,8 @@ int main( int argc, char * argv[] )
 	}
 
 	// needed for QSettings
-	QCoreApplication::setOrganizationName( "Ununoctium" );
-	QCoreApplication::setApplicationName( "Ununoctium" );
+	QCoreApplication::setOrganizationName( "Splatterlinge" );
+	QCoreApplication::setApplicationName( "Splatterlinge" );
 
 	QTextCodec::setCodecForLocale( QTextCodec::codecForName( "UTF-8" ) );
 

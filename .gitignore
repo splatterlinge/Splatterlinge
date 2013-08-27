@@ -1,4 +1,5 @@
 bin/
+build/
 CMakeCache.txt
 CMakeFiles/
 CMakeLists.txt.user
@@ -6,8 +7,8 @@ cmake_install.cmake
 Makefile
 moc_*.cxx
 moc_*.cpp
-Ununoctium.cbp
-Ununoctium.kdev4
+Splatterlinge.cbp
+Splatterlinge.kdev4
 .kdev4/
 doc/
 *.*~

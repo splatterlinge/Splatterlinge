@@ -1,4 +1,4 @@
-Ununoctium [![Build Status](https://travis-ci.org/zwostein/Ununoctium.png)](https://travis-ci.org/zwostein/Ununoctium)
-==========
+Splatterlinge [![Build Status](https://travis-ci.org/splatterlinge/Splatterlinge.png)](https://travis-ci.org/splatterlinge/Splatterlinge)
+=============
 
-Nothing here yet - just a basic example on how to mix Qt with OpenGL and some graphics experiments.
+Just a simple first person shooter based on Qt and some "Splatterlinge"
