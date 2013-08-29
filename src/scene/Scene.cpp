@@ -358,10 +358,10 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 
 	painter->setFont( mFont );
 	painter->setRenderHints(
-				QPainter::Antialiasing |
-				QPainter::SmoothPixmapTransform |
-				QPainter::TextAntialiasing |
-				QPainter::HighQualityAntialiasing );
+		QPainter::Antialiasing |
+		QPainter::SmoothPixmapTransform |
+		QPainter::TextAntialiasing |
+		QPainter::HighQualityAntialiasing );
 
 	// radar radius
 	QRect radarRect( rect.width()-160, 10, 150, 150 );
@@ -384,8 +384,8 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	painter->drawRect( armorRect.left(), armorRect.top(), player->armor()*3, armorRect.height() );
 	painter->setPen( QColor(255,255,255,255) );
 	painter->drawText( armorRect,
-						Qt::AlignCenter | Qt::AlignHCenter,
-						QString( tr("%1%").arg(player->armor()) ) );
+		Qt::AlignCenter | Qt::AlignHCenter,
+		QString( tr("%1%").arg(player->armor()) ) );
 
 	// player health
 	QRect healthRect( rect.left()+10, rect.bottom()-40, 100*3, 30 );
@@ -396,38 +396,42 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	painter->drawRect( healthRect.left(), healthRect.top(), player->life()*3, healthRect.height() );
 	painter->setPen( QColor(255,255,255,255) );
 	painter->drawText( healthRect,
-						Qt::AlignCenter | Qt::AlignHCenter,
-						QString( tr("%1%").arg(player->life()) ) );
+		Qt::AlignCenter | Qt::AlignHCenter,
+		QString( tr("%1%").arg(player->life()) ) );
 
 	// weapon status
-	QRect weaponNameRect( rect.right()-210, rect.bottom()-75, 200, 30 );
-	QRect weaponStatusRect( rect.right()-210, rect.bottom()-40, 200, 30 );
-	painter->setPen( QColor(0,0,0,0) );
-	painter->setBrush( QBrush( QColor(11,110,240,80) ) );
-	painter->drawRect( weaponNameRect );
-	painter->drawRect( weaponStatusRect );
-	painter->setPen( QColor(255,255,255,255) );
-	painter->drawText( weaponNameRect,
-						Qt::AlignCenter | Qt::AlignHCenter,
-						QString( tr("%1").arg(player->weapon()->name()) ) );
-	if( player->weapon()->clipammo() == 0 )
+	QSharedPointer<AWeapon> weapon = player->currentWeapon();
+	if( !weapon.isNull() )
 	{
-		if( !mBlinkingState )
+		QRect weaponNameRect( rect.right()-210, rect.bottom()-75, 200, 30 );
+		QRect weaponStatusRect( rect.right()-210, rect.bottom()-40, 200, 30 );
+		painter->setPen( QColor(0,0,0,0) );
+		painter->setBrush( QBrush( QColor(11,110,240,80) ) );
+		painter->drawRect( weaponNameRect );
+		painter->drawRect( weaponStatusRect );
+		painter->setPen( QColor(255,255,255,255) );
+		painter->drawText( weaponNameRect,
+			Qt::AlignCenter | Qt::AlignHCenter,
+			QString( tr("%1").arg(player->currentWeapon()->name()) ) );
+		if( player->currentWeapon()->clipammo() == 0 )
+		{
+			if( !mBlinkingState )
+			{
+				painter->drawText( weaponStatusRect,
+					Qt::AlignCenter | Qt::AlignHCenter,
+					QString( tr("%2 | %3 ")
+						.arg(player->currentWeapon()->clipammo())
+						.arg(player->currentWeapon()->ammo()) ) );
+			}
+		}
+		else
 		{
 			painter->drawText( weaponStatusRect,
-								Qt::AlignCenter | Qt::AlignHCenter,
-								QString( tr("%2 | %3 ")
-											.arg(player->weapon()->clipammo())
-											.arg(player->weapon()->ammo()) ) );
+				Qt::AlignCenter | Qt::AlignHCenter,
+				QString( tr("%2 | %3 ")
+					.arg(player->currentWeapon()->clipammo())
+					.arg(player->currentWeapon()->ammo()) ) );
 		}
-	}
-	else
-	{
-		painter->drawText( weaponStatusRect,
-							Qt::AlignCenter | Qt::AlignHCenter,
-							QString( tr("%2 | %3 ")
-										.arg(player->weapon()->clipammo())
-										.arg(player->weapon()->ammo()) ) );
 	}
 }
 

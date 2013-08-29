@@ -17,6 +17,9 @@
 
 #include "PowerUp.hpp"
 
+#include "../weapon/Laser.hpp"
+#include "../weapon/Minigun.hpp"
+
 #include <scene/Scene.hpp>
 
 
@@ -24,9 +27,9 @@ PowerUp::PowerUp( Landscape * landscape, QString type, const QPoint & mapPositio
 	AWorldObject( landscape->world() ),
 	mLandscape( landscape ),
 	mPosition( mapPosition ),
-	mRadius( mapRadius )
+	mRadius( mapRadius ),
+	mRotationAngle( 0.0f )
 {
-	mCoolDown = -1.0f;
 	respawn();
 
 	setBoundingSphere( 1.0f );
@@ -67,57 +70,57 @@ void PowerUp::respawn()
 	pos.setY( mLandscape->terrain()->getHeight( pos ) + 1.5 );
 
 	setPosition( pos );
-	mCoolDown = -1.0f;
+	mRespawnCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
+	mRespawning = true;
 }
 
 
-void PowerUp::updateSelf( const double &delta )
+void PowerUp::updateSelf( const double & delta )
 {
-	mRotation += delta * 50;
+	mRotationAngle += delta * 100.0f;
+	setRotation( QQuaternion::fromAxisAndAngle( 0,1,0, mRotationAngle ) );
 
-	float dist = ( mLandscape->world()->player()->worldPosition() - worldPosition() ).length();
+	QSharedPointer<Player> player = mLandscape->world()->player();
 
-	if( dist <= 2 && mCoolDown == -1.0f )
+	float dist = ( player->worldPosition() - worldPosition() ).length();
+
+	if( mRespawning )
 	{
-		switch( mPowerType )
+		mRespawnCoolDown -= delta;
+		if( mRespawnCoolDown < 0.0f )
 		{
-			case HEALTH:
-				mLandscape->world()->player()->receivePowerUp( HEALTH, 25 );
-				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
-				break;
-			case ARMOR:
-				mLandscape->world()->player()->receivePowerUp( ARMOR, 40 );
-				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
-				break;
-			case WEAPON_LASER:
-				mLandscape->world()->player()->receivePowerUp( WEAPON_LASER );
-				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
-				break;
-			case WEAPON_MINIGUN:
-				mLandscape->world()->player()->receivePowerUp( WEAPON_MINIGUN );
-				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
-				break;
+			mRespawnCoolDown = 0.0f;
+			mRespawning = false;
 		}
 	}
-
-	if( mCoolDown != -1.0f )
+	else
 	{
-		if( mCoolDown > delta )
-			mCoolDown -= delta;
-		else
-			mCoolDown = 0.0f;
-	}
-
-	if( mCoolDown == 0.0f )
-	{
-		respawn();
+		if( dist <= 2.0f )
+		{
+			switch( mPowerType )
+			{
+				case HEALTH:
+					player->setLife( qMin( player->life() + 25, 100 ) );
+					break;
+				case ARMOR:
+					player->setArmor( qMin( player->armor() + 40, 100 ) );
+					break;
+				case WEAPON_LASER:
+					player->giveWeapon( QSharedPointer<AWeapon>( new Laser( world() ) ) );
+					break;
+				case WEAPON_MINIGUN:
+					player->giveWeapon( QSharedPointer<AWeapon>( new Minigun( world() ) ) );
+					break;
+			}
+			respawn();
+		}
 	}
 }
 
 
 void PowerUp::drawSelf()
 {
-	if( mCoolDown == -1.0f )
+	if( !mRespawning )
 	{
 		switch( mPowerType )
 		{
@@ -132,13 +135,12 @@ void PowerUp::drawSelf()
 				mMaterial->bind();
 
 				glColor3f( 1.0f, 0.0f, 0.0f );
-				glRotatef( mRotation, 0.0f, 1.0f, 0.0f );
 				glScalef( 0.7f, 0.7f, 0.7f );
 				glBegin( GL_QUADS );
 				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -1.0f,  1.0f, 0.0 );
 				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -1.0f, -1.0f, 0.0 );
 				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  1.0f, -1.0f, 0.0 );
-				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 1.0f, 1.0f );	glVertex3f(  1.0f,  1.0f, 0.0 );
+				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  1.0f,  1.0f, 0.0 );
 				glEnd();
 
 				mMaterial->release();

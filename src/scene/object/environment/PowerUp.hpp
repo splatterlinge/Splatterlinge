@@ -46,8 +46,9 @@ private:
 	Material * mMaterial;
 	QPoint mPosition;
 	int mRadius;
-	float mRotation;
-	float mCoolDown;
+	float mRotationAngle;
+	float mRespawnCoolDown;
+	bool mRespawning;
 	PowerType mPowerType;
 };
 
