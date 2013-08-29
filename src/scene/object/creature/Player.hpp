@@ -50,13 +50,15 @@ public:
 	virtual void mouseWheelEvent( QGraphicsSceneWheelEvent * event );
 
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
-	virtual void receivePowerUp( int power, int value=0 );
 
 	const int & armor() const { return mArmor; }
-	QSharedPointer<AWeapon> weapon() { return *mCurrentWeapon; }
+	QSharedPointer<AWeapon> currentWeapon() const { return *mCurrentWeapon; }
+	const QList< QSharedPointer<AWeapon> > & weapons() const { return mWeapons; }
+	void giveWeapon( QSharedPointer<AWeapon> weapon );
+
+	void setArmor( const int & armor ) { mArmor = armor; }
 
 protected:
-	void setArmor( const int & armor ) { mArmor = armor; }
 
 private:
 	QVector3D mTarget;

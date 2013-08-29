@@ -41,10 +41,10 @@ public:
 	virtual void pull() = 0;
 	virtual void reload() = 0;
 
-	const QString name() const { return mName; }
-	const int ammo() const { return mAmmo; }
-	const int clipammo() const { return mClipAmmo; }
-	const int clipsize() const { return mClipSize; }
+	const QString & name() const { return mName; }
+	const int & ammo() const { return mAmmo; }
+	const int & clipammo() const { return mClipAmmo; }
+	const int & clipsize() const { return mClipSize; }
 
 	void setAmmo( const int & ammo ) { mAmmo = ammo; }
 

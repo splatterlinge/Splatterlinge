@@ -17,6 +17,9 @@
 
 #include "PowerUp.hpp"
 
+#include "../weapon/Laser.hpp"
+#include "../weapon/Minigun.hpp"
+
 #include <scene/Scene.hpp>
 
 
@@ -74,30 +77,28 @@ void PowerUp::respawn()
 void PowerUp::updateSelf( const double &delta )
 {
 	mRotation += delta * 50;
+	QSharedPointer<Player> player = mLandscape->world()->player();
 
-	float dist = ( mLandscape->world()->player()->worldPosition() - worldPosition() ).length();
+	float dist = ( player->worldPosition() - worldPosition() ).length();
 
-	if( dist <= 2 && mCoolDown == -1.0f )
+	if( dist <= 2 && mCoolDown <= 0.0f )
 	{
 		switch( mPowerType )
 		{
 			case HEALTH:
-				mLandscape->world()->player()->receivePowerUp( HEALTH, 25 );
-				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
+				player->setLife( qMin( player->life() + 25, 100 ) );
 				break;
 			case ARMOR:
-				mLandscape->world()->player()->receivePowerUp( ARMOR, 40 );
-				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
+				player->setArmor( qMin( player->armor() + 40, 100 ) );
 				break;
 			case WEAPON_LASER:
-				mLandscape->world()->player()->receivePowerUp( WEAPON_LASER );
-				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
+				player->giveWeapon( QSharedPointer<AWeapon>( new Laser( world() ) ) );
 				break;
 			case WEAPON_MINIGUN:
-				mLandscape->world()->player()->receivePowerUp( WEAPON_MINIGUN );
-				mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
+				player->giveWeapon( QSharedPointer<AWeapon>( new Minigun( world() ) ) );
 				break;
 		}
+		mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
 	}
 
 	if( mCoolDown != -1.0f )

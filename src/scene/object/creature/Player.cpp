@@ -94,7 +94,7 @@ void Player::keyPressEvent( QKeyEvent * event )
 		mRightPressed = true;
 		break;
 	case Qt::Key_R:
-		weapon()->reload();
+		currentWeapon()->reload();
 		break;
 	case Qt::Key_Space:
 		mUpPressed = true;
@@ -324,67 +324,30 @@ void Player::receiveDamage( int damage, const QVector3D * position, const QVecto
 }
 
 
-void Player::receivePowerUp( int power, int value )
+void Player::giveWeapon( QSharedPointer< AWeapon > weapon )
 {
-	bool found;
-	switch( power )
+	bool alreadyGotWeapon = false;
+	foreach( QSharedPointer<AWeapon> myWeapon, mWeapons )
 	{
-		case PowerUp::HEALTH:
-			setLife( life() + value );
-			setLife( qMin( life(), 100 ) );
+		if( myWeapon->name() == weapon->name() )
+		{
+			alreadyGotWeapon = true;
+			myWeapon->setAmmo( myWeapon->ammo() + 1 );	// TODO: how much ammo to add
 			break;
-		case PowerUp::ARMOR:
-			setArmor( armor() + value );
-			setArmor( qMin( armor(), 100 ) );
-			break;
-		case PowerUp::WEAPON_LASER:
-			found = false;
-			foreach( QSharedPointer<AWeapon> w, mWeapons )
-			{
-				if( w->name() == "Laser" )
-				{
-					found = true;
-					w->setAmmo( w->ammo() + 1 );
-					break;
-				}
-			}
+		}
+	}
 
-			if( !found )
-			{
-				QSharedPointer<AWeapon> w = QSharedPointer<AWeapon>( new Laser( world() ) );
-				mWeapons.push_front( w );
-				add( w );
+	if( !alreadyGotWeapon )
+	{
+		mWeapons.push_front( weapon );
+		add( weapon );
 
-				(*mCurrentWeapon)->holster();
-				mCurrentWeapon = mWeapons.begin();
-				(*mCurrentWeapon)->pull();
-			}
-			break;
-		case PowerUp::WEAPON_MINIGUN:
-			found = false;
-			foreach( QSharedPointer<AWeapon> w, mWeapons )
-			{
-				if( w->name() == "Minigun" )
-				{
-					found = true;
-					w->setAmmo( w->ammo() + 200 );
-					break;
-				}
-			}
-
-			if( !found )
-			{
-				QSharedPointer<AWeapon> w = QSharedPointer<AWeapon>( new Minigun( world() ) );
-				mWeapons.push_front( w );
-				add( w );
-
-				(*mCurrentWeapon)->holster();
-				mCurrentWeapon = mWeapons.begin();
-				(*mCurrentWeapon)->pull();
-			}
-			break;
+		(*mCurrentWeapon)->holster();
+		mCurrentWeapon = mWeapons.begin();
+		(*mCurrentWeapon)->pull();
 	}
 }
+
 
 void Player::updateRotation( const double & delta )
 {
