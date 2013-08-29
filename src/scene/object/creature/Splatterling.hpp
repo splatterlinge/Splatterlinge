@@ -15,15 +15,15 @@ class Splatterling : public ACreature
 {
 public:
 
-	static const GLsizeiptr PositionSize = 16 * 3 * sizeof( GLfloat );
-	static const GLsizeiptr ColorSize = 16 * 3 * sizeof( GLubyte );
-	static const GLsizeiptr TexSize = 16 * 2 * sizeof( GLfloat );
+	static const GLsizeiptr PositionSize = 72 * 3 * sizeof( GLfloat );
+	static const GLsizeiptr ColorSize = 72 * 3 * sizeof( GLubyte );
+	static const GLsizeiptr TexSize = 72 * 2 * sizeof( GLfloat );
 
 
 	static const int BufferSize = 3;
 
-	static const GLsizei BodyVertexCount = 6;
-	static const GLsizei HeadVertexCount = 4;
+	static const GLsizei BodyVertexCount = 34;
+	static const GLsizei HeadVertexCount = 32;
 	static const int WingOneYPos = ( ( BodyVertexCount + HeadVertexCount ) * 3 ) + 4;
 	static const int WingTwoYPos = ( ( BodyVertexCount + HeadVertexCount ) * 3 ) + ( 3 * 3 ) + 4;
 	static const double RotationStepSize = 2.0;
@@ -37,7 +37,8 @@ public:
 	{
 		TARGET_BODY = 0,
 		TARGET_HEAD = 1,
-		TARGET_WING = 2
+		TARGET_WING_RIGHT = 2,
+		TARGET_WING_LEFT = 3
 	};
 
 	GLuint BufferName[BufferSize];
@@ -67,13 +68,13 @@ private:
 	float mVelocityY;
 	float mHeightAboveGround;
 	GLuint vboId;
-	GLfloat PositionData[48];
+	GLfloat PositionData[PositionSize/sizeof( GLfloat )];
 	QVector3D destinationPoint;
 	bool wingUpMovement;
 	bool playerDetected;
 	AudioSample * mWingSound;
 	int targetBodyPart;
-	float damageMultiplicationFactor[3];
+	float damageMultiplicationFactor[4];
 	float mCoolDown;
 	bool recalculationOfRotationAngle;
 	float rotationAroundPlayer;

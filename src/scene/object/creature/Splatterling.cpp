@@ -23,7 +23,69 @@ static const GLfloat GlobalPositionData[] =
 	-1.0f, -1.0f, 8.0f,
 	-1.0f, 1.0f, 8.0f,
 
+
+	0.0f,0.0f,0.0f,
+	0.25f,0.5f,1.0f,
+	-0.25f,0.5f,1.0f,
+	-0.5f,0.25f,1.0f,
+	-0.5f,-0.25f,1.0f,
+	-0.25f,-0.5f,1.0f,
+	0.25f,-0.5f,1.0f,
+	0.5f,-0.25f,1.0f,
+	0.5f,0.25f,1.0f,
+	0.25f,0.5f,1.0f,
+
+	-0.25f,0.5f,8.5f,
+	0.25f,0.5f,1.0f,
+	0.5f,1.0f,8.0f,
+	-0.5f,1.0f,8.0f,
+	-0.5f,0.25f,1.0f,
+	-1.0f,0.5f,8.0f,
+	-0.5f,-0.25f,1.0f,
+	-1.0f,-0.5f,8.0f,
+	-0.25f,-0.5f,1.0f,
+	-0.5f,-1.0f,8.0f,
+	0.25f,-0.5f,1.0f,
+	0.5f,-1.0f,8.0f,
+	0.5f,-0.25f,1.0f,
+	1.0f,-0.5f,8.0f,
+	0.5f,0.25f,1.0f,
+	1.0f,0.5f,8.0f,
+	0.25f,0.5f,1.0f,
+	0.5f,1.0f,8.0f,
+
 	//face
+
+	0.0f,0.0f,8.8f,
+	0.25f,0.5f,8.5f,
+	-0.25f,0.5f,8.5f,
+	-0.5f,0.25f,8.5f,
+	-0.5f,-0.25f,8.5f,
+	-0.25f,-0.5f,8.5f,
+	0.25f,-0.5f,8.5f,
+	0.5f,-0.25f,8.5f,
+	0.5f,0.25f,8.5f,
+	0.25f,0.5f,8.5f,
+
+	-0.25f,0.5f,8.5f,
+	0.25f,0.5f,8.5f,
+	0.5f,1.0f,8.0f,
+	-0.5f,1.0f,8.0f,
+	-0.5f,0.25f,8.5f,
+	-1.0f,0.5f,8.0f,
+	-0.5f,-0.25f,8.5f,
+	-1.0f,-0.5f,8.0f,
+	-0.25f,-0.5f,8.5f,
+	-0.5f,-1.0f,8.0f,
+	0.25f,-0.5f,8.5f,
+	0.5f,-1.0f,8.0f,
+	0.5f,-0.25f,8.5f,
+	1.0f,-0.5f,8.0f,
+	0.5f,0.25f,8.5f,
+	1.0f,0.5f,8.0f,
+	0.25f,0.5f,8.5f,
+	0.5f,1.0f,8.0f,
+
 	-1.0f, 1.0f, 8.0f,
 	-1.0f, -1.0f, 8.0f,
 	1.0f, 1.0f, 8.0f,
@@ -31,16 +93,16 @@ static const GLfloat GlobalPositionData[] =
 
 	//wingOne
 	0.0f, 0.5f, 4.0f,
-	8.0f, 4.0f, -2.0f,
-	8.0f, 4.0f, 10.0f,
+	8.0f, 4.0f, -6.0f,
+	8.0f, 4.0f, 14.0f,
 
 	//wingTwo
 	0.0f, 0.5f, 4.0f,
-	-8.0f, 4.0f, -2.0f,
-	-8.0f, 4.0f, 10.0f,
+	-8.0f, 4.0f, -6.0f,
+	-8.0f, 4.0f, 14.0f,
 };
 
-static const GLfloat TextureCoordData[] =
+static GLfloat TextureCoordData[] =
 {
 	0.0f, 0.0f,
 	0.5f, 0.0f,
@@ -49,7 +111,70 @@ static const GLfloat TextureCoordData[] =
 	0.5f, 0.5f,
 	0.5f, 0.0f,
 
+
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+
+
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+	0.0f, 0.0f,
+
 	//face
+
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+	0.7f, 0.65f,
+
 	0.0f, 1.0f,
 	0.0f, 0.5f,
 	0.5f, 1.0f,
@@ -77,6 +202,66 @@ static const GLubyte ColorData[] =
 	255, 255, 0,
 	255, 255, 0,
 
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+	255, 255, 255,
+
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+	0, 255, 0,
+
 	0, 255, 255,
 	0, 255, 255,
 	0, 255, 255,
@@ -89,6 +274,17 @@ static const GLubyte ColorData[] =
 	0, 0, 255,
 	0, 0, 255,
 };
+
+static void initTexCoordArray(){
+	int posCoordIndex, end = Splatterling::TexSize / sizeof( GLfloat );
+	end = end - (10 * 2);
+
+	for (int i = Splatterling::BodyVertexCount*2; i < end; i=i+2) {
+		posCoordIndex = (i/2)*3;
+		TextureCoordData[i] = ((GlobalPositionData[posCoordIndex]+1.0f) / 2.0f)/2.0f;
+		TextureCoordData[i+1] = ((GlobalPositionData[posCoordIndex+1]+1.0f) / 2.0f)/2.0f + 0.5f;
+	}
+}
 
 
 Splatterling::Splatterling( World * world ) : ACreature( world )
@@ -112,16 +308,19 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 
 	damageMultiplicationFactor[TARGET_BODY] = 1.0f;
 	damageMultiplicationFactor[TARGET_HEAD] = 2.0f;
-	damageMultiplicationFactor[TARGET_WING] = 0.5f;
+	damageMultiplicationFactor[TARGET_WING_LEFT] = 0.5f;
+	damageMultiplicationFactor[TARGET_WING_RIGHT] = 0.5f;
 
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
 	{
-		PositionData[i] = GlobalPositionData[i];
+		PositionData[i] = GlobalPositionData[i] / 2.0f;
 	}
 
 	mCoolDown = 0.0f;
 	recalculationOfRotationAngle = true;
 	rotationAroundPlayer = -1000.0f;
+
+	initTexCoordArray();
 }
 
 
@@ -165,7 +364,7 @@ void Splatterling::updateSelf( const double & delta )
 		}
 		case ALIVE:
 		{
-			mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
+/		mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
 			GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
 
 			if( dist < 13 )
@@ -300,8 +499,14 @@ void Splatterling::drawSelf()
 	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
 //	glEnableClientState( GL_COLOR_ARRAY );
 
-	glDrawArrays( GL_TRIANGLE_FAN, 0, Splatterling::BodyVertexCount );
-	glDrawArrays( GL_TRIANGLE_STRIP, 6, Splatterling::HeadVertexCount );
+//	glDrawArrays( GL_TRIANGLE_FAN, 0, Splatterling::BodyVertexCount );
+
+	glDrawArrays( GL_TRIANGLE_FAN, 6, 10 );
+	glDrawArrays( GL_TRIANGLE_STRIP, 16, 18 );
+
+	glDrawArrays( GL_TRIANGLE_FAN, Splatterling::BodyVertexCount, 10 );
+	glDrawArrays( GL_TRIANGLE_STRIP, Splatterling::BodyVertexCount+10, 18 );
+//	glDrawArrays( GL_TRIANGLE_STRIP, 6 + Splatterling::HeadVertexCount-4, 4 );
 
 	glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount, 3 );
 	glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount + 3, 3 );
@@ -372,7 +577,7 @@ bool Splatterling::intersectWing(const QVector3D & origin, const QVector3D & dir
 	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
 		Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
 	{
-		targetBodyPart = TARGET_WING;
+		targetBodyPart = TARGET_WING_LEFT;
 		return true;
 	}
 
@@ -383,7 +588,7 @@ bool Splatterling::intersectWing(const QVector3D & origin, const QVector3D & dir
 	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
 		Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
 	{
-		targetBodyPart = TARGET_WING;
+		targetBodyPart = TARGET_WING_RIGHT;
 		return true;
 	}
 
@@ -395,9 +600,11 @@ bool Splatterling::intersectHead(const QVector3D & origin, const QVector3D & dir
 {
 	QVector3D v[4];
 
+	int flatHeadPosition = BodyVertexCount+HeadVertexCount-4;
+
 
 	for (int i = 0; i < 4; i++) {
-		v[i] = QVector3D(PositionData[(BodyVertexCount+i)*3], PositionData[(BodyVertexCount+i)*3+1], PositionData[(BodyVertexCount+i)*3+2]);
+		v[i] = QVector3D(PositionData[(flatHeadPosition+i)*3], PositionData[(flatHeadPosition+i)*3+1], PositionData[(flatHeadPosition+i)*3+2]);
 	}
 	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
 		Triangle::intersectRay(this->pointToWorld(v[1]), this->pointToWorld(v[3]), this->pointToWorld(v[2]), origin, direction, intersectionDistance))
@@ -416,7 +623,6 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 	if(intersectHead(*position, *direction, &rayLength) || intersectWing(*position, *direction, &rayLength)
 		|| intersectBody(*position, *direction, &rayLength)){
 
-		qDebug() << damageMultiplicationFactor[targetBodyPart];
 		damage *= damageMultiplicationFactor[targetBodyPart];
 		ACreature::receiveDamage( damage, direction );
 		QVector3D splatterSource;
