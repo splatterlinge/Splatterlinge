@@ -25,6 +25,7 @@
 namespace Quaternion
 {
 	QQuaternion lookAt( const QVector3D & lookAt, const QVector3D & upDirection );
+	QQuaternion fromTo( const QVector3D & fromDirection, const QVector3D & toDirection );
 }
 
 

@@ -60,8 +60,11 @@ public:
 protected:
 
 private:
+	bool mTargetAvailable;
 	QVector3D mTarget;
 	QVector3D mTargetNormal;
+	float mTargetDistance;
+
 	QPointF mMouseDelta;
 	bool mForwardPressed;
 	bool mBackwardPressed;
@@ -89,6 +92,7 @@ private:
 
 	void updateRotation( const double & delta );
 	void updatePosition( const double & delta );
+	void updateTarget( const double & delta );
 
 	void drawCrosshair();
 };

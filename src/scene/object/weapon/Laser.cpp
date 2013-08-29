@@ -21,6 +21,7 @@
 
 #include <effect/SplatterSystem.hpp>
 #include <scene/Scene.hpp>
+#include <utility/Quaternion.hpp>
 
 
 Laser::Laser( World * world ) :
@@ -32,7 +33,6 @@ Laser::Laser( World * world ) :
 	mName = "Laser";
 	mDrawn = false;
 	mTrailVisibilityDuration = 1.0f;
-	mCoolDown = 2.0f;
 	mHeat = 0.0f;
 	mTrailAlpha = 0.0f;
 	mFired = false;
@@ -77,39 +77,57 @@ void Laser::pull()
 void Laser::holster()
 {
 	mDrawn = false;
-
-	mFireSound->stop();
-	mReloadSound->stop();
 }
 
 
-void Laser::reload()
+void Laser::setTarget( const QVector3D * target )
 {
+	if( target )
+	{
+		QMatrix4x4 parentModelMatrix;
+		if( parent() )
+		{
+			parentModelMatrix = parent()->modelMatrix();
+		} else {
+			parentModelMatrix.setToIdentity();
+		}
+
+		QVector3D localTarget = ( parentModelMatrix.inverted() * QVector4D(*target,1) ).toVector3D();
+		QVector3D dirToLocalTarget = ( localTarget - position() ).normalized();
+
+		setRotation( Quaternion::fromTo( QVector3D(0,0,1), dirToLocalTarget ) );
+	}
+	else
+		setRotation( QQuaternion() );
 }
+
 
 void Laser::updateSelf( const double & delta )
 {
-	if( mFired )
+	if( mDrawn )
 	{
-		if( mHeat <= 0.0f && mClipAmmo > 0 )
+		if( mFired )
 		{
-			mHeat = 3.0f;
-			mTrailAlpha = 1.0f;
-			mTrailStart = worldPosition();
-			mTrailDirection = worldDirection();
-			mTrailLength = mRange;
-			AObject * target = world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength );
-			mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
-			ACreature * victim = dynamic_cast<ACreature*>(target);
-			if( victim )
+			if( mHeat <= 0.0f && mClipAmmo > 0 )
 			{
-				victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
-			}
+				mHeat = 3.0f;
+				mTrailAlpha = 1.0f;
+				mTrailStart = worldPosition();
+				mTrailDirection = worldDirection();
+				mTrailLength = mRange;
+				AObject * target = world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength );
+				mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
+				ACreature * victim = dynamic_cast<ACreature*>(target);
+				if( victim )
+				{
+					victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
+				}
 
-			mFireSound->play();
-			mReloadSound->play();
-			mClipAmmo--;
-			mAmmo--;
+				mFireSound->play();
+				mReloadSound->play();
+				mClipAmmo--;
+				mAmmo--;
+			}
 		}
 	}
 
@@ -120,11 +138,7 @@ void Laser::updateSelf( const double & delta )
 	else
 	{
 		mHeat = 0.0f;
-
 		mClipAmmo = mClipSize;
-
-		if( mReloadSound->isPlaying() )
-			mReloadSound->stop();
 	}
 
 	if( mTrailAlpha > delta )
@@ -136,14 +150,14 @@ void Laser::updateSelf( const double & delta )
 
 void Laser::drawSelf()
 {
-	if( mDrawn )
-	{
-		mMaterial->bind();
-		glTranslatef( 0.0f, 0.0f, -0.2f );
-		gluCylinder( mQuadric, 0.08f, 0.08f, 0.4f, 16, 16 );
-		gluCylinder( mQuadric, 0.15f, 0.10f, 0.2f, 16, 16 );
-		mMaterial->release();
-	}
+	if( !mDrawn )
+		return;
+
+	mMaterial->bind();
+	glTranslatef( 0.0f, 0.0f, -0.2f );
+	gluCylinder( mQuadric, 0.08f, 0.08f, 0.4f, 16, 16 );
+	gluCylinder( mQuadric, 0.15f, 0.10f, 0.2f, 16, 16 );
+	mMaterial->release();
 }
 
 

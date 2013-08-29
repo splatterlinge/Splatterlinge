@@ -64,3 +64,11 @@ QQuaternion Quaternion::lookAt( const QVector3D & lookAt, const QVector3D & upDi
 	}
 	return ret;
 }
+
+
+QQuaternion Quaternion::fromTo( const QVector3D & fromDirection, const QVector3D & toDirection )
+{
+	QVector3D axis = QVector3D::crossProduct( fromDirection, toDirection );
+	float angle = acosf( QVector3D::dotProduct( fromDirection, toDirection ) ) * (180.0/M_PI);
+	return QQuaternion::fromAxisAndAngle( axis, angle );
+}

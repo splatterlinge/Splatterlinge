@@ -21,6 +21,7 @@
 
 #include <effect/SplatterSystem.hpp>
 #include <scene/Scene.hpp>
+#include <utility/Quaternion.hpp>
 
 
 Minigun::Minigun( World * world ) :
@@ -85,51 +86,74 @@ void Minigun::reload()
 }
 
 
-void Minigun::updateSelf( const double & delta )
+void Minigun::setTarget( const QVector3D * target )
 {
-	if( mReload )
+	if( target )
 	{
-		if( mCoolDown <= 0.0f )
+		QMatrix4x4 parentModelMatrix;
+		if( parent() )
 		{
-			reloadClip();
-
-			mReload = false;
+			parentModelMatrix = parent()->modelMatrix();
+		} else {
+			parentModelMatrix.setToIdentity();
 		}
 
-		spinDown( delta );
-	}
-	else if( mFired )
-	{
-		if( mClipAmmo == 0 )
-		{
-			mFireSound->stop();
-		}
-		else if( mCoolDown <= 0.0f && mRPM >= 600.0f )
-		{
-			mTrailStart = worldPosition();
-			mTrailDirection = worldDirection();
-			mTrailLength = mRange;
-			AObject * target = world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength );
-			mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
-			ACreature * victim = dynamic_cast<ACreature*>(target);
-			if( victim )
-			{
-				victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
-			}
+		QVector3D localTarget = ( parentModelMatrix.inverted() * QVector4D(*target,1) ).toVector3D();
+		QVector3D dirToLocalTarget = ( localTarget - position() ).normalized();
 
-			if( !mFireSound->isPlaying() )
-			{
-				mFireSound->play();
-			}
-			mClipAmmo--;
-			mCoolDown = 0.1f;
-		}
-
-		spinUp( delta );
+		setRotation( Quaternion::fromTo( QVector3D(0,0,1), dirToLocalTarget ) );
 	}
 	else
+		setRotation( QQuaternion() );
+}
+
+
+void Minigun::updateSelf( const double & delta )
+{
+	if( mDrawn )
 	{
-		spinDown( delta );
+		if( mReload )
+		{
+			if( mCoolDown <= 0.0f )
+			{
+				reloadClip();
+				mReload = false;
+			}
+			spinDown( delta );
+		}
+		else if( mFired )
+		{
+			if( mClipAmmo == 0 )
+			{
+				mFireSound->stop();
+			}
+			else if( mCoolDown <= 0.0f && mRPM >= 600.0f )
+			{
+				mTrailStart = worldPosition();
+				mTrailDirection = worldDirection();
+				mTrailLength = mRange;
+				AObject * target = world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength );
+				mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
+				ACreature * victim = dynamic_cast<ACreature*>(target);
+				if( victim )
+				{
+					victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
+				}
+
+				if( !mFireSound->isPlaying() )
+				{
+					mFireSound->play();
+				}
+				mClipAmmo--;
+				mCoolDown = 0.1f;
+			}
+
+			spinUp( delta );
+		}
+		else
+		{
+			spinDown( delta );
+		}
 	}
 
 	mRotation += mRPM * delta;

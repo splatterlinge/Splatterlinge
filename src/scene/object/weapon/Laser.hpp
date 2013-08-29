@@ -41,7 +41,7 @@ public:
 	virtual void triggerReleased();
 	virtual void holster();
 	virtual void pull();
-	virtual void reload();
+	virtual void setTarget( const QVector3D * target );
 
 private:
 	GLUquadric * mQuadric;
@@ -49,7 +49,6 @@ private:
 	bool mFired;
 	bool mReload;
 	float mHeat;
-	float mCoolDown;
 	float mRange;
 	float mTrailRadius;
 	float mTrailLength;

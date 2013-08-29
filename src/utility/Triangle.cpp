@@ -46,3 +46,17 @@ bool Triangle::intersectRay( const QVector3D & p, const QVector3D & q, const QVe
 
 	return true;
 }
+
+
+bool Triangle::intersectCulledRay( const QVector3D & p, const QVector3D & q, const QVector3D & r, const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
+{
+	float distance;
+	bool intersection = Triangle::intersectRay( p, q, r, origin, direction, &distance );
+	if( intersection && distance > 0.0f )
+	{
+		if( intersectionDistance )
+			*intersectionDistance = distance;
+		return true;
+	}
+	return false;
+}

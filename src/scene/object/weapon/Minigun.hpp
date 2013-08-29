@@ -42,6 +42,7 @@ public:
 	virtual void holster();
 	virtual void pull();
 	virtual void reload();
+	virtual void setTarget( const QVector3D * target );
 
 private:
 	void spinUp( const double & delta );
