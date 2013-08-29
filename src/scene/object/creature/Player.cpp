@@ -54,13 +54,7 @@ Player::Player( World * world ) :
 	mTarget = QVector3D(0,0,0);
 	mDragTeapot = false;
 
-	mWeapons.append( QSharedPointer<Minigun>( new Minigun( world ) ) );
-	mCurrentWeapon = mWeapons.begin();
-	foreach( QSharedPointer<AWeapon> w, mWeapons )
-	{
-		add( w );
-	}
-	(*mCurrentWeapon)->pull();
+	mCurrentWeapon = QSharedPointer<AWeapon>();
 
 	mTorch = QSharedPointer<Torch>( new Torch( world ) );
 	mTorch->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) + 1.0f );
@@ -157,8 +151,8 @@ void Player::mousePressEvent( QGraphicsSceneMouseEvent * event )
 {
 	if( event->button() == Qt::LeftButton )
 	{
-		if( mCurrentWeapon != mWeapons.end() )
-			(*mCurrentWeapon)->triggerPressed();
+		if( mCurrentWeapon )
+			mCurrentWeapon->triggerPressed();
 	}
 	else if( event->button() == Qt::RightButton )
 	{
@@ -176,8 +170,8 @@ void Player::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 {
 	if( event->button() == Qt::LeftButton )
 	{
-		if( mCurrentWeapon != mWeapons.end() )
-			(*mCurrentWeapon)->triggerReleased();
+		if( mCurrentWeapon )
+			mCurrentWeapon->triggerReleased();
 	}
 	else if( event->button() == Qt::RightButton )
 	{
@@ -194,17 +188,27 @@ void Player::mouseWheelEvent( QGraphicsSceneWheelEvent * event )
 {
 	if( mWeapons.size() )
 	{
-		if( event->delta() > 0 && mCurrentWeapon != --mWeapons.end() )
+		int currentWeaponindex = mWeapons.indexOf( mCurrentWeapon );
+		if( currentWeaponindex < 0 )
 		{
-			(*mCurrentWeapon)->holster();
-			++mCurrentWeapon;
-			(*mCurrentWeapon)->pull();
+			if( mCurrentWeapon )
+				mCurrentWeapon->holster();
+			mCurrentWeapon = mWeapons.first();
+			mCurrentWeapon->pull();
 		}
-		else if( event->delta() < 0 && mCurrentWeapon != mWeapons.begin() )
+		else if( event->delta() > 0 && currentWeaponindex < mWeapons.size()-1 )
 		{
-			(*mCurrentWeapon)->holster();
-			--mCurrentWeapon;
-			(*mCurrentWeapon)->pull();
+			if( mCurrentWeapon )
+				mCurrentWeapon->holster();
+			mCurrentWeapon = mWeapons.at( currentWeaponindex + 1 );
+			mCurrentWeapon->pull();
+		}
+		else if( event->delta() < 0 && currentWeaponindex > 0 )
+		{
+			if( mCurrentWeapon )
+				mCurrentWeapon->holster();
+			mCurrentWeapon = mWeapons.at( currentWeaponindex - 1 );
+			mCurrentWeapon->pull();
 		}
 	}
 }
@@ -227,8 +231,8 @@ void Player::updateSelf( const double & delta )
 			updateRotation( delta );
 			updatePosition( delta );
 
-			if( mCurrentWeapon != mWeapons.end() )
-				(*mCurrentWeapon)->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
+			if( mCurrentWeapon )
+				mCurrentWeapon->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
 
 			break;
 		case DYING:
@@ -326,26 +330,25 @@ void Player::receiveDamage( int damage, const QVector3D * position, const QVecto
 
 void Player::giveWeapon( QSharedPointer< AWeapon > weapon )
 {
-	bool alreadyGotWeapon = false;
+	if( weapon.isNull() )
+		return;
+
 	foreach( QSharedPointer<AWeapon> myWeapon, mWeapons )
 	{
 		if( myWeapon->name() == weapon->name() )
 		{
-			alreadyGotWeapon = true;
 			myWeapon->setAmmo( myWeapon->ammo() + 1 );	// TODO: how much ammo to add
-			break;
+			return;
 		}
 	}
 
-	if( !alreadyGotWeapon )
-	{
-		mWeapons.push_front( weapon );
-		add( weapon );
+	mWeapons.append( weapon );
+	add( weapon );
 
-		(*mCurrentWeapon)->holster();
-		mCurrentWeapon = mWeapons.begin();
-		(*mCurrentWeapon)->pull();
-	}
+	if( mCurrentWeapon )
+		mCurrentWeapon->holster();
+	mCurrentWeapon = *(--mWeapons.end());
+	mCurrentWeapon->pull();
 }
 
 

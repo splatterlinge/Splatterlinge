@@ -47,7 +47,8 @@ private:
 	QPoint mPosition;
 	int mRadius;
 	float mRotation;
-	float mCoolDown;
+	float mRespawnCoolDown;
+	bool mRespawning;
 	PowerType mPowerType;
 };
 

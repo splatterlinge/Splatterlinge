@@ -29,7 +29,6 @@ PowerUp::PowerUp( Landscape * landscape, QString type, const QPoint & mapPositio
 	mPosition( mapPosition ),
 	mRadius( mapRadius )
 {
-	mCoolDown = -1.0f;
 	respawn();
 
 	setBoundingSphere( 1.0f );
@@ -70,55 +69,55 @@ void PowerUp::respawn()
 	pos.setY( mLandscape->terrain()->getHeight( pos ) + 1.5 );
 
 	setPosition( pos );
-	mCoolDown = -1.0f;
+	mRespawnCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
+	mRespawning = true;
 }
 
 
-void PowerUp::updateSelf( const double &delta )
+void PowerUp::updateSelf( const double & delta )
 {
-	mRotation += delta * 50;
+	mRotation += delta * 50.0f;
 	QSharedPointer<Player> player = mLandscape->world()->player();
 
 	float dist = ( player->worldPosition() - worldPosition() ).length();
 
-	if( dist <= 2 && mCoolDown <= 0.0f )
+	if( mRespawning )
 	{
-		switch( mPowerType )
+		mRespawnCoolDown -= delta;
+		if( mRespawnCoolDown < 0.0f )
 		{
-			case HEALTH:
-				player->setLife( qMin( player->life() + 25, 100 ) );
-				break;
-			case ARMOR:
-				player->setArmor( qMin( player->armor() + 40, 100 ) );
-				break;
-			case WEAPON_LASER:
-				player->giveWeapon( QSharedPointer<AWeapon>( new Laser( world() ) ) );
-				break;
-			case WEAPON_MINIGUN:
-				player->giveWeapon( QSharedPointer<AWeapon>( new Minigun( world() ) ) );
-				break;
+			mRespawnCoolDown = 0.0f;
+			mRespawning = false;
 		}
-		mCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
 	}
-
-	if( mCoolDown != -1.0f )
+	else
 	{
-		if( mCoolDown > delta )
-			mCoolDown -= delta;
-		else
-			mCoolDown = 0.0f;
-	}
-
-	if( mCoolDown == 0.0f )
-	{
-		respawn();
+		if( dist <= 2.0f )
+		{
+			switch( mPowerType )
+			{
+				case HEALTH:
+					player->setLife( qMin( player->life() + 25, 100 ) );
+					break;
+				case ARMOR:
+					player->setArmor( qMin( player->armor() + 40, 100 ) );
+					break;
+				case WEAPON_LASER:
+					player->giveWeapon( QSharedPointer<AWeapon>( new Laser( world() ) ) );
+					break;
+				case WEAPON_MINIGUN:
+					player->giveWeapon( QSharedPointer<AWeapon>( new Minigun( world() ) ) );
+					break;
+			}
+			respawn();
+		}
 	}
 }
 
 
 void PowerUp::drawSelf()
 {
-	if( mCoolDown == -1.0f )
+	if( !mRespawning )
 	{
 		switch( mPowerType )
 		{

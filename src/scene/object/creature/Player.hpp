@@ -23,7 +23,6 @@
 #include "../Teapot.hpp"
 #include "../Torch.hpp"
 #include "../weapon/AWeapon.hpp"
-#include "../environment/PowerUp.hpp"
 #include <scene/AKeyListener.hpp>
 #include <scene/AMouseListener.hpp>
 
@@ -52,7 +51,7 @@ public:
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
 
 	const int & armor() const { return mArmor; }
-	QSharedPointer<AWeapon> currentWeapon() const { return *mCurrentWeapon; }
+	QSharedPointer<AWeapon> currentWeapon() { return mCurrentWeapon; }
 	const QList< QSharedPointer<AWeapon> > & weapons() const { return mWeapons; }
 	void giveWeapon( QSharedPointer<AWeapon> weapon );
 
@@ -86,7 +85,7 @@ private:
 	QVector3D mGroundNormal;
 	QSharedPointer<Torch> mTorch;
 	QList< QSharedPointer<AWeapon> > mWeapons;
-	QList< QSharedPointer<AWeapon> >::iterator mCurrentWeapon;
+	QSharedPointer<AWeapon> mCurrentWeapon;
 
 	void updateRotation( const double & delta );
 	void updatePosition( const double & delta );
