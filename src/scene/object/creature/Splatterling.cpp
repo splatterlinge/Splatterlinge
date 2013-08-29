@@ -306,6 +306,10 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	mWingSound->setRolloffFactor(0.01f);
 	mWingSound->play();
 
+	mSnapSound = new AudioSample( "neck_snap" );
+	mSnapSound->setLooping( false );
+	mSnapSound->setRolloffFactor(0.01f);
+
 	damageMultiplicationFactor[TARGET_BODY] = 1.0f;
 	damageMultiplicationFactor[TARGET_HEAD] = 2.0f;
 	damageMultiplicationFactor[TARGET_WING_LEFT] = 0.5f;
@@ -364,7 +368,7 @@ void Splatterling::updateSelf( const double & delta )
 		}
 		case ALIVE:
 		{
-/		mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
+			mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
 			GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
 
 			if( dist < 13 )
@@ -395,6 +399,11 @@ void Splatterling::updateSelf( const double & delta )
 					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 					QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
 					setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.5 ) );
+
+
+					if(!mSnapSound->isPlaying()){
+						mSnapSound->play();
+					}
 
 					world()->player()->receiveDamage( 1 );
 					mCoolDown = 0.1f;

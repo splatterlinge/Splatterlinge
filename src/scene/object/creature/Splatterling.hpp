@@ -73,6 +73,7 @@ private:
 	bool wingUpMovement;
 	bool playerDetected;
 	AudioSample * mWingSound;
+	AudioSample * mSnapSound;
 	int targetBodyPart;
 	float damageMultiplicationFactor[4];
 	float mCoolDown;
