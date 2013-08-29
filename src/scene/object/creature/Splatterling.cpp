@@ -23,7 +23,6 @@ static const GLfloat GlobalPositionData[] =
 	-1.0f, -1.0f, 8.0f,
 	-1.0f, 1.0f, 8.0f,
 
-
 	0.0f,0.0f,0.0f,
 	0.25f,0.5f,1.0f,
 	-0.25f,0.5f,1.0f,
@@ -35,9 +34,9 @@ static const GLfloat GlobalPositionData[] =
 	0.5f,0.25f,1.0f,
 	0.25f,0.5f,1.0f,
 
-	-0.25f,0.5f,8.5f,
 	0.25f,0.5f,1.0f,
 	0.5f,1.0f,8.0f,
+	-0.25f,0.5f,1.0f,
 	-0.5f,1.0f,8.0f,
 	-0.5f,0.25f,1.0f,
 	-1.0f,0.5f,8.0f,
@@ -67,9 +66,9 @@ static const GLfloat GlobalPositionData[] =
 	0.5f,0.25f,8.5f,
 	0.25f,0.5f,8.5f,
 
-	-0.25f,0.5f,8.5f,
 	0.25f,0.5f,8.5f,
 	0.5f,1.0f,8.0f,
+	-0.25f,0.5f,8.5f,
 	-0.5f,1.0f,8.0f,
 	-0.5f,0.25f,8.5f,
 	-1.0f,0.5f,8.0f,
@@ -317,7 +316,7 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
 	{
-		PositionData[i] = GlobalPositionData[i] / 2.0f;
+		PositionData[i] = GlobalPositionData[i] * Splatterling::SplatterlinfSizeFactor;
 	}
 
 	mCoolDown = 0.0f;
@@ -510,13 +509,16 @@ void Splatterling::drawSelf()
 
 //	glDrawArrays( GL_TRIANGLE_FAN, 0, Splatterling::BodyVertexCount );
 
+	//body
 	glDrawArrays( GL_TRIANGLE_FAN, 6, 10 );
 	glDrawArrays( GL_TRIANGLE_STRIP, 16, 18 );
 
+	//head
 	glDrawArrays( GL_TRIANGLE_FAN, Splatterling::BodyVertexCount, 10 );
 	glDrawArrays( GL_TRIANGLE_STRIP, Splatterling::BodyVertexCount+10, 18 );
 //	glDrawArrays( GL_TRIANGLE_STRIP, 6 + Splatterling::HeadVertexCount-4, 4 );
 
+	//wings
 	glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount, 3 );
 	glDrawArrays( GL_TRIANGLES, Splatterling::BodyVertexCount + Splatterling::HeadVertexCount + 3, 3 );
 
@@ -607,19 +609,53 @@ bool Splatterling::intersectWing(const QVector3D & origin, const QVector3D & dir
 
 bool Splatterling::intersectHead(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance)
 {
-	QVector3D v[4];
+	QVector3D centerPoint(0.0f, 0.0f, PositionData[BodyVertexCount*3+HeadVertexCount*3-1]);
 
-	int flatHeadPosition = BodyVertexCount+HeadVertexCount-4;
+	if(Sphere::intersectRay(this->pointToWorld(centerPoint),
+			1.0f*Splatterling::SplatterlinfSizeFactor,origin, direction, intersectionDistance)){
+		qDebug() << "sphere intersect";
 
+		//inner
+		QVector3D v[3];
+		v[0] = QVector3D(PositionData[BodyVertexCount*3], PositionData[BodyVertexCount*3+1], PositionData[BodyVertexCount*3+2]);
+		v[1] = QVector3D(PositionData[BodyVertexCount*3+3], PositionData[BodyVertexCount*3+4], PositionData[BodyVertexCount*3+5]);
 
-	for (int i = 0; i < 4; i++) {
-		v[i] = QVector3D(PositionData[(flatHeadPosition+i)*3], PositionData[(flatHeadPosition+i)*3+1], PositionData[(flatHeadPosition+i)*3+2]);
-	}
-	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
-		Triangle::intersectRay(this->pointToWorld(v[1]), this->pointToWorld(v[3]), this->pointToWorld(v[2]), origin, direction, intersectionDistance))
-	{
-		targetBodyPart = TARGET_HEAD;
-		return true;
+		for(int i = BodyVertexCount+2; i < BodyVertexCount+10; i++)
+		{
+			if(i != BodyVertexCount+2)
+			{
+				v[1] = v[2];
+			}
+
+			v[2] = QVector3D(PositionData[i*3], PositionData[i*3+1], PositionData[i*3+2]);
+
+			if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) )
+			{
+				targetBodyPart = TARGET_HEAD;
+				return true;
+			}
+		}
+
+		//Outter
+		v[0] = QVector3D(PositionData[(BodyVertexCount+10)*3], PositionData[(BodyVertexCount+10)*3+1], PositionData[(BodyVertexCount+10)*3+2]);
+		v[1] = QVector3D(PositionData[(BodyVertexCount+10)*3+3], PositionData[(BodyVertexCount+10)*3+4], PositionData[(BodyVertexCount+10)*3+5]);
+
+		for(int i = BodyVertexCount+12; i < BodyVertexCount+HeadVertexCount-4; i++)
+		{
+			if(i != BodyVertexCount+12){
+				v[0] = v[1];
+				v[1] = v[2];
+			}
+
+			v[2] = QVector3D(PositionData[i*3], PositionData[i*3+1], PositionData[i*3+2]);
+
+			if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
+					Triangle::intersectRay(this->pointToWorld(v[1]), this->pointToWorld(v[0]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) )
+			{
+				targetBodyPart = TARGET_HEAD;
+				return true;
+			}
+		}
 	}
 
 	return false;

@@ -20,6 +20,7 @@ public:
 	static const GLsizeiptr TexSize = 72 * 2 * sizeof( GLfloat );
 
 
+	static const float SplatterlinfSizeFactor = 0.5f;
 	static const int BufferSize = 3;
 
 	static const GLsizei BodyVertexCount = 34;
