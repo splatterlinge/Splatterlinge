@@ -27,7 +27,8 @@ PowerUp::PowerUp( Landscape * landscape, QString type, const QPoint & mapPositio
 	AWorldObject( landscape->world() ),
 	mLandscape( landscape ),
 	mPosition( mapPosition ),
-	mRadius( mapRadius )
+	mRadius( mapRadius ),
+	mRotationAngle( 0.0f )
 {
 	respawn();
 
@@ -76,7 +77,9 @@ void PowerUp::respawn()
 
 void PowerUp::updateSelf( const double & delta )
 {
-	mRotation += delta * 50.0f;
+	mRotationAngle += delta * 100.0f;
+	setRotation( QQuaternion::fromAxisAndAngle( 0,1,0, mRotationAngle ) );
+
 	QSharedPointer<Player> player = mLandscape->world()->player();
 
 	float dist = ( player->worldPosition() - worldPosition() ).length();
@@ -132,13 +135,12 @@ void PowerUp::drawSelf()
 				mMaterial->bind();
 
 				glColor3f( 1.0f, 0.0f, 0.0f );
-				glRotatef( mRotation, 0.0f, 1.0f, 0.0f );
 				glScalef( 0.7f, 0.7f, 0.7f );
 				glBegin( GL_QUADS );
 				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -1.0f,  1.0f, 0.0 );
 				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -1.0f, -1.0f, 0.0 );
 				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  1.0f, -1.0f, 0.0 );
-				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 1.0f, 1.0f );	glVertex3f(  1.0f,  1.0f, 0.0 );
+				glNormal3f( 0.0f, 1.0f, 0.0f ); glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  1.0f,  1.0f, 0.0 );
 				glEnd();
 
 				mMaterial->release();
