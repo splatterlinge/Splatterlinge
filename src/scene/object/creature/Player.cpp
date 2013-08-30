@@ -494,3 +494,9 @@ void Player::drawCrosshair()
 	glVertex3f(-0.15f, 0.0f, -1.0f);
 	glEnd();
 }
+
+const int Player::time() const
+{
+	int t = static_cast<int>(mAliveTimer.elapsed() / 1000);
+	return t;
+}

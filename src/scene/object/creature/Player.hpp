@@ -52,7 +52,7 @@ public:
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
 
 	const int & armor() const { return mArmor; }
-	const int & time() const { return mAliveTimer.elapsed() / 1000; }
+	const int time() const;
 	QSharedPointer<AWeapon> currentWeapon() { return mCurrentWeapon; }
 	const QList< QSharedPointer<AWeapon> > & weapons() const { return mWeapons; }
 	void giveWeapon( QSharedPointer<AWeapon> weapon );
