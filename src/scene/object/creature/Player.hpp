@@ -27,6 +27,7 @@
 #include <scene/AMouseListener.hpp>
 
 #include <GLWidget.hpp>
+#include <QTime>
 
 
 class Player : public ACreature, public AKeyListener, public AMouseListener
@@ -51,6 +52,7 @@ public:
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
 
 	const int & armor() const { return mArmor; }
+	const int & time() const { return mAliveTimer.elapsed() / 1000; }
 	QSharedPointer<AWeapon> currentWeapon() { return mCurrentWeapon; }
 	const QList< QSharedPointer<AWeapon> > & weapons() const { return mWeapons; }
 	void giveWeapon( QSharedPointer<AWeapon> weapon );
@@ -89,6 +91,7 @@ private:
 	QSharedPointer<Torch> mTorch;
 	QList< QSharedPointer<AWeapon> > mWeapons;
 	QSharedPointer<AWeapon> mCurrentWeapon;
+	QTime mAliveTimer;
 
 	void updateRotation( const double & delta );
 	void updatePosition( const double & delta );

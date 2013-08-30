@@ -62,6 +62,9 @@ Player::Player( World * world ) :
 	world->add( mTorch );
 	mDragTorch = false;
 
+
+	mAliveTimer.start();
+
 	scene()->addKeyListener( this );
 	scene()->addMouseListener( this );
 }
