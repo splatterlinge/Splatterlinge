@@ -20,9 +20,12 @@
 
 
 #include "AWeapon.hpp"
-#include "resource/AudioSample.hpp"
 
+
+class ParticleSystem;
 class Material;
+class AudioSample;
+
 struct GLUquadric;
 
 
@@ -41,7 +44,7 @@ public:
 	virtual void triggerReleased();
 	virtual void holster();
 	virtual void pull();
-	virtual void reload();
+	virtual void setTarget( const QVector3D * target );
 
 private:
 	GLUquadric * mQuadric;
@@ -49,19 +52,21 @@ private:
 	bool mFired;
 	bool mReload;
 	float mHeat;
-	float mCoolDown;
 	float mRange;
 	float mTrailRadius;
 	float mTrailLength;
 	float mTrailAlpha;
 	float mTrailVisibilityDuration;
 	float mDamage;
+	const QVector3D * mTarget;
 	QVector3D mTrailStart;
 	QVector3D mTrailDirection;
 	QVector3D mTrailEnd;
 	Material * mMaterial;
 	AudioSample * mFireSound;
 	AudioSample * mReloadSound;
+	Material * mImpactParticleMaterial;
+	ParticleSystem * mImpactParticles;
 };
 
 

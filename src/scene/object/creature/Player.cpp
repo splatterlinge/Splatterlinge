@@ -61,6 +61,9 @@ Player::Player( World * world ) :
 	world->add( mTorch );
 	mDragTorch = false;
 
+
+	mAliveTimer.start();
+
 	scene()->addKeyListener( this );
 	scene()->addMouseListener( this );
 }
@@ -230,9 +233,12 @@ void Player::updateSelf( const double & delta )
 		case ALIVE:
 			updateRotation( delta );
 			updatePosition( delta );
+			updateTarget( delta );
 
 			if( mCurrentWeapon )
+			{
 				mCurrentWeapon->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
+			}
 
 			break;
 		case DYING:
@@ -246,21 +252,16 @@ void Player::updateSelf( const double & delta )
 
 void Player::update2Self( const double & delta )
 {
-	float length = 300.0f;
-	if( mDragTeapot || mDragTorch )
+	if( mTargetAvailable )
 	{
-		if( world()->intersectLine( this, position(), direction(), length, &mTargetNormal ) )
+		if( mDragTeapot )
 		{
-			mTarget = position() + direction() * length;
-			if( mDragTeapot )
-			{
-				world()->teapot()->setPosition( mTarget );
-			}
-			if( mDragTorch )
-			{
-				mTorch->setPosition( mTarget );
-				mTorch->moveY( 1 );
-			}
+			world()->teapot()->setPosition( mTarget );
+		}
+		if( mDragTorch )
+		{
+			mTorch->setPosition( mTarget );
+			mTorch->moveY( 1 );
 		}
 	}
 }
@@ -348,6 +349,7 @@ void Player::giveWeapon( QSharedPointer< AWeapon > weapon )
 	if( mCurrentWeapon )
 		mCurrentWeapon->holster();
 	mCurrentWeapon = *(--mWeapons.end());
+	mCurrentWeapon->setTarget( &mTarget );
 	mCurrentWeapon->pull();
 }
 
@@ -467,6 +469,17 @@ void Player::updatePosition( const double & delta )
 }
 
 
+void Player::updateTarget( const double & delta )
+{
+	mTargetDistance = 300.0f;
+	if( world()->intersectLine( this, position(), direction(), mTargetDistance, &mTargetNormal ) )
+		mTargetAvailable = true;
+	else
+		mTargetAvailable = false;
+	mTarget = position() + direction() * mTargetDistance;
+}
+
+
 void Player::drawCrosshair()
 {
 	glColor3f( 0.0f, 1.0f, 0.0f );
@@ -480,4 +493,10 @@ void Player::drawCrosshair()
 	glVertex3f(-0.05f, 0.0f, -1.0f);
 	glVertex3f(-0.15f, 0.0f, -1.0f);
 	glEnd();
+}
+
+const int Player::time() const
+{
+	int t = static_cast<int>(mAliveTimer.elapsed() / 1000);
+	return t;
 }

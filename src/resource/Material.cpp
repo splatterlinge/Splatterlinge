@@ -21,6 +21,7 @@
 #include <utility/glWrappers.hpp>
 
 #include <QSettings>
+#include <QFile>
 #include <QGLShaderProgram>
 
 #include <unistd.h>
@@ -98,6 +99,12 @@ bool MaterialData::load()
 {
 	unload();
 	qDebug() << "+" << this << "MaterialData" << uid();
+
+	if( !QFile::exists( baseDirectory()+mName+"/material.ini" ) )
+	{
+		qCritical() << "!!" << this << "MaterialData" << uid() << "Could not find " << (baseDirectory()+mName+"/material.ini");
+		return false;
+	}
 
 	QSettings s( baseDirectory()+mName+"/material.ini", QSettings::IniFormat );
 

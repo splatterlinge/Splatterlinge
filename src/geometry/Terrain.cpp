@@ -18,6 +18,7 @@
 #include "Terrain.hpp"
 
 #include <utility/Triangle.hpp>
+#include <utility/Quaternion.hpp>
 
 #include <QImage>
 #include <QDebug>
@@ -328,9 +329,7 @@ QVector3D Terrain::getNormal( const QPointF & position ) const
 QQuaternion Terrain::getNormalRotation( const QPointF & position, const QVector3D & from ) const
 {
 	QVector3D normal = getNormal( position );
-	QVector3D axis = QVector3D::crossProduct( from, normal );
-	float angle = acosf( QVector3D::dotProduct( from, normal ) ) * (180.0/M_PI);
-	return QQuaternion::fromAxisAndAngle( axis, angle );
+	return Quaternion::fromTo( from, normal );
 }
 
 
@@ -356,7 +355,7 @@ bool Terrain::getLineQuadIntersection( const QVector3D & origin, const QVector3D
 
 	if( t1.intersectRay( origin, direction, &intersectionDistance ) )
 	{
-		if( intersectionDistance < length )
+		if( intersectionDistance < length && intersectionDistance > 0.0f )
 		{
 			length = intersectionDistance;
 			return true;
@@ -371,7 +370,7 @@ bool Terrain::getLineQuadIntersection( const QVector3D & origin, const QVector3D
 
 	if( t2.intersectRay( origin, direction, &intersectionDistance ) )
 	{
-		if( intersectionDistance < length )
+		if( intersectionDistance < length && intersectionDistance > 0.0f )
 		{
 			length = intersectionDistance;
 			return true;

@@ -19,8 +19,11 @@
 
 #include "../World.hpp"
 
-#include <effect/SplatterSystem.hpp>
+#include <geometry/ParticleSystem.hpp>
 #include <scene/Scene.hpp>
+#include <utility/Quaternion.hpp>
+#include <resource/AudioSample.hpp>
+#include <resource/Material.hpp>
 
 
 Minigun::Minigun( World * world ) :
@@ -41,12 +44,22 @@ Minigun::Minigun( World * world ) :
 	mMaterial = new Material( scene()->glWidget(), "BlackSteel" );
 	mFireSound = new AudioSample( "minigun" );
 	mFireSound->setLooping( true );
+
+	mImpactParticleMaterial = new Material( scene()->glWidget(), "DirtParticle" );
+	mImpactParticles = new ParticleSystem( 128 );
+	mImpactParticles->setSize( 0.5f );
+	mImpactParticles->setGravity( QVector3D( 0.0f, -80.0f, 0.0f ) );
+	mImpactParticles->setDrag( 0.25f );
+	mImpactParticles->setMinLife( 1.0f );
+	mImpactParticles->setMaxLife( 2.0f );
 }
 
 
 Minigun::~Minigun()
 {
 	gluDeleteQuadric( mQuadric );
+	delete mImpactParticleMaterial;
+	delete mImpactParticles;
 	delete mMaterial;
 	delete mFireSound;
 }
@@ -85,51 +98,64 @@ void Minigun::reload()
 }
 
 
+void Minigun::setTarget( const QVector3D * target )
+{
+	mTarget = target;
+}
+
+
 void Minigun::updateSelf( const double & delta )
 {
-	if( mReload )
+	mImpactParticles->update( delta );
+	if( mDrawn )
 	{
-		if( mCoolDown <= 0.0f )
+		setRotation( QQuaternion::slerp( rotation(), getRotationToTarget( mTarget, 0.7f ), 2.0 * delta ) );
+		if( mReload )
 		{
-			reloadClip();
-
-			mReload = false;
-		}
-
-		spinDown( delta );
-	}
-	else if( mFired )
-	{
-		if( mClipAmmo == 0 )
-		{
-			mFireSound->stop();
-		}
-		else if( mCoolDown <= 0.0f && mRPM >= 600.0f )
-		{
-			mTrailStart = worldPosition();
-			mTrailDirection = worldDirection();
-			mTrailLength = mRange;
-			AObject * target = world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength );
-			mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
-			ACreature * victim = dynamic_cast<ACreature*>(target);
-			if( victim )
+			if( mCoolDown <= 0.0f )
 			{
-				victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
+				reloadClip();
+				mReload = false;
+			}
+			spinDown( delta );
+		}
+		else if( mFired )
+		{
+			if( mClipAmmo == 0 )
+			{
+				mFireSound->stop();
+			}
+			else if( mCoolDown <= 0.0f && mRPM >= 600.0f )
+			{
+				mTrailStart = worldPosition();
+				mTrailDirection = worldDirection();
+				mTrailLength = mRange;
+				AObject * target = world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength );
+				mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
+				ACreature * victim = dynamic_cast<ACreature*>(target);
+				if( victim )
+				{
+					victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
+				}
+				else
+				{
+					mImpactParticles->emitSpherical( mTrailEnd, 16, 5.0, 10.0, QVector3D(0,10,0) );
+				}
+
+				if( !mFireSound->isPlaying() )
+				{
+					mFireSound->play();
+				}
+				mClipAmmo--;
+				mCoolDown = 0.1f;
 			}
 
-			if( !mFireSound->isPlaying() )
-			{
-				mFireSound->play();
-			}
-			mClipAmmo--;
-			mCoolDown = 0.1f;
+			spinUp( delta );
 		}
-
-		spinUp( delta );
-	}
-	else
-	{
-		spinDown( delta );
+		else
+		{
+			spinDown( delta );
+		}
 	}
 
 	mRotation += mRPM * delta;
@@ -188,7 +214,17 @@ void Minigun::drawSelf()
 
 void Minigun::draw2Self()
 {
-	// TODO
+	glPushMatrix();
+	glLoadMatrix( world()->modelViewMatrix() );
+
+	// particles on impact
+	glEnable( GL_TEXTURE_2D );
+	glColor4f( 1, 1, 1, 1 );
+	mImpactParticleMaterial->bind();
+	mImpactParticles->draw( world()->modelViewMatrix() );
+	mImpactParticleMaterial->release();
+
+	glPopMatrix();
 }
 
 

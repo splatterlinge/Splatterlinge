@@ -173,7 +173,7 @@ void World::keyReleaseEvent( QKeyEvent * event )
 
 void World::updateSelf( const double & delta )
 {
-	mTimeOfDay += 0.01f * delta;
+	mTimeOfDay += 0.002f * delta;
 
 	if( mTimeLapse )
 		mTimeOfDay += 0.2f * delta;

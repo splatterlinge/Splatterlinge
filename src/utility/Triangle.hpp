@@ -40,7 +40,11 @@ public:
 	bool intersectRay( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance ) const
 		{ return intersectRay( mP, mQ, mR, origin, direction, intersectionDistance ); }
 
+	bool intersectCulledRay( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance ) const
+		{ return intersectCulledRay( mP, mQ, mR, origin, direction, intersectionDistance ); }
+
 	static bool intersectRay( const QVector3D & p, const QVector3D & q, const QVector3D & r, const QVector3D & origin, const QVector3D & direction, float * intersectionDistance );
+	static bool intersectCulledRay( const QVector3D & p, const QVector3D & q, const QVector3D & r, const QVector3D & origin, const QVector3D & direction, float * intersectionDistance );
 
 private:
 	QVector3D mP;

@@ -132,7 +132,7 @@ AObject * Dummy::intersectLine( const AObject * exclude, const QVector3D & origi
 	AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
 
 	float rayLength;
-	if( Sphere::intersectRay( worldPosition(), 4, origin, direction, &rayLength ) )
+	if( Sphere::intersectCulledRay( worldPosition(), 4, origin, direction, &rayLength ) )
 	{
 		if( rayLength < length )
 		{	// intersection closer than previous intersections?

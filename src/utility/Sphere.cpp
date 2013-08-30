@@ -47,7 +47,7 @@ bool Sphere::intersectSphere( const QVector3D & centerA, const float & radiusA,
 
 // http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection
 
-bool Sphere::intersectRay( const QVector3D & sphereCenter, const float & sphereRadius,
+bool Sphere::intersectCulledRay( const QVector3D & sphereCenter, const float & sphereRadius,
 	const QVector3D & rayOrigin, const QVector3D & rayDirection,
 	float * intersectionDistance )
 {

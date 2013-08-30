@@ -11,8 +11,6 @@
 #include <float.h>
 #include <QDebug>
 
-#define PI 3.14159265
-
 
 static const GLfloat GlobalPositionData[] =
 {
@@ -342,6 +340,7 @@ static QVector3D randomPointOnWorld( World * world )
 	return pos;
 }
 
+
 void Splatterling::randomDestinationPoint()
 {
 	QVector3D pos( RandomNumber::minMax( this->position().x() - 100, this->position().x() + 100 ), 0, RandomNumber::minMax( this->position().z() - 100, this->position().z() + 100 ) );
@@ -377,7 +376,7 @@ void Splatterling::updateSelf( const double & delta )
 
 				if(recalculationOfRotationAngle){
 					rotationAroundPlayer = asin((worldPosition().x() - world()->player()->worldPosition().x())/dist);
-					rotationAroundPlayer = rotationAroundPlayer * 180.0 / PI;
+					rotationAroundPlayer = rotationAroundPlayer * 180.0 / M_PI;
 					recalculationOfRotationAngle = false;
 				}
 
@@ -388,8 +387,8 @@ void Splatterling::updateSelf( const double & delta )
 					}
 
 					if(mTarget == world()->player()->worldPosition()){
-						setPositionX(world()->player()->worldPosition().x() + sin(rotationAroundPlayer*PI/180.0)*(12.8));
-						setPositionZ(world()->player()->worldPosition().z() + cos(rotationAroundPlayer*PI/180.0)*(12.8));
+						setPositionX(world()->player()->worldPosition().x() + sin(rotationAroundPlayer*M_PI/180.0)*(12.8));
+						setPositionZ(world()->player()->worldPosition().z() + cos(rotationAroundPlayer*M_PI/180.0)*(12.8));
 					}else{
 						recalculationOfRotationAngle = true;
 					}
@@ -553,7 +552,8 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 	return nearestTarget;
 }
 
-bool Splatterling::intersectBody(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance)
+
+bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
 {
 	QVector3D v0(PositionData[0], PositionData[1], PositionData[2]);
 	QVector3D v1(PositionData[3], PositionData[4], PositionData[5]);
@@ -568,7 +568,7 @@ bool Splatterling::intersectBody(const QVector3D & origin, const QVector3D & dir
 
 		v2 = QVector3D(PositionData[i*3], PositionData[i*3+1], PositionData[i*3+2]);
 
-		if( Triangle::intersectRay(this->pointToWorld(v0), this->pointToWorld(v1), this->pointToWorld(v2), origin, direction, intersectionDistance) )
+		if( Triangle::intersectCulledRay(this->pointToWorld(v0), this->pointToWorld(v1), this->pointToWorld(v2), origin, direction, intersectionDistance) )
 		{
 			targetBodyPart = TARGET_BODY;
 			return true;
@@ -577,27 +577,30 @@ bool Splatterling::intersectBody(const QVector3D & origin, const QVector3D & dir
 	return false;
 }
 
-bool Splatterling::intersectWing(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance)
+
+bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
 {
 	QVector3D v[3];
 
 	//FirstWing
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++)
+	{
 		v[i] = QVector3D(PositionData[(BodyVertexCount+HeadVertexCount+i)*3], PositionData[(BodyVertexCount+HeadVertexCount+i)*3+1], PositionData[(BodyVertexCount+HeadVertexCount+i)*3+2]);
 	}
-	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
-		Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
+	if( Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
+		Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
 	{
 		targetBodyPart = TARGET_WING_LEFT;
 		return true;
 	}
 
 	//SecondWing
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++)
+	{
 		v[i] = QVector3D(PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+1], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+2]);
 	}
-	if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
-		Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
+	if( Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
+		Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
 	{
 		targetBodyPart = TARGET_WING_RIGHT;
 		return true;
@@ -607,11 +610,11 @@ bool Splatterling::intersectWing(const QVector3D & origin, const QVector3D & dir
 }
 
 
-bool Splatterling::intersectHead(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance)
+bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
 {
 	QVector3D centerPoint(0.0f, 0.0f, PositionData[BodyVertexCount*3+HeadVertexCount*3-1]);
 
-	if(Sphere::intersectRay(this->pointToWorld(centerPoint),
+	if(Sphere::intersectCulledRay(this->pointToWorld(centerPoint),
 			1.0f*Splatterling::SplatterlinfSizeFactor,origin, direction, intersectionDistance)){
 		qDebug() << "sphere intersect";
 
@@ -649,8 +652,8 @@ bool Splatterling::intersectHead(const QVector3D & origin, const QVector3D & dir
 
 			v[2] = QVector3D(PositionData[i*3], PositionData[i*3+1], PositionData[i*3+2]);
 
-			if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
-					Triangle::intersectRay(this->pointToWorld(v[1]), this->pointToWorld(v[0]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) )
+			if( Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
+					Triangle::intersectCulledRay(this->pointToWorld(v[1]), this->pointToWorld(v[0]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) )
 			{
 				targetBodyPart = TARGET_HEAD;
 				return true;
@@ -683,6 +686,7 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 			world()->splatterSystem()->spray( splatterSource, damage / 2.0f );
 	}
 }
+
 
 void Splatterling::recalculateWingPosition()
 {

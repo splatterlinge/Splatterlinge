@@ -363,6 +363,23 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 		QPainter::TextAntialiasing |
 		QPainter::HighQualityAntialiasing );
 
+	// timer
+	QRect timerRect( rect.width()/2-100, 10, 200, 30 );
+	painter->setPen( QColor(255,255,255,200) );
+	int time = player->time();
+	int mm = time / 60;
+	int ss = time % 60;
+	QFont old = painter->font();
+	QFont f = painter->font();
+	f.setPointSize(24);
+	painter->setFont(f);
+	painter->drawText( timerRect,
+		Qt::AlignCenter | Qt::AlignTop,
+		QString( tr("%1:%2").
+				 arg(QString::number(mm), 2, '0').
+				 arg(QString::number(ss), 2, '0') ) );
+	painter->setFont(old);
+
 	// radar radius
 	QRect radarRect( rect.width()-160, 10, 150, 150 );
 	painter->setPen( QColor(0,0,0,0) );

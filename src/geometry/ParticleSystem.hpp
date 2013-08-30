@@ -64,7 +64,7 @@ public:
 	~ParticleSystem() {}
 	void update( const double & delta );
 	void draw( const QMatrix4x4 & modelView );
-	void emitSpherical( const QVector3D & source, int toEmit, const float & minVel, const float & maxVel );
+	void emitSpherical( const QVector3D & source, int toEmit, const float & minVel, const float & maxVel, const QVector3D & velOffset = QVector3D(0,0,0) );
 	const float & minLife() const { return mMinLife; }
 	const float & maxLife() const { return mMaxLife; }
 	const float & drag() const { return mDrag; }

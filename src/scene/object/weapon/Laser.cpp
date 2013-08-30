@@ -19,8 +19,12 @@
 
 #include "../World.hpp"
 
-#include <effect/SplatterSystem.hpp>
+
+#include <geometry/ParticleSystem.hpp>
+#include <resource/AudioSample.hpp>
+#include <resource/Material.hpp>
 #include <scene/Scene.hpp>
+#include <utility/Quaternion.hpp>
 
 
 Laser::Laser( World * world ) :
@@ -32,24 +36,35 @@ Laser::Laser( World * world ) :
 	mName = "Laser";
 	mDrawn = false;
 	mTrailVisibilityDuration = 1.0f;
-	mCoolDown = 2.0f;
 	mHeat = 0.0f;
 	mTrailAlpha = 0.0f;
 	mFired = false;
 	mRange = 250.0f;
 	mTrailRadius = 0.04f;
 	mDamage = 50.0f;
+
 	mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
+
 	mFireSound = new AudioSample( "laser" );
 	mFireSound->setLooping( false );
 	mReloadSound = new AudioSample( "laser_reload" );
 	mReloadSound->setLooping( false );
+
+	mImpactParticleMaterial = new Material( scene()->glWidget(), "GlowParticle" );
+	mImpactParticles = new ParticleSystem( 64 );
+	mImpactParticles->setSize( 0.25f );
+	mImpactParticles->setGravity( QVector3D( 0.0f, -20.0f, 0.0f ) );
+	mImpactParticles->setDrag( 0.75f );
+	mImpactParticles->setMinLife( 1.0f );
+	mImpactParticles->setMaxLife( 2.0f );
 }
 
 
 Laser::~Laser()
 {
 	gluDeleteQuadric( mQuadric );
+	delete mImpactParticleMaterial;
+	delete mImpactParticles;
 	delete mMaterial;
 	delete mFireSound;
 	delete mReloadSound;
@@ -77,39 +92,44 @@ void Laser::pull()
 void Laser::holster()
 {
 	mDrawn = false;
-
-	mFireSound->stop();
-	mReloadSound->stop();
 }
 
 
-void Laser::reload()
+void Laser::setTarget( const QVector3D * target )
 {
+	mTarget = target;
 }
+
 
 void Laser::updateSelf( const double & delta )
 {
-	if( mFired )
+	mImpactParticles->update( delta );
+	if( mDrawn )
 	{
-		if( mHeat <= 0.0f && mClipAmmo > 0 )
+		setRotation( QQuaternion::slerp( rotation(), getRotationToTarget( mTarget, 0.3f ), 20.0 * delta ) );
+		if( mFired )
 		{
-			mHeat = 3.0f;
-			mTrailAlpha = 1.0f;
-			mTrailStart = worldPosition();
-			mTrailDirection = worldDirection();
-			mTrailLength = mRange;
-			AObject * target = world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength );
-			mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
-			ACreature * victim = dynamic_cast<ACreature*>(target);
-			if( victim )
+			if( mHeat <= 0.0f && mClipAmmo > 0 )
 			{
-				victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
-			}
+				mHeat = 3.0f;
+				mTrailAlpha = 1.0f;
+				mTrailStart = worldPosition();
+				mTrailDirection = worldDirection();
+				mTrailLength = mRange;
+				AObject * target = world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength );
+				mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
+				ACreature * victim = dynamic_cast<ACreature*>(target);
+				if( victim )
+				{
+					victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
+				}
+				mImpactParticles->emitSpherical( mTrailEnd, 64, 5.0, 10.0, QVector3D(0,10,0) );
 
-			mFireSound->play();
-			mReloadSound->play();
-			mClipAmmo--;
-			mAmmo--;
+				mFireSound->play();
+				mReloadSound->play();
+				mClipAmmo--;
+				mAmmo--;
+			}
 		}
 	}
 
@@ -120,11 +140,7 @@ void Laser::updateSelf( const double & delta )
 	else
 	{
 		mHeat = 0.0f;
-
 		mClipAmmo = mClipSize;
-
-		if( mReloadSound->isPlaying() )
-			mReloadSound->stop();
 	}
 
 	if( mTrailAlpha > delta )
@@ -136,33 +152,39 @@ void Laser::updateSelf( const double & delta )
 
 void Laser::drawSelf()
 {
-	if( mDrawn )
-	{
-		mMaterial->bind();
-		glTranslatef( 0.0f, 0.0f, -0.2f );
-		gluCylinder( mQuadric, 0.08f, 0.08f, 0.4f, 16, 16 );
-		gluCylinder( mQuadric, 0.15f, 0.10f, 0.2f, 16, 16 );
-		mMaterial->release();
-	}
+	if( !mDrawn )
+		return;
+
+	mMaterial->bind();
+	glTranslatef( 0.0f, 0.0f, -0.2f );
+	gluCylinder( mQuadric, 0.08f, 0.08f, 0.4f, 16, 16 );
+	gluCylinder( mQuadric, 0.15f, 0.10f, 0.2f, 16, 16 );
+	mMaterial->release();
 }
 
 
 void Laser::draw2Self()
 {
-	glColor4f( 0.2, 0.4, 1.0f, mTrailAlpha );
-
-	glDisable( GL_TEXTURE_2D );
-	glDisable( GL_LIGHTING );
-	glDisable( GL_CULL_FACE );
+	glPushMatrix();
+	glLoadMatrix( world()->modelViewMatrix() );
 
 	glDepthMask( GL_FALSE );
 	glEnable( GL_BLEND );
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 
+	// particles on impact
+	glEnable( GL_TEXTURE_2D );
+	glColor4f( 0.2f, 0.4f, 1.0f, 1.0f );
+	mImpactParticleMaterial->bind();
+	mImpactParticles->draw( world()->modelViewMatrix() );
+	mImpactParticleMaterial->release();
+
+	// trail
+	glColor4f( 0.2f, 0.4f, 1.0f, mTrailAlpha );
+	glDisable( GL_TEXTURE_2D );
+	glDisable( GL_LIGHTING );
 	QVector3D toEye = scene()->eye()->position() - mTrailStart;
 	QVector3D crossDir = QVector3D::crossProduct( mTrailDirection, toEye ).normalized();
-
-	glLoadMatrix( scene()->eye()->viewMatrix() );
 	glBegin( GL_TRIANGLE_STRIP );
 		glVertex(-crossDir*mTrailRadius + mTrailStart);
 		glVertex( crossDir*mTrailRadius + mTrailStart);
@@ -172,4 +194,6 @@ void Laser::draw2Self()
 
 	glDisable( GL_BLEND );
 	glDepthMask( GL_TRUE );
+
+	glPopMatrix();
 }

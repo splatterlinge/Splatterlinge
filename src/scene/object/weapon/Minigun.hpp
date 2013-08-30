@@ -18,11 +18,14 @@
 #ifndef SCENE_OBJECT_WEAPON_MINIGUN_INCLUDED
 #define SCENE_OBJECT_WEAPON_MINIGUN_INCLUDED
 
-#include <qmath.h>
+
 #include "AWeapon.hpp"
-#include "resource/AudioSample.hpp"
+
 
 class Material;
+class ParticleSystem;
+class AudioSample;
+
 struct GLUquadric;
 
 
@@ -42,6 +45,7 @@ public:
 	virtual void holster();
 	virtual void pull();
 	virtual void reload();
+	virtual void setTarget( const QVector3D * target );
 
 private:
 	void spinUp( const double & delta );
@@ -59,11 +63,14 @@ private:
 	float mDamage;
 	float mRotation;
 	double mRPM;
+	const QVector3D * mTarget;
 	QVector3D mTrailStart;
 	QVector3D mTrailDirection;
 	QVector3D mTrailEnd;
 	Material * mMaterial;
 	AudioSample * mFireSound;
+	Material * mImpactParticleMaterial;
+	ParticleSystem * mImpactParticles;
 };
 
 
