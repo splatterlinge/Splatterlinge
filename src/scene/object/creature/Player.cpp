@@ -55,7 +55,6 @@ Player::Player( World * world ) :
 	mDragTeapot = false;
 
 	mCurrentWeapon = QSharedPointer<AWeapon>();
-	giveWeapon( QSharedPointer<AWeapon>( new Laser(world) ) );
 
 	mTorch = QSharedPointer<Torch>( new Torch( world ) );
 	mTorch->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) + 1.0f );
@@ -239,10 +238,6 @@ void Player::updateSelf( const double & delta )
 			if( mCurrentWeapon )
 			{
 				mCurrentWeapon->setPosition( QVector3D(-0.5f,-0.5f-0.1*QVector3D::dotProduct(QVector3D(0,1,0),direction()), 0.5f ) );
-				if( mTargetAvailable )
-					mCurrentWeapon->setTarget( &mTarget );
-				else
-					mCurrentWeapon->setTarget( NULL );
 			}
 
 			break;
@@ -354,6 +349,7 @@ void Player::giveWeapon( QSharedPointer< AWeapon > weapon )
 	if( mCurrentWeapon )
 		mCurrentWeapon->holster();
 	mCurrentWeapon = *(--mWeapons.end());
+	mCurrentWeapon->setTarget( &mTarget );
 	mCurrentWeapon->pull();
 }
 

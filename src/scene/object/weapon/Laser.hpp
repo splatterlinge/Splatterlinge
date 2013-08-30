@@ -55,6 +55,7 @@ private:
 	float mTrailAlpha;
 	float mTrailVisibilityDuration;
 	float mDamage;
+	const QVector3D * mTarget;
 	QVector3D mTrailStart;
 	QVector3D mTrailDirection;
 	QVector3D mTrailEnd;

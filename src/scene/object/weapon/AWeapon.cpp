@@ -17,6 +17,8 @@
 
 #include "AWeapon.hpp"
 
+#include <utility/Quaternion.hpp>
+
 
 AWeapon::AWeapon( World * world ) :
 	AWorldObject::AWorldObject( world )
@@ -30,6 +32,31 @@ AWeapon::AWeapon( World *world, int ammo, int ammoclip, int clipsize ) :
 	mClipAmmo( ammoclip ),
 	mClipSize( clipsize )
 {
+}
+
+
+QQuaternion AWeapon::getRotationToTarget( const QVector3D * target, const float & maxRotationDP )
+{
+	if( target )
+	{
+		QMatrix4x4 parentModelMatrix;
+		if( parent() )
+		{
+			parentModelMatrix = parent()->modelMatrix();
+		} else {
+			parentModelMatrix.setToIdentity();
+		}
+
+		QVector3D localTarget = ( parentModelMatrix.inverted() * QVector4D(*target,1) ).toVector3D();
+		QVector3D dirToLocalTarget = ( localTarget - position() ).normalized();
+
+		if( QVector3D::dotProduct( dirToLocalTarget, QVector3D(0,0,1) ) < maxRotationDP )
+			return QQuaternion();
+		else
+			return Quaternion::fromTo( QVector3D(0,0,1), dirToLocalTarget );
+	}
+	else
+		return QQuaternion();
 }
 
 

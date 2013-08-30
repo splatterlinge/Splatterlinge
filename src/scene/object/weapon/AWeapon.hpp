@@ -50,6 +50,8 @@ public:
 	void setAmmo( const int & ammo ) { mAmmo = ammo; }
 
 protected:
+	QQuaternion getRotationToTarget( const QVector3D * target, const float & maxRotationDP = 0.0f );
+
 	QString mName;
 	int mAmmo;
 	int mClipAmmo;

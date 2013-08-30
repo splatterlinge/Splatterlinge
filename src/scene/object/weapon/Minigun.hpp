@@ -60,6 +60,7 @@ private:
 	float mDamage;
 	float mRotation;
 	double mRPM;
+	const QVector3D * mTarget;
 	QVector3D mTrailStart;
 	QVector3D mTrailDirection;
 	QVector3D mTrailEnd;

@@ -82,23 +82,7 @@ void Laser::holster()
 
 void Laser::setTarget( const QVector3D * target )
 {
-	if( target )
-	{
-		QMatrix4x4 parentModelMatrix;
-		if( parent() )
-		{
-			parentModelMatrix = parent()->modelMatrix();
-		} else {
-			parentModelMatrix.setToIdentity();
-		}
-
-		QVector3D localTarget = ( parentModelMatrix.inverted() * QVector4D(*target,1) ).toVector3D();
-		QVector3D dirToLocalTarget = ( localTarget - position() ).normalized();
-
-		setRotation( Quaternion::fromTo( QVector3D(0,0,1), dirToLocalTarget ) );
-	}
-	else
-		setRotation( QQuaternion() );
+	mTarget = target;
 }
 
 
@@ -106,6 +90,7 @@ void Laser::updateSelf( const double & delta )
 {
 	if( mDrawn )
 	{
+		setRotation( QQuaternion::slerp( rotation(), getRotationToTarget( mTarget, 0.3f ), 20.0 * delta ) );
 		if( mFired )
 		{
 			if( mHeat <= 0.0f && mClipAmmo > 0 )
