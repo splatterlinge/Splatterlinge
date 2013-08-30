@@ -135,7 +135,7 @@ void ParticleSystem::draw( const QMatrix4x4 & modelView )
 }
 
 
-void ParticleSystem::emitSpherical( const QVector3D & source, int toEmit, const float & minVel, const float & maxVel )
+void ParticleSystem::emitSpherical( const QVector3D & source, int toEmit, const float & minVel, const float & maxVel, const QVector3D & velOffset )
 {
 	for( int i=0; i<mParticles.size() && toEmit>0; ++i )
 	{
@@ -145,7 +145,7 @@ void ParticleSystem::emitSpherical( const QVector3D & source, int toEmit, const 
 		--toEmit;
 		QVector3D direction = RandomNumber::inUnitSphere();
 		direction.normalize();
-		mParticles[i].rVelocity() = direction * RandomNumber::minMax( minVel, maxVel );
+		mParticles[i].rVelocity() = direction * RandomNumber::minMax( minVel, maxVel ) + velOffset;
 		mParticles[i].rPosition() = source;
 		mParticles[i].rLife() = RandomNumber::minMax( mMinLife, mMaxLife );
 	}

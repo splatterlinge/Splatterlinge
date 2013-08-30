@@ -20,9 +20,12 @@
 
 
 #include "AWeapon.hpp"
-#include "resource/AudioSample.hpp"
 
+
+class ParticleSystem;
 class Material;
+class AudioSample;
+
 struct GLUquadric;
 
 
@@ -62,6 +65,8 @@ private:
 	Material * mMaterial;
 	AudioSample * mFireSound;
 	AudioSample * mReloadSound;
+	Material * mImpactParticleMaterial;
+	ParticleSystem * mImpactParticles;
 };
 
 

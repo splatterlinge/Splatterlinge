@@ -18,11 +18,14 @@
 #ifndef SCENE_OBJECT_WEAPON_MINIGUN_INCLUDED
 #define SCENE_OBJECT_WEAPON_MINIGUN_INCLUDED
 
-#include <qmath.h>
+
 #include "AWeapon.hpp"
-#include "resource/AudioSample.hpp"
+
 
 class Material;
+class ParticleSystem;
+class AudioSample;
+
 struct GLUquadric;
 
 
@@ -66,6 +69,8 @@ private:
 	QVector3D mTrailEnd;
 	Material * mMaterial;
 	AudioSample * mFireSound;
+	Material * mImpactParticleMaterial;
+	ParticleSystem * mImpactParticles;
 };
 
 

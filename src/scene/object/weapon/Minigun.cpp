@@ -19,9 +19,11 @@
 
 #include "../World.hpp"
 
-#include <effect/SplatterSystem.hpp>
+#include <geometry/ParticleSystem.hpp>
 #include <scene/Scene.hpp>
 #include <utility/Quaternion.hpp>
+#include <resource/AudioSample.hpp>
+#include <resource/Material.hpp>
 
 
 Minigun::Minigun( World * world ) :
@@ -42,12 +44,22 @@ Minigun::Minigun( World * world ) :
 	mMaterial = new Material( scene()->glWidget(), "BlackSteel" );
 	mFireSound = new AudioSample( "minigun" );
 	mFireSound->setLooping( true );
+
+	mImpactParticleMaterial = new Material( scene()->glWidget(), "DirtParticle" );
+	mImpactParticles = new ParticleSystem( 128 );
+	mImpactParticles->setSize( 0.5f );
+	mImpactParticles->setGravity( QVector3D( 0.0f, -80.0f, 0.0f ) );
+	mImpactParticles->setDrag( 0.25f );
+	mImpactParticles->setMinLife( 1.0f );
+	mImpactParticles->setMaxLife( 2.0f );
 }
 
 
 Minigun::~Minigun()
 {
 	gluDeleteQuadric( mQuadric );
+	delete mImpactParticleMaterial;
+	delete mImpactParticles;
 	delete mMaterial;
 	delete mFireSound;
 }
@@ -94,6 +106,7 @@ void Minigun::setTarget( const QVector3D * target )
 
 void Minigun::updateSelf( const double & delta )
 {
+	mImpactParticles->update( delta );
 	if( mDrawn )
 	{
 		setRotation( QQuaternion::slerp( rotation(), getRotationToTarget( mTarget, 0.7f ), 2.0 * delta ) );
@@ -123,6 +136,10 @@ void Minigun::updateSelf( const double & delta )
 				if( victim )
 				{
 					victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
+				}
+				else
+				{
+					mImpactParticles->emitSpherical( mTrailEnd, 16, 5.0, 10.0, QVector3D(0,10,0) );
 				}
 
 				if( !mFireSound->isPlaying() )
@@ -197,7 +214,17 @@ void Minigun::drawSelf()
 
 void Minigun::draw2Self()
 {
-	// TODO
+	glPushMatrix();
+	glLoadMatrix( world()->modelViewMatrix() );
+
+	// particles on impact
+	glEnable( GL_TEXTURE_2D );
+	glColor4f( 1, 1, 1, 1 );
+	mImpactParticleMaterial->bind();
+	mImpactParticles->draw( world()->modelViewMatrix() );
+	mImpactParticleMaterial->release();
+
+	glPopMatrix();
 }
 
 
