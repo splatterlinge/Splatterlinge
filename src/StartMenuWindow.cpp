@@ -95,6 +95,10 @@ void StartMenuWindow::initMenu()
 void StartMenuWindow::handleNewGameButton()
 {
 	//TODO: implement
+	World * world = dynamic_cast<World*>(mScene->root());
+	delete world;
+	world = new World( mScene, "earth" );
+	mScene->setRoot( world );
 	this->setVisible( false );
 }
 

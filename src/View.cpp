@@ -147,7 +147,7 @@ View::~View()
 	alcMakeContextCurrent( NULL );
 	alcDestroyContext( mALContext );
 	alcCloseDevice( mALDevice );
-	delete mWorld;
+	delete mScene->root();
 	delete mScene;
 	delete mGLWidget;
 }

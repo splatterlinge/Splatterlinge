@@ -288,7 +288,6 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 		delta = 1;
 	mDelta = (double)delta/1000000000.0;
 
-
 	updateObjects( mDelta );
 
 	if( mStereo )
@@ -354,7 +353,10 @@ void Scene::drawFPS( QPainter * painter, const QRectF & rect )
 
 void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 {
-	QSharedPointer<Player> player = ((World *)mRoot)->player();
+	World * world = dynamic_cast<World*>(mRoot);
+	if( !world )
+		return;
+	QSharedPointer<Player> player = world->player();
 
 	painter->setFont( mFont );
 	painter->setRenderHints(
