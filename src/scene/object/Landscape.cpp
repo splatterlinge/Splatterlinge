@@ -32,6 +32,7 @@
 #include <QSettings>
 #include <QGLShaderProgram>
 
+int Landscape::Blob::sQuality = 0;
 
 Landscape::Landscape( World * world, QString name ) :
 	AWorldObject( world )
@@ -84,6 +85,7 @@ Landscape::Landscape( World * world, QString name ) :
 					s.value( "materialScaleS", 1.0f ).toFloat(),
 					s.value( "materialScaleT", 1.0f ).toFloat()
 				),
+				s.value("priority").toInt(),
 				"./data/landscape/"+name+"/"+s.value("maskPath").toString()
 			);
 			mBlobs.append( b );
@@ -100,13 +102,13 @@ Landscape::Landscape( World * world, QString name ) :
 			{
 				f = QSharedPointer<AObject>( new Forest( this,
 						s.value("model").toString(), s.value("position").toPoint(),
-						s.value("radius").toInt(), s.value("number").toInt() ) );
+						s.value("radius").toInt(), s.value("number").toInt(), s.value("priority").toInt() ) );
 			}
 			else if( type == "grass" )
 			{
 				f = QSharedPointer<AObject>( new Grass( this,
 						s.value("model").toString(), s.value("position").toPoint(),
-						s.value("radius").toInt(), s.value("number").toInt() ) );
+						s.value("radius").toInt(), s.value("number").toInt(), s.value("priority").toInt()) );
 			}
 
 			mVegetation.append( f );
@@ -356,7 +358,7 @@ QVector<AObject*> Landscape::collideSphere( const AObject * exclude, const float
 // Blob
 
 
-Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, QVector2D materialScale, QString blobMapPath )
+Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, QVector2D materialScale, int priority, QString blobMapPath )
 {
 	mGLWidget = landscape->scene()->glWidget();
 	mLandscape = landscape;
@@ -370,6 +372,7 @@ Landscape::Blob::Blob( Landscape * landscape, QRect rect, QString materialName, 
 	}
 	mBlobMap =  mGLWidget->bindTexture( blobMap );
 	mMaterial->setBlobMap( mBlobMap );
+	mPriority = priority;
 }
 
 
@@ -382,28 +385,31 @@ Landscape::Blob::~Blob()
 
 void Landscape::Blob::drawPatchMap( const QRect & visible )
 {
-	QRect rectToDraw = mRect.intersected( visible );
-	if( rectToDraw.width() <= 1 || rectToDraw.height() <= 1 )
-		return;	// nothing to draw
+	if( mPriority >= 99-sQuality)
+	{
+		QRect rectToDraw = mRect.intersected( visible );
+		if( rectToDraw.width() <= 1 || rectToDraw.height() <= 1 )
+			return;	// nothing to draw
 
-	mMaterial->bind();
-	glMatrixMode( GL_TEXTURE );
+		mMaterial->bind();
+		glMatrixMode( GL_TEXTURE );
 
-	glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
-	glScaled( mMaterialScale.x(), -mMaterialScale.y(), 1.0 );
+		glActiveTexture( GL_TEXTURE0 );	glPushMatrix();
+		glScaled( mMaterialScale.x(), -mMaterialScale.y(), 1.0 );
 
-	glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
-	glScaled( 1.0/((double)mRect.width()), -1.0/((double)mRect.height()), 1.0 );
-	glTranslated( -mRect.x(), -mRect.y(), 0.0 );
+		glActiveTexture( GL_TEXTURE1 );	glPushMatrix();
+		glScaled( 1.0/((double)mRect.width()), -1.0/((double)mRect.height()), 1.0 );
+		glTranslated( -mRect.x(), -mRect.y(), 0.0 );
 
-	mLandscape->terrain()->drawPatchMap( rectToDraw );
+		mLandscape->terrain()->drawPatchMap( rectToDraw );
 
-	glMatrixMode( GL_TEXTURE );
-	glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
-	glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
+		glMatrixMode( GL_TEXTURE );
+		glActiveTexture( GL_TEXTURE1 );	glPopMatrix();
+		glActiveTexture( GL_TEXTURE0 );	glPopMatrix();
 
-	glMatrixMode( GL_MODELVIEW );
-	mMaterial->release();
+		glMatrixMode( GL_MODELVIEW );
+		mMaterial->release();
+	}
 }
 
 

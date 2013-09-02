@@ -47,6 +47,10 @@ private:
 	QSlider * mMaterialQuality;
 	QLabel * mMaterialAnisotropyLabel;
 	QSlider * mMaterialAnisotropy;
+	QLabel * mLandscapeBlobPriorityLabel;
+	QSlider * mLandscapeBlobPriority;
+	QLabel * mLandscapeVegetationPriorityLabel;
+	QSlider * mLandscapeVegetationPriority;
 	QLabel * mFarPlaneLabel;
 	QSlider * mFarPlane;
 	QCheckBox * mMultiSample;
@@ -57,6 +61,8 @@ public slots:
 	void setMaterialQuality( int q );
 	void setSplatterQuality( int q );
 	void setMaterialFilterAnisotropy( int a );
+	void setBlobQuality( int q );
+	void setVegetationQuality( int q );
 	void setFarPlane( int distance );
 	void setMultiSample( int state );
 	void setStereo( int state );

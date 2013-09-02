@@ -61,6 +61,7 @@ Player::Player( World * world ) :
 	world->add( mTorch );
 	mDragTorch = false;
 
+	mPoints = 0;
 	mAliveTimer.start();
 
 	scene()->addKeyListener( this );
@@ -327,6 +328,12 @@ void Player::receiveDamage( int damage, const QVector3D * position, const QVecto
 			}
 		}
 	}
+}
+
+
+void Player::receivePoints( int points )
+{
+	mPoints += points;
 }
 
 

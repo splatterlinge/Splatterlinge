@@ -369,7 +369,7 @@ void Splatterling::updateSelf( const double & delta )
 		}
 		case ALIVE:
 		{
-/*			mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
+			mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
 			GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
 
 			if( dist < 13 )
@@ -446,8 +446,10 @@ void Splatterling::updateSelf( const double & delta )
 			recalculateWingPosition();
 
 			if( life() <= 0 )
+			{
 				setState( DYING );
-*/
+				world()->player()->receivePoints( 100 );
+			}
 			break;
 		}
 		case DYING:
