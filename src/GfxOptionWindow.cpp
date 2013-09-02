@@ -86,6 +86,18 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	mLayout->addWidget( mLandscapeVegetationPriorityLabel );
 	mLayout->addWidget( mLandscapeVegetationPriority );
 
+	mMaterialAnisotropyLabel = new QLabel();
+	mMaterialAnisotropy = new QSlider( Qt::Horizontal );
+	mMaterialAnisotropy->setRange( 1, Material::filterAnisotropyMaximum() );
+	mMaterialAnisotropy->setSingleStep( 1 );
+	mMaterialAnisotropy->setPageStep( 1 );
+	//     materialAnisotropy->setTickPosition( QSlider::TicksAbove );
+	mMaterialAnisotropy->setValue( Material::filterAnisotropy() );
+	setMaterialFilterAnisotropy( mMaterialAnisotropy->value() );
+	QObject::connect( mMaterialAnisotropy, SIGNAL(valueChanged(int)), this, SLOT(setMaterialFilterAnisotropy(int)) );
+	mLayout->addWidget( mMaterialAnisotropyLabel );
+	mLayout->addWidget( mMaterialAnisotropy );
+
 	mFarPlaneLabel = new QLabel();
 	mFarPlane = new QSlider( Qt::Horizontal );
 	mFarPlane->setRange( 50, 1000 );
