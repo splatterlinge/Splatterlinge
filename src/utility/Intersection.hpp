@@ -1,12 +1,12 @@
 #ifndef INTERSECTION_HPP
 #define INTERSECTION_HPP
 
-#include <stdlib.h>
 #include <QVector4D>
 #include <QVector3D>
 #include <qmatrix4x4.h>
 #include <QtGlobal>
-#include <GL/freeglut.h>
+#include <GLWidget.hpp>
+
 #include "Triangle.hpp"
 
 namespace Intersection
