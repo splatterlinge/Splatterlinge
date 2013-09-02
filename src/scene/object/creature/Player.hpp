@@ -50,8 +50,10 @@ public:
 	virtual void mouseWheelEvent( QGraphicsSceneWheelEvent * event );
 
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
+	virtual void receivePoints( int points );
 
 	const int & armor() const { return mArmor; }
+	const int & points() const { return mPoints; }
 	const int time() const;
 	QSharedPointer<AWeapon> currentWeapon() { return mCurrentWeapon; }
 	const QList< QSharedPointer<AWeapon> > & weapons() const { return mWeapons; }
@@ -91,6 +93,7 @@ private:
 	QSharedPointer<Torch> mTorch;
 	QList< QSharedPointer<AWeapon> > mWeapons;
 	QSharedPointer<AWeapon> mCurrentWeapon;
+	int mPoints;
 	QTime mAliveTimer;
 
 	void updateRotation( const double & delta );

@@ -443,7 +443,10 @@ void Splatterling::updateSelf( const double & delta )
 			recalculateWingPosition();
 
 			if( life() <= 0 )
+			{
 				setState( DYING );
+				world()->player()->receivePoints( 100 );
+			}
 
 			break;
 		}

@@ -365,6 +365,13 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 		QPainter::TextAntialiasing |
 		QPainter::HighQualityAntialiasing );
 
+	// points
+	QRect pointsRect( rect.left()+10, rect.top()+10, 200, 30 );
+	painter->setPen( QColor(255,255,255,200) );
+	painter->drawText( pointsRect,
+		Qt::AlignLeft | Qt::AlignTop,
+					   QString( tr("Points: %1").arg(player->points())) );
+
 	// timer
 	QRect timerRect( rect.width()/2-100, 10, 200, 30 );
 	painter->setPen( QColor(255,255,255,200) );
