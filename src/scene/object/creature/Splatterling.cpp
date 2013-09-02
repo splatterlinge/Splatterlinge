@@ -4,6 +4,7 @@
 #include <resource/Material.hpp>
 #include <effect/SplatterSystem.hpp>
 #include <utility/RandomNumber.hpp>
+#include <utility/Intersection.hpp>
 #include <utility/Quaternion.hpp>
 #include <utility/Sphere.hpp>
 
@@ -366,7 +367,7 @@ void Splatterling::updateSelf( const double & delta )
 		}
 		case ALIVE:
 		{
-			mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
+/*			mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
 			GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
 
 			if( dist < 13 )
@@ -444,7 +445,7 @@ void Splatterling::updateSelf( const double & delta )
 
 			if( life() <= 0 )
 				setState( DYING );
-
+*/
 			break;
 		}
 		case DYING:
@@ -555,24 +556,16 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 
 bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
 {
-	QVector3D v0(PositionData[0], PositionData[1], PositionData[2]);
-	QVector3D v1(PositionData[3], PositionData[4], PositionData[5]);
-	QVector3D v2;
 
-	for(int i = 2; i < 6; i++)
-	{
-		if(i != 2)
-		{
-			v1 = v2;
-		}
 
-		v2 = QVector3D(PositionData[i*3], PositionData[i*3+1], PositionData[i*3+2]);
+	if(Intersection::intersectTriangleFan(PositionData, 6, 15, modelMatrix(), origin, direction, intersectionDistance)){
+		targetBodyPart = TARGET_BODY;
+		return true;
+	}
 
-		if( Triangle::intersectCulledRay(this->pointToWorld(v0), this->pointToWorld(v1), this->pointToWorld(v2), origin, direction, intersectionDistance) )
-		{
-			targetBodyPart = TARGET_BODY;
-			return true;
-		}
+	if(Intersection::intersectTriangleStrip(PositionData, 15, BodyVertexCount-1, modelMatrix(), origin, direction, intersectionDistance)){
+		targetBodyPart = TARGET_BODY;
+		return true;
 	}
 	return false;
 }
@@ -619,45 +612,15 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 		qDebug() << "sphere intersect";
 
 		//inner
-		QVector3D v[3];
-		v[0] = QVector3D(PositionData[BodyVertexCount*3], PositionData[BodyVertexCount*3+1], PositionData[BodyVertexCount*3+2]);
-		v[1] = QVector3D(PositionData[BodyVertexCount*3+3], PositionData[BodyVertexCount*3+4], PositionData[BodyVertexCount*3+5]);
-
-		for(int i = BodyVertexCount+2; i < BodyVertexCount+10; i++)
-		{
-			if(i != BodyVertexCount+2)
-			{
-				v[1] = v[2];
-			}
-
-			v[2] = QVector3D(PositionData[i*3], PositionData[i*3+1], PositionData[i*3+2]);
-
-			if( Triangle::intersectRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) )
-			{
-				targetBodyPart = TARGET_HEAD;
-				return true;
-			}
+		if(Intersection::intersectTriangleFan(PositionData, BodyVertexCount, BodyVertexCount+9, modelMatrix(), origin, direction, intersectionDistance)){
+			targetBodyPart = TARGET_HEAD;
+			return true;
 		}
 
 		//Outter
-		v[0] = QVector3D(PositionData[(BodyVertexCount+10)*3], PositionData[(BodyVertexCount+10)*3+1], PositionData[(BodyVertexCount+10)*3+2]);
-		v[1] = QVector3D(PositionData[(BodyVertexCount+10)*3+3], PositionData[(BodyVertexCount+10)*3+4], PositionData[(BodyVertexCount+10)*3+5]);
-
-		for(int i = BodyVertexCount+12; i < BodyVertexCount+HeadVertexCount-4; i++)
-		{
-			if(i != BodyVertexCount+12){
-				v[0] = v[1];
-				v[1] = v[2];
-			}
-
-			v[2] = QVector3D(PositionData[i*3], PositionData[i*3+1], PositionData[i*3+2]);
-
-			if( Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
-					Triangle::intersectCulledRay(this->pointToWorld(v[1]), this->pointToWorld(v[0]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) )
-			{
-				targetBodyPart = TARGET_HEAD;
-				return true;
-			}
+		if(Intersection::intersectTriangleStrip(PositionData, BodyVertexCount+10, BodyVertexCount+HeadVertexCount-5, modelMatrix(), origin, direction, intersectionDistance)){
+			targetBodyPart = TARGET_HEAD;
+			return true;
 		}
 	}
 
