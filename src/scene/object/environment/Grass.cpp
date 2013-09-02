@@ -6,8 +6,8 @@
 #include <utility/Sphere.hpp>
 
 
-Grass::Grass( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number ) :
-	AWorldObject( landscape->world() ),
+Grass::Grass( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number, int priority ) :
+	AVegetation( landscape->world(), priority ),
 	mLandscape( landscape )
 {
 	QPointF position = mLandscape->terrain()->fromMap( mapPosition );
@@ -56,5 +56,6 @@ void Grass::updateSelf( const double & delta )
 
 void Grass::drawSelf()
 {
-	mModel->draw( mInstances );
+	if( mPriority >= 99-quality() )
+		mModel->draw( mInstances );
 }

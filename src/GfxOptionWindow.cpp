@@ -18,6 +18,8 @@
 #include "GfxOptionWindow.hpp"
 
 #include <resource/Material.hpp>
+#include <scene/object/environment/AVegetation.hpp>
+#include <scene/object/Landscape.hpp>
 #include <scene/Scene.hpp>
 #include <scene/object/World.hpp>
 
@@ -62,17 +64,27 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	mLayout->addWidget( mMaterialQualityLabel );
 	mLayout->addWidget( mMaterialQuality );
 
-	mMaterialAnisotropyLabel = new QLabel();
-	mMaterialAnisotropy = new QSlider( Qt::Horizontal );
-	mMaterialAnisotropy->setRange( 1, Material::filterAnisotropyMaximum() );
-	mMaterialAnisotropy->setSingleStep( 1 );
-	mMaterialAnisotropy->setPageStep( 1 );
-//	materialAnisotropy->setTickPosition( QSlider::TicksAbove );
-	mMaterialAnisotropy->setValue( Material::filterAnisotropy() );
-	setMaterialFilterAnisotropy( mMaterialAnisotropy->value() );
-	QObject::connect( mMaterialAnisotropy, SIGNAL(valueChanged(int)), this, SLOT(setMaterialFilterAnisotropy(int)) );
-	mLayout->addWidget( mMaterialAnisotropyLabel );
-	mLayout->addWidget( mMaterialAnisotropy );
+	mLandscapeBlobPriorityLabel = new QLabel();
+	mLandscapeBlobPriority = new QSlider( Qt::Horizontal );
+	mLandscapeBlobPriority->setRange( 0, 99 );
+	mLandscapeBlobPriority->setSingleStep( 1 );
+	mLandscapeBlobPriority->setPageStep( 1 );
+	mLandscapeBlobPriority->setValue( Landscape::Blob::quality() );
+	setBlobQuality( mLandscapeBlobPriority->value() );
+	QObject::connect( mLandscapeBlobPriority, SIGNAL(valueChanged(int)), this, SLOT(setBlobQuality(int)) );
+	mLayout->addWidget( mLandscapeBlobPriorityLabel );
+	mLayout->addWidget( mLandscapeBlobPriority );
+
+	mLandscapeVegetationPriorityLabel = new QLabel();
+	mLandscapeVegetationPriority = new QSlider( Qt::Horizontal );
+	mLandscapeVegetationPriority->setRange( 0, 99 );
+	mLandscapeVegetationPriority->setSingleStep( 1 );
+	mLandscapeVegetationPriority->setPageStep( 1 );
+	mLandscapeVegetationPriority->setValue( AVegetation::quality() );
+	setVegetationQuality( mLandscapeVegetationPriority->value() );
+	QObject::connect( mLandscapeVegetationPriority, SIGNAL(valueChanged(int)), this, SLOT(setVegetationQuality(int)) );
+	mLayout->addWidget( mLandscapeVegetationPriorityLabel );
+	mLayout->addWidget( mLandscapeVegetationPriority );
 
 	mFarPlaneLabel = new QLabel();
 	mFarPlane = new QSlider( Qt::Horizontal );
@@ -152,6 +164,26 @@ void GfxOptionWindow::setMaterialFilterAnisotropy( int a )
 
 	QSettings settings;
 	settings.setValue( "materialFilterAnisotropy", a );
+}
+
+
+void GfxOptionWindow::setBlobQuality( int q )
+{
+	Landscape::Blob::setQuality( q );
+	mLandscapeBlobPriorityLabel->setText(tr("Blob Quality (%1):").arg(q));
+
+	QSettings settings;
+	settings.setValue( "landscapeBlobQuality", q );
+}
+
+
+void GfxOptionWindow::setVegetationQuality( int q )
+{
+	AVegetation::setQuality( q );
+	mLandscapeVegetationPriorityLabel->setText(tr("Vegetation Quality (%1):").arg(q));
+
+	QSettings settings;
+	settings.setValue( "landscapeVegetationQuality", q );
 }
 
 

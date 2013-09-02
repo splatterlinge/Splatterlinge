@@ -18,11 +18,8 @@
 #ifndef SCENE_OBJECT_ENVIRONMENT_FOREST_INCLUDED
 #define SCENE_OBJECT_ENVIRONMENT_FOREST_INCLUDED
 
-#include "../AWorldObject.hpp"
+#include "AVegetation.hpp"
 #include "../../Scene.hpp"
-
-#include <resource/StaticModel.hpp>
-#include <utility/RandomNumber.hpp>
 
 #include <QPointF>
 #include <QVector>
@@ -30,12 +27,12 @@
 
 
 class Landscape;
+class StaticModel;
 
-
-class Forest : public AWorldObject
+class Forest : public AVegetation
 {
 public:
-	Forest( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
+	Forest( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number, int priority );
 	virtual ~Forest();
 
 	virtual void updateSelf( const double & delta );

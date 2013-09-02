@@ -63,7 +63,6 @@ public:
 	const bool & drawingReflection() const { return mDrawingReflection; }
 	const bool & drawingRefraction() const { return mDrawingRefraction; }
 
-private:
 	/// Draws a part of the Terrain using another Material.
 	class Blob
 	{
@@ -74,14 +73,21 @@ private:
 		QString mBlobMapPath;
 		GLuint mBlobMap;
 		QRect mRect;
+		int mPriority;
+
+		static int sQuality;
 	public:
-		Blob( Landscape * landscape, QRect rect, QString material, QVector2D materialScale, QString blobMapPath );
+		Blob( Landscape * landscape, QRect rect, QString material, QVector2D materialScale, int priority, QString blobMapPath );
 		~Blob();
 		void drawPatchMap( const QRect & visible );
 		void drawPatch( const QRectF & visible )
 			{ drawPatchMap( mLandscape->terrain()->toMap(visible) ); }
+
+		static int quality() { return sQuality; }
+		static void setQuality( int quality ) { sQuality = quality; }
 	};
 
+private:
 	/// Splits the Terrain into a grid of patches and applies frustum culling.
 	class Filter
 	{

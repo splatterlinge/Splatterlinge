@@ -19,12 +19,14 @@
 
 #include <scene/object/World.hpp>
 #include <scene/object/Landscape.hpp>
+#include <resource/StaticModel.hpp>
+#include <utility/RandomNumber.hpp>
 #include <utility/Capsule.hpp>
 #include <utility/Sphere.hpp>
 
 
-Forest::Forest( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number ) :
-	AWorldObject( landscape->world() ),
+Forest::Forest( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number, int priority ) :
+	AVegetation( landscape->world(), priority ),
 	mLandscape( landscape )
 {
 	QPointF position = mLandscape->terrain()->fromMap( mapPosition );
@@ -76,7 +78,8 @@ void Forest::updateSelf( const double & delta )
 
 void Forest::drawSelf()
 {
-	mModel->draw( mInstances );
+	if( mPriority >= 99-quality() )
+		mModel->draw( mInstances );
 }
 
 

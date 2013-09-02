@@ -18,7 +18,7 @@
 #ifndef SCENE_OBJECT_ENVIRONMENT_GRASS_INCLUDED
 #define SCENE_OBJECT_ENVIRONMENT_GRASS_INCLUDED
 
-#include "../AWorldObject.hpp"
+#include "AVegetation.hpp"
 #include "../../Scene.hpp"
 
 #include <resource/StaticModel.hpp>
@@ -33,10 +33,10 @@
 class Landscape;
 
 
-class Grass : public AWorldObject
+class Grass : public AVegetation
 {
 public:
-	Grass( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number );
+	Grass( Landscape * landscape, const QString & filename, const QPoint & mapPosition, int mapRadius, int number, int priority );
 	virtual ~Grass();
 
 	virtual void updateSelf( const double & delta );

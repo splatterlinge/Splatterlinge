@@ -21,6 +21,8 @@
 #include <scene/Scene.hpp>
 #include <scene/object/Eye.hpp>
 #include <scene/object/World.hpp>
+#include <scene/object/Landscape.hpp>
+#include <scene/object/environment/AVegetation.hpp>
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -126,6 +128,8 @@ void View::initScene()
 	SplatterQuality::setMaximum( SplatterQuality::fromString(
 		settings.value( "splatterQuality", SplatterQuality::toString(SplatterQuality::HIGH) ).toString()
 	));
+	Landscape::Blob::setQuality( settings.value( "landscapeBlobQuality" ).toInt() );
+	AVegetation::setQuality( settings.value( "landscapeVegetationQuality" ).toInt() );
 
 	mScene = new Scene( mGLWidget, this );
 	mWorld = new World( mScene, "earth" );
