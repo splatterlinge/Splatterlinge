@@ -55,6 +55,7 @@ public:
 	const int & armor() const { return mArmor; }
 	const int & points() const { return mPoints; }
 	const int time() const;
+	const int mstime() const;
 	QSharedPointer<AWeapon> currentWeapon() { return mCurrentWeapon; }
 	const QList< QSharedPointer<AWeapon> > & weapons() const { return mWeapons; }
 	void giveWeapon( QSharedPointer<AWeapon> weapon );

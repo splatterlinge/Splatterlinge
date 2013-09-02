@@ -134,6 +134,7 @@ private:
 	float mWaterClippingPlaneOffset;
 	bool mDrawingReflection;
 	bool mDrawingRefraction;
+	GLuint mWaterMap;
 
 	void drawInfinitePlane( const float & height );
 	void renderReflection();
