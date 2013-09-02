@@ -315,12 +315,14 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
 	{
-		PositionData[i] = GlobalPositionData[i] * Splatterling::SplatterlinfSizeFactor;
+		PositionData[i] = GlobalPositionData[i] * Splatterling::SplatterlingSizeFactor;
 	}
 
 	mCoolDown = 0.0f;
 	recalculationOfRotationAngle = true;
 	rotationAroundPlayer = -1000.0f;
+
+	setBoundingSphere(Splatterling::SplatterlingLength * Splatterling::SplatterlingSizeFactor);
 
 	initTexCoordArray();
 }
@@ -608,7 +610,7 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 	QVector3D centerPoint(0.0f, 0.0f, PositionData[BodyVertexCount*3+HeadVertexCount*3-1]);
 
 	if(Sphere::intersectCulledRay(this->pointToWorld(centerPoint),
-			1.0f*Splatterling::SplatterlinfSizeFactor,origin, direction, intersectionDistance)){
+			1.0f*Splatterling::SplatterlingSizeFactor,origin, direction, intersectionDistance)){
 		qDebug() << "sphere intersect";
 
 		//inner
