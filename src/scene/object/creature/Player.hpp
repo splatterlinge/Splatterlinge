@@ -28,6 +28,7 @@
 
 #include <GLWidget.hpp>
 #include <QTime>
+#include <QFont>
 
 
 class Player : public ACreature, public AKeyListener, public AMouseListener
@@ -40,6 +41,7 @@ public:
 	virtual void update2Self( const double & delta );
 	virtual void drawSelf();
 	virtual void draw2Self();
+	virtual void draw2SelfPost();
 
 	virtual void keyPressEvent( QKeyEvent * event );
 	virtual void keyReleaseEvent( QKeyEvent * event );
@@ -96,6 +98,7 @@ private:
 	QSharedPointer<AWeapon> mCurrentWeapon;
 	int mPoints;
 	QTime mAliveTimer;
+	QFont mFont;
 
 	void updateRotation( const double & delta );
 	void updatePosition( const double & delta );

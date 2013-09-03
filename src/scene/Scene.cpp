@@ -101,7 +101,6 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mEye->setFarPlane( settings.value( "farPlane", 500.0f ).toFloat() );
 	mEye->setFOV(90);
 
-	mFont = QFont( "Xolonium", 12, QFont::Normal );
 	mBlinkingState = false;
 	mOVRLensCenter = 0.635;
 	mOVRScale = 0.2;
@@ -281,6 +280,7 @@ void Scene::drawStereoFrameBuffers()
 void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 {
 	mGLWidget->setUpdatesEnabled( false );
+	mPainter = painter;
 
 	qint64 delta = mElapsedTimer.nsecsElapsed();
 	mElapsedTimer.restart();
@@ -290,10 +290,12 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	updateObjects( mDelta );
 
+	painter->beginNativePainting();
 	if( mStereo )
 	{
 		mEye->setViewOffset( QVector3D(-mStereoEyeDistance/2.0f,0,0) );
 		mEye->setAspect( (float)mLeftTextureRenderer->size().width()/mLeftTextureRenderer->size().height() );
+		mPainterRect = QRectF( 0, 0, mLeftTextureRenderer->size().width(), mLeftTextureRenderer->size().height() );
 		mLeftTextureRenderer->bind();
 		pushAllGL();
 			applyDefaultStatesGL();
@@ -304,6 +306,7 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 		mEye->setViewOffset( QVector3D(mStereoEyeDistance/2.0f,0,0) );
 		mEye->setAspect( (float)mRightTextureRenderer->size().width()/mRightTextureRenderer->size().height() );
+		mPainterRect = QRectF( 0, 0, mRightTextureRenderer->size().width(), mRightTextureRenderer->size().height() );
 		mRightTextureRenderer->bind();
 		pushAllGL();
 			applyDefaultStatesGL();
@@ -320,16 +323,18 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 	{
 		mEye->setViewOffset( QVector3D(0,0,0) );
 		mEye->setAspect( (float)width()/height() );
+		mPainterRect = QRectF( 0, 0, width(), height() );
 		pushAllGL();
 			applyDefaultStatesGL();
 			glClear( GL_DEPTH_BUFFER_BIT );
 			drawObjects();
 		popAllGL();
 	}
+	painter->endNativePainting();
 
 	mFrameCountSecond++;
 	drawFPS( painter, rect );
-	drawHUD( painter, rect );
+	//drawHUD( painter, rect );
 
 	GLenum glError = glGetError();
 	if( glError  != GL_NO_ERROR )
@@ -346,119 +351,8 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 void Scene::drawFPS( QPainter * painter, const QRectF & rect )
 {
 	painter->setPen( QColor(255,255,255) );
-	painter->setFont( mFont );
+	//painter->setFont( mFont );
 	painter->drawText( rect, Qt::AlignTop | Qt::AlignRight, QString( tr("(%2s) %1 FPS") ).arg(mFramesPerSecond).arg(mDelta) );
-}
-
-
-void Scene::drawHUD( QPainter * painter, const QRectF & rect )
-{
-	World * world = dynamic_cast<World*>(mRoot);
-	if( !world )
-		return;
-	QSharedPointer<Player> player = world->player();
-
-	painter->setFont( mFont );
-	painter->setRenderHints(
-		QPainter::Antialiasing |
-		QPainter::SmoothPixmapTransform |
-		QPainter::TextAntialiasing |
-		QPainter::HighQualityAntialiasing );
-
-	// points
-	QRect pointsRect( rect.left()+10, rect.top()+10, 200, 30 );
-	painter->setPen( QColor(255,255,255,200) );
-	painter->drawText( pointsRect,
-		Qt::AlignLeft | Qt::AlignTop,
-					   QString( tr("Points: %1").arg(player->points())) );
-
-	// timer
-	QRect timerRect( rect.width()/2-100, 10, 200, 30 );
-	painter->setPen( QColor(255,255,255,200) );
-	int time = player->time();
-	int mm = time / 60;
-	int ss = time % 60;
-	QFont old = painter->font();
-	QFont f = painter->font();
-	f.setPointSize(24);
-	painter->setFont(f);
-	painter->drawText( timerRect,
-		Qt::AlignCenter | Qt::AlignTop,
-		QString( tr("%1:%2").
-				 arg(QString::number(mm), 2, '0').
-				 arg(QString::number(ss), 2, '0') ) );
-	painter->setFont(old);
-
-	// radar radius
-	QRect radarRect( rect.width()-160, 10, 150, 150 );
-	painter->setPen( QColor(0,0,0,0) );
-	painter->setBrush( QBrush( QColor(11,110,240,80) ) );
-	painter->drawEllipse( radarRect.center(), 75, 75 );
-
-	// radar player point
-	painter->setBrush( QBrush( QColor(255,255,255,50) ) );
-	painter->drawPie( radarRect, 45*16, 90*16 );
-	painter->setBrush( QBrush( QColor(255,255,255,200) ) );
-	painter->drawEllipse( radarRect.center(), 7, 7 );
-
-	// player armor
-	QRect armorRect( rect.left()+10, rect.bottom()-74, 100*3, 30 );
-	painter->setPen( QColor(0,0,0,0) );
-	painter->setBrush( QBrush( QColor(11,110,240,80) ) );
-	painter->drawRect( armorRect );
-	painter->setBrush( QBrush( QColor(26,121,245,200) ) );
-	painter->drawRect( armorRect.left(), armorRect.top(), player->armor()*3, armorRect.height() );
-	painter->setPen( QColor(255,255,255,255) );
-	painter->drawText( armorRect,
-		Qt::AlignCenter | Qt::AlignHCenter,
-		QString( tr("%1%").arg(player->armor()) ) );
-
-	// player health
-	QRect healthRect( rect.left()+10, rect.bottom()-40, 100*3, 30 );
-	painter->setPen( QColor(0,0,0,0) );
-	painter->setBrush( QBrush( QColor(255,14,14,80) ) );
-	painter->drawRect( healthRect );
-	painter->setBrush( QBrush( QColor(230,0,0,200) ) );
-	painter->drawRect( healthRect.left(), healthRect.top(), player->life()*3, healthRect.height() );
-	painter->setPen( QColor(255,255,255,255) );
-	painter->drawText( healthRect,
-		Qt::AlignCenter | Qt::AlignHCenter,
-		QString( tr("%1%").arg(player->life()) ) );
-
-	// weapon status
-	QSharedPointer<AWeapon> weapon = player->currentWeapon();
-	if( !weapon.isNull() )
-	{
-		QRect weaponNameRect( rect.right()-210, rect.bottom()-75, 200, 30 );
-		QRect weaponStatusRect( rect.right()-210, rect.bottom()-40, 200, 30 );
-		painter->setPen( QColor(0,0,0,0) );
-		painter->setBrush( QBrush( QColor(11,110,240,80) ) );
-		painter->drawRect( weaponNameRect );
-		painter->drawRect( weaponStatusRect );
-		painter->setPen( QColor(255,255,255,255) );
-		painter->drawText( weaponNameRect,
-			Qt::AlignCenter | Qt::AlignHCenter,
-			QString( tr("%1").arg(player->currentWeapon()->name()) ) );
-		if( player->currentWeapon()->clipammo() == 0 )
-		{
-			if( !mBlinkingState )
-			{
-				painter->drawText( weaponStatusRect,
-					Qt::AlignCenter | Qt::AlignHCenter,
-					QString( tr("%2 | %3 ")
-						.arg(player->currentWeapon()->clipammo())
-						.arg(player->currentWeapon()->ammo()) ) );
-			}
-		}
-		else
-		{
-			painter->drawText( weaponStatusRect,
-				Qt::AlignCenter | Qt::AlignHCenter,
-				QString( tr("%2 | %3 ")
-					.arg(player->currentWeapon()->clipammo())
-					.arg(player->currentWeapon()->ammo()) ) );
-		}
-	}
 }
 
 

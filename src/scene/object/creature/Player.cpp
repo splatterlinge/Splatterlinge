@@ -25,6 +25,8 @@
 #include "../weapon/Laser.hpp"
 #include "../weapon/Minigun.hpp"
 
+#include <QString>
+
 
 Player::Player( World * world ) :
 	ACreature( world )
@@ -63,6 +65,8 @@ Player::Player( World * world ) :
 
 	mPoints = 0;
 	mAliveTimer.start();
+
+	mFont = QFont( "Xolonium", 12, QFont::Normal );
 
 	scene()->addKeyListener( this );
 	scene()->addMouseListener( this );
@@ -300,6 +304,133 @@ void Player::draw2Self()
 	}
 
 	glPopMatrix();
+
+	glPopAttrib();
+}
+
+
+void Player::draw2SelfPost()
+{
+	glPushAttrib( GL_LIGHTING_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT | GL_DEPTH_BUFFER_BIT );
+
+	glDepthMask( GL_FALSE );
+	glDisable( GL_CULL_FACE );
+	glDisable( GL_DEPTH_TEST );
+	glDisable( GL_ALPHA_TEST );
+
+	glDisable( GL_LIGHTING );
+	glDisable( GL_BLEND );
+	glDisable( GL_TEXTURE_2D );
+	glDisable( GL_STENCIL_TEST );
+	glDisable( GL_AUTO_NORMAL );
+
+	scene()->painter()->endNativePainting();
+
+	QRectF rect = scene()->rect();
+
+	float factor;
+	if( scene()->stereo() )
+		factor = 0.5f;
+	else
+		factor = 1.0f;
+
+	scene()->painter()->setFont( mFont );
+	scene()->painter()->setRenderHints(
+		QPainter::Antialiasing |
+		QPainter::SmoothPixmapTransform |
+		QPainter::TextAntialiasing |
+		QPainter::HighQualityAntialiasing );
+
+	QFont tmp = scene()->painter()->font();
+	tmp.setStretch(100*factor);
+	scene()->painter()->setFont(tmp);
+
+	// points
+	QRect pointsRect( rect.left()+10, rect.top()+10, 300*factor, 30 );
+	scene()->painter()->setPen( QColor(255,255,255,200) );
+	scene()->painter()->drawText( pointsRect,
+			Qt::AlignLeft | Qt::AlignTop,
+			QString( "Points: %1" ).arg(mPoints) );
+
+	// timer
+	QRect timerRect( rect.width()/2-100*factor, 10, 200*factor, 30 );
+	scene()->painter()->setPen( QColor(255,255,255,200) );
+	int time = mAliveTimer.elapsed() / 1000;
+	int mm = time / 60;
+	int ss = time % 60;
+	QFont old = scene()->painter()->font();
+	QFont f = scene()->painter()->font();
+	f.setPointSize(24);
+	scene()->painter()->setFont(f);
+	scene()->painter()->drawText( timerRect,
+		Qt::AlignCenter | Qt::AlignTop,
+		QString( "%1:%2" ).
+				 arg(QString::number(mm), 2, '0').
+				 arg(QString::number(ss), 2, '0') );
+	scene()->painter()->setFont(old);
+
+	// radar radius
+	QRect radarRect( rect.width()-160*factor, 10, 150*factor, 150 );
+	scene()->painter()->setPen( QColor(0,0,0,0) );
+	scene()->painter()->setBrush( QBrush( QColor(11,110,240,80) ) );
+	scene()->painter()->drawEllipse( radarRect.center(), 75*factor, 75 );
+
+	// radar player point
+	scene()->painter()->setBrush( QBrush( QColor(255,255,255,200) ) );
+	scene()->painter()->drawEllipse( radarRect.center(), 7*factor, 7 );
+
+	// player armor
+	QRect armorRect( rect.left()+10, rect.bottom()-74, 300*factor, 30 );
+	scene()->painter()->setPen( QColor(0,0,0,0) );
+	scene()->painter()->setBrush( QBrush( QColor(11,110,240,80) ) );
+	scene()->painter()->drawRect( armorRect );
+	scene()->painter()->setBrush( QBrush( QColor(26,121,245,200) ) );
+	scene()->painter()->drawRect( armorRect.left(), armorRect.top(), mArmor*armorRect.width()/100, armorRect.height() );
+	scene()->painter()->setPen( QColor(255,255,255,255) );
+	scene()->painter()->drawText( armorRect,
+		Qt::AlignCenter | Qt::AlignHCenter,
+		QString( "%1%" ).arg(mArmor) );
+
+	// player health
+	QRect healthRect( rect.left()+10, rect.bottom()-40, 300*factor, 30 );
+	scene()->painter()->setPen( QColor(0,0,0,0) );
+	scene()->painter()->setBrush( QBrush( QColor(255,14,14,80) ) );
+	scene()->painter()->drawRect( healthRect );
+	scene()->painter()->setBrush( QBrush( QColor(230,0,0,200) ) );
+	scene()->painter()->drawRect( healthRect.left(), healthRect.top(), life()*healthRect.width()/100*factor, healthRect.height() );
+	scene()->painter()->setPen( QColor(255,255,255,255) );
+	scene()->painter()->drawText( healthRect,
+		Qt::AlignCenter | Qt::AlignHCenter,
+		QString( "%1%" ).arg(life()) );
+
+	// weapon status
+	QSharedPointer<AWeapon> weapon = currentWeapon();
+	if( !weapon.isNull() )
+	{
+		QRect weaponNameRect( rect.right()-210*factor, rect.bottom()-75, 200*factor, 30 );
+		QRect weaponStatusRect( rect.right()-210*factor, rect.bottom()-40, 200*factor, 30 );
+		scene()->painter()->setPen( QColor(0,0,0,0) );
+		scene()->painter()->setBrush( QBrush( QColor(11,110,240,80) ) );
+		scene()->painter()->drawRect( weaponNameRect );
+		scene()->painter()->drawRect( weaponStatusRect );
+		scene()->painter()->setPen( QColor(255,255,255,255) );
+		scene()->painter()->drawText( weaponNameRect,
+			Qt::AlignCenter | Qt::AlignHCenter,
+			QString( "%1" ).arg(currentWeapon()->name()) );
+
+		scene()->painter()->drawText( weaponStatusRect,
+			Qt::AlignCenter | Qt::AlignHCenter,
+			QString( "%2 | %3 " )
+				.arg(currentWeapon()->clipammo())
+				.arg(currentWeapon()->ammo()) );
+	}
+
+	//scene()->painter()->setBrush( Qt::green );
+	//scene()->painter()->drawRect( 0, 0, 100, 100 );
+	//scene()->painter()->setPen( QColor(Qt::blue) );
+	//scene()->painter()->drawText(100, 100, "test");
+
+	scene()->painter()->beginNativePainting();
 
 	glPopAttrib();
 }

@@ -63,6 +63,8 @@ public:
 	void setSceneRect( qreal x, qreal y, qreal w, qreal h ) { setSceneRect( QRectF( x, y, w, h ) ); }
 
 	GLWidget * glWidget() { return mGLWidget; }
+	QPainter * painter() { return mPainter; }
+	QRectF & rect() { return mPainterRect; }
 
 	AObject * root() const { return mRoot; }
 	void setRoot( AObject * root ) { mRoot = root; }
@@ -92,6 +94,9 @@ public:
 	StartMenuWindow * startMenuWindow() { return mStartMenuWindow; }
 	DebugWindow * debugWindow() { return mDebugWindow; }
 
+	void pushAllGL();
+	void popAllGL();
+
 protected:
 	// Overrides:
 	void keyPressEvent( QKeyEvent * event );
@@ -107,6 +112,8 @@ private:
 	static QGLBuffer sQuadVertexBuffer;
 
 	GLWidget * mGLWidget;
+	QPainter * mPainter;
+	QRectF mPainterRect;
 
 	DebugWindow * mDebugWindow;
 	StartMenuWindow * mStartMenuWindow;
@@ -115,7 +122,6 @@ private:
 	double mDelta;
 	int mFrameCountSecond;
 	int mFramesPerSecond;
-	QFont mFont;
 	bool mWireFrame;
 	bool mMultiSample;
 	bool mStereo;
@@ -140,10 +146,7 @@ private:
 	void resizeStereoFrameBuffers( const QSize & screenSize );
 	void drawStereoFrameBuffers();
 	void drawFPS( QPainter * painter, const QRectF & rect );
-	void drawHUD( QPainter * painter, const QRectF & rect );
 	void applyDefaultStatesGL();
-	void pushAllGL();
-	void popAllGL();
 	void updateObjects( const double & delta );
 	void drawObjects();
 

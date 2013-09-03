@@ -78,12 +78,12 @@ World::World( Scene * scene, QString name ) :
 	mLandscape = QSharedPointer<Landscape>( new Landscape( this, landscapeName ) );
 	add( mLandscape );
 
-	mSky = QSharedPointer<Sky>( new Sky( this, skyName ) );
-	add( mSky );
-
 	mPlayer = QSharedPointer<Player>( new Player( this ) );
 	add( mPlayer );
 	scene->eye()->attach( mPlayer );
+
+	mSky = QSharedPointer<Sky>( new Sky( this, skyName ) );
+	add( mSky );
 
 	mTeapot = QSharedPointer<Teapot>( new Teapot( scene, 2 ) );
 	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) );
