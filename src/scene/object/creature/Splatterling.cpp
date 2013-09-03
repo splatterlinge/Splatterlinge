@@ -315,12 +315,14 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
 	{
-		PositionData[i] = GlobalPositionData[i] * Splatterling::SplatterlinfSizeFactor;
+		PositionData[i] = GlobalPositionData[i] * Splatterling::SplatterlingSizeFactor;
 	}
 
 	mCoolDown = 0.0f;
 	recalculationOfRotationAngle = true;
 	rotationAroundPlayer = -1000.0f;
+
+	setBoundingSphere(Splatterling::SplatterlingLength * Splatterling::SplatterlingSizeFactor);
 
 	initTexCoordArray();
 }
@@ -537,8 +539,8 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 	AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
 	float rayLength;
 
-	if(intersectHead(origin, direction, &rayLength) || intersectWing(origin, direction, &rayLength)
-		|| intersectBody(origin, direction, &rayLength)){
+	if(intersectHead(origin, direction, &rayLength) || intersectBody(origin, direction, &rayLength)
+			|| intersectWing(origin, direction, &rayLength)	){
 
 		if( rayLength < length )
 		{
@@ -555,17 +557,16 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 	return nearestTarget;
 }
 
-
 bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
 {
-
 
 	if(Intersection::intersectTriangleFan(PositionData, 6, 15, modelMatrix(), origin, direction, intersectionDistance)){
 		targetBodyPart = TARGET_BODY;
 		return true;
 	}
 
-	if(Intersection::intersectTriangleStrip(PositionData, 15, BodyVertexCount-1, modelMatrix(), origin, direction, intersectionDistance)){
+
+	if(Intersection::intersectTriangleStrip(PositionData, 16, BodyVertexCount-1, modelMatrix(), origin, direction, intersectionDistance)){
 		targetBodyPart = TARGET_BODY;
 		return true;
 	}
@@ -610,8 +611,7 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 	QVector3D centerPoint(0.0f, 0.0f, PositionData[BodyVertexCount*3+HeadVertexCount*3-1]);
 
 	if(Sphere::intersectCulledRay(this->pointToWorld(centerPoint),
-			1.0f*Splatterling::SplatterlinfSizeFactor,origin, direction, intersectionDistance)){
-		qDebug() << "sphere intersect";
+			1.0f*Splatterling::SplatterlingSizeFactor,origin, direction, intersectionDistance)){
 
 		//inner
 		if(Intersection::intersectTriangleFan(PositionData, BodyVertexCount, BodyVertexCount+9, modelMatrix(), origin, direction, intersectionDistance)){

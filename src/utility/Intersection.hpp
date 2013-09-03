@@ -6,6 +6,7 @@
 #include <qmatrix4x4.h>
 #include <QtGlobal>
 #include <GLWidget.hpp>
+#include<QDebug>
 
 #include "Triangle.hpp"
 
