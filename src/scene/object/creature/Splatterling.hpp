@@ -23,6 +23,7 @@ public:
 	static const float SplatterlingSizeFactor = 0.5f;
 	static const int BufferSize = 3;
 	static const float SplatterlingLength = 8.8f;
+	static const float SplatterlingBoundingSphereSize = 18.0f;
 
 	static const GLsizei BodyVertexCount = 34;
 	static const GLsizei HeadVertexCount = 32;
@@ -40,7 +41,14 @@ public:
 		TARGET_BODY = 0,
 		TARGET_HEAD = 1,
 		TARGET_WING_RIGHT = 2,
-		TARGET_WING_LEFT = 3
+		TARGET_WING_LEFT = 3,
+		TARGET_NOTHING = 4
+	};
+	enum
+	{
+		DEAD_NORMAL =0,
+		DEAD_HEADSHOT= 1,
+		DEAD_WINGSHOT = 2
 	};
 
 	GLuint BufferName[BufferSize];
@@ -81,6 +89,11 @@ private:
 	float mCoolDown;
 	bool recalculationOfRotationAngle;
 	float rotationAroundPlayer;
+	int lastBodyPart;
+	float dmgWingRight;
+	float dmgWingLeft;
+	float fallHeight;
+	int kindOfDead;
 };
 
 
