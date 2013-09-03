@@ -71,6 +71,12 @@ Landscape::Landscape( World * world, QString name ) :
 		mWaterClippingPlaneOffset = s.value( "clippingPlaneOffset", 0.01f ).toFloat();
 	s.endGroup();
 	mWaterShader = new Shader( scene()->glWidget(), "water" );
+	QImage waterImage( "./data/effect/water.png" );
+	if( waterImage.isNull() )
+	{
+		qFatal( "\"%s\" not found!", "./data/effect/water.png" );
+	}
+	mWaterMap = scene()->glWidget()->bindTexture( waterImage );
 	mReflectionRenderer = new TextureRenderer( scene()->glWidget(), QSize(512,512), true );
 	mRefractionRenderer = new TextureRenderer( scene()->glWidget(), QSize(512,512), true );
 
@@ -277,12 +283,18 @@ void Landscape::draw2SelfPost()
 
 	glDisable( GL_CULL_FACE );
 	mWaterShader->bind();
+
+	mWaterShader->program()->setUniformValue( "eyeVector", world()->player()->eyeDirection() );
 	mWaterShader->program()->setUniformValue( "reflectionMap", 0 );
 	mWaterShader->program()->setUniformValue( "refractionMap", 1 );
+	mWaterShader->program()->setUniformValue( "waterMap", 2 );
+	mWaterShader->program()->setUniformValue( "time", (float)(world()->player()->mstime()) );
+	glActiveTexture( GL_TEXTURE2 );	glBindTexture( GL_TEXTURE_2D, mWaterMap );
 	glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, mRefractionRenderer->texID() );
 	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, mReflectionRenderer->texID() );
 	drawInfinitePlane( mWaterHeight );
 	mWaterShader->release();
+	glActiveTexture( GL_TEXTURE2 );	glBindTexture( GL_TEXTURE_2D, 0 );
 	glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, 0 );
 	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, 0 );
 	glEnable( GL_CULL_FACE );

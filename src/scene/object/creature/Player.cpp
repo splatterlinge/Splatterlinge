@@ -508,3 +508,8 @@ const int Player::time() const
 	int t = static_cast<int>(mAliveTimer.elapsed() / 1000);
 	return t;
 }
+
+const int Player::mstime() const
+{
+	return mAliveTimer.elapsed();
+}
