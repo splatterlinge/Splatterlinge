@@ -41,7 +41,14 @@ public:
 		TARGET_BODY = 0,
 		TARGET_HEAD = 1,
 		TARGET_WING_RIGHT = 2,
-		TARGET_WING_LEFT = 3
+		TARGET_WING_LEFT = 3,
+		TARGET_NOTHING = 4
+	};
+	enum
+	{
+		DEAD_NORMAL =0,
+		DEAD_HEADSHOT= 1,
+		DEAD_WINGSHOT = 2
 	};
 
 	GLuint BufferName[BufferSize];
@@ -82,6 +89,11 @@ private:
 	float mCoolDown;
 	bool recalculationOfRotationAngle;
 	float rotationAroundPlayer;
+	int lastBodyPart;
+	float dmgWingRight;
+	float dmgWingLeft;
+	float fallHeight;
+	int kindOfDead;
 };
 
 
