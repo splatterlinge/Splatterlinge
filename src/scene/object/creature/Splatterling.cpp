@@ -322,7 +322,7 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	recalculationOfRotationAngle = true;
 	rotationAroundPlayer = -1000.0f;
 
-	setBoundingSphere(Splatterling::SplatterlingLength * Splatterling::SplatterlingSizeFactor);
+	setBoundingSphere(Splatterling::SplatterlingBoundingSphereSize * Splatterling::SplatterlingSizeFactor);
 
 	initTexCoordArray();
 }
@@ -539,18 +539,22 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 	AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
 	float rayLength;
 
-	if(intersectHead(origin, direction, &rayLength) || intersectBody(origin, direction, &rayLength)
-			|| intersectWing(origin, direction, &rayLength)	){
+	if(Sphere::intersectCulledRay(worldPosition(), boundingSphereRadius(), origin, direction, &rayLength)){
 
-		if( rayLength < length )
+		if(intersectHead(origin, direction, &rayLength) || intersectBody(origin, direction, &rayLength)
+			|| intersectWing(origin, direction, &rayLength)	)
 		{
-			// intersection closer than previous intersections?
-			length = rayLength;
 
-			if( normal )	// interested in normal?
-				*normal = origin - worldPosition();
+			if( rayLength < length )
+			{
+				// intersection closer than previous intersections?
+				length = rayLength;
 
-			nearestTarget = this;
+				if( normal )	// interested in normal?
+					*normal = origin - worldPosition();
+
+				nearestTarget = this;
+			}
 		}
 	}
 

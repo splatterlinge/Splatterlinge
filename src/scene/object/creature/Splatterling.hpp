@@ -23,6 +23,7 @@ public:
 	static const float SplatterlingSizeFactor = 0.5f;
 	static const int BufferSize = 3;
 	static const float SplatterlingLength = 8.8f;
+	static const float SplatterlingBoundingSphereSize = 18.0f;
 
 	static const GLsizei BodyVertexCount = 34;
 	static const GLsizei HeadVertexCount = 32;
