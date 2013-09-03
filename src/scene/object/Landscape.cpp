@@ -288,7 +288,7 @@ void Landscape::draw2SelfPost()
 	mWaterShader->program()->setUniformValue( "reflectionMap", 0 );
 	mWaterShader->program()->setUniformValue( "refractionMap", 1 );
 	mWaterShader->program()->setUniformValue( "waterMap", 2 );
-	mWaterShader->program()->setUniformValue( "time", (float)(world()->player()->mstime()) );
+	mWaterShader->program()->setUniformValue( "time", world()->sky()->timeOfDay() );
 	glActiveTexture( GL_TEXTURE2 );	glBindTexture( GL_TEXTURE_2D, mWaterMap );
 	glActiveTexture( GL_TEXTURE1 );	glBindTexture( GL_TEXTURE_2D, mRefractionRenderer->texID() );
 	glActiveTexture( GL_TEXTURE0 );	glBindTexture( GL_TEXTURE_2D, mReflectionRenderer->texID() );
