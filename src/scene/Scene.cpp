@@ -40,6 +40,10 @@
 #include <QCoreApplication>
 #include <QGLShaderProgram>
 
+#ifdef OVR_ENABLED
+#include "OVR.h"
+#endif
+
 
 const GLfloat Scene::sQuadVertices[] =
 {	// positions		texcoords
@@ -79,7 +83,6 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mStereo = false;
 	mStereoEyeDistance = 0.1f;
 	mStereoUseOVR = settings.value( "stereoUseOVR", false ).toBool();;
-	mOVRShader = new Shader( glWidget, "postProc.OVR" );
 
 	if( !sQuadVertexBuffer.isCreated() )
 	{
@@ -99,13 +102,44 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 
 	mEye = new Eye( this );
 	mEye->setFarPlane( settings.value( "farPlane", 500.0f ).toFloat() );
-	mEye->setFOV(90);
 
 	mFont = QFont( "Xolonium", 12, QFont::Normal );
 	mBlinkingState = false;
-	mOVRLensCenter = 0.635;
-	mOVRScale = 0.2;
-	mOVRScaleIn = 2.0;
+
+#ifdef OVR_ENABLED
+	mOVRShader = new Shader( glWidget, "postProc.OVR" );
+	OVR::System::Init( OVR::Log::ConfigureDefaultLog(OVR::LogMask_All) );
+	mOVRDeviceManager = OVR::DeviceManager::Create();
+	if( !mOVRDeviceManager )
+	{
+		qDebug() << "Could not create OVR Device Manager!";
+		mStereoUseOVR = false;
+		goto lSkipOVR;
+	}
+	mOVRHMDDevice = mOVRDeviceManager->EnumerateDevices<OVR::HMDDevice>().CreateDevice();
+	if( !mOVRHMDDevice )
+	{
+		qDebug() << "Could not create OVR Device!";
+		mStereoUseOVR = false;
+		goto lSkipOVR;
+	}
+	if( mOVRHMDDevice->GetDeviceInfo(&mOVRHMDInfo) )
+	{
+		qDebug() << "OVR device info:";
+		qDebug() << "\tDisplay Device Name =" << mOVRHMDInfo.DisplayDeviceName;
+		qDebug() << "\tInterpupillary Distance =" << mOVRHMDInfo.InterpupillaryDistance;
+		qDebug() << "\tDistortion =" << mOVRHMDInfo.DistortionK[0] << mOVRHMDInfo.DistortionK[1] << mOVRHMDInfo.DistortionK[2] << mOVRHMDInfo.DistortionK[3];
+	}
+	mOVRSensorDevice = mOVRHMDDevice->GetSensor();
+	if( !mOVRSensorDevice )
+	{
+		qDebug() << "Could not get OVR Sensor!";
+		mStereoUseOVR = false;
+		goto lSkipOVR;
+	}
+	mOVRSensorFusion.AttachToSensor( mOVRSensorDevice );
+lSkipOVR:
+#endif
 
 	mDebugWindow = new DebugWindow( this );
 	addWidget( mDebugWindow, mDebugWindow->windowFlags() );
@@ -135,13 +169,23 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 
 Scene::~Scene()
 {
+#ifdef OVR_ENABLED
 	delete mOVRShader;
+#endif
 	delete mEye;
 	delete mDebugWindow;
-	//delete mStartMenuWindow; // SIGSEGV
 	delete mLeftTextureRenderer;
 	delete mRightTextureRenderer;
 }
+
+
+#ifdef OVR_ENABLED
+QQuaternion Scene::OVROrientation()
+{
+	OVR::Quatf hmdOrient = mOVRSensorFusion.GetOrientation();
+	return QQuaternion( -hmdOrient.z, -hmdOrient.y, -hmdOrient.x, -hmdOrient.w ) * QQuaternion::fromAxisAndAngle(0,0,1,-180);
+}
+#endif
 
 
 QGraphicsProxyWidget * Scene::addWidget( QWidget * widget, Qt::WindowFlags wFlags )
@@ -242,33 +286,44 @@ void Scene::drawStereoFrameBuffers()
 	glActiveTexture( GL_TEXTURE0 );
 	glClientActiveTexture( GL_TEXTURE0 );
 
+#ifdef OVR_ENABLED
 	if( mStereoUseOVR )
 	{
+		float lensCenter = 0.5f + mOVRLensViewportShift * 0.25f;
+		float scale = 0.5f * (1.0f / mOVRDistortionScale);
 		mOVRShader->bind();
-		mOVRShader->program()->setUniformValue( "lensCenter", QVector2D( 1-mOVRLensCenter, 0.5 ) );
-		mOVRShader->program()->setUniformValue( "scale", QVector2D( mOVRScale, mOVRScale ) );
-		mOVRShader->program()->setUniformValue( "scaleIn", QVector2D( mOVRScaleIn, mOVRScaleIn ) );
-		QVector4D distortion7Inch( 1.0, 0.22, 0.24, 0.0 );
+		mOVRShader->program()->setUniformValue( "lensCenter", QVector2D( lensCenter, 0.5 ) );
+		mOVRShader->program()->setUniformValue( "scale", QVector2D( scale, scale ) );
+		mOVRShader->program()->setUniformValue( "scaleIn", QVector2D( 2, 2 ) );
+//		QVector4D distortion7Inch( 1.0, 0.22, 0.24, 0.0 );
 //		QVector4D distortion( 1.0, 0.18, 0.115, 0.0 );
-		mOVRShader->program()->setUniformValue( "hmdWarpParam", distortion7Inch );
-		QVector4D chromAb( 0.996, -0.004, 1.014, 0 );
-		mOVRShader->program()->setUniformValue( "chromAbParam", chromAb );
+		mOVRShader->program()->setUniformValue( "hmdWarpParam", QVector4D(mOVRHMDInfo.DistortionK[0],mOVRHMDInfo.DistortionK[1],mOVRHMDInfo.DistortionK[2],mOVRHMDInfo.DistortionK[3]) );
+//		QVector4D chromAb( 0.996, -0.004, 1.014, 0 );
+		mOVRShader->program()->setUniformValue( "chromAbParam", QVector4D(mOVRHMDInfo.ChromaAbCorrection[0],mOVRHMDInfo.ChromaAbCorrection[1],mOVRHMDInfo.ChromaAbCorrection[2],mOVRHMDInfo.ChromaAbCorrection[3]) );
 		mOVRShader->program()->setUniformValue( "sourceMap", 0 );
 	}
+#endif
+
 	glBindTexture( GL_TEXTURE_2D, mLeftTextureRenderer->texID() );
 	glDrawArrays( GL_QUADS, 4, 4 );
 
+#ifdef OVR_ENABLED
 	if( mStereoUseOVR )
 	{
-		mOVRShader->program()->setUniformValue( "lensCenter", QVector2D( mOVRLensCenter, 0.5 ) );
+		float lensCenter = 0.5f - mOVRLensViewportShift * 0.25f;
+		mOVRShader->program()->setUniformValue( "lensCenter", QVector2D( lensCenter, 0.5 ) );
 	}
+#endif
+
 	glBindTexture( GL_TEXTURE_2D, mRightTextureRenderer->texID() );
 	glDrawArrays( GL_QUADS, 8, 4 );
 
+#ifdef OVR_ENABLED
 	if( mStereoUseOVR )
 	{
 		mOVRShader->release();
 	}
+#endif
 
 	glBindTexture( GL_TEXTURE_2D, 0 );
 
@@ -292,32 +347,79 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 
 	if( mStereo )
 	{
-		mEye->setViewOffset( QVector3D(-mStereoEyeDistance/2.0f,0,0) );
-		mEye->setAspect( (float)mLeftTextureRenderer->size().width()/mLeftTextureRenderer->size().height() );
-		mLeftTextureRenderer->bind();
-		pushAllGL();
-			applyDefaultStatesGL();
-			glClear( GL_DEPTH_BUFFER_BIT );
-			drawObjects();
-		popAllGL();
-		mLeftTextureRenderer->release();
+#ifdef OVR_ENABLED
+		if( mStereoUseOVR )
+		{
+			float aspect = float(mOVRHMDInfo.HResolution*0.5f) / float(mOVRHMDInfo.VResolution);
+			mOVRLensViewportShift = OVRLensViewportShift( mOVRHMDInfo );
+			mOVRDistortionScale = OVRDistortionScale( mOVRHMDInfo, mOVRLensViewportShift, aspect, -1, 0 );
 
-		mEye->setViewOffset( QVector3D(mStereoEyeDistance/2.0f,0,0) );
-		mEye->setAspect( (float)mRightTextureRenderer->size().width()/mRightTextureRenderer->size().height() );
-		mRightTextureRenderer->bind();
-		pushAllGL();
-			applyDefaultStatesGL();
-			glClear( GL_DEPTH_BUFFER_BIT );
-			drawObjects();
-		popAllGL();
-		mRightTextureRenderer->release();
+			float halfScreenDistance = mOVRHMDInfo.VScreenSize * 0.5f * mOVRDistortionScale;
+			float viewCenter = mOVRHMDInfo.HScreenSize * 0.25f;
+			float eyeProjectionShift = viewCenter - mOVRHMDInfo.LensSeparationDistance * 0.5f;
+			float projectionCenterOffset = 4.0f * eyeProjectionShift / mOVRHMDInfo.HScreenSize;
+			float halfIPD = mOVRHMDInfo.InterpupillaryDistance * 0.5f;
 
+			mEye->setAspect( aspect );
+			mEye->setFOV( (2.0f * atanf( halfScreenDistance / mOVRHMDInfo.EyeToScreenDistance )) * (180.0f/M_PI) );
+//			mEye->setViewOffset( QVector3D(0,0,0) );
+
+			mEye->setPerspectiveOffset( QVector3D(-projectionCenterOffset,0,0) );
+			mEye->setViewOffset( QVector3D(-halfIPD,0,0) );
+			mLeftTextureRenderer->bind();
+			pushAllGL();
+				applyDefaultStatesGL();
+				glClear( GL_DEPTH_BUFFER_BIT );
+				drawObjects();
+			popAllGL();
+			mLeftTextureRenderer->release();
+
+			mEye->setPerspectiveOffset( QVector3D(projectionCenterOffset,0,0) );
+			mEye->setViewOffset( QVector3D(halfIPD,0,0) );
+			mRightTextureRenderer->bind();
+			pushAllGL();
+				applyDefaultStatesGL();
+				glClear( GL_DEPTH_BUFFER_BIT );
+				drawObjects();
+			popAllGL();
+			mRightTextureRenderer->release();
+		}
+		else
+		{
+#endif
+			mEye->setFOV( 90.0f );
+			mEye->setPerspectiveOffset( QVector3D(0,0,0) );
+
+			mEye->setViewOffset( QVector3D(-mStereoEyeDistance/2.0f,0,0) );
+			mEye->setAspect( (float)mLeftTextureRenderer->size().width()/mLeftTextureRenderer->size().height() );
+			mLeftTextureRenderer->bind();
+			pushAllGL();
+				applyDefaultStatesGL();
+				glClear( GL_DEPTH_BUFFER_BIT );
+				drawObjects();
+			popAllGL();
+			mLeftTextureRenderer->release();
+
+			mEye->setViewOffset( QVector3D(mStereoEyeDistance/2.0f,0,0) );
+			mEye->setAspect( (float)mRightTextureRenderer->size().width()/mRightTextureRenderer->size().height() );
+			mRightTextureRenderer->bind();
+			pushAllGL();
+				applyDefaultStatesGL();
+				glClear( GL_DEPTH_BUFFER_BIT );
+				drawObjects();
+			popAllGL();
+			mRightTextureRenderer->release();
+#ifdef OVR_ENABLED
+		}
+#endif
 		pushAllGL();
 			drawStereoFrameBuffers();
 		popAllGL();
 	}
 	else
 	{
+		mEye->setFOV( 90.0f );
+		mEye->setPerspectiveOffset( QVector3D(0,0,0) );
 		mEye->setViewOffset( QVector3D(0,0,0) );
 		mEye->setAspect( (float)width()/height() );
 		pushAllGL();
@@ -592,24 +694,20 @@ void Scene::keyPressEvent( QKeyEvent * event )
 	case Qt::Key_F3:
 		mDebugWindow->setVisible( mDebugWindow->isHidden() );
 		break;
-	case Qt::Key_Plus:
+/*
+	case Qt::Key_F9:
 		mOVRLensCenter += 0.01;
 		break;
-	case Qt::Key_Minus:
+	case Qt::Key_F10:
 		mOVRLensCenter -= 0.01;
 		break;
-	case Qt::Key_F8:
+	case Qt::Key_F11:
 		mOVRScale += 0.01;
 		break;
-	case Qt::Key_F9:
+	case Qt::Key_F12:
 		mOVRScale -= 0.01;
 		break;
-	case Qt::Key_Home:
-		mOVRScaleIn += 0.01;
-		break;
-	case Qt::Key_End:
-		mOVRScaleIn -= 0.01;
-		break;
+*/
 	default:
 		return;
 	}

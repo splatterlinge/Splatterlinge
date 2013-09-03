@@ -32,7 +32,8 @@ Eye::Eye( Scene * scene ) :
 	mAspect( 1.0f ),
 	mNearPlane( 0.1f ),
 	mFarPlane( 500.0f ),
-	mViewOffset()
+	mViewOffset(),
+	mPerspectiveOffset()
 {
 }
 
@@ -46,7 +47,8 @@ Eye::Eye( Eye & other ) :
 	mAspect( other.mAspect ),
 	mNearPlane( other.mNearPlane ),
 	mFarPlane( other.mFarPlane ),
-	mViewOffset( other.mViewOffset )
+	mViewOffset( other.mViewOffset ),
+	mPerspectiveOffset( other.mPerspectiveOffset )
 {
 }
 
@@ -85,6 +87,7 @@ void Eye::applyAL()
 void Eye::applyGL()
 {
 	mProjectionMatrix.setToIdentity();
+	mProjectionMatrix.translate( -mPerspectiveOffset );
 	mProjectionMatrix.perspective( mFOV, mAspect, mNearPlane, mFarPlane );
 
 	mViewMatrixInverse.setToIdentity();

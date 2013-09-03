@@ -95,6 +95,7 @@ public:
 	/// Sets the scale
 	void setScale( const QVector3D & scale ) { mScale = scale; }
 
+	void setPerspectiveOffset( const QVector3D & offset ) { mPerspectiveOffset = offset; }
 	void setViewOffset( const QVector3D & offset ) { mViewOffset = offset; }
 
 	/// The object's position
@@ -127,6 +128,7 @@ private:
 	QMatrix4x4 mViewMatrixInverse;
 	QMatrix4x4 mProjectionMatrix;
 	QVector3D mViewOffset;
+	QVector3D mPerspectiveOffset;
 };
 
 

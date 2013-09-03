@@ -13,6 +13,13 @@ else( USE_QT5 )
 	include( ${QT_USE_FILE} )
 endif( USE_QT5 )
 
+set( USE_OVR FALSE CACHE BOOL "Enables Oculus Rift support" )
+set( OVR_SDK_ROOT CACHE STRING "/opt/OculusSDK" )
+if( USE_OVR )
+	message( STATUS "Oculus Rift enabled" )
+	find_package( OVR REQUIRED )
+endif( USE_OVR )
+
 find_package( OpenGL REQUIRED )
 find_package( GLEW REQUIRED )
 find_package( OpenAL REQUIRED )
@@ -39,6 +46,7 @@ set( Splatterlinge_LIBS
 	${GLEW_LIBRARY}
 	${OPENAL_LIBRARY}
 	${VorbisFile_LIBRARY}
+	${OVR_LIBRARIES}
 )
 
 # Additional include directories
@@ -46,12 +54,15 @@ set( Splatterlinge_INCS
 	${QT_INCLUDES}
 	${GLEW_INCLUDE_DIR}
 	${OPENAL_INCLUDE_DIR}
+	${OPENAL_INCLUDE_DIR}
+	${OVR_INCLUDES}
 	./src/
 )
 
 # Additional compiler definitions
 set( Splatterlinge_DEFS
 	${QT_DEFINITIONS}
+	${OVR_DEFINITIONS}
 	-Wall
 )
 

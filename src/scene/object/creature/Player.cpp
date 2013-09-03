@@ -364,6 +364,16 @@ void Player::giveWeapon( QSharedPointer< AWeapon > weapon )
 
 void Player::updateRotation( const double & delta )
 {
+#ifdef OVR_ENABLED
+	if( scene()->stereo() && scene()->stereoUseOVR() )
+	{
+		mAxisRotationY += -mMouseDelta.x()/5.0f;
+		mMouseDelta = QPointF( 0, 0 );
+		QQuaternion qY = QQuaternion::fromAxisAndAngle( 0,1,0, mAxisRotationY );
+		setRotation( qY * scene()->OVROrientation() );
+		return;
+	}
+#endif
 	mAxisRotationY += -mMouseDelta.x()/5.0f;
 	mAxisRotationX += mMouseDelta.y()/5.0f;
 	if( mAxisRotationX > 80 )

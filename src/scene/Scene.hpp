@@ -27,6 +27,10 @@
 #include <QRectF>
 #include <QGLBuffer>
 
+#ifdef OVR_ENABLED
+#include "OVR.h"
+#endif
+
 
 class QPainter;
 class QGraphicsItem;
@@ -92,6 +96,10 @@ public:
 	StartMenuWindow * startMenuWindow() { return mStartMenuWindow; }
 	DebugWindow * debugWindow() { return mDebugWindow; }
 
+#ifdef OVR_ENABLED
+	QQuaternion OVROrientation();
+#endif
+
 protected:
 	// Overrides:
 	void keyPressEvent( QKeyEvent * event );
@@ -121,10 +129,40 @@ private:
 	bool mStereo;
 	float mStereoEyeDistance;
 	bool mStereoUseOVR;
+
+#ifdef OVR_ENABLED
 	Shader * mOVRShader;
-	float mOVRLensCenter;
-	float mOVRScale;
-	float mOVRScaleIn;
+	float mOVRLensViewportShift;
+	float mOVRDistortionScale;
+	OVR::DeviceManager * mOVRDeviceManager;
+	OVR::HMDDevice * mOVRHMDDevice;
+	OVR::SensorDevice * mOVRSensorDevice;
+	OVR::SensorFusion mOVRSensorFusion;
+	OVR::HMDInfo mOVRHMDInfo;
+	float OVRLensViewportShift( const OVR::HMDInfo & hmdInfo ) const
+	{
+		float lensOffset = hmdInfo.LensSeparationDistance * 0.5f;
+		float lensShift = hmdInfo.HScreenSize * 0.25f - lensOffset;
+		return 4.0f * lensShift / hmdInfo.HScreenSize;
+	}
+	float OVRDistortionFn( const OVR::HMDInfo & hmdInfo, const float & r ) const
+	{
+		float rsq   = r * r;
+		float scale = r * (hmdInfo.DistortionK[0]
+			+ hmdInfo.DistortionK[1] * rsq
+			+ hmdInfo.DistortionK[2] * rsq * rsq
+			+ hmdInfo.DistortionK[3] * rsq * rsq * rsq);
+		return scale;
+	}
+	float OVRDistortionScale( const OVR::HMDInfo & hmdInfo, const float & lensViewportShift, const float & aspect, const float & fitX, const float & fitY ) const
+	{
+		float dx = fitX - lensViewportShift;
+		float dy = fitY / aspect;
+		float fitRadius = sqrtf(dx * dx + dy * dy);
+		return OVRDistortionFn( hmdInfo, fitRadius ) / fitRadius;
+	}
+#endif
+
 
 	bool mMouseGrabbing;
 	bool mBlinkingState;
