@@ -15,11 +15,13 @@
  * along with Splatterlinge. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include"Intersection.hpp"
+#include "Intersection.hpp"
+#include "Triangle.hpp"
+
 
 bool Intersection::intersectTriangleFan(const GLfloat PositionData[], const int firstVertexPos, const int lastVertexPos,
-										const QMatrix4x4 & modelMatrix, const QVector3D & origin, const QVector3D & direction,
-										float * intersectionDistance ){
+	const QMatrix4x4 & modelMatrix, const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
+{
 	QVector3D v[3];
 	v[0] = QVector3D(PositionData[firstVertexPos*3], PositionData[firstVertexPos*3+1], PositionData[firstVertexPos*3+2]);
 	v[1] = QVector3D(PositionData[firstVertexPos*3+3], PositionData[firstVertexPos*3+4], PositionData[firstVertexPos*3+5]);
@@ -44,8 +46,8 @@ bool Intersection::intersectTriangleFan(const GLfloat PositionData[], const int 
 
 
 bool Intersection::intersectTriangleStrip(const GLfloat PositionData[], const int firstVertexPos, const int lastVertexPos,
-										  const QMatrix4x4 & modelMatrix, const QVector3D & origin, const QVector3D & direction,
-										  float * intersectionDistance ){
+	const QMatrix4x4 & modelMatrix, const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
+{
 	QVector3D v[3];
 	v[0] = QVector3D(PositionData[firstVertexPos*3], PositionData[firstVertexPos*3+1], PositionData[firstVertexPos*3+2]);
 	v[1] = QVector3D(PositionData[firstVertexPos*3+3], PositionData[firstVertexPos*3+4], PositionData[firstVertexPos*3+5]);
