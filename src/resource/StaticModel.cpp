@@ -48,7 +48,7 @@ void StaticModelData::unload()
 		return;
 	qDebug() << "-" << this << "StaticModelData" << uid();
 
-	foreach( Part part, mParts )
+	foreach( const Part & part, mParts )
 	{
 		if( part.material )
 		{
@@ -228,7 +228,8 @@ bool StaticModelData::parse()
 	unsigned int current = 0;
 	unsigned int count = 0;
 
-	foreach( Face face, faces )
+	int counter = 1;
+	foreach( const Face & face, faces )
 	{
 		int mode = 0;
 		int size = face.points.size();
@@ -256,7 +257,7 @@ bool StaticModelData::parse()
 			}
 		}
 
-		if( face.material != lastMat || face == faces.last() )
+		if( face.material != lastMat || counter == faces.size() )
 		{
 			Part p;
 			p.start = current - count;
@@ -271,7 +272,7 @@ bool StaticModelData::parse()
 			count = 0;
 		}
 
-		foreach( VertexP3fN3fT2f vertex, face.points )
+		foreach( const VertexP3fN3fT2f & vertex, face.points )
 		{
 			if( mVertices.indexOf( vertex ) == -1 )
 			{
@@ -282,6 +283,8 @@ bool StaticModelData::parse()
 			current++;
 			count++;
 		}
+
+		counter++;
 	}
 
 	mVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
@@ -326,14 +329,14 @@ void StaticModel::draw( const QVector<QMatrix4x4> & instances )
 
 	glPushMatrix();
 
-	foreach( Part part, data()->parts() )
+	foreach( const Part & part, data()->parts() )
 	{
 		if( part.material )
 		{
 			part.material->bind();
 		}
 
-		foreach( QMatrix4x4 instance, instances )
+		foreach( const QMatrix4x4 & instance, instances )
 		{
 			glLoadMatrix( mScene->eye()->viewMatrix() * instance );
 
@@ -374,7 +377,7 @@ void StaticModel::draw()
 
 	glPushMatrix();
 
-	foreach( Part part, data()->parts() )
+	foreach( const Part & part, data()->parts() )
 	{
 		if( part.material )
 		{

@@ -71,7 +71,7 @@ bool AudioSampleData::load()
 		qWarning() << "!" << this << "AudioSampleData" << uid() << "found multiple candidates with the same name: " << candidates;
 
 	bool validFileLoaded = false;
-	foreach( QString file, candidates )
+	foreach( const QString & file, candidates )
 	{
 		if( audioLoader( (baseDirectory()+file).toLocal8Bit().constData(), &mBuffer, &mFrequency, &mFormat ) == 0 )
 		{
