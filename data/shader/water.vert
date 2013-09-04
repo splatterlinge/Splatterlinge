@@ -1,7 +1,6 @@
 #version 120
 
 varying vec3 vVertex;
-varying vec3 vEyeVector;
 varying vec3 vNormal;
 varying vec4 vTexCoord;
 

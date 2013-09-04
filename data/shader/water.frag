@@ -1,14 +1,12 @@
 #version 120
 
 varying vec3 vVertex;
-varying vec3 vEyeVector;
 varying vec3 vNormal;
 varying vec4 vTexCoord;
 
 uniform sampler2D reflectionMap;
 uniform sampler2D refractionMap;
 uniform sampler2D waterMap;
-uniform vec3 eyeVector;
 uniform float time;
 
 void main()
