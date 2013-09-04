@@ -125,7 +125,7 @@ bool MaterialData::load()
 		QStringList textures = s.allKeys();
 		for( QStringList::const_iterator i = textures.constBegin(); i != textures.constEnd(); ++i )
 		{
-			QString mapPath = baseDirectory()+mName+"/" + s.value( (*i) ).toString();
+			QString mapPath = baseDirectory()+mName+'/' + s.value( (*i) ).toString();
 			QImage map = QImage( mapPath );
 			if( map.isNull() )
 			{

@@ -83,7 +83,7 @@ bool StaticModelData::load()
 
 bool StaticModelData::parse()
 {
-	QFile file( baseDirectory()+mName+"/"+mName+".obj" );
+	QFile file( baseDirectory()+mName+'/'+mName+".obj" );
 	QString line;
 	QString keyword;
 	QStringList fields;
@@ -174,7 +174,7 @@ bool StaticModelData::parse()
 
 			while( !fields.isEmpty() )
 			{
-				points = fields.takeFirst().split( "/" );
+				points = fields.takeFirst().split( '/' );
 
 				if( !points.isEmpty() )
 				{

@@ -124,8 +124,8 @@ Sky::Sky( World * world, QString name ) :
 	QSettings s( "./data/sky/"+name+"/sky.ini", QSettings::IniFormat );
 
 	s.beginGroup( "Sky" );
-		QString skyDomePath = "./data/sky/"+name+"/"+s.value( "domeMapPath", "dome.png" ).toString();
-		QString sunFlarePath = "./data/sky/"+name+"/"+s.value( "sunFlarePath", "flare.png" ).toString();
+		QString skyDomePath = "./data/sky/"+name+'/'+s.value( "domeMapPath", "dome.png" ).toString();
+		QString sunFlarePath = "./data/sky/"+name+'/'+s.value( "sunFlarePath", "flare.png" ).toString();
 		mSunFlareSize = s.value( "sunFlareSize", 0.6 ).toFloat();
 		mAxis = QVector3D(
 			s.value( "axisX", 1.0f ).toFloat(),
@@ -150,16 +150,16 @@ Sky::Sky( World * world, QString name ) :
 	s.endGroup();
 
 	s.beginGroup( "StarMap" );
-		QString starMapPathPX = "./data/sky/"+name+"/"+s.value( "positiveX", "star.px.png" ).toString();
-		QString starMapPathNX = "./data/sky/"+name+"/"+s.value( "negativeX", "star.nx.png" ).toString();
-		QString starMapPathPY = "./data/sky/"+name+"/"+s.value( "positiveY", "star.py.png" ).toString();
-		QString starMapPathNY = "./data/sky/"+name+"/"+s.value( "negativeY", "star.ny.png" ).toString();
-		QString starMapPathPZ = "./data/sky/"+name+"/"+s.value( "positiveZ", "star.pz.png" ).toString();
-		QString starMapPathNZ = "./data/sky/"+name+"/"+s.value( "negativeZ", "star.nz.png" ).toString();
+		QString starMapPathPX = "./data/sky/"+name+'/'+s.value( "positiveX", "star.px.png" ).toString();
+		QString starMapPathNX = "./data/sky/"+name+'/'+s.value( "negativeX", "star.nx.png" ).toString();
+		QString starMapPathPY = "./data/sky/"+name+'/'+s.value( "positiveY", "star.py.png" ).toString();
+		QString starMapPathNY = "./data/sky/"+name+'/'+s.value( "negativeY", "star.ny.png" ).toString();
+		QString starMapPathPZ = "./data/sky/"+name+'/'+s.value( "positiveZ", "star.pz.png" ).toString();
+		QString starMapPathNZ = "./data/sky/"+name+'/'+s.value( "negativeZ", "star.nz.png" ).toString();
 	s.endGroup();
 
 	s.beginGroup( "CloudPlane" );
-		QString cloudMapPath = "./data/sky/"+name+"/"+s.value( "map", "clouds.png" ).toString();
+		QString cloudMapPath = "./data/sky/"+name+'/'+s.value( "map", "clouds.png" ).toString();
 		float cloudScale = s.value( "scale", 10.0f ).toFloat();
 		float cloudCurvature = s.value( "curvature", 1.5f ).toFloat();
 		float cloudOffset = s.value( "offset", 1.0f ).toFloat();

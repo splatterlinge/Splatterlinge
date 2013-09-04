@@ -64,7 +64,7 @@ Landscape::Landscape( World * world, QString name ) :
 		);
 		int smoothingPasses = s.value( "smoothingPasses", 1 ).toInt();
 	s.endGroup();
-	mTerrain = new Terrain( "./data/landscape/"+name+"/"+heightMapPath, mTerrainSize, mTerrainOffset, smoothingPasses );
+	mTerrain = new Terrain( "./data/landscape/"+name+'/'+heightMapPath, mTerrainSize, mTerrainOffset, smoothingPasses );
 	mTerrainFilter = new Filter( this, QSize( 3, 3 ) );
 	mTerrainMaterial = new Material( scene()->glWidget(), terrainMaterial );
 
@@ -94,7 +94,7 @@ Landscape::Landscape( World * world, QString name ) :
 					s.value( "materialScaleT", 1.0f ).toFloat()
 				),
 				s.value("priority").toInt(),
-				"./data/landscape/"+name+"/"+s.value("maskPath").toString()
+				"./data/landscape/"+name+'/'+s.value("maskPath").toString()
 			);
 			mBlobs.append( b );
 		}
