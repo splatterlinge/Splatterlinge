@@ -55,9 +55,9 @@ void MainWindow::saveWindowGeometry()
 void MainWindow::toggleFullScreen()
 {
 	if( this->windowState() == Qt::WindowFullScreen )
-		this->showNormal();
+		this->setWindowState( this->windowState() & ~Qt::WindowFullScreen );
 	else
-		this->showFullScreen();
+		this->setWindowState( this->windowState() | Qt::WindowFullScreen );
 }
 
 
