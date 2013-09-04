@@ -150,7 +150,7 @@ public:
 	 * @param exclude Exclude this object and all subordinates - NULL to disable exclusion.
 	 * @param origin The origin of the line.
 	 * @param direction The direction of the line.
-	 * @param length Length of the line from origin - if an intersection occured,
+	 * @param length Length of the line from origin - if an intersection occurred,
 	 *  this will be set to the distance from origin to the intersection point.
 	 * @param normal Optionally return surface normal.
 	 */

@@ -28,7 +28,7 @@ bool Capsule::intersectSphere( const QVector3D & startCapsule, const QVector3D &
 {
 	QVector3D cylCenterVector = endCapsule - startCapsule;
 	float distanceFactorFromStart = QVector3D::dotProduct( centerSphere - startCapsule, cylCenterVector  ) / cylCenterVector.lengthSquared();
-	if( distanceFactorFromStart < 0.0f ) distanceFactorFromStart = 0.0f;	// clamp to endpoints if neccesary
+	if( distanceFactorFromStart < 0.0f ) distanceFactorFromStart = 0.0f;	// clamp to endpoints if necessary
 	if( distanceFactorFromStart > 1.0f ) distanceFactorFromStart = 1.0f;
 	QVector3D closestPoint = startCapsule + ( cylCenterVector * distanceFactorFromStart );
 
