@@ -24,6 +24,8 @@
 #include "../weapon/Laser.hpp"
 #include "../weapon/Minigun.hpp"
 
+#include "float.h"
+
 
 Player::Player( World * world ) :
 	ACreature( world )
