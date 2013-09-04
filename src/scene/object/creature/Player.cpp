@@ -42,6 +42,7 @@ Player::Player( World * world ) :
 	mSpeedPressed = false;
 	mGodMode = true;
 	mOnGround = false;
+	mUnderWater = false;
 
 	mVelocityY = 0.0f;
 	mHeightAboveGround = 2.0f;
@@ -449,7 +450,17 @@ void Player::updatePosition( const double & delta )
 			}
 			finalMove.normalize();
 			finalMove -= mGroundNormal * qMin( 0.0f, ((float)QVector3D::dotProduct( finalMove, mGroundNormal )) );
-		} else {
+		}
+		else if( mUnderWater )
+		{
+			if( mUpPressed )
+				control.setY( control.y() + 1.0f );
+			if( mDownPressed )
+				control.setY( control.y() - 1.0f );
+			finalMove = QVector3D( control.x()*left() + control.y()*up() + control.z()*direction() );
+		}
+		else
+		{
 			finalMove += QVector3D::crossProduct( left(), QVector3D(0,1,0) ) * control.z();
 			finalMove += left() * control.x();
 			finalMove.normalize();
@@ -459,7 +470,11 @@ void Player::updatePosition( const double & delta )
 
 		mVelocityY += -80.0f * delta;	// apply gravity
 
-		if( mUpPressed && mOnGround && mGroundNormal.y() > 0.7 )	// jump if key is pressed and player touches ground
+		if( mUnderWater )
+		{
+			mVelocityY = 0.0f;
+		}
+		else if( mUpPressed && mOnGround && mGroundNormal.y() > 0.7 )	// jump if key is pressed and player touches ground
 			mVelocityY = 20.0f;
 
 		if( mDownPressed )	// duck by lowering the player's height above ground
@@ -483,6 +498,21 @@ void Player::updatePosition( const double & delta )
 		setPosition( newPosition );
 	} else {
 		mOnGround = false;
+	}
+	if( newPosition.y() <= 0.3 )
+	{
+		mUnderWater = true;
+		if( mCurrentWeapon )
+			mCurrentWeapon->holster();
+	}
+	else
+	{
+		if( mUnderWater )
+		{
+			mUnderWater = false;
+			if( mCurrentWeapon )
+				mCurrentWeapon->pull();
+		}
 	}
 }
 
