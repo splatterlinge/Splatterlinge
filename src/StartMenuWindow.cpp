@@ -74,19 +74,19 @@ void StartMenuWindow::initMenu()
 //	mNewGame->setPalette( pal );
 	mNewGame->setFont( buttonFont );
 	layout->addWidget( mNewGame );
-	connect( mNewGame, SIGNAL( released() ), this, SLOT( handleNewGameButton() ) );
+	connect( mNewGame, SIGNAL(released()), this, SLOT(handleNewGameButton()) );
 
 	mOptions = new QPushButton( "Options", this );
 //	mOptions->setPalette( pal );
 	mOptions->setFont( buttonFont );
 	layout->addWidget( mOptions );
-	connect( mOptions, SIGNAL( released() ), this, SLOT( handleOptionsButton() ) );
+	connect( mOptions, SIGNAL(released()), this, SLOT(handleOptionsButton()) );
 
 	mEnd = new QPushButton( "End Game", this );
 //	mEnd->setPalette( pal );
 	mEnd->setFont( buttonFont );
 	layout->addWidget( mEnd );
-	connect( mEnd, SIGNAL( released() ), this, SLOT( handleEndGameButton() ) );
+	connect( mEnd, SIGNAL(released()), this, SLOT(handleEndGameButton()) );
 
 	setLayout( layout );
 }

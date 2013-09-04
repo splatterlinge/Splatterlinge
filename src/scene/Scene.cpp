@@ -157,7 +157,7 @@ lSkipOVR:
 	secondTimer->start();
 
 	QTimer * halfSecondTimer = new QTimer( this );
-	QObject::connect( halfSecondTimer, SIGNAL( timeout() ), this, SLOT( halfSecondPassed() ) );
+	QObject::connect( halfSecondTimer, SIGNAL(timeout()), this, SLOT(halfSecondPassed()) );
 	halfSecondTimer->setInterval( 500 );
 	halfSecondTimer->start();
 
