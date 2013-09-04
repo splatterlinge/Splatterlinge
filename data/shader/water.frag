@@ -19,8 +19,8 @@ void main()
 
 	vec2 texCoord = vec2( vTexCoord.x / vTexCoord.w, vTexCoord.y / vTexCoord.w );
 	vec2 samplePos = vec2(256, 255) / 4 + time * 8 * vec2(0,1);
-	vec3 bump = vec3( texture2D( waterMap, gl_TexCoord[0].st/16 + samplePos ) );
-	vec2 perturbation = texCoord + 3 * (bump.rg - 0.5f);
+	vec3 bump = vec3( texture2D( waterMap, gl_TexCoord[0].st/32 + samplePos ) );
+	vec2 perturbation = texCoord + 2 * (bump.rg - 0.5f);
 	vec2 refrPerturbation = texCoord + 0.5 * (bump.rg - 0.5f);
 
 	vec3 reflection = vec3( texture2D( reflectionMap, perturbation ) );
