@@ -125,7 +125,7 @@ bool StaticModelData::parse()
 			continue;
 		}
 
-		fields = line.split( " ", QString::SkipEmptyParts );
+		fields = line.split( ' ', QString::SkipEmptyParts );
 		keyword = fields.takeFirst();
 
 		if( keyword == "g" )
@@ -201,7 +201,7 @@ bool StaticModelData::parse()
 		else if( keyword == "usemtl" )
 		{
 			QFileInfo fileinfo( file );
-			QFileInfo mat( MaterialData::baseDirectory()+fileinfo.baseName()+"_"+fields.takeFirst() );
+			QFileInfo mat( MaterialData::baseDirectory()+fileinfo.baseName()+'_'+fields.takeFirst() );
 			if( mat.exists() )
 			{
 				material = mat.fileName();
