@@ -507,9 +507,12 @@ void Player::updatePosition( const double & delta )
 	}
 	else
 	{
-		mUnderWater = false;
-		if( mCurrentWeapon )
-			mCurrentWeapon->pull();
+		if( mUnderWater )
+		{
+			mUnderWater = false;
+			if( mCurrentWeapon )
+				mCurrentWeapon->pull();
+		}
 	}
 }
 
