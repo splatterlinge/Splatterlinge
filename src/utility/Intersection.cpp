@@ -35,7 +35,8 @@ bool Intersection::intersectTriangleFan(const GLfloat PositionData[], const int 
 
 		v[2] = QVector3D(PositionData[i*3], PositionData[i*3+1], PositionData[i*3+2]);
 
-		if( Triangle::intersectRay(modelMatrix.map(v[0]), modelMatrix.map(v[1]), modelMatrix.map(v[2]), origin, direction, intersectionDistance) )
+		if( Triangle::intersectRay(modelMatrix.map(v[0]), modelMatrix.map(v[1]), modelMatrix.map(v[2]), origin, direction, intersectionDistance) ||
+			Triangle::intersectRay(modelMatrix.map(v[0]), modelMatrix.map(v[2]), modelMatrix.map(v[1]), origin, direction, intersectionDistance) )
 		{
 			return true;
 		}
@@ -62,7 +63,7 @@ bool Intersection::intersectTriangleStrip(const GLfloat PositionData[], const in
 		v[2] = QVector3D(PositionData[i*3], PositionData[i*3+1], PositionData[i*3+2]);
 
 		if( Triangle::intersectCulledRay(modelMatrix.map(v[0]), modelMatrix.map(v[1]), modelMatrix.map(v[2]), origin, direction, intersectionDistance) ||
-				Triangle::intersectCulledRay(modelMatrix.map(v[1]), modelMatrix.map(v[0]), modelMatrix.map(v[2]), origin, direction, intersectionDistance) )
+			Triangle::intersectCulledRay(modelMatrix.map(v[1]), modelMatrix.map(v[0]), modelMatrix.map(v[2]), origin, direction, intersectionDistance) )
 		{
 			return true;
 		}

@@ -674,8 +674,11 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 void Splatterling::receiveDamage( int damage, const QVector3D * position, const QVector3D * direction )
 {
 	float rayLength;
-	if(intersectHead(*position, *direction, &rayLength) || intersectBody(*position, *direction, &rayLength)
-			|| intersectWing(*position, *direction, &rayLength)	){
+
+	QVector3D newPos = (*position) - 0.1f*(*direction);
+
+	if(intersectHead(newPos, *direction, &rayLength) || intersectBody(newPos, *direction, &rayLength)
+			|| intersectWing(newPos, *direction, &rayLength)	){
 
 		damage *= damageMultiplicationFactor[targetBodyPart];
 		ACreature::receiveDamage( damage, direction );
