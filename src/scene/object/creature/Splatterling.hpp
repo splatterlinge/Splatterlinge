@@ -20,7 +20,7 @@ public:
 	static const GLsizeiptr TexSize = 72 * 2 * sizeof( GLfloat );
 
 
-	static const float SplatterlingSizeFactor = 0.5f;
+	static const float SplatterlingSizeFactor = 0.25f;
 	static const int BufferSize = 3;
 	static const float SplatterlingLength = 8.8f;
 	static const float SplatterlingBoundingSphereSize = 18.0f;

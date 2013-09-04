@@ -403,40 +403,21 @@ void Splatterling::updateSelf( const double & delta )
 				playerDetected = false;
 			}
 
-			if( dist < 13 )
+			if( dist < 10 )
 			{
 				//Player in front of player
-				//Player near get him
-
 				if(recalculationOfRotationAngle){
-					rotationAroundPlayer = asin((worldPosition().x() - world()->player()->worldPosition().x())/dist);
-					rotationAroundPlayer = rotationAroundPlayer * 180.0 / M_PI;
+					mTarget = QVector3D(mTarget.x(), worldPosition().y(), mTarget.z());
+					mTarget = ( mTarget - worldPosition() ).normalized();
 					recalculationOfRotationAngle = false;
 				}
 
+				QVector3D directionToTarget = mTarget;
+				QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
+				setRotation( QQuaternion::slerp( rotation(), targetRotation, 5*delta ) );
+				setPosition( position() + direction()*delta * 8.0 );
+
 				if(mCoolDown == 0.0f){
-					rotationAroundPlayer += RotationStepSize;
-					if(rotationAroundPlayer >= 360.0f){
-						rotationAroundPlayer = 0.0f;
-					}
-
-					if(mTarget == world()->player()->worldPosition()){
-						setPositionX(world()->player()->worldPosition().x() + sin(rotationAroundPlayer*M_PI/180.0)*(12.8));
-						setPositionZ(world()->player()->worldPosition().z() + cos(rotationAroundPlayer*M_PI/180.0)*(12.8));
-					}else{
-						recalculationOfRotationAngle = true;
-					}
-
-					mTarget = world()->player()->worldPosition();
-					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
-					QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
-					setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.5 ) );
-
-
-					if(!mSnapSound->isPlaying()){
-						mSnapSound->play();
-					}
-
 					world()->player()->receiveDamage( 1 );
 					mCoolDown = 0.1f;
 				}
@@ -446,6 +427,7 @@ void Splatterling::updateSelf( const double & delta )
 				{
 					//Player near get him
 					mTarget = world()->player()->worldPosition();
+					mTarget += QVector3D(0,1,0);
 					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 					QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
 					setRotation( QQuaternion::slerp( rotation(), targetRotation, 5*delta ) );
