@@ -112,28 +112,28 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mOVRDeviceManager = OVR::DeviceManager::Create();
 	if( !mOVRDeviceManager )
 	{
-		qDebug() << "Could not create OVR Device Manager!";
+		qCritical() << "!!! Could not create OVR Device Manager!";
 		mStereoUseOVR = false;
 		goto lSkipOVR;
 	}
 	mOVRHMDDevice = mOVRDeviceManager->EnumerateDevices<OVR::HMDDevice>().CreateDevice();
 	if( !mOVRHMDDevice )
 	{
-		qDebug() << "Could not create OVR Device!";
+		qCritical() << "!!! Could not create OVR Device!";
 		mStereoUseOVR = false;
 		goto lSkipOVR;
 	}
 	if( mOVRHMDDevice->GetDeviceInfo(&mOVRHMDInfo) )
 	{
-		qDebug() << "OVR device info:";
-		qDebug() << "\tDisplay Device Name =" << mOVRHMDInfo.DisplayDeviceName;
-		qDebug() << "\tInterpupillary Distance =" << mOVRHMDInfo.InterpupillaryDistance;
-		qDebug() << "\tDistortion =" << mOVRHMDInfo.DistortionK[0] << mOVRHMDInfo.DistortionK[1] << mOVRHMDInfo.DistortionK[2] << mOVRHMDInfo.DistortionK[3];
+		qDebug() << "* OVR device info:";
+		qDebug() << "\t* Display Device Name =" << mOVRHMDInfo.DisplayDeviceName;
+		qDebug() << "\t* Interpupillary Distance =" << mOVRHMDInfo.InterpupillaryDistance;
+		qDebug() << "\t* Distortion =" << mOVRHMDInfo.DistortionK[0] << mOVRHMDInfo.DistortionK[1] << mOVRHMDInfo.DistortionK[2] << mOVRHMDInfo.DistortionK[3];
 	}
 	mOVRSensorDevice = mOVRHMDDevice->GetSensor();
 	if( !mOVRSensorDevice )
 	{
-		qDebug() << "Could not get OVR Sensor!";
+		qCritical() << "!!! Could not get OVR Sensor!";
 		mStereoUseOVR = false;
 		goto lSkipOVR;
 	}

@@ -118,12 +118,12 @@ void Laser::updateSelf( const double & delta )
 				mTrailLength = mRange;
 				AObject * target = world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength );
 				mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
+
+				if( target )
+					mImpactParticles->emitSpherical( mTrailEnd, 64, 5.0, 10.0, QVector3D(0,10,0) );
 				ACreature * victim = dynamic_cast<ACreature*>(target);
 				if( victim )
-				{
 					victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
-				}
-				mImpactParticles->emitSpherical( mTrailEnd, 64, 5.0, 10.0, QVector3D(0,10,0) );
 
 				mFireSound->play();
 				mReloadSound->play();

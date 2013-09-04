@@ -94,10 +94,10 @@ World::World( Scene * scene, QString name ) :
 	add( mDummy );
 	*/
 
-	mSplatterlingList = QList<QSharedPointer<Splatterling> >();
-	for (int i = 0; i < 5; ++i) {
-		mSplatterlingList.append(QSharedPointer<Splatterling>( new Splatterling( this ) ));
-		add(mSplatterlingList.last());
+	for( int i = 0; i < 5; ++i )
+	{
+		mSplatterlingList.append( QSharedPointer<Splatterling>( new Splatterling(this) ) );
+		add( mSplatterlingList.last() );
 	}
 
 	scene->addKeyListener( this );

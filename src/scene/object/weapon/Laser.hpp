@@ -44,6 +44,7 @@ public:
 	virtual void triggerReleased();
 	virtual void holster();
 	virtual void pull();
+	virtual bool isPulled() { return mDrawn; }
 	virtual void setTarget( const QVector3D * target );
 
 private:

@@ -39,8 +39,10 @@ public:
 	virtual void triggerReleased() = 0;
 	virtual void holster() = 0;
 	virtual void pull() = 0;
-	virtual void reload() {};
-	virtual void setTarget( const QVector3D * target ) {};
+	virtual bool isPulled() = 0;
+	virtual void reload() {}
+	virtual bool isReloading() { return false; }
+	virtual void setTarget( const QVector3D * target ) {}
 
 	const QString & name() const { return mName; }
 	const int & ammo() const { return mAmmo; }

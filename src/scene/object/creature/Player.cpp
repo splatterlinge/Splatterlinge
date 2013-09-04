@@ -17,7 +17,6 @@
 
 #include "Player.hpp"
 
-
 #include <scene/Scene.hpp>
 #include <effect/SplatterSystem.hpp>
 #include "../World.hpp"
@@ -403,37 +402,40 @@ void Player::updatePosition( const double & delta )
 
 	if( mGodMode )
 	{
+		speed = 30.0f;
+		if( mSpeedPressed )
+			speed *= 10.0f;
 		if( mUpPressed )
 			control.setY( control.y() + 1.0f );
 		if( mDownPressed )
 			control.setY( control.y() - 1.0f );
-		if( mSpeedPressed )
-		{
-			speed = 300.0;
-		} else {
-			speed = 50.0;
-		}
-		QVector3D finalMove( control.x()*left() + control.y()*up() + control.z()*direction() );
-		move( finalMove*speed*delta );
-	} else {
 		control.normalize();
+		QVector3D finalMove( control.x()*left() + control.y()*up() + control.z()*direction() );
+		move( finalMove * speed * delta );
+	} else {
+		speed = 8.0f;
 		if( mSpeedPressed && mSpeedCooldown <= 0.0f )
 		{
-			speed = 15.0;
+			speed *= 2.0f;
 			mSpeedCounter += delta;
-		} else {
-			speed = 8.0;
 		}
-
 		if( mSpeedCounter >= 3.0f )
 		{
 			mSpeedPressed = false;
 			mSpeedCooldown = 2.0f;
 			mSpeedCounter = 0.0f;
 		}
-
 		if( mSpeedCooldown > 0.0f )
 			mSpeedCooldown -= delta;
+		if( mUnderWater )
+		{
+			speed *= 0.5f;
+			if( mUpPressed )
+				control.setY( control.y() + 1.0f );
+			if( mDownPressed )
+				control.setY( control.y() - 1.0f );
+		}
+		control.normalize();
 
 		QVector3D finalMove(0,0,0);
 		if( mOnGround )
@@ -451,14 +453,6 @@ void Player::updatePosition( const double & delta )
 			finalMove.normalize();
 			finalMove -= mGroundNormal * qMin( 0.0f, ((float)QVector3D::dotProduct( finalMove, mGroundNormal )) );
 		}
-		else if( mUnderWater )
-		{
-			if( mUpPressed )
-				control.setY( control.y() + 1.0f );
-			if( mDownPressed )
-				control.setY( control.y() - 1.0f );
-			finalMove = QVector3D( control.x()*left() + control.y()*up() + control.z()*direction() );
-		}
 		else
 		{
 			finalMove += QVector3D::crossProduct( left(), QVector3D(0,1,0) ) * control.z();
@@ -466,15 +460,43 @@ void Player::updatePosition( const double & delta )
 			finalMove.normalize();
 		}
 
-		move( finalMove*speed*delta );
+		move( finalMove * speed * delta );
 
-		mVelocityY += -80.0f * delta;	// apply gravity
-
+		// simulate further movement on y axis using a more accurate model
+		float forceY = 0.0f;
+		float drag = 0.0f;
 		if( mUnderWater )
 		{
-			mVelocityY = 0.0f;
+			forceY = control.y() * 8.0f;
+			drag = 1.0f;
 		}
-		else if( mUpPressed && mOnGround && mGroundNormal.y() > 0.7 )	// jump if key is pressed and player touches ground
+		else
+		{
+			drag = 0.01f;
+		}
+		// apply gravity force with a smooth transition between under/over-water depending on how much we are covered in water
+		forceY += -80.0f * (1.0f-mWaterImmersion);
+		forceY += -0.5f * mWaterImmersion;
+
+		// calculate friction of air/fluid
+		float fr = 0.5f * drag * mVelocityY*mVelocityY * 1.0f;
+		// fr may get too big for a float on very low framerates
+		if( fr < FLT_MAX )
+		{
+			//subtract friction force
+			if( mVelocityY > FLT_EPSILON )
+				forceY -= fr;
+			else if( mVelocityY < -FLT_EPSILON )
+				forceY += fr;
+		}
+		else
+		{
+			mVelocityY = 0.0f;
+			forceY = 0.0f;
+		}
+		mVelocityY += forceY * delta;
+
+		if( mUpPressed && mOnGround && mGroundNormal.y() > 0.7 )	// jump if key is pressed and player touches ground
 			mVelocityY = 20.0f;
 
 		if( mDownPressed )	// duck by lowering the player's height above ground
@@ -489,30 +511,28 @@ void Player::updatePosition( const double & delta )
 	}
 
 	QVector3D newPosition = position();
-	if( !( world()->collideSphere( this, mHeightAboveGround, newPosition, &mGroundNormal ) ).isEmpty() )
+	mOnGround = !( world()->collideSphere( this, mHeightAboveGround, newPosition, &mGroundNormal ) ).isEmpty();
+	if( mOnGround )
 	{
-		mOnGround = true;
 		mGroundNormal.normalize();
 		if( mGroundNormal.y() > 0.7 && mVelocityY < 0.0f )
 			mVelocityY = 0.0f;
 		setPosition( newPosition );
-	} else {
-		mOnGround = false;
 	}
-	if( newPosition.y() <= 0.3 )
+
+	mUnderWater = position().y()-mHeightAboveGround/4.0f < world()->landscape()->waterHeight();
+	mWaterImmersion = (world()->landscape()->waterHeight() - position().y() + mHeightAboveGround) / mHeightAboveGround;
+	if( mWaterImmersion < 0.0f )
+		mWaterImmersion = 0.0f;
+	if( mWaterImmersion > 1.0f )
+		mWaterImmersion = 1.0f;
+	if( mCurrentWeapon )
 	{
-		mUnderWater = true;
-		if( mCurrentWeapon )
+		bool nearWater = position().y()-mHeightAboveGround/2.0f < world()->landscape()->waterHeight();
+		if( mUnderWater && mCurrentWeapon->isPulled() )
 			mCurrentWeapon->holster();
-	}
-	else
-	{
-		if( mUnderWater )
-		{
-			mUnderWater = false;
-			if( mCurrentWeapon )
-				mCurrentWeapon->pull();
-		}
+		else if( !nearWater && !mCurrentWeapon->isPulled() )
+			mCurrentWeapon->pull();
 	}
 }
 

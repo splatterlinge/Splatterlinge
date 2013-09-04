@@ -32,7 +32,9 @@
 #include <QSettings>
 #include <QGLShaderProgram>
 
+
 int Landscape::Blob::sQuality = 0;
+
 
 Landscape::Landscape( World * world, QString name ) :
 	AWorldObject( world )
