@@ -344,8 +344,16 @@ Splatterling::~Splatterling()
 
 static QVector3D randomPointOnWorld( World * world )
 {
-	QVector3D pos( RandomNumber::minMax( -500, 500 ), 0, RandomNumber::minMax( -500, 500 ) );
-	pos.setY( world->landscape()->terrain()->getHeight( pos ) );
+//	QVector3D pos( RandomNumber::minMax( -500, 500 ), 0, RandomNumber::minMax( -500, 500 ) );
+	QVector3D terrainSize = world->landscape()->terrain()->size();
+	QVector3D terrainOffset = world->landscape()->terrain()->offset();
+	QVector3D pos;
+	do{
+		pos = QVector3D( RandomNumber::minMax( terrainOffset.x(), terrainSize.x()+terrainOffset.x() ), 0, RandomNumber::minMax( terrainOffset.z(), terrainSize.z()+terrainOffset.z() ) );
+		pos.setY( world->landscape()->terrain()->getHeight( pos ) );
+
+	}while(pos.y() <= world->landscape()->waterHeight());
+
 	return pos;
 }
 
@@ -353,7 +361,7 @@ static QVector3D randomPointOnWorld( World * world )
 void Splatterling::randomDestinationPoint()
 {
 	QVector3D pos( RandomNumber::minMax( this->position().x() - 100, this->position().x() + 100 ), 0, RandomNumber::minMax( this->position().z() - 100, this->position().z() + 100 ) );
-	pos.setY( this->world()->landscape()->terrain()->getHeight( pos ) + 20 );
+	pos.setY( this->world()->landscape()->terrain()->getHeight( pos ) + RandomNumber::minMax(20,40) );
 	destinationPoint = pos;
 }
 
