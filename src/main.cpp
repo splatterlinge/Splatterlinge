@@ -15,9 +15,10 @@
  * along with Splatterlinge. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QtGui>
-
 #include "MainWindow.hpp"
+
+#include <QDir>
+#include <QTextCodec>
 
 
 int main( int argc, char * argv[] )
