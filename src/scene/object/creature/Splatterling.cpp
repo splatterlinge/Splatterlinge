@@ -355,7 +355,7 @@ static QVector3D randomPointOnWorld( World * world )
 
 		distanceToPlayer = (world->player()->position() - pos).length();
 
-	}while(pos.y() <= world->landscape()->waterHeight() && distanceToPlayer < Splatterling::DetectionDistance);
+	}while(pos.y() <= world->landscape()->waterHeight() || distanceToPlayer < Splatterling::DetectionDistance);
 
 	return pos;
 }
@@ -387,7 +387,21 @@ void Splatterling::updateSelf( const double & delta )
 		case ALIVE:
 		{
 			mWingSound->setPositionAutoVelocity(this->worldPosition(), delta);
-			GLfloat dist = ( world()->player()->worldPosition() - worldPosition() ).length();
+			mSnapSound->setPositionAutoVelocity(this->worldPosition(), delta);
+			QVector3D vectPlayerSplatter = world()->player()->worldPosition() - worldPosition();
+			GLfloat dist = ( vectPlayerSplatter ).length();
+			vectPlayerSplatter = vectPlayerSplatter.normalized();
+
+
+			double anglePlayerInSight = acos( QVector3D::dotProduct(vectPlayerSplatter, worldDirection()) ) * 360 / M_PI;
+
+			if(anglePlayerInSight < 100 && anglePlayerInSight > -100 && dist < 2.0f*Splatterling::DetectionDistance){
+				playerDetected = true;
+			}else if(dist < Splatterling::DetectionDistance){
+				playerDetected = true;
+			}else{
+				playerDetected = false;
+			}
 
 			if( dist < 13 )
 			{
@@ -428,7 +442,7 @@ void Splatterling::updateSelf( const double & delta )
 				}
 			}
 			else
-				if( dist < Splatterling::DetectionDistance || playerDetected)
+				if( playerDetected )
 				{
 					//Player near get him
 					mTarget = world()->player()->worldPosition();
@@ -437,7 +451,6 @@ void Splatterling::updateSelf( const double & delta )
 					setRotation( QQuaternion::slerp( rotation(), targetRotation, 5*delta ) );
 					setPosition( position() + direction()*delta * 12.0 );
 					recalculationOfRotationAngle = true;
-					playerDetected = true;
 				}
 				else
 				{
