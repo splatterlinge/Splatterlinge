@@ -110,7 +110,7 @@ bool StaticModelData::parse()
 	while( !in.atEnd() ) {
 		line = in.readLine().trimmed();
 
-		while( line.endsWith( "\\" ) )
+		while( line.endsWith( QLatin1String("\\") ) )
 		{
 			line.truncate( line.size()-1 );
 			if( in.atEnd() )
@@ -120,7 +120,7 @@ bool StaticModelData::parse()
 			line += in.readLine().trimmed();
 		}
 
-		if( line.startsWith( "#" ) || line.isEmpty() )
+		if( line.startsWith( '#' ) || line.isEmpty() )
 		{
 			continue;
 		}
