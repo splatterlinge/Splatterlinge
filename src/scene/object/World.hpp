@@ -114,6 +114,7 @@ private:
 	QSharedPointer<Teapot> mTeapot;
 	QSharedPointer<Player> mPlayer;
 	QSharedPointer<Dummy> mDummy;
+	QList<QSharedPointer<Splatterling> > mSplatterlingList;
 	QSharedPointer<Splatterling> mSplatterling;
 	QSharedPointer<Splatterling> mSplatterlingSecond;
 	QVector3D mTarget;
