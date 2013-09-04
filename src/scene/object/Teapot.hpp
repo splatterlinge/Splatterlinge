@@ -1,4 +1,10 @@
 /*
+ * Copyright (C) 2013
+ * Branimir Djordjevic <branimir.djordjevic@gmail.com>
+ * Tobias Himmer <provisorisch@online.de>
+ * Michael Wydler <michael.wydler@gmail.com>
+ * Karl-Heinz Zimmermann <karlzimmermann3787@gmail.com>
+ *
  * This file is part of Splatterlinge.
  *
  * Splatterlinge is free software: you can redistribute it and/or modify
