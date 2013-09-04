@@ -30,6 +30,7 @@ public:
 	static const int WingOneYPos = ( ( BodyVertexCount + HeadVertexCount ) * 3 ) + 4;
 	static const int WingTwoYPos = ( ( BodyVertexCount + HeadVertexCount ) * 3 ) + ( 3 * 3 ) + 4;
 	static const double RotationStepSize = 2.0;
+	static const int DetectionDistance = 60;
 	enum
 	{
 		POSITION_OBJECT = 0,

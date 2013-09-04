@@ -348,11 +348,14 @@ static QVector3D randomPointOnWorld( World * world )
 	QVector3D terrainSize = world->landscape()->terrain()->size();
 	QVector3D terrainOffset = world->landscape()->terrain()->offset();
 	QVector3D pos;
+	GLfloat distanceToPlayer = 0.0f;
 	do{
 		pos = QVector3D( RandomNumber::minMax( terrainOffset.x(), terrainSize.x()+terrainOffset.x() ), 0, RandomNumber::minMax( terrainOffset.z(), terrainSize.z()+terrainOffset.z() ) );
 		pos.setY( world->landscape()->terrain()->getHeight( pos ) );
 
-	}while(pos.y() <= world->landscape()->waterHeight());
+		distanceToPlayer = (world->player()->position() - pos).length();
+
+	}while(pos.y() <= world->landscape()->waterHeight() && distanceToPlayer < Splatterling::DetectionDistance);
 
 	return pos;
 }
@@ -425,7 +428,7 @@ void Splatterling::updateSelf( const double & delta )
 				}
 			}
 			else
-				if( dist < 200 || playerDetected)
+				if( dist < Splatterling::DetectionDistance || playerDetected)
 				{
 					//Player near get him
 					mTarget = world()->player()->worldPosition();
