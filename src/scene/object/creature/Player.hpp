@@ -81,6 +81,7 @@ private:
 	bool mSpeedPressed;
 	bool mGodMode;
 	bool mOnGround;
+	bool mUnderWater;
 	int mArmor;
 	float mVelocityY;
 	float mHeightAboveGround;
