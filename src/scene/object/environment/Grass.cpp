@@ -38,7 +38,7 @@ Grass::Grass( Landscape * landscape, const QString & filename, const QPoint & ma
 
 	mModel = new StaticModel( world()->scene(), filename );
 	setPosition( QVector3D( position.x(), 0, position.y() ) );
-	setBoundingSphere( qMax(radi.width(),radi.height()) + qMax(mModel->size().width(),mModel->size().height()) * 0.8f * 1.5f );
+	setBoundingSphere( qMax( radi.width(),radi.height() ) );
 
 	for( int i=0; i<number; i++ )
 	{

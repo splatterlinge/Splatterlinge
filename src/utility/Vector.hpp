@@ -25,12 +25,17 @@
 #define UTILITY_VECTOR_INCLUDED
 
 
+#include <QVector2D>
 #include <QVector3D>
+#include <QStringList>
 
 
 namespace Vector
 {
 	QVector3D orthoNormalize( const QVector3D & fixed, const QVector3D & v );
+
+	QVector2D V2f( QStringList & list );
+	QVector3D V3f( QStringList & list );
 }
 
 

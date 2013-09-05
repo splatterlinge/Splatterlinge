@@ -30,6 +30,7 @@
 #include "Material.hpp"
 #include <scene/Scene.hpp>
 #include <geometry/Vertex.hpp>
+#include <utility/Vector.hpp>
 
 #include <QGLBuffer>
 #include <QFile>
@@ -40,6 +41,7 @@ class Face
 {
 public:
 	Face() {}
+	Face( QStringList & fields, QString & material, QVector<QVector3D> * positions, QVector<QVector2D> * texCoords, QVector<QVector3D> * normals );
 
 	QVector<VertexP3fN3fT2f> points;
 	QString material;
@@ -54,6 +56,9 @@ public:
 class Part
 {
 public:
+	Part() {}
+	Part( unsigned int current, unsigned int count, GLWidget * widget, QString & material );
+
 	unsigned int start;
 	unsigned int count;
 	Material * material;
@@ -67,7 +72,6 @@ public:
 	virtual ~StaticModelData();
 
 	const QString & name() const { return mName; }
-	const QSizeF & size() const { return mSize; }
 	int mode() { return mMode; }
 	QVector<Part> & parts() { return mParts; }
 	QGLBuffer & vertexBuffer() { return mVertexBuffer; }
@@ -84,13 +88,16 @@ public:
 protected:
 	GLWidget * mGLWidget;
 	QString mName;
-	QSizeF mSize;
-	int mMode;
+	GLuint mMode;
 	QVector<Part> mParts;
 	QVector<VertexP3fN3fT2f> mVertices;
 	QVector<unsigned int> mIndices;
 	QGLBuffer mVertexBuffer;
 	QGLBuffer mIndexBuffer;
+
+	void generateParts( QVector<Face> * faces );
+	void generateBuffers();
+	QString generateMaterialName( QFile & file, QStringList & fields );
 };
 
 
@@ -100,8 +107,6 @@ class StaticModel : public AResource<StaticModelData>
 public:
 	StaticModel( Scene * scene, QString name );
 	virtual ~StaticModel();
-
-	const QSizeF & size() const { return constData()->size(); }
 
 	void draw( const QVector<QMatrix4x4> & instances );
 	void draw();

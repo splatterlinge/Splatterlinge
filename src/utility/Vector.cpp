@@ -38,3 +38,20 @@ QVector3D Vector::orthoNormalize( const QVector3D & fixed, const QVector3D & v )
 		return QVector3D();
 	return ortho/length;
 }
+
+
+QVector2D Vector::V2f( QStringList & list )
+{
+	float x = list.takeFirst().toFloat();
+	float y = list.takeFirst().toFloat();
+	return QVector2D( x, y );
+}
+
+
+QVector3D Vector::V3f( QStringList & list )
+{
+	float x = list.takeFirst().toFloat();
+	float y = list.takeFirst().toFloat();
+	float z = list.takeFirst().toFloat();
+	return QVector3D( x, y, z );
+}

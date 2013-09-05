@@ -30,6 +30,45 @@
 #include <float.h>
 
 
+Face::Face( QStringList &fields, QString &material, QVector<QVector3D> *positions, QVector<QVector2D> *texCoords, QVector<QVector3D> *normals )
+{
+	VertexP3fN3fT2f vertex;
+	QStringList points;
+
+	while( !fields.isEmpty() )
+	{
+		points = fields.takeFirst().split( '/' );
+
+		if( !points.isEmpty() )
+		{
+			vertex.position = positions->at( points.takeFirst().toInt()-1 );
+		}
+		if( !points.isEmpty() )
+		{
+			vertex.texCoord = texCoords->at( points.takeFirst().toInt()-1 );
+		}
+		if( !points.isEmpty() )
+		{
+			vertex.normal = normals->at( points.takeFirst().toInt()-1 );
+		}
+
+		this->points.append( vertex );
+		this->material = material;
+	}
+}
+
+
+Part::Part( unsigned int current, unsigned int count, GLWidget * widget, QString & material )
+{
+	this->start = current - count;
+	this->count = count;
+	if( !material.isEmpty() )
+		this->material = new Material( widget, material );
+	else
+		this->material = NULL;
+}
+
+
 RESOURCE_CACHE(StaticModelData);
 
 
@@ -98,13 +137,6 @@ bool StaticModelData::parse()
 	QVector<QVector2D> texCoords;
 	QVector<QVector3D> normals;
 	QString material;
-	float x, y, z;
-	float u, v;
-
-	float minX = 0;
-	float maxX = 0;
-	float minY = 0;
-	float maxY = 0;
 
 	if( !file.open( QIODevice::ReadOnly ) ) {
 		qCritical() << "!!" << this << "StaticModelData" << uid() << "Could not open "<< file.fileName() << ": " << file.errorString();
@@ -144,61 +176,19 @@ bool StaticModelData::parse()
 		}
 		else if( keyword == "v" )
 		{
-			x = fields.takeFirst().toFloat();
-			if( x > maxX )
-				maxX = x;
-			if( x < minX )
-				minX = x;
-
-			y = fields.takeFirst().toFloat();
-			if( y > maxY )
-				maxY = y;
-			if( y < minY )
-				minY = y;
-
-			z = fields.takeFirst().toFloat();
-			positions.append( QVector3D( x, y, z ) );
+			positions.append( Vector::V3f( fields ) );
 		}
 		else if( keyword == "vt" )
 		{
-			u = fields.takeFirst().toFloat();
-			v = fields.takeFirst().toFloat();
-			texCoords.append( QVector2D( u, v ) );
+			texCoords.append( Vector::V2f( fields ) );
 		}
 		else if( keyword == "vn" )
 		{
-			x = fields.takeFirst().toFloat();
-			y = fields.takeFirst().toFloat();
-			z = fields.takeFirst().toFloat();
-			normals.append( QVector3D( x, y, z ) );
+			normals.append( Vector::V3f( fields ) );
 		}
 		else if( keyword == "f" )
 		{
-			Face face;
-			VertexP3fN3fT2f vertex;
-			QStringList points;
-
-			while( !fields.isEmpty() )
-			{
-				points = fields.takeFirst().split( '/' );
-
-				if( !points.isEmpty() )
-				{
-					vertex.position = positions.at( points.takeFirst().toInt()-1 );
-				}
-				if( !points.isEmpty() )
-				{
-					vertex.texCoord = texCoords.at( points.takeFirst().toInt()-1 );
-				}
-				if( !points.isEmpty() )
-				{
-					vertex.normal = normals.at( points.takeFirst().toInt()-1 );
-				}
-
-				face.points.append( vertex );
-				face.material = material;
-			}
-			faces.append( face );
+			faces.append( Face( fields, material, &positions, &texCoords, &normals ) );
 		}
 		else if( keyword == "mtllib" )
 		{
@@ -206,17 +196,7 @@ bool StaticModelData::parse()
 		}
 		else if( keyword == "usemtl" )
 		{
-			QFileInfo fileinfo( file );
-			QFileInfo mat( MaterialData::baseDirectory()+fileinfo.baseName()+'_'+fields.takeFirst() );
-			if( mat.exists() )
-			{
-				material = mat.fileName();
-			}
-			else
-			{
-				qWarning() << "!" << this << "StaticModelData" << uid() << "Material" << mat.fileName() << "not found.";
-				material = "";
-			}
+			material = generateMaterialName( file, fields );
 		}
 		else
 		{
@@ -226,73 +206,15 @@ bool StaticModelData::parse()
 
 	file.close();
 
-	mSize.setWidth(maxX-minX);
-	mSize.setHeight(maxY-minY);
+	generateParts( & faces );
+	generateBuffers();
 
-	mParts.clear();
-	QString lastMat = faces.first().material;
-	unsigned int current = 0;
-	unsigned int count = 0;
+	return true;
+}
 
-	int counter = 1;
-	foreach( const Face & face, faces )
-	{
-		int mode = 0;
-		int size = face.points.size();
 
-		if( size == 3 )
-			mode = GL_TRIANGLES;
-		else if( size == 4 )
-			mode = GL_QUADS;
-		else
-			qCritical() << "!!" << this << "StaticModelData" << uid() << "Only 3 or 4 vertices per face are supported!";
-
-		if( mMode == 0 )
-		{
-			mMode = mode;
-		}
-		else
-		{
-			if( mMode == 0 )
-			{
-				mMode = mode;
-			}
-			else if( mMode != mode )
-			{
-				qCritical() << "!!" << this << "StaticModelData" << uid() << "Switching between different counts of vertices per face is unsupported!" ;
-			}
-		}
-
-		if( face.material != lastMat || counter == faces.size() )
-		{
-			Part p;
-			p.start = current - count;
-			p.count = count;
-			if( !lastMat.isEmpty() )
-				p.material = new Material( mGLWidget, lastMat );
-			else
-				p.material = NULL;
-			mParts.append(p);
-
-			lastMat = face.material;
-			count = 0;
-		}
-
-		foreach( const VertexP3fN3fT2f & vertex, face.points )
-		{
-			if( mVertices.indexOf( vertex ) == -1 )
-			{
-				mVertices.append( vertex );
-			}
-			mIndices.append( mVertices.indexOf( vertex ) );
-
-			current++;
-			count++;
-		}
-
-		counter++;
-	}
-
+void StaticModelData::generateBuffers()
+{
 	mVertexBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
 	mVertexBuffer.create();
 	mVertexBuffer.bind();
@@ -306,8 +228,76 @@ bool StaticModelData::parse()
 	mIndexBuffer.setUsagePattern( QGLBuffer::StaticDraw );
 	mIndexBuffer.allocate( mIndices.constData(), mIndices.size() * sizeof( unsigned int ) );
 	mIndexBuffer.release();
+}
 
-	return true;
+
+void StaticModelData::generateParts( QVector<Face> * faces)
+{
+	mParts.clear();
+	QString lastMat;
+	unsigned int current = 0;
+	unsigned int count = 0;
+
+	QVector<Face>::ConstIterator iter = faces->constBegin();
+	for( ; iter != faces->constEnd(); ++iter )
+	{
+		GLuint mode = 0;
+		int size = (*iter).points.size();
+
+		switch( size )
+		{
+			case 3:
+				mode = GL_TRIANGLES;
+				break;
+			case 4:
+				mode = GL_QUADS;
+				break;
+			default:
+				qCritical() << "!!" << this << "StaticModelData" << uid() << "Only 3 or 4 vertices per face are supported!";
+				break;
+		}
+
+		if( mMode == 0 )
+			mMode = mode;
+		else if( mMode != mode )
+			qCritical() << "!!" << this << "StaticModelData" << uid() << "Switching between different counts of vertices per face is unsupported!" ;
+
+		if( (*iter).material != lastMat || iter+1 == faces->constEnd() )
+		{
+			mParts.append( Part( current, count, mGLWidget, lastMat ) );
+
+			lastMat = (*iter).material;
+			count = 0;
+		}
+
+		foreach( const VertexP3fN3fT2f & vertex, (*iter).points )
+		{
+			if( mVertices.indexOf( vertex ) == -1 )
+			{
+				mVertices.append( vertex );
+			}
+			mIndices.append( mVertices.indexOf( vertex ) );
+
+			current++;
+			count++;
+		}
+	}
+}
+
+
+QString StaticModelData::generateMaterialName( QFile & file, QStringList & fields )
+{
+	QFileInfo fileinfo( file );
+	QFileInfo mat( MaterialData::baseDirectory()+fileinfo.baseName()+'_'+fields.takeFirst() );
+	if( mat.exists() )
+	{
+		return mat.fileName();
+	}
+	else
+	{
+		qWarning() << "!" << this << "StaticModelData" << uid() << "Material" << mat.fileName() << "not found.";
+		return "";
+	}
 }
 
 
