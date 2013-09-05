@@ -700,9 +700,11 @@ void Scene::keyPressEvent( QKeyEvent * event )
 	case Qt::Key_F3:
 		mDebugWindow->setVisible( mDebugWindow->isHidden() );
 		break;
+#ifdef OVR_ENABLED
 	case Qt::Key_F12:
 		mOVRSensorFusion.Reset();
 		break;
+#endif
 	default:
 		return;
 	}
