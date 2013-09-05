@@ -198,6 +198,7 @@ void Laser::draw2Self()
 		glVertex( crossDir*mTrailRadius + mTrailEnd );
 	glEnd();
 
+	glColor4f(1,1,1,1);
 	glDisable( GL_BLEND );
 	glDepthMask( GL_TRUE );
 

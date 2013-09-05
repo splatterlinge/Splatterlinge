@@ -117,7 +117,7 @@ void Torch::draw2Self()
 	if( !visiblePoints )
 		return;
 
-	glPushAttrib( GL_VIEWPORT_BIT | GL_DEPTH_BUFFER_BIT );
+	glPushAttrib( GL_VIEWPORT_BIT | GL_DEPTH_BUFFER_BIT | GL_CURRENT_BIT );
 	glDepthMask( GL_FALSE );
 	glDisable( GL_CULL_FACE );
 	glDisable( GL_DEPTH_TEST );

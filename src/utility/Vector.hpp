@@ -34,8 +34,8 @@ namespace Vector
 {
 	QVector3D orthoNormalize( const QVector3D & fixed, const QVector3D & v );
 
-	QVector2D V2f( QStringList & list );
-	QVector3D V3f( QStringList & list );
+	QVector2D takeFirstFromStringList2D( QStringList & list );
+	QVector3D takeFirstFromStringList3D( QStringList & list );
 }
 
 

@@ -67,7 +67,7 @@ TextureRenderer::TextureRenderer( GLWidget * glWidget, const QSize & size, bool 
 	GLenum status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
 	if( status != GL_FRAMEBUFFER_COMPLETE )
 	{
-		qFatal( "Could not create FBO (%dx%d%s)\n", mSize.width(), mSize.height(), (mHasDepthBuffer?"+depth":"") );
+		qFatal( "Could not create FBO (%dx%d%s): %s\n", mSize.width(), mSize.height(), (mHasDepthBuffer?"+depth":""), qPrintable(glGetFrameBufferStatusString(status)) );
 	}
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 	glBindRenderbuffer( GL_RENDERBUFFER, 0 );

@@ -15,7 +15,7 @@ void main()
 	vec3 normal = normalize( vNormal );
 	vec3 viewDir = normalize( -vVertex );
 
-	vec4 colorFromMap = texture2D( diffuseMap, gl_TexCoord[0].st );
+	vec4 colorFromMap = texture2D( diffuseMap, gl_TexCoord[0].st ) * gl_Color;
 	vec4 specularFromMap = texture2D( specularMap, gl_TexCoord[0].st );
 
 	for( int i=0; i<MAX_LIGHTS; ++i )

@@ -700,20 +700,9 @@ void Scene::keyPressEvent( QKeyEvent * event )
 	case Qt::Key_F3:
 		mDebugWindow->setVisible( mDebugWindow->isHidden() );
 		break;
-/*
-	case Qt::Key_F9:
-		mOVRLensCenter += 0.01;
-		break;
-	case Qt::Key_F10:
-		mOVRLensCenter -= 0.01;
-		break;
-	case Qt::Key_F11:
-		mOVRScale += 0.01;
-		break;
 	case Qt::Key_F12:
-		mOVRScale -= 0.01;
+		mOVRSensorFusion.Reset();
 		break;
-*/
 	default:
 		return;
 	}

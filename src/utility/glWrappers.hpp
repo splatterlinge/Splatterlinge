@@ -193,6 +193,7 @@ inline void glMaterial( const GLenum & face, const GLenum & pname, const QVector
 
 
 QString glGetErrorString( const GLenum & error );
+QString glGetFrameBufferStatusString( const GLenum & target );
 GLenum glGetAlphaTestFunctionFromString( const QString & name );
 GLint glGetTextureWrapFromString( const QString & name );
 

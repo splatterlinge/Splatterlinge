@@ -13,6 +13,7 @@ void main()
 	gl_Position = ftransform();
 	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
 	vNormal = gl_NormalMatrix * gl_Normal;
+	gl_FrontColor = gl_Color;
 
 	for( int i=0; i<MAX_LIGHTS; ++i )
 	{

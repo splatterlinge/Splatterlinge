@@ -30,7 +30,7 @@
 #include "../weapon/Laser.hpp"
 #include "../weapon/Minigun.hpp"
 
-#include "float.h"
+#include <float.h>
 
 
 Player::Player( World * world ) :
@@ -569,6 +569,7 @@ void Player::drawCrosshair()
 	glVertex3f(-0.05f, 0.0f, -1.0f);
 	glVertex3f(-0.15f, 0.0f, -1.0f);
 	glEnd();
+	glColor4f(1,1,1,1);
 }
 
 const int Player::time() const

@@ -40,7 +40,7 @@ QVector3D Vector::orthoNormalize( const QVector3D & fixed, const QVector3D & v )
 }
 
 
-QVector2D Vector::V2f( QStringList & list )
+QVector2D Vector::takeFirstFromStringList2D( QStringList & list )
 {
 	float x = list.takeFirst().toFloat();
 	float y = list.takeFirst().toFloat();
@@ -48,7 +48,7 @@ QVector2D Vector::V2f( QStringList & list )
 }
 
 
-QVector3D Vector::V3f( QStringList & list )
+QVector3D Vector::takeFirstFromStringList3D( QStringList & list )
 {
 	float x = list.takeFirst().toFloat();
 	float y = list.takeFirst().toFloat();

@@ -179,8 +179,6 @@ void Minigun::drawSelf()
 
 	glPushMatrix();
 
-	glColor3f( 0.7f, 0.7f, 0.7f );
-
 	glTranslatef( 0.0f, 0.0f, -0.4f );
 	glRotatef( mRotation, 0.0f, 0.0f, 1.0f );
 
@@ -209,8 +207,6 @@ void Minigun::drawSelf()
 
 	mMaterial->release();
 
-	glEnable( GL_LIGHTING );
-
 	glPopMatrix();
 }
 
@@ -222,7 +218,6 @@ void Minigun::draw2Self()
 
 	// particles on impact
 	glEnable( GL_TEXTURE_2D );
-	glColor4f( 1, 1, 1, 1 );
 	mImpactParticleMaterial->bind();
 	mImpactParticles->draw( world()->modelViewMatrix() );
 	mImpactParticleMaterial->release();

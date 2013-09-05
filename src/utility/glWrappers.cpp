@@ -51,6 +51,33 @@ QString glGetErrorString( const GLenum & error )
 }
 
 
+QString glGetFrameBufferStatusString( const GLenum & target )
+{
+	switch( target )
+	{
+		case GL_FRAMEBUFFER_COMPLETE:
+			return QString( "Framebuffer Complete" );
+		case GL_FRAMEBUFFER_UNDEFINED:
+			return QString( "Framebuffer Undefined" );
+		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+			return QString( "Incomplete Attachment" );
+		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+			return QString( "Incomplete Missing Attachment" );
+		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+			return QString( "Incomplete Draw Buffer" );
+		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+			return QString( "Incomplete Read Buffer" );
+		case GL_FRAMEBUFFER_UNSUPPORTED:
+			return QString( "Framebuffer Unsupported" );
+		case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+			return QString( "Incomplete Multisample" );
+		case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+			return QString( "Incomplete Layer Targets" );
+	}
+	return QString( "Unknown Framebuffer Status" );
+}
+
+
 GLenum glGetAlphaTestFunctionFromString( const QString & name )
 {
 	if( name == "GL_NEVER" ) return GL_NEVER;

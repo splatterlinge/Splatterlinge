@@ -33,7 +33,7 @@ void main()
 	float depth = texture2D( depthMap, gl_TexCoord[0].st ).r * depthScale - depthOffset;
 	vec2 parallaxCoord = gl_TexCoord[0].st - eyeDir.xy * depth;
 
-	vec4 colorFromMap = texture2D( diffuseMap, parallaxCoord );
+	vec4 colorFromMap = texture2D( diffuseMap, parallaxCoord ) * gl_Color;
 	vec4 specularFromMap = texture2D( specularMap, parallaxCoord );
 	vec3 normalFromMap = normalize( texture2D( normalMap, parallaxCoord ).rgb * 2.0 - 1.0 );
 	normal = normalize( TBN * normalFromMap );	// transform the normal to eye space

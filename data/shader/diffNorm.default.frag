@@ -23,7 +23,7 @@ void main()
 	vec3 binormal = normalize( -dpx * dty.s + dpy * dtx.s );
 	mat3 TBN = mat3( tangent, binormal, normal );	// the transpose of texture-to-eye space matrix
 
-	vec4 colorFromMap = texture2D( diffuseMap, gl_TexCoord[0].st );
+	vec4 colorFromMap = texture2D( diffuseMap, gl_TexCoord[0].st ) * gl_Color;
 	vec3 normalFromMap = normalize( texture2D( normalMap, gl_TexCoord[0].st ).rgb * 2.0 - 1.0 );
 	normal = normalize( TBN * normalFromMap );	// transform the normal to eye space
 

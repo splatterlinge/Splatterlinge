@@ -176,15 +176,15 @@ bool StaticModelData::parse()
 		}
 		else if( keyword == "v" )
 		{
-			positions.append( Vector::V3f( fields ) );
+			positions.append( Vector::takeFirstFromStringList3D( fields ) );
 		}
 		else if( keyword == "vt" )
 		{
-			texCoords.append( Vector::V2f( fields ) );
+			texCoords.append( Vector::takeFirstFromStringList2D( fields ) );
 		}
 		else if( keyword == "vn" )
 		{
-			normals.append( Vector::V3f( fields ) );
+			normals.append( Vector::takeFirstFromStringList3D( fields ) );
 		}
 		else if( keyword == "f" )
 		{
