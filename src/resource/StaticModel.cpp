@@ -116,7 +116,7 @@ bool StaticModelData::parse()
 	while( !in.atEnd() ) {
 		line = in.readLine().trimmed();
 
-		while( line.endsWith( QLatin1String("\\") ) )
+		while( line.endsWith( '\\' ) )
 		{
 			line.truncate( line.size()-1 );
 			if( in.atEnd() )
