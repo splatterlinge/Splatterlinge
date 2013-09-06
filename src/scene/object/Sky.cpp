@@ -26,7 +26,9 @@
 
 #include <utility/Interpolation.hpp>
 #include <resource/Shader.hpp>
+#include <resource/Material.hpp>
 #include <scene/TextureRenderer.hpp>
+#include <scene/Scene.hpp>
 
 #include <QGLShaderProgram>
 #include <QSettings>
@@ -289,12 +291,7 @@ Sky::Sky( World * world, QString name ) :
 	TexImage( scene()->glWidget(), GL_TEXTURE_CUBE_MAP_POSITIVE_Z, starMapPathPZ );
 	TexImage( scene()->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, starMapPathNZ );
 
-	QImage sunFlareImage( sunFlarePath );
-	if( sunFlareImage.isNull() )
-	{
-		qFatal( "\"%s\" not found!", cloudMapPath.toLocal8Bit().constData() );
-	}
-	mSunFlareMap = scene()->glWidget()->bindTexture( sunFlareImage );
+	mSunFlareMaterial = new Material( scene()->glWidget(), "Flare" );
 }
 
 
@@ -302,7 +299,7 @@ Sky::~Sky()
 {
 	scene()->glWidget()->deleteTexture( mDomeMap );
 	scene()->glWidget()->deleteTexture( mStarCubeMap );
-	scene()->glWidget()->deleteTexture( mSunFlareMap );
+	delete mSunFlareMaterial;
 	delete mDomeShader;
 	delete mStarCubeShader;
 	delete mCloudShader;
@@ -441,7 +438,7 @@ void Sky::drawSunFlare()
 	glEnable( GL_BLEND );
 	glBlendFunc( GL_ONE, GL_ONE );
 	glEnable( GL_TEXTURE_2D );
-	glBindTexture( GL_TEXTURE_2D, mSunFlareMap );
+	mSunFlareMaterial->bind();
 	glPushMatrix();
 		glRotate( mTimeOfDay*360.0f*2.0f, 0,0,1 );
 		drawQuad( true );
@@ -450,6 +447,7 @@ void Sky::drawSunFlare()
 		glRotate( -mTimeOfDay*360.0f*3.0f, 0,0,1 );
 		drawQuad( true );
 	glPopMatrix();
+	mSunFlareMaterial->release();
 	glDisable( GL_BLEND );
 	glPopMatrix();
 }

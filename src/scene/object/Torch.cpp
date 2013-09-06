@@ -25,6 +25,8 @@
 #include "World.hpp"
 
 #include <scene/TextureRenderer.hpp>
+#include <scene/Scene.hpp>
+#include <resource/Material.hpp>
 
 
 const GLfloat Torch::sQuadVertices[] =
@@ -55,19 +57,14 @@ Torch::Torch( World * world ) :
 		sQuadVertexBuffer.release();
 	}
 
-	QImage flareImage( "./data/effect/flare.png" );
-	if( flareImage.isNull() )
-	{
-		qFatal( "\"%s\" not found!", "./data/effect/flare.png" );
-	}
-	mFlareMap = scene()->glWidget()->bindTexture( flareImage );
+	mMaterial = new Material( scene()->glWidget(), "Flare" );
 	world->addLightSource( this );
 }
 
 
 Torch::~Torch()
 {
-	scene()->glWidget()->deleteTexture( mFlareMap );
+	delete mMaterial;
 	world()->removeLightSource( this );
 }
 
@@ -125,8 +122,7 @@ void Torch::draw2Self()
 	glDisable( GL_LIGHTING );
 	glEnable( GL_BLEND );
 	glBlendFunc( GL_ONE, GL_ONE );
-	glEnable( GL_TEXTURE_2D );
-	glBindTexture( GL_TEXTURE_2D, mFlareMap );
+	mMaterial->bind();
 	glColor( ((float)visiblePoints/(float)samplingPoints)*mColor/2.0f );
 
 	sQuadVertexBuffer.bind();
@@ -149,6 +145,7 @@ void Torch::draw2Self()
 	glDisableClientState( GL_VERTEX_ARRAY );
 	sQuadVertexBuffer.release();
 
+	mMaterial->release();
 	glDisable( GL_BLEND );
 
 	glPopAttrib();

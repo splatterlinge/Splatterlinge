@@ -39,6 +39,7 @@
 
 
 class Scene;
+class Material;
 
 
 /// Sky renderer
@@ -124,7 +125,7 @@ private:
 	QImage mDomeImage;
 
 	OcclusionTest mOcclusionTest;
-	GLuint mSunFlareMap;
+	Material * mSunFlareMaterial;
 	float mSunFlareSize;
 
 	float mTimeOfDay;

@@ -79,10 +79,10 @@ Landscape::Landscape( World * world, QString name ) :
 		mWaterClippingPlaneOffset = s.value( "clippingPlaneOffset", 0.01f ).toFloat();
 	s.endGroup();
 	mWaterShader = new Shader( scene()->glWidget(), "water" );
-	QImage waterImage( "./data/effect/water.png" );
+	QImage waterImage( "./data/landscape/"+name+'/'+"water.png" );
 	if( waterImage.isNull() )
 	{
-		qFatal( "\"%s\" not found!", "./data/effect/water.png" );
+		qFatal( "\"%s\" not found!", qPrintable("./data/landscape/"+name+'/'+"water.png") );
 	}
 	mWaterMap = scene()->glWidget()->bindTexture( waterImage );
 	mReflectionRenderer = new TextureRenderer( scene()->glWidget(), QSize(512,512), true );
@@ -115,14 +115,14 @@ Landscape::Landscape( World * world, QString name ) :
 			if( type == "forest" )
 			{
 				f = QSharedPointer<AObject>( new Forest( this,
-						s.value("model").toString(), s.value("position").toPoint(),
-						s.value("radius").toInt(), s.value("number").toInt(), s.value("priority").toInt() ) );
+					s.value("model").toString(), s.value("position").toPoint(),
+					s.value("radius").toInt(), s.value("number").toInt(), s.value("priority").toInt() ) );
 			}
 			else if( type == "grass" )
 			{
 				f = QSharedPointer<AObject>( new Grass( this,
-						s.value("model").toString(), s.value("position").toPoint(),
-						s.value("radius").toInt(), s.value("number").toInt(), s.value("priority").toInt()) );
+					s.value("model").toString(), s.value("position").toPoint(),
+					s.value("radius").toInt(), s.value("number").toInt(), s.value("priority").toInt()) );
 			}
 
 			mVegetation.append( f );
@@ -136,9 +136,9 @@ Landscape::Landscape( World * world, QString name ) :
 			s.setArrayIndex( i );
 			QSharedPointer<AObject> f;
 			f = QSharedPointer<AObject>( new PowerUp( this,
-					s.value("type").toString(),
-					s.value("position").toPoint(),
-					s.value("radius").toInt() ) );
+				s.value("type").toString(),
+				s.value("position").toPoint(),
+				s.value("radius").toInt() ) );
 
 			mPowerUps.append( f );
 			add( f );

@@ -34,6 +34,9 @@
 #include <QGLBuffer>
 
 
+class Material;
+
+
 /// A torch
 /**
  *
@@ -57,7 +60,7 @@ private:
 	static QGLBuffer sQuadVertexBuffer;
 
 	OcclusionTest mOcclusionTest;
-	GLuint mFlareMap;
+	Material * mMaterial;
 	float mFlareSize;
 	float mColorCycle;
 	QVector4D mColor;
