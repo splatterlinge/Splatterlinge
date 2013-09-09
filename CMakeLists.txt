@@ -52,8 +52,8 @@ set( Splatterlinge_LIBS
 # Additional include directories
 set( Splatterlinge_INCS
 	${QT_INCLUDES}
+	${OPENGL_INCLUDE_DIR}
 	${GLEW_INCLUDE_DIR}
-	${OPENAL_INCLUDE_DIR}
 	${OPENAL_INCLUDE_DIR}
 	${OVR_INCLUDES}
 	./src/

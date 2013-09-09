@@ -24,9 +24,6 @@ find_library(VorbisFile_LIBRARY
   /opt/local
 )
 
-
-# handle the QUIETLY and REQUIRED arguments and set OPENAL_FOUND to TRUE if
-# all listed variables are TRUE
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(VorbisFile  DEFAULT_MSG VorbisFile_LIBRARY OPENAL_INCLUDE_DIR)
 
