@@ -483,7 +483,11 @@ void Splatterling::updateSelf( const double & delta )
 			if( life() <= 0 )
 			{
 				setState( DYING );
-				world()->player()->receivePoints( 100 );
+				if(lastBodyPart == TARGET_HEAD){
+					world()->player()->receivePoints( 200 );
+				}else{
+					world()->player()->receivePoints( 100 );
+				}
 			}
 			break;
 		}
@@ -515,6 +519,7 @@ void Splatterling::updateSelf( const double & delta )
 				if(lastBodyPart == TARGET_WING_LEFT || lastBodyPart == TARGET_WING_RIGHT){
 					kindOfDead = DEAD_WINGSHOT;
 					world()->splatterSystem()->spray( worldPosition(), fallHeight*10 );
+					world()->player()->receivePoints( fallHeight*10 );
 				}
 				setState( DEAD );
 			}
