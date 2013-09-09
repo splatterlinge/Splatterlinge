@@ -85,6 +85,7 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 	mRoot = 0;
 	mFrameCountSecond = 0;
 	mFramesPerSecond = 0;
+	mPaused = false;
 	mWireFrame = false;
 	mStereo = false;
 	mStereoEyeDistance = 0.1f;
@@ -349,7 +350,8 @@ void Scene::drawBackground( QPainter * painter, const QRectF & rect )
 		delta = 1;
 	mDelta = (double)delta/1000000000.0;
 
-	updateObjects( mDelta );
+	if( !mPaused )
+		updateObjects( mDelta );
 
 	if( mStereo )
 	{
@@ -690,6 +692,7 @@ void Scene::keyPressEvent( QKeyEvent * event )
 	case Qt::Key_Escape:
 		mStartMenuWindow->setVisible( mMouseGrabbing );
 		setMouseGrabbing( !mMouseGrabbing );
+		setPaused( !mMouseGrabbing );
 		break;
 	case Qt::Key_F1:
 		mStartMenuWindow->helpWindow()->setVisible( mStartMenuWindow->helpWindow()->isHidden() );

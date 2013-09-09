@@ -88,6 +88,8 @@ public:
 	void setMouseGrabbing( bool enable );
 	bool isMouseGrabbing() const { return mMouseGrabbing; }
 
+	void setPaused( bool enable ) { mPaused = enable; }
+	bool paused() { return mPaused; }
 	void setWireFrame( bool enable ) { mWireFrame = enable; }
 	bool wireFrame() const { return mWireFrame; }
 	void setMultiSample( bool enable ) { mMultiSample = enable; }
@@ -127,6 +129,7 @@ private:
 
 	QElapsedTimer mElapsedTimer;
 	double mDelta;
+	bool mPaused;
 	int mFrameCountSecond;
 	int mFramesPerSecond;
 	QFont mFont;
