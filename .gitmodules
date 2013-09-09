@@ -4,3 +4,6 @@
 [submodule "tools/Converter"]
 	path = tools/Converter
 	url = git://github.com/splatterlinge/Converter.git
+[submodule "web"]
+	path = web
+	url = git@github.com:splatterlinge/splatterlinge.github.io.git
