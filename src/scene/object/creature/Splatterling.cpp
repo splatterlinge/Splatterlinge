@@ -744,8 +744,6 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 
 void Splatterling::receiveDamage( int damage, const QVector3D * position, const QVector3D * direction )
 {
-	float rayLength = 1000;
-
 	bool hit = true;
 
 /*	if(intersectHead(*position, *direction, &rayLength)){
