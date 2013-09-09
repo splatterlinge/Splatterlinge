@@ -594,37 +594,36 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 
 	if(Sphere::intersectCulledRay(worldPosition(), boundingSphereRadius(), origin, direction, &rayLength)){
 
-//		if(intersectHead(origin, direction, &rayLength) || intersectBody(origin, direction, &rayLength)
-//			|| intersectWing(origin, direction, &rayLength)	)
-//		{
+		if(rayLength < length ){
 
-		rayLength = length;
+			rayLength = length;
 
-		bool hit = false;
+			bool hit = false;
 
-		if(intersectHead(origin, direction, &rayLength)){
-			hit = true;
-		}
+			if(intersectHead(origin, direction, &rayLength)){
+				hit = true;
+			}
 
-		if(intersectBody(origin, direction, &rayLength)){
-			hit = true;
-		}
+			if(intersectBody(origin, direction, &rayLength)){
+				hit = true;
+			}
 
-		if(intersectWing(origin, direction, &rayLength)){
-			hit = true;
-		}
+			if(intersectWing(origin, direction, &rayLength)){
+				hit = true;
+			}
 
-		if(hit){
+			if(hit){
 
-			if( rayLength < length )
-			{
-				// intersection closer than previous intersections?
-				length = rayLength;
+				if( rayLength < length )
+				{
+					// intersection closer than previous intersections?
+					length = rayLength;
 
-				if( normal )	// interested in normal?
-					*normal = origin - worldPosition();
+					if( normal )	// interested in normal?
+						*normal = origin - worldPosition();
 
-				nearestTarget = this;
+					nearestTarget = this;
+				}
 			}
 		}
 	}
