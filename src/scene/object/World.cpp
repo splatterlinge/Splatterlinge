@@ -265,7 +265,9 @@ void World::respawnEnemies(){
 			mSplatterlingList.removeAt(i);
 		}
 	}
-	for (int i = 0; i < splatterlingCount-mSplatterlingList.length(); ++i) {
+
+	int numberOfEnemiesToAdd = splatterlingCount-mSplatterlingList.length();
+	for (int i = 0; i < numberOfEnemiesToAdd; i++) {
 		mSplatterlingList.append( QSharedPointer<Splatterling>( new Splatterling(this) ) );
 		add( mSplatterlingList.last() );
 	}
