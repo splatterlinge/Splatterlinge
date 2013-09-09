@@ -99,12 +99,9 @@ World::World( Scene * scene, QString name ) :
 	mDummy = QSharedPointer<Dummy>( new Dummy( this ) );
 	add( mDummy );
 	*/
+	splatterlingCount = 5;
 
-	for( int i = 0; i < 5; ++i )
-	{
-		mSplatterlingList.append( QSharedPointer<Splatterling>( new Splatterling(this) ) );
-		add( mSplatterlingList.last() );
-	}
+	respawnEnemies();
 
 	scene->addKeyListener( this );
 
@@ -186,8 +183,11 @@ void World::updateSelf( const double & delta )
 	if( mTimeReverse )
 		mTimeOfDay -= 0.2f * delta;
 
-	if( mTimeOfDay > 1.0f )
+	if( mTimeOfDay > 1.0f ){
 		mTimeOfDay -= 1.0f;
+		splatterlingCount +=1;
+		respawnEnemies();
+	}
 
 	mSky->setTimeOfDay( mTimeOfDay );
 
@@ -253,5 +253,22 @@ void World::SplatterInteractor::particleInteraction( const double & delta, Parti
 		particle.setLife( 0.0f );
 		if( !belowWater && SplatterQuality::maximum() == SplatterQuality::HIGH )
 			mWorld.splatterSystem()->splat( particle.position(), mWorld.splatterSystem()->particleSystem()->size() * RandomNumber::minMax( 0.5f, 2.0f ) );
+	}
+}
+
+void World::respawnEnemies(){
+
+	for( int i = 0; i < mSplatterlingList.length(); ++i )
+	{
+		if(mSplatterlingList.at(i).data()->state() == ACreature::DEAD){
+			remove(mSplatterlingList.at(i));
+			mSplatterlingList.removeAt(i);
+		}
+	}
+
+	int numberOfEnemiesToAdd = splatterlingCount-mSplatterlingList.length();
+	for (int i = 0; i < numberOfEnemiesToAdd; i++) {
+		mSplatterlingList.append( QSharedPointer<Splatterling>( new Splatterling(this) ) );
+		add( mSplatterlingList.last() );
 	}
 }

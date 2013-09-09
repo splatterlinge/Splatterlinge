@@ -111,6 +111,8 @@ private:
 	private:
 		World & mWorld;
 	};
+	void respawnEnemies();
+
 	SplatterInteractor * mSplatterInteractor;
 	bool mTimeLapse;
 	bool mTimeReverse;
@@ -125,6 +127,7 @@ private:
 	QVector3D mTargetNormal;
 	SplatterSystem * mSplatterSystem;
 	QList< ALightSource * > mLightSources;
+	int splatterlingCount;
 };
 
 

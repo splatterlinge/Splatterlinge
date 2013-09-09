@@ -483,7 +483,11 @@ void Splatterling::updateSelf( const double & delta )
 			if( life() <= 0 )
 			{
 				setState( DYING );
-				world()->player()->receivePoints( 100 );
+				if(lastBodyPart == TARGET_HEAD){
+					world()->player()->receivePoints( 200 );
+				}else{
+					world()->player()->receivePoints( 100 );
+				}
 			}
 			break;
 		}
@@ -515,6 +519,7 @@ void Splatterling::updateSelf( const double & delta )
 				if(lastBodyPart == TARGET_WING_LEFT || lastBodyPart == TARGET_WING_RIGHT){
 					kindOfDead = DEAD_WINGSHOT;
 					world()->splatterSystem()->spray( worldPosition(), fallHeight*10 );
+					world()->player()->receivePoints( fallHeight*10 );
 				}
 				setState( DEAD );
 			}
@@ -589,9 +594,27 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 
 	if(Sphere::intersectCulledRay(worldPosition(), boundingSphereRadius(), origin, direction, &rayLength)){
 
-		if(intersectHead(origin, direction, &rayLength) || intersectBody(origin, direction, &rayLength)
-			|| intersectWing(origin, direction, &rayLength)	)
-		{
+//		if(intersectHead(origin, direction, &rayLength) || intersectBody(origin, direction, &rayLength)
+//			|| intersectWing(origin, direction, &rayLength)	)
+//		{
+
+		rayLength = 1000;
+
+		bool hit = false;
+
+		if(intersectHead(origin, direction, &rayLength)){
+			hit = true;
+		}
+
+		if(intersectBody(origin, direction, &rayLength)){
+			hit = true;
+		}
+
+		if(intersectWing(origin, direction, &rayLength)){
+			hit = true;
+		}
+
+		if(hit){
 
 			if( rayLength < length )
 			{
@@ -615,15 +638,24 @@ bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & di
 		return false;
 	}
 
-	if(Intersection::intersectTriangleFan(PositionData, 6, 15, modelMatrix(), origin, direction, intersectionDistance)){
-		targetBodyPart = TARGET_BODY;
-		return true;
+	float rayLenght;
+
+	if(Intersection::intersectTriangleFan(PositionData, 6, 15, modelMatrix(), origin, direction, &rayLenght)){
+		if(rayLenght < *intersectionDistance){
+			*intersectionDistance = rayLenght;
+			targetBodyPart = TARGET_BODY;
+			return true;
+		}
 	}
 
 
-	if(Intersection::intersectTriangleStrip(PositionData, 16, BodyVertexCount-1, modelMatrix(), origin, direction, intersectionDistance)){
-		targetBodyPart = TARGET_BODY;
-		return true;
+	if(Intersection::intersectTriangleStrip(PositionData, 16, BodyVertexCount-1, modelMatrix(), origin, direction, &rayLenght)){
+
+		if(rayLenght < *intersectionDistance){
+			*intersectionDistance = rayLenght;
+			targetBodyPart = TARGET_BODY;
+			return true;
+		}
 	}
 	return false;
 }
@@ -633,6 +665,7 @@ bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & di
 {
 	QVector3D v[3];
 
+	float rayLenght;
 
 	//FirstWing
 	if(lastBodyPart != TARGET_WING_LEFT){
@@ -640,11 +673,14 @@ bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & di
 		{
 			v[i] = QVector3D(PositionData[(BodyVertexCount+HeadVertexCount+i)*3], PositionData[(BodyVertexCount+HeadVertexCount+i)*3+1], PositionData[(BodyVertexCount+HeadVertexCount+i)*3+2]);
 		}
-		if( Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
-			Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
+		if( Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, &rayLenght) ||
+			Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, &rayLenght))
 		{
-			targetBodyPart = TARGET_WING_LEFT;
-			return true;
+			if(rayLenght < *intersectionDistance){
+				*intersectionDistance = rayLenght;
+				targetBodyPart = TARGET_WING_LEFT;
+				return true;
+			}
 		}
 	}
 
@@ -654,11 +690,14 @@ bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & di
 		{
 			v[i] = QVector3D(PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+1], PositionData[(BodyVertexCount+HeadVertexCount+3+i)*3+2]);
 		}
-		if( Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, intersectionDistance) ||
-			Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, intersectionDistance))
+		if( Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[1]), this->pointToWorld(v[2]), origin, direction, &rayLenght) ||
+			Triangle::intersectCulledRay(this->pointToWorld(v[0]), this->pointToWorld(v[2]), this->pointToWorld(v[1]), origin, direction, &rayLenght))
 		{
-			targetBodyPart = TARGET_WING_RIGHT;
-			return true;
+			if(rayLenght < *intersectionDistance){
+				*intersectionDistance = rayLenght;
+				targetBodyPart = TARGET_WING_RIGHT;
+				return true;
+			}
 		}
 	}
 
@@ -672,21 +711,29 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 		return false;
 	}
 
+	float rayLenght;
+
 	QVector3D centerPoint(0.0f, 0.0f, PositionData[BodyVertexCount*3+HeadVertexCount*3-1]);
 
 	if(Sphere::intersectCulledRay(this->pointToWorld(centerPoint),
-			1.0f*Splatterling::SplatterlingSizeFactor,origin, direction, intersectionDistance)){
+			1.0f*Splatterling::SplatterlingSizeFactor,origin, direction, &rayLenght)){
 
 		//inner
-		if(Intersection::intersectTriangleFan(PositionData, BodyVertexCount, BodyVertexCount+9, modelMatrix(), origin, direction, intersectionDistance)){
-			targetBodyPart = TARGET_HEAD;
-			return true;
+		if(Intersection::intersectTriangleFan(PositionData, BodyVertexCount, BodyVertexCount+9, modelMatrix(), origin, direction, &rayLenght)){
+			if(rayLenght < *intersectionDistance){
+				*intersectionDistance = rayLenght;
+				targetBodyPart = TARGET_HEAD;
+				return true;
+			}
 		}
 
 		//Outter
-		if(Intersection::intersectTriangleStrip(PositionData, BodyVertexCount+10, BodyVertexCount+HeadVertexCount-5, modelMatrix(), origin, direction, intersectionDistance)){
-			targetBodyPart = TARGET_HEAD;
-			return true;
+		if(Intersection::intersectTriangleStrip(PositionData, BodyVertexCount+10, BodyVertexCount+HeadVertexCount-5, modelMatrix(), origin, direction, &rayLenght)){
+			if(rayLenght < *intersectionDistance){
+				*intersectionDistance = rayLenght;
+				targetBodyPart = TARGET_HEAD;
+				return true;
+			}
 		}
 	}
 
@@ -696,10 +743,21 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 
 void Splatterling::receiveDamage( int damage, const QVector3D * position, const QVector3D * direction )
 {
-	float rayLength;
+	bool hit = true;
 
-	if(intersectHead(*position, *direction, &rayLength) || intersectBody(*position, *direction, &rayLength)
-			|| intersectWing(*position, *direction, &rayLength)	){
+/*	if(intersectHead(*position, *direction, &rayLength)){
+		hit = true;
+	}
+
+	if(intersectBody(*position, *direction, &rayLength)){
+		hit = true;
+	}
+
+	if(intersectWing(*position, *direction, &rayLength)){
+		hit = true;
+	}*/
+
+	if(hit){
 
 		damage *= damageMultiplicationFactor[targetBodyPart];
 		ACreature::receiveDamage( damage, direction );
