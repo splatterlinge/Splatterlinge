@@ -592,7 +592,6 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 //		if(intersectHead(origin, direction, &rayLength) || intersectBody(origin, direction, &rayLength)
 //			|| intersectWing(origin, direction, &rayLength)	)
 //		{
-		qDebug() << "intersectBoundingSphere";
 
 		rayLength = 1000;
 
@@ -634,8 +633,6 @@ bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & di
 		return false;
 	}
 
-	qDebug() << "intersectBody";
-
 	float rayLenght;
 
 	if(Intersection::intersectTriangleFan(PositionData, 6, 15, modelMatrix(), origin, direction, &rayLenght)){
@@ -664,8 +661,6 @@ bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & di
 	QVector3D v[3];
 
 	float rayLenght;
-
-	qDebug() << "intersectWing";
 
 	//FirstWing
 	if(lastBodyPart != TARGET_WING_LEFT){
@@ -711,7 +706,6 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 		return false;
 	}
 
-	qDebug() << "intersectHead";
 	float rayLenght;
 
 	QVector3D centerPoint(0.0f, 0.0f, PositionData[BodyVertexCount*3+HeadVertexCount*3-1]);
