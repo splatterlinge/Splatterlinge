@@ -64,7 +64,6 @@ set( Splatterlinge_DEFS
 	${QT_DEFINITIONS}
 	${OVR_DEFINITIONS}
 	-Wall
-	-fPIC
 )
 
 # Create a list of header files containing classes that
