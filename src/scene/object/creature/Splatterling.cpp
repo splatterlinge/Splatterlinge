@@ -598,7 +598,7 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 //			|| intersectWing(origin, direction, &rayLength)	)
 //		{
 
-		rayLength = 1000;
+		rayLength = length;
 
 		bool hit = false;
 
