@@ -739,6 +739,7 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 	float rayLength = shortestRay;
 	int intersectingWing;
 	float disanceToPlayer = (worldPosition()-world()->player()->worldPosition()).length();
+	targetBodyPart = TARGET_BODY;
 
 	const QVector3D mTrailStart = (*position - (*direction)*disanceToPlayer);
 
