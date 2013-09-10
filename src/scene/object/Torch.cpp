@@ -121,9 +121,9 @@ void Torch::draw2Self()
 
 	glDisable( GL_LIGHTING );
 	glEnable( GL_BLEND );
-	glBlendFunc( GL_ONE, GL_ONE );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE );
 	mMaterial->bind();
-	glColor( ((float)visiblePoints/(float)samplingPoints)*mColor/2.0f );
+	glColor( ((float)visiblePoints/(float)samplingPoints)*mColor );
 
 	sQuadVertexBuffer.bind();
 	glClientActiveTexture( GL_TEXTURE0 );

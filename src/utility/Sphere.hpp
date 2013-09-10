@@ -39,17 +39,30 @@ public:
 	void setCenter( const QVector3D & center ) { mCenter = center; }
 	void setRadius( const float & radius ) { mRadius = radius; }
 
+	/// Sphere/Sphere intersection test
 	bool intersectSphere( const QVector3D & centerB, const float & radiusB, QVector3D * normal, float * depth ) const
 		{ return intersectSphere( mCenter, mRadius, centerB, radiusB, normal, depth ); }
 
+	/// Sphere/Ray intersection test - only intersections along the positive direction vector are tested
 	bool intersectCulledRay( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance ) const
 		{ return intersectCulledRay( mCenter, mRadius, origin, direction, intersectionDistance ); }
 
+	/// Sphere/Ray intersection test - like intersectCulledRay, but only intersects with the sphere's hull
+	bool intersectCulledRayHull( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance ) const
+		{ return intersectCulledRayHull( mCenter, mRadius, origin, direction, intersectionDistance ); }
+
+	/// Sphere/Sphere intersection test
 	static bool intersectSphere( const QVector3D & centerA, const float & radiusA,
 		const QVector3D & centerB, const float & radiusB,
 		QVector3D * normal, float * depth );
 
+	/// Sphere/Ray intersection test - only intersections along the positive direction vector are tested
 	static bool intersectCulledRay( const QVector3D & sphereCenter, const float & sphereRadius,
+		const QVector3D & rayOrigin, const QVector3D & rayDirection,
+		float * intersectionDistance );
+
+	/// Sphere/Ray intersection test - like intersectCulledRay, but only intersects with the sphere's hull
+	static bool intersectCulledRayHull( const QVector3D & sphereCenter, const float & sphereRadius,
 		const QVector3D & rayOrigin, const QVector3D & rayDirection,
 		float * intersectionDistance );
 

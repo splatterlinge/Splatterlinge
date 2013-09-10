@@ -58,7 +58,7 @@ bool Triangle::intersectCulledRay( const QVector3D & p, const QVector3D & q, con
 {
 	float distance;
 	bool intersection = Triangle::intersectRay( p, q, r, origin, direction, &distance );
-	if( intersection && distance > 0.0f )
+	if( intersection && distance >= 0.0f )
 	{
 		if( intersectionDistance )
 			*intersectionDistance = distance;

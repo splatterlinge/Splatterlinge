@@ -53,7 +53,7 @@ bool Sphere::intersectSphere( const QVector3D & centerA, const float & radiusA,
 
 // http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection
 
-bool Sphere::intersectCulledRay( const QVector3D & sphereCenter, const float & sphereRadius,
+bool Sphere::intersectCulledRayHull( const QVector3D & sphereCenter, const float & sphereRadius,
 	const QVector3D & rayOrigin, const QVector3D & rayDirection,
 	float * intersectionDistance )
 {
@@ -63,6 +63,67 @@ bool Sphere::intersectCulledRay( const QVector3D & sphereCenter, const float & s
 	float a = rayDirection.lengthSquared();
 	float b = 2.0f * QVector3D::dotProduct( rayDirection, relRayOrigin );
 	float c = relRayOrigin.lengthSquared() - (sphereRadius * sphereRadius);
+
+	// find discriminant
+	float disc = b * b - 4 * a * c;
+
+	// if discriminant is negative there are no real roots, so return false as ray misses sphere
+	if( disc < 0.0f )
+		return false;
+
+	float distSqrt = sqrtf( disc );
+	float q;
+	if( b < 0.0f )
+		q = (-b - distSqrt)/2.0f;
+	else
+		q = (-b + distSqrt)/2.0f;
+
+	// compute t0 and t1
+	float t0 = q / a;
+	float t1 = c / q;
+
+	// make sure t0 is smaller than t1
+	if( t0 > t1 )
+	{	// if t0 is bigger than t1 swap them around
+		float temp = t0;
+		t0 = t1;
+		t1 = temp;
+	}
+
+	// if t1 is less than zero, the object is in the ray's negative direction
+	// and consequently the ray misses the sphere
+	if( t1 < 0.0f )
+		return false;
+
+	if( intersectionDistance )
+	{
+		// if t0 is less than zero, the intersection point is at t1
+		if( t0 < 0.0f )
+			*intersectionDistance = t1;
+		else	// else the intersection point is at t0
+			*intersectionDistance = t0;
+	}
+
+	return true;
+}
+
+
+bool Sphere::intersectCulledRay( const QVector3D & sphereCenter, const float & sphereRadius,
+	const QVector3D & rayOrigin, const QVector3D & rayDirection,
+	float * intersectionDistance )
+{
+	QVector3D relRayOrigin = rayOrigin - sphereCenter;
+
+	// compute coefficients
+	float c = relRayOrigin.lengthSquared() - (sphereRadius * sphereRadius);
+	if( c < 0.0f )
+	{
+		if( intersectionDistance )
+			*intersectionDistance = 0.0f;
+		return true;
+	}
+	float a = rayDirection.lengthSquared();
+	float b = 2.0f * QVector3D::dotProduct( rayDirection, relRayOrigin );
 
 	// find discriminant
 	float disc = b * b - 4 * a * c;

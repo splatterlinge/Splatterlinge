@@ -33,9 +33,9 @@
 namespace Intersection
 {
 	bool intersectTriangleFan(const GLfloat PositionData[], const int firstVertexPos, const int lastVertexPos,
-		const QMatrix4x4 & modelMatrix,const QVector3D & origin, const QVector3D & direction, float * intersectionDistance );
+		const QMatrix4x4 & modelMatrix,const QVector3D & origin, const QVector3D & direction, float * intersectionDistance=NULL );
 	bool intersectTriangleStrip(const GLfloat PositionData[], const int firstVertexPos, const int lastVertexPos,
-		const QMatrix4x4 & modelMatrix,const QVector3D & origin, const QVector3D & direction, float * intersectionDistance );
+		const QMatrix4x4 & modelMatrix,const QVector3D & origin, const QVector3D & direction, float * intersectionDistance=NULL );
 }
 
 
