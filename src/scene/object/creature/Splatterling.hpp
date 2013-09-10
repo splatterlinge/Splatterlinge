@@ -27,7 +27,6 @@
 
 #include "ACreature.hpp"
 #include "resource/AudioSample.hpp"
-#include "../weapon/AWeapon.hpp"
 
 
 struct GLUquadric;
