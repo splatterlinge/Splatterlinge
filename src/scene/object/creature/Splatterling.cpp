@@ -744,24 +744,15 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 	const QVector3D mTrailStart = (*position - (*direction)*disanceToPlayer);
 
 	if(intersectBody(mTrailStart, *direction, &rayLength)){
-		if(rayLength < shortestRay){
-			shortestRay = rayLength;
-			targetBodyPart = TARGET_BODY;
-		}
+		targetBodyPart = TARGET_BODY;
 	}
 
 	if(intersectWing(mTrailStart, *direction, &rayLength, &intersectingWing)){
-		if(rayLength < shortestRay){
-			shortestRay = rayLength;
-			targetBodyPart = intersectingWing;
-		}
+		targetBodyPart = intersectingWing;
 	}
 
 	if(intersectHead(mTrailStart, *direction, &rayLength)){
-		if(rayLength < shortestRay){
-			shortestRay = rayLength;
-			targetBodyPart = TARGET_HEAD;
-		}
+		targetBodyPart = TARGET_HEAD;
 	}
 
 	damage *= damageMultiplicationFactor[targetBodyPart];
