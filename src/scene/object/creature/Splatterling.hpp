@@ -85,14 +85,14 @@ public:
 	virtual void drawSelf();
 
 	virtual AObject * intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
-					 float & length, QVector3D * normal = NULL );
+		float & length, QVector3D * normal = NULL );
 
 	virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL );
 	virtual void recalculateWingPosition( );
 
-	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
-	virtual bool intersectWing(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance, int * intersectingWing);
-	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
+	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
+	virtual bool intersectWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance, int & intersectingWing);
+	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
 
 private:
 	virtual void randomDestinationPoint();
@@ -108,16 +108,15 @@ private:
 	bool playerDetected;
 	AudioSample * mWingSound;
 	AudioSample * mSnapSound;
-	int targetBodyPart;
 	float damageMultiplicationFactor[4];
 	float mCoolDown;
 	bool recalculationOfRotationAngle;
 	float rotationAroundPlayer;
-	int lastBodyPart;
 	float dmgWingRight;
 	float dmgWingLeft;
+	bool mWingLeftDisintegrated;
+	bool mWingRightDisintegrated;
 	float fallHeight;
-	int kindOfDead;
 };
 
 
