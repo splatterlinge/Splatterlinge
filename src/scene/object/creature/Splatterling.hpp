@@ -27,6 +27,7 @@
 
 #include "ACreature.hpp"
 #include "resource/AudioSample.hpp"
+#include "../weapon/AWeapon.hpp"
 
 
 struct GLUquadric;
@@ -90,9 +91,10 @@ public:
 	virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL );
 	virtual void recalculateWingPosition( );
 
-	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
-	virtual bool intersectWing(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
-	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
+	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance, bool isWeapon);
+	virtual bool intersectWing(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance, bool isWeapon);
+	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance, bool isWeapon);
+	virtual bool isSourceWeapon(const AObject * object);
 
 private:
 	virtual void randomDestinationPoint();

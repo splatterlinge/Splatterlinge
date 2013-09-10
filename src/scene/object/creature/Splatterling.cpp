@@ -600,15 +600,18 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 
 			bool hit = false;
 
-			if(intersectHead(origin, direction, &rayLength)){
+
+			bool isWeapon = isSourceWeapon(exclude);
+
+			if(intersectHead(origin, direction, &rayLength, isWeapon)){
 				hit = true;
 			}
 
-			if(intersectBody(origin, direction, &rayLength)){
+			if(intersectBody(origin, direction, &rayLength, isWeapon)){
 				hit = true;
 			}
 
-			if(intersectWing(origin, direction, &rayLength)){
+			if(intersectWing(origin, direction, &rayLength, isWeapon)){
 				hit = true;
 			}
 
@@ -631,7 +634,7 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 	return nearestTarget;
 }
 
-bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
+bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance, bool isWeapon )
 {
 	if(kindOfDead == DEAD_HEADSHOT || kindOfDead == DEAD_WINGSHOT){
 		return false;
@@ -642,7 +645,9 @@ bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & di
 	if(Intersection::intersectTriangleFan(PositionData, 6, 15, modelMatrix(), origin, direction, &rayLenght)){
 		if(rayLenght < *intersectionDistance){
 			*intersectionDistance = rayLenght;
-			targetBodyPart = TARGET_BODY;
+			if(isWeapon){
+				targetBodyPart = TARGET_BODY;
+			}
 			return true;
 		}
 	}
@@ -652,7 +657,9 @@ bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & di
 
 		if(rayLenght < *intersectionDistance){
 			*intersectionDistance = rayLenght;
-			targetBodyPart = TARGET_BODY;
+			if(isWeapon){
+				targetBodyPart = TARGET_BODY;
+			}
 			return true;
 		}
 	}
@@ -660,7 +667,7 @@ bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & di
 }
 
 
-bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
+bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance, bool isWeapon )
 {
 	QVector3D v[3];
 
@@ -677,7 +684,9 @@ bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & di
 		{
 			if(rayLenght < *intersectionDistance){
 				*intersectionDistance = rayLenght;
-				targetBodyPart = TARGET_WING_LEFT;
+				if(isWeapon){
+					targetBodyPart = TARGET_WING_LEFT;
+				}
 				return true;
 			}
 		}
@@ -694,7 +703,9 @@ bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & di
 		{
 			if(rayLenght < *intersectionDistance){
 				*intersectionDistance = rayLenght;
-				targetBodyPart = TARGET_WING_RIGHT;
+				if(isWeapon){
+					targetBodyPart = TARGET_WING_RIGHT;
+				}
 				return true;
 			}
 		}
@@ -704,7 +715,7 @@ bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & di
 }
 
 
-bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance )
+bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & direction, float * intersectionDistance, bool isWeapon )
 {
 	if(kindOfDead == DEAD_HEADSHOT || kindOfDead == DEAD_WINGSHOT){
 		return false;
@@ -721,7 +732,9 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 		if(Intersection::intersectTriangleFan(PositionData, BodyVertexCount, BodyVertexCount+9, modelMatrix(), origin, direction, &rayLenght)){
 			if(rayLenght < *intersectionDistance){
 				*intersectionDistance = rayLenght;
-				targetBodyPart = TARGET_HEAD;
+				if(isWeapon){
+					targetBodyPart = TARGET_HEAD;
+				}
 				return true;
 			}
 		}
@@ -730,7 +743,9 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 		if(Intersection::intersectTriangleStrip(PositionData, BodyVertexCount+10, BodyVertexCount+HeadVertexCount-5, modelMatrix(), origin, direction, &rayLenght)){
 			if(rayLenght < *intersectionDistance){
 				*intersectionDistance = rayLenght;
-				targetBodyPart = TARGET_HEAD;
+				if(isWeapon){
+					targetBodyPart = TARGET_HEAD;
+				}
 				return true;
 			}
 		}
@@ -826,5 +841,19 @@ void Splatterling::recalculateWingPosition()
 		{
 			wingUpMovement = true;
 		}
+	}
+}
+
+bool Splatterling::isSourceWeapon(const AObject *object){
+	if(object == NULL){
+		return false;
+	}
+
+	const AWeapon * weapon = dynamic_cast<const AWeapon*>(object);
+
+	if(weapon != NULL){
+		return true;
+	}else{
+		return false;
 	}
 }
