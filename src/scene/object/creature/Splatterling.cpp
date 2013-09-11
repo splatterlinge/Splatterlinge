@@ -296,6 +296,88 @@ static const GLubyte ColorData[] =
 	0, 0, 255,
 };
 
+static const GLfloat GlobalNormalData[] =
+{
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+
+	0.0f, 0.0f, -1.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, 0.0f, -1.0f,
+
+	0.0f, 0.0f, -1.0f,
+	0.0f, 1.0f, 0.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, 1.0f, 1.0f,
+	0.0f, 0.0f, -1.0f,
+	-1.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, -1.0f,
+	-1.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, -1.0f, 0.0f,
+	0.0f, 0.0f, -1.0f,
+	0.0f, -1.0f, 0.0f,
+	0.0f, 0.0f, -1.0f,
+	1.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, -1.0f,
+	1.0f, 0.0f, 0.0f,
+
+	//face
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+
+	0.0f, 0.0f, 1.0f,
+	0.0f, 1.0f, 0.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 1.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	-1.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 1.0f,
+	-1.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, -1.0f, 0.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, -1.0f, 0.0f,
+	0.0f, 0.0f, 1.0f,
+	1.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 1.0f,
+	1.0f, 0.0f, 0.0f,
+
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 0.0f, 1.0f,
+
+	//wingOne
+	0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f,
+
+	//wingTwo
+	0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f,
+};
+
 static void initTexCoordArray()
 {
 	int posCoordIndex, end = Splatterling::TexSize / sizeof( GLfloat );
@@ -579,8 +661,17 @@ void Splatterling::drawSelf()
 	glBufferData( GL_ARRAY_BUFFER, Splatterling::TexSize, TextureCoordData, GL_STREAM_DRAW );
 	glTexCoordPointer( 2, GL_FLOAT, 0, 0 );
 
+
+
+	glBindBuffer( GL_ARRAY_BUFFER, this->BufferName[NORMAL_OBJECT] );
+	glBufferData( GL_ARRAY_BUFFER, Splatterling::NormalSize, GlobalNormalData, GL_STREAM_DRAW );
+	glNormalPointer(GL_FLOAT, 0, 0 );
+
+
+
 	glEnableClientState( GL_VERTEX_ARRAY );
 	glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+	glEnableClientState( GL_NORMAL_ARRAY );
 //	glEnableClientState( GL_COLOR_ARRAY );
 
 //	glDrawArrays( GL_TRIANGLE_FAN, 0, Splatterling::BodyVertexCount );
@@ -595,6 +686,8 @@ void Splatterling::drawSelf()
 		glDrawArrays( GL_TRIANGLE_STRIP, Splatterling::BodyVertexCount + 10, 18 );
 //		glDrawArrays( GL_TRIANGLE_STRIP, 6 + Splatterling::HeadVertexCount-4, 4 );
 	}
+
+	glDisableClientState( GL_NORMAL_ARRAY );
 
 	//wings
 	if( !mWingLeftDisintegrated )

@@ -41,10 +41,11 @@ public:
 	static const GLsizeiptr PositionSize = 72 * 3 * sizeof( GLfloat );
 	static const GLsizeiptr ColorSize = 72 * 3 * sizeof( GLubyte );
 	static const GLsizeiptr TexSize = 72 * 2 * sizeof( GLfloat );
+	static const GLsizeiptr NormalSize = 72 * 3 * sizeof( GLfloat );
 
 
 	static const float SplatterlingSizeFactor = 0.25f;
-	static const int BufferSize = 3;
+	static const int BufferSize = 4;
 	static const float SplatterlingLength = 8.8f;
 	static const float SplatterlingBoundingSphereSize = 18.0f;
 
@@ -58,7 +59,8 @@ public:
 	{
 		POSITION_OBJECT = 0,
 		COLOR_OBJECT = 1,
-		TEXTURE_OBJECT = 2
+		TEXTURE_OBJECT = 2,
+		NORMAL_OBJECT = 3,
 	};
 	enum
 	{
