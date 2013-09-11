@@ -398,8 +398,22 @@ static QVector3D randomPointOnWorld( World * world )
 
 void Splatterling::randomDestinationPoint()
 {
-	QVector3D pos( RandomNumber::minMax( this->position().x() - 100, this->position().x() + 100 ), 0, RandomNumber::minMax( this->position().z() - 100, this->position().z() + 100 ) );
-	pos.setY( this->world()->landscape()->terrain()->getHeight( pos ) + RandomNumber::minMax( 20, 40 ) );
+	QVector2D twoDimPosXZ;
+	QVector3D pos;
+	bool destinationPointValid = false;
+
+	do{
+		pos = QVector3D( RandomNumber::minMax( this->position().x() - 100, this->position().x() + 100 ), 0, RandomNumber::minMax( this->position().z() - 100, this->position().z() + 100 ) );
+		twoDimPosXZ = QVector2D(pos.x(), (pos.z()/(world()->landscape()->terrain()->size().z()/2.0f))*(world()->landscape()->terrain()->size().x()/2.0f) );
+
+		float dist = (twoDimPosXZ - QVector2D(0,0)).length();
+
+		if( dist < (world()->landscape()->terrain()->size().x()/2.0f) ){
+			destinationPointValid = true;
+		}
+
+	}while (!destinationPointValid);
+	pos.setY( this->world()->landscape()->terrain()->getHeight( pos ) + RandomNumber::minMax( 20, 50 ) );
 	destinationPoint = pos;
 }
 
