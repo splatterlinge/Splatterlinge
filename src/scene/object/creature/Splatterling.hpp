@@ -41,10 +41,11 @@ public:
 	static const GLsizeiptr PositionSize = 72 * 3 * sizeof( GLfloat );
 	static const GLsizeiptr ColorSize = 72 * 3 * sizeof( GLubyte );
 	static const GLsizeiptr TexSize = 72 * 2 * sizeof( GLfloat );
+	static const GLsizeiptr NormalSize = 72 * 3 * sizeof( GLfloat );
 
 
 	static const float SplatterlingSizeFactor = 0.25f;
-	static const int BufferSize = 3;
+	static const int BufferSize = 4;
 	static const float SplatterlingLength = 8.8f;
 	static const float SplatterlingBoundingSphereSize = 18.0f;
 
@@ -58,7 +59,8 @@ public:
 	{
 		POSITION_OBJECT = 0,
 		COLOR_OBJECT = 1,
-		TEXTURE_OBJECT = 2
+		TEXTURE_OBJECT = 2,
+		NORMAL_OBJECT = 3,
 	};
 	enum
 	{
@@ -85,14 +87,15 @@ public:
 	virtual void drawSelf();
 
 	virtual AObject * intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
-					 float & length, QVector3D * normal = NULL );
+		float & length, QVector3D * normal = NULL );
 
 	virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL );
 	virtual void recalculateWingPosition( );
 
-	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
-	virtual bool intersectWing(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance, int * intersectingWing);
-	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float * intersectionDistance);
+	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
+	virtual bool intersectRightWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
+	virtual bool intersectLeftWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
+	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
 
 private:
 	virtual void randomDestinationPoint();
@@ -108,16 +111,15 @@ private:
 	bool playerDetected;
 	AudioSample * mWingSound;
 	AudioSample * mSnapSound;
-	int targetBodyPart;
 	float damageMultiplicationFactor[4];
 	float mCoolDown;
 	bool recalculationOfRotationAngle;
 	float rotationAroundPlayer;
-	int lastBodyPart;
-	float dmgWingRight;
-	float dmgWingLeft;
-	float fallHeight;
-	int kindOfDead;
+	bool mWingLeftDisintegrated;
+	bool mWingRightDisintegrated;
+	bool mHeadDisintegrated;
+	bool mBodyHittedToGround;
+	float mDamageOnBodyPart[4];
 };
 
 
