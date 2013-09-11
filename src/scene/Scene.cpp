@@ -492,27 +492,27 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	painter->drawRect( multi5Rect );
 	painter->drawRect( multi10Rect );
 
-	if( player->killTime() < 10000 )
+	if( player->killTime() < 10.0f )
 	{
 		qDebug() << player->killTime();
 
 		painter->setBrush( QBrush( QColor(255,0,0,200) ) );
-		painter->drawRect( multi1Rect.left(), multi1Rect.top(), qMin( player->killTime(), 1000 )/1000.0f*w1, multi1Rect.height() );
+		painter->drawRect( multi1Rect.left(), multi1Rect.top(), qMin( player->killTime(), 1.0f )*w1, multi1Rect.height() );
 
-		if( player->killTime() >= 1000 )
+		if( player->killTime() >= 1.0f )
 		{
 			painter->setBrush( QBrush( QColor(255,255,0,200) ) );
-			painter->drawRect( multi2Rect.left(), multi2Rect.top(), qMin( player->killTime()-1000, 2000 )/1000.0f*w1, multi2Rect.height() );
+			painter->drawRect( multi2Rect.left(), multi2Rect.top(), qMin( player->killTime()-1.0f, 2.0f )*w1, multi2Rect.height() );
 		}
-		if( player->killTime() >= 3000 )
+		if( player->killTime() >= 3.0f )
 		{
 			painter->setBrush( QBrush( QColor(0,255,0,200) ) );
-			painter->drawRect( multi5Rect.left(), multi5Rect.top(), qMin( player->killTime()-3000, 2000 )/1000.0f*w1, multi5Rect.height() );
+			painter->drawRect( multi5Rect.left(), multi5Rect.top(), qMin( player->killTime()-3.0f, 2.0f )*w1, multi5Rect.height() );
 		}
-		if( player->killTime() >= 5000 )
+		if( player->killTime() >= 5.0f )
 		{
 			painter->setBrush( QBrush( QColor(0,0,255,200) ) );
-			painter->drawRect( multi10Rect.left(), multi10Rect.top(), qMin( player->killTime()-5000, 5000 )/1000.0f*w1, multi10Rect.height() );
+			painter->drawRect( multi10Rect.left(), multi10Rect.top(), qMin( player->killTime()-5.0f, 5.0f )*w1, multi10Rect.height() );
 		}
 	}
 

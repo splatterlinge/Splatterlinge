@@ -70,8 +70,8 @@ Player::Player( World * world ) :
 	mDragTorch = false;
 
 	mPoints = 0;
-	mKillTimer.start();
-	mAliveTimer.start();
+	mKillTimer = 0;
+	mAliveTimer = 0;
 
 	scene()->addKeyListener( this );
 	scene()->addMouseListener( this );
@@ -230,6 +230,9 @@ void Player::mouseWheelEvent( QGraphicsSceneWheelEvent * event )
 
 void Player::updateSelf( const double & delta )
 {
+	mAliveTimer += delta;
+	mKillTimer += delta;
+
 	if( mGodMode )
 	{
 		setState( ALIVE );
@@ -342,17 +345,19 @@ void Player::receiveDamage( int damage, const QVector3D * position, const QVecto
 
 void Player::receivePoints( int points )
 {
-	int time = mKillTimer.restart();
+	int time = mKillTimer;
 	float mult = 1;
-	if( time < 1000 )
+	if( time < 1.0f )
 		mult = 5;
-	else if( time < 3000 )
+	else if( time < 3.0f )
 		mult = 3;
-	else if( time < 5000 )
+	else if( time < 5.0f )
 		mult = 2;
-	else if( time < 10000 )
+	else if( time < 10.0f )
 		mult = 1.5;
 	mPoints += points * mult;
+
+	mKillTimer = 0;
 }
 
 
@@ -581,15 +586,4 @@ void Player::drawCrosshair()
 	glVertex3f(-0.15f, 0.0f, -1.0f);
 	glEnd();
 	glColor4f(1,1,1,1);
-}
-
-const int Player::time() const
-{
-	int t = static_cast<int>(mAliveTimer.elapsed() / 1000);
-	return t;
-}
-
-const int Player::mstime() const
-{
-	return mAliveTimer.elapsed();
 }
