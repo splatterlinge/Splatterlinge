@@ -14,7 +14,7 @@ void main()
 	vec3 normal = normalize(vNormal);
 	vec3 viewDir = normalize(-vVertex);
 	float fangle = 1+abs(dot( viewDir, normal ));
-	fangle = pow(fangle ,5);
+	fangle = pow( fangle, 2 );
 	float fresnelTerm = 1/fangle;
 
 	vec2 texCoord = vec2( vTexCoord.x / vTexCoord.w, vTexCoord.y / vTexCoord.w );
