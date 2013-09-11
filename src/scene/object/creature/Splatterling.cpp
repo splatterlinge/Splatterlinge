@@ -315,7 +315,7 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
 
-	mHeightAboveGround = 6.0f;
+	mHeightAboveGround = 1.0f;
 	mVelocityY = 0.0f;
 	mMaterial = new Material( scene()->glWidget(), "Splatterling" );
 	glGenBuffers( BufferSize, this->BufferName );
@@ -324,6 +324,8 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	playerDetected = false;
 	mWingRightDisintegrated = false;
 	mWingLeftDisintegrated = false;
+	mHeadDisintegrated = false;
+	mBodyHittedToGround = false;
 
 	mWingSound = new AudioSample( "butterfly" );
 	mWingSound->setLooping( true );
@@ -339,6 +341,11 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	damageMultiplicationFactor[TARGET_WING_LEFT] = 1.0f;
 	damageMultiplicationFactor[TARGET_WING_RIGHT] = 1.0f;
 
+	mDamageOnBodyPart[TARGET_BODY] = 0.0f;
+	mDamageOnBodyPart[TARGET_HEAD] = 0.0f;
+	mDamageOnBodyPart[TARGET_WING_LEFT] = 0.0f;
+	mDamageOnBodyPart[TARGET_WING_RIGHT] = 0.0f;
+
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
 	{
 		PositionData[i] = GlobalPositionData[i] * Splatterling::SplatterlingSizeFactor;
@@ -351,10 +358,6 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	setBoundingSphere( Splatterling::SplatterlingBoundingSphereSize * Splatterling::SplatterlingSizeFactor );
 
 	initTexCoordArray();
-
-	dmgWingLeft = 0.0f;
-	dmgWingRight = 0.0f;
-	fallHeight = 0.0f;
 }
 
 
@@ -374,14 +377,20 @@ static QVector3D randomPointOnWorld( World * world )
 	QVector3D terrainOffset = world->landscape()->terrain()->offset();
 	QVector3D pos;
 	GLfloat distanceToPlayer = 0.0f;
+	bool distanceIsValid = false;
 	do
 	{
 		pos = QVector3D( RandomNumber::minMax( terrainOffset.x(), terrainSize.x() + terrainOffset.x() ), 0, RandomNumber::minMax( terrainOffset.z(), terrainSize.z() + terrainOffset.z() ) );
 		pos.setY( world->landscape()->terrain()->getHeight( pos ) );
 
 		distanceToPlayer = ( world->player()->position() - pos ).length();
+
+		if( distanceToPlayer > Splatterling::DetectionDistance*2.0f && distanceToPlayer < Splatterling::DetectionDistance*5.0f)
+		{
+			distanceIsValid = true;
+		}
 	}
-	while( pos.y() <= world->landscape()->waterHeight() || distanceToPlayer < Splatterling::DetectionDistance );
+	while( pos.y() <= world->landscape()->waterHeight() || !distanceIsValid );
 
 	return pos;
 }
@@ -499,9 +508,8 @@ void Splatterling::updateSelf( const double & delta )
 			mWingSound->stop();
 			mHeightAboveGround = 3.0f;
 
-			mVelocityY += -6.0f * delta;	// apply some gravity
-			fallHeight -= mVelocityY * delta;
-			setPositionY( position().y() + mVelocityY * delta );
+			mVelocityY += -10.0f * delta;	// apply some gravity
+			setPositionY( position().y() + mVelocityY *delta );
 
 			float landscapeHeight;
 
@@ -510,13 +518,19 @@ void Splatterling::updateSelf( const double & delta )
 				if( landscapeHeight + mHeightAboveGround > position().y() )
 				{
 					setPositionY( landscapeHeight + mHeightAboveGround );
-					if( mVelocityY < 0.0f )
-						mVelocityY = 0.0f;
+					/*if( mVelocityY < 0.0f )
+						mVelocityY = 0.0f;*/
 				}
 			}
 
 			if( !( position().y() > landscapeHeight + mHeightAboveGround ) )
 			{
+				if( mWingLeftDisintegrated || mWingRightDisintegrated )
+				{
+					mBodyHittedToGround = true;
+					world()->splatterSystem()->spray( worldPosition(), mVelocityY*(-10.0f) );
+					world()->player()->receivePoints( mVelocityY*(-10.0f) );
+				}
 				setState( DEAD );
 			}
 
@@ -557,14 +571,16 @@ void Splatterling::drawSelf()
 
 //	glDrawArrays( GL_TRIANGLE_FAN, 0, Splatterling::BodyVertexCount );
 
-	//body
-	glDrawArrays( GL_TRIANGLE_FAN, 6, 10 );
-	glDrawArrays( GL_TRIANGLE_STRIP, 16, 18 );
+	if( !mHeadDisintegrated && ! mBodyHittedToGround ){
+		//body
+		glDrawArrays( GL_TRIANGLE_FAN, 6, 10 );
+		glDrawArrays( GL_TRIANGLE_STRIP, 16, 18 );
 
-	//head
-	glDrawArrays( GL_TRIANGLE_FAN, Splatterling::BodyVertexCount, 10 );
-	glDrawArrays( GL_TRIANGLE_STRIP, Splatterling::BodyVertexCount + 10, 18 );
-//	glDrawArrays( GL_TRIANGLE_STRIP, 6 + Splatterling::HeadVertexCount-4, 4 );
+		//head
+		glDrawArrays( GL_TRIANGLE_FAN, Splatterling::BodyVertexCount, 10 );
+		glDrawArrays( GL_TRIANGLE_STRIP, Splatterling::BodyVertexCount + 10, 18 );
+//		glDrawArrays( GL_TRIANGLE_STRIP, 6 + Splatterling::HeadVertexCount-4, 4 );
+	}
 
 	//wings
 	if( !mWingLeftDisintegrated )
@@ -589,7 +605,6 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 {
 	AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
 	float rayLength;
-	int wing;
 
 	if( Sphere::intersectCulledRay( worldPosition(), boundingSphereRadius(), origin, direction, &rayLength ) )
 	{
@@ -601,7 +616,8 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 
 			hit |= intersectHead( origin, direction, rayLength );
 			hit |= intersectBody( origin, direction, rayLength );
-			hit |= intersectWing( origin, direction, rayLength, wing );
+			hit |= intersectRightWing( origin, direction, rayLength );
+			hit |= intersectLeftWing( origin, direction, rayLength );
 
 			if( hit )
 			{
@@ -627,28 +643,31 @@ bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & di
 {
 	float rayLength;
 
-	if( Intersection::intersectTriangleFan( PositionData, 6, 15, modelMatrix(), origin, direction, &rayLength ) )
+	if( !mHeadDisintegrated )
 	{
-		if( rayLength < intersectionDistance )
+		if( Intersection::intersectTriangleFan( PositionData, 6, 15, modelMatrix(), origin, direction, &rayLength ) )
 		{
-			intersectionDistance = rayLength;
-			return true;
+			if( rayLength < intersectionDistance )
+			{
+				intersectionDistance = rayLength;
+				return true;
+			}
 		}
-	}
 
-	if( Intersection::intersectTriangleStrip( PositionData, 16, BodyVertexCount - 1, modelMatrix(), origin, direction, &rayLength ) )
-	{
-		if( rayLength < intersectionDistance )
+		if( Intersection::intersectTriangleStrip( PositionData, 16, BodyVertexCount - 1, modelMatrix(), origin, direction, &rayLength ) )
 		{
-			intersectionDistance = rayLength;
-			return true;
+			if( rayLength < intersectionDistance )
+			{
+				intersectionDistance = rayLength;
+				return true;
+			}
 		}
 	}
 	return false;
 }
 
 
-bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & direction, float & intersectionDistance, int & intersectingWing )
+bool Splatterling::intersectLeftWing( const QVector3D & origin, const QVector3D & direction, float & intersectionDistance )
 {
 	QVector3D v[3];
 
@@ -668,11 +687,20 @@ bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & di
 			if( rayLength < intersectionDistance )
 			{
 				intersectionDistance = rayLength;
-				intersectingWing = TARGET_WING_LEFT;
 				hit = true;
 			}
 		}
 	}
+
+	return hit;
+}
+
+bool Splatterling::intersectRightWing( const QVector3D & origin, const QVector3D & direction, float & intersectionDistance )
+{
+	QVector3D v[3];
+
+	float rayLength;
+	bool hit = false;
 
 	if( !mWingRightDisintegrated )
 	{
@@ -687,7 +715,6 @@ bool Splatterling::intersectWing( const QVector3D & origin, const QVector3D & di
 			if( rayLength < intersectionDistance )
 			{
 				intersectionDistance = rayLength;
-				intersectingWing = TARGET_WING_RIGHT;
 				hit = true;
 			}
 		}
@@ -701,23 +728,26 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 {
 	float rayLength;
 
-	//inner
-	if( Intersection::intersectTriangleFan( PositionData, BodyVertexCount, BodyVertexCount + 9, modelMatrix(), origin, direction, &rayLength ) )
+	if(! mHeadDisintegrated )
 	{
-		if( rayLength < intersectionDistance )
+		//inner
+		if( Intersection::intersectTriangleFan( PositionData, BodyVertexCount, BodyVertexCount + 9, modelMatrix(), origin, direction, &rayLength ) )
 		{
-			intersectionDistance = rayLength;
-			return true;
+			if( rayLength < intersectionDistance )
+			{
+				intersectionDistance = rayLength;
+				return true;
+			}
 		}
-	}
 
-	//Outter
-	if( Intersection::intersectTriangleStrip( PositionData, BodyVertexCount + 10, BodyVertexCount + HeadVertexCount - 5, modelMatrix(), origin, direction, &rayLength ) )
-	{
-		if( rayLength < intersectionDistance )
+		//Outter
+		if( Intersection::intersectTriangleStrip( PositionData, BodyVertexCount + 10, BodyVertexCount + HeadVertexCount - 5, modelMatrix(), origin, direction, &rayLength ) )
 		{
-			intersectionDistance = rayLength;
-			return true;
+			if( rayLength < intersectionDistance )
+			{
+				intersectionDistance = rayLength;
+				return true;
+			}
 		}
 	}
 
@@ -735,15 +765,22 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 	if( intersectBody( mTrailStart, *direction, rayLength ) )
 		targetBodyPart = TARGET_BODY;
 
-	if( intersectWing( mTrailStart, *direction, rayLength, targetBodyPart ) )
+	if( intersectRightWing( mTrailStart, *direction, rayLength ) )
+		targetBodyPart = TARGET_WING_RIGHT;
+
+	if( intersectLeftWing( mTrailStart, *direction, rayLength ) )
+		targetBodyPart = TARGET_WING_LEFT;
 
 	if( intersectHead( mTrailStart, *direction, rayLength ) )
 		targetBodyPart = TARGET_HEAD;
 
+	damage *= damageMultiplicationFactor[targetBodyPart];
+	ACreature::receiveDamage( damage, direction );
+	mDamageOnBodyPart[targetBodyPart] += damage;
+
 	if( targetBodyPart == TARGET_WING_LEFT )
 	{
-		dmgWingLeft += damage;
-		if( dmgWingLeft >= 5.0f )
+		if( mDamageOnBodyPart[TARGET_WING_LEFT] >= 5.0f )
 		{
 			mWingLeftDisintegrated = true;
 			setLife( 0 );
@@ -752,17 +789,22 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 	}
 	else if( targetBodyPart == TARGET_WING_RIGHT )
 	{
-		dmgWingRight += damage;
-		if( dmgWingRight >= 5.0f )
+		if( mDamageOnBodyPart[TARGET_WING_RIGHT] >= 5.0f )
 		{
 			mWingRightDisintegrated = true;
 			setLife( 0 );
 			setState( DYING );
 		}
 	}
-
-	damage *= damageMultiplicationFactor[targetBodyPart];
-	ACreature::receiveDamage( damage, direction );
+	else if( targetBodyPart == TARGET_HEAD )
+	{
+		if( mDamageOnBodyPart[TARGET_HEAD] >= 5.0f )
+		{
+			mHeadDisintegrated = true;
+			setLife( 0 );
+			setState( DYING );
+		}
+	}
 
 	QVector3D splatterSource;
 

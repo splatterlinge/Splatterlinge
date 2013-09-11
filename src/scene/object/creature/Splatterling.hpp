@@ -91,7 +91,8 @@ public:
 	virtual void recalculateWingPosition( );
 
 	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
-	virtual bool intersectWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance, int & intersectingWing);
+	virtual bool intersectRightWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
+	virtual bool intersectLeftWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
 	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
 
 private:
@@ -112,11 +113,11 @@ private:
 	float mCoolDown;
 	bool recalculationOfRotationAngle;
 	float rotationAroundPlayer;
-	float dmgWingRight;
-	float dmgWingLeft;
 	bool mWingLeftDisintegrated;
 	bool mWingRightDisintegrated;
-	float fallHeight;
+	bool mHeadDisintegrated;
+	bool mBodyHittedToGround;
+	float mDamageOnBodyPart[4];
 };
 
 
