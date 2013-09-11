@@ -42,6 +42,8 @@ TextureRenderer::TextureRenderer( GLWidget * glWidget, const QSize & size, bool 
 	glBindTexture( GL_TEXTURE_2D, mTex );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	glTexImage2D( GL_TEXTURE_2D, 0, 3, mSize.width(), mSize.height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL );
 
 	glGenFramebuffers( 1, &mFrameBuffer );
@@ -59,6 +61,8 @@ TextureRenderer::TextureRenderer( GLWidget * glWidget, const QSize & size, bool 
 		glBindTexture( GL_TEXTURE_2D, mDepth );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 		glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, mSize.width(), mSize.height(), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL );
 
 		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mDepth, 0 );
