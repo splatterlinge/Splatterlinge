@@ -70,6 +70,7 @@ Player::Player( World * world ) :
 	mDragTorch = false;
 
 	mPoints = 0;
+	mKillTimer.start();
 	mAliveTimer.start();
 
 	scene()->addKeyListener( this );
@@ -341,7 +342,17 @@ void Player::receiveDamage( int damage, const QVector3D * position, const QVecto
 
 void Player::receivePoints( int points )
 {
-	mPoints += points;
+	int time = mKillTimer.restart();
+	float mult = 1;
+	if( time < 1000 )
+		mult = 5;
+	else if( time < 3000 )
+		mult = 3;
+	else if( time < 5000 )
+		mult = 2;
+	else if( time < 10000 )
+		mult = 1.5;
+	mPoints += points * mult;
 }
 
 
@@ -354,7 +365,7 @@ void Player::giveWeapon( QSharedPointer< AWeapon > weapon )
 	{
 		if( myWeapon->name() == weapon->name() )
 		{
-			myWeapon->setAmmo( myWeapon->ammo() + 1 );	// TODO: how much ammo to add
+			myWeapon->setAmmo( myWeapon->ammo() + myWeapon->clipsize() );	// TODO: how much ammo to add
 			return;
 		}
 	}

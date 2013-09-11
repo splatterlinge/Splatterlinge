@@ -94,6 +94,7 @@ void Minigun::holster()
 {
 	mDrawn = false;
 	mFired = false;
+	mFireSound->stop();
 }
 
 
@@ -101,6 +102,7 @@ void Minigun::reload()
 {
 	mReload = true;
 	mCoolDown = 5.0f;
+	mFireSound->stop();
 }
 
 

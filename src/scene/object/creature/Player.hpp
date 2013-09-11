@@ -60,6 +60,7 @@ public:
 
 	const int & armor() const { return mArmor; }
 	const int & points() const { return mPoints; }
+	const int killTime() const { return mKillTimer.elapsed(); }
 	const int time() const;
 	const int mstime() const;
 	QSharedPointer<AWeapon> currentWeapon() { return mCurrentWeapon; }
@@ -104,6 +105,7 @@ private:
 	QSharedPointer<AWeapon> mCurrentWeapon;
 	int mPoints;
 	QTime mAliveTimer;
+	QTime mKillTimer;
 
 	void updateRotation( const double & delta );
 	void updatePosition( const double & delta );

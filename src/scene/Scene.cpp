@@ -475,6 +475,49 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 		QPainter::TextAntialiasing |
 		QPainter::HighQualityAntialiasing );
 
+	// multi
+	float w1 = rect.width()/10*1;
+	float w2 = rect.width()/10*2;
+	float w3 = rect.width()/10*3;
+	float w5 = rect.width()/10*5;
+	int h = 5;
+	int x = rect.left();
+	int y = rect.top();
+	QRect multi1Rect( x, y, w1, h );
+	QRect multi2Rect( x+w1, y, w2, h );
+	QRect multi5Rect( x+w3, y, w2, h );
+	QRect multi10Rect( x+w5, y, w5+1, h );
+	painter->setPen( QColor(255,255,255,0) );
+	painter->setBrush( QBrush( QColor(255,255,255,50) ) );
+	painter->drawRect( multi1Rect );
+	painter->drawRect( multi2Rect );
+	painter->drawRect( multi5Rect );
+	painter->drawRect( multi10Rect );
+
+	if( player->killTime() < 10000 )
+	{
+		qDebug() << player->killTime();
+
+		painter->setBrush( QBrush( QColor(255,0,0,200) ) );
+		painter->drawRect( multi1Rect.left(), multi1Rect.top(), qMin( player->killTime(), 1000 )/1000.0f*w1, multi1Rect.height() );
+
+		if( player->killTime() >= 1000 )
+		{
+			painter->setBrush( QBrush( QColor(255,255,0,200) ) );
+			painter->drawRect( multi2Rect.left(), multi2Rect.top(), qMin( player->killTime()-1000, 2000 )/1000.0f*w1, multi2Rect.height() );
+		}
+		if( player->killTime() >= 3000 )
+		{
+			painter->setBrush( QBrush( QColor(0,255,0,200) ) );
+			painter->drawRect( multi5Rect.left(), multi5Rect.top(), qMin( player->killTime()-3000, 2000 )/1000.0f*w1, multi5Rect.height() );
+		}
+		if( player->killTime() >= 5000 )
+		{
+			painter->setBrush( QBrush( QColor(0,0,255,200) ) );
+			painter->drawRect( multi10Rect.left(), multi10Rect.top(), qMin( player->killTime()-5000, 5000 )/1000.0f*w1, multi10Rect.height() );
+		}
+	}
+
 	// points
 	QRect pointsRect( rect.left()+10, rect.top()+10, 200, 30 );
 	painter->setPen( QColor(255,255,255,200) );
@@ -498,18 +541,6 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 				 arg(QString::number(mm), 2, '0').
 				 arg(QString::number(ss), 2, '0') ) );
 	painter->setFont(old);
-
-	// radar radius
-	QRect radarRect( rect.width()-160, 10, 150, 150 );
-	painter->setPen( QColor(0,0,0,0) );
-	painter->setBrush( QBrush( QColor(11,110,240,80) ) );
-	painter->drawEllipse( radarRect.center(), 75, 75 );
-
-	// radar player point
-	painter->setBrush( QBrush( QColor(255,255,255,50) ) );
-	painter->drawPie( radarRect, 45*16, 90*16 );
-	painter->setBrush( QBrush( QColor(255,255,255,200) ) );
-	painter->drawEllipse( radarRect.center(), 7, 7 );
 
 	// player armor
 	QRect armorRect( rect.left()+10, rect.bottom()-74, 100*3, 30 );
