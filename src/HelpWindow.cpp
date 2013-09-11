@@ -31,19 +31,21 @@
 #include <QSlider>
 #include <QLabel>
 #include <QDebug>
+#include <QSpacerItem>
 
 
-HelpWindow::HelpWindow( QWidget * parent, Qt::WindowFlags f ) :
-	QWidget( parent, f )
+HelpWindow::HelpWindow( QWidget * parent ) :
+	QWidget( parent )
 {
 	setWindowTitle( tr("Help") );
 	setWindowOpacity( 0.8 );
 
 	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
 	layout->addWidget( new QLabel("F1\tThis Window\nF2\tGraphics Options\nF3\tDebug Options") );
+	layout->addSpacerItem( new QSpacerItem( 50, 1, QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 	setLayout( layout );
 
-	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint );
+	setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
 }
 
 

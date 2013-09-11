@@ -21,37 +21,34 @@
  * along with Splatterlinge. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DEBUGOPTIONWINDOW_INCLUDED
-#define DEBUGOPTIONWINDOW_INCLUDED
+#ifndef OPTIONWINDOW_INCLUDED
+#define OPTIONWINDOW_INCLUDED
 
 
 #include <QWidget>
+#include <QTabWidget>
 
 
 class Scene;
 
+class QLabel;
 class QSlider;
 class QCheckBox;
 class QBoxLayout;
 
 
-class DebugWindow : public QWidget
+class OptionWindow : public QTabWidget
 {
 	Q_OBJECT
 
 public:
-	DebugWindow( Scene * scene, QWidget * parent = 0 );
-	~DebugWindow();
+	OptionWindow( Scene * scene, QWidget * parent = 0 );
+	~OptionWindow();
 
 private:
 	Scene * mScene;
-	QBoxLayout * mLayout;
-	QCheckBox * mWireFrame;
-	QCheckBox * mObjectBoundingSpheres;
 
 public slots:
-	void setWireFrame( int enable );
-	void setObjectBoundingSpheres( int enable );
 };
 
 

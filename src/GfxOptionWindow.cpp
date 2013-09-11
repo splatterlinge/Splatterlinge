@@ -37,8 +37,8 @@
 #include <QSettings>
 
 
-GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFlags f ) :
-	QWidget( parent, f ),
+GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent ) :
+	QWidget( parent ),
 	mScene( scene )
 {
 	setWindowTitle( tr("Graphics Options") );
@@ -130,6 +130,8 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent, Qt::WindowFla
 	mStereoUseOVR->setChecked( mScene->stereoUseOVR() );
 	QObject::connect( mStereoUseOVR, SIGNAL(stateChanged(int)), this, SLOT(setStereoUseOVR(int)) );
 	mLayout->addWidget( mStereoUseOVR );
+
+	mLayout->addSpacerItem( new QSpacerItem( 50, 1, QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 
 	setLayout( mLayout );
 

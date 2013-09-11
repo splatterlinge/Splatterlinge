@@ -33,8 +33,8 @@
 #include <QDebug>
 
 
-DebugWindow::DebugWindow( Scene * scene, QWidget * parent, Qt::WindowFlags f ) :
-	QWidget( parent, f ),
+DebugWindow::DebugWindow( Scene * scene, QWidget * parent ) :
+	QWidget( parent ),
 	mScene( scene )
 {
 	setWindowTitle( tr("Debug") );
@@ -50,9 +50,9 @@ DebugWindow::DebugWindow( Scene * scene, QWidget * parent, Qt::WindowFlags f ) :
 	QObject::connect( mObjectBoundingSpheres, SIGNAL(stateChanged(int)), this, SLOT(setObjectBoundingSpheres(int)) );
 	mLayout->addWidget( mObjectBoundingSpheres );
 
-	setLayout( mLayout );
+	mLayout->addSpacerItem( new QSpacerItem( 50, 1, QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 
-	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint );
+	setLayout( mLayout );
 }
 
 

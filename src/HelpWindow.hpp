@@ -33,7 +33,7 @@ class HelpWindow : public QWidget
 	Q_OBJECT
 
 public:
-	HelpWindow( QWidget * parent = 0, Qt::WindowFlags f = 0 );
+	HelpWindow( QWidget * parent = 0 );
 	~HelpWindow();
 
 private:

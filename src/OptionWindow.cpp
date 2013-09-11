@@ -21,38 +21,44 @@
  * along with Splatterlinge. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DEBUGOPTIONWINDOW_INCLUDED
-#define DEBUGOPTIONWINDOW_INCLUDED
+#include "OptionWindow.hpp"
+
+#include "GfxOptionWindow.hpp"
+#include "DebugWindow.hpp"
+#include "HelpWindow.hpp"
+
+#include <resource/Material.hpp>
+#include <scene/object/environment/AVegetation.hpp>
+#include <scene/object/Landscape.hpp>
+#include <scene/Scene.hpp>
+#include <scene/object/World.hpp>
+
+#include <QBoxLayout>
+#include <QCheckBox>
+#include <QSlider>
+#include <QLabel>
+#include <QDebug>
+#include <QSettings>
+#include <QTabBar>
 
 
-#include <QWidget>
-
-
-class Scene;
-
-class QSlider;
-class QCheckBox;
-class QBoxLayout;
-
-
-class DebugWindow : public QWidget
+OptionWindow::OptionWindow( Scene * scene, QWidget * parent ) :
+	QTabWidget( parent ),
+	mScene( scene )
 {
-	Q_OBJECT
+	setObjectName( "options" );
+	setWindowTitle( tr("Options") );
+	setWindowOpacity( 0.8 );
 
-public:
-	DebugWindow( Scene * scene, QWidget * parent = 0 );
-	~DebugWindow();
+	addTab( new HelpWindow(), "Help" );
+	addTab( new GfxOptionWindow( scene ), "Graphics" );
+	addTab( new DebugWindow( scene ), "Debug" );
 
-private:
-	Scene * mScene;
-	QBoxLayout * mLayout;
-	QCheckBox * mWireFrame;
-	QCheckBox * mObjectBoundingSpheres;
-
-public slots:
-	void setWireFrame( int enable );
-	void setObjectBoundingSpheres( int enable );
-};
+	move( 100, 100 );
+	setMinimumWidth( 400 );
+}
 
 
-#endif
+OptionWindow::~OptionWindow()
+{
+}

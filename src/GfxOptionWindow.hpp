@@ -41,7 +41,7 @@ class GfxOptionWindow : public QWidget
 	Q_OBJECT
 
 public:
-	GfxOptionWindow( Scene * scene, QWidget * parent = 0, Qt::WindowFlags f = 0 );
+	GfxOptionWindow( Scene * scene, QWidget * parent = 0 );
 	~GfxOptionWindow();
 
 private:

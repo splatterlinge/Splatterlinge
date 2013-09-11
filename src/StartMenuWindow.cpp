@@ -23,8 +23,7 @@
 
 #include "StartMenuWindow.hpp"
 
-#include "GfxOptionWindow.hpp"
-#include "HelpWindow.hpp"
+#include "OptionWindow.hpp"
 
 #include <scene/Scene.hpp>
 
@@ -35,25 +34,18 @@
 #include <QBoxLayout>
 
 
-StartMenuWindow::StartMenuWindow( Scene * scene, QWidget * parent ) :
+StartMenuWindow::StartMenuWindow( Scene * scene, OptionWindow * options, QWidget * parent ) :
 	QWidget( parent ),
-	mScene( scene )
+	mScene( scene ),
+	mOptionWindow( options )
 {
+	setObjectName( "startMenu" );
 	setWindowTitle( tr( "Start Menu" ) );
-	setWindowOpacity( 0.8 );
-
-	mHelpWindow = new HelpWindow();
-	mScene->addWidget( mHelpWindow, mHelpWindow->windowFlags() );
-	mHelpWindow->move( 32, 32 );
-
-	mGfxOptionWindow = new GfxOptionWindow( mScene );
-	mScene->addWidget( mGfxOptionWindow, mGfxOptionWindow->windowFlags() );
-	mGfxOptionWindow->move( 32, 32 );
-	mGfxOptionWindow->hide();
+	setWindowOpacity( 1.0 );
 
 	initMenu();
 
-	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint );
+	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::FramelessWindowHint );
 }
 
 
@@ -70,7 +62,7 @@ void StartMenuWindow::initMenu()
 	pal.setColor( QPalette::Inactive, QPalette::Button, Qt::darkRed );
 	pal.setColor( QPalette::ButtonText, Qt::white );
 */
-	QFont buttonFont = font();
+	QFont buttonFont = QFont( "Xolonium", 12, QFont::Normal );
 	buttonFont.setBold( true );
 	buttonFont.setPixelSize( 24 );
 
@@ -111,7 +103,10 @@ void StartMenuWindow::handleNewGameButton()
 
 void StartMenuWindow::handleOptionsButton()
 {
-	mGfxOptionWindow->show();
+	if( !mOptionWindow->isVisible() )
+		mOptionWindow->show();
+	else
+		mOptionWindow->hide();
 }
 
 

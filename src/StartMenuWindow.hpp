@@ -27,19 +27,15 @@
 #include <QWidget>
 
 class Scene;
-class HelpWindow;
-class GfxOptionWindow;
+class OptionWindow;
 class QPushButton;
 
 class StartMenuWindow : public QWidget
 {
 	Q_OBJECT
 public:
-	StartMenuWindow( Scene * scene, QWidget * parent = 0 );
+	StartMenuWindow( Scene * scene, OptionWindow * options, QWidget * parent = 0 );
 	~StartMenuWindow();
-
-	GfxOptionWindow * gfxOptionWindow() { return mGfxOptionWindow; }
-	HelpWindow * helpWindow() { return mHelpWindow; }
 
 private:
 	static const int WIDTH = 740;
@@ -51,8 +47,7 @@ private:
 	QPushButton * mEnd;
 	Scene * mScene;
 
-	GfxOptionWindow * mGfxOptionWindow;
-	HelpWindow * mHelpWindow;
+	OptionWindow * mOptionWindow;
 
 	void initMenu();
 

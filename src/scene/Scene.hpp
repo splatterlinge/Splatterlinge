@@ -47,6 +47,7 @@ class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 
 class GLWidget;
+class OptionWindow;
 class DebugWindow;
 class StartMenuWindow;
 class AMouseListener;
@@ -102,7 +103,7 @@ public:
 	bool stereoUseOVR() const { return mStereoUseOVR; }
 
 	StartMenuWindow * startMenuWindow() { return mStartMenuWindow; }
-	DebugWindow * debugWindow() { return mDebugWindow; }
+	OptionWindow * optionWindow() { return mOptionWindow; }
 
 #ifdef OVR_ENABLED
 	QQuaternion OVROrientation();
@@ -124,7 +125,7 @@ private:
 
 	GLWidget * mGLWidget;
 
-	DebugWindow * mDebugWindow;
+	OptionWindow * mOptionWindow;
 	StartMenuWindow * mStartMenuWindow;
 
 	QElapsedTimer mElapsedTimer;

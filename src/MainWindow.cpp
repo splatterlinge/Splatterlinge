@@ -37,6 +37,12 @@ MainWindow::MainWindow( QWidget * parent ) :
 	QFontDatabase::addApplicationFont( "./data/font/xolonium/Xolonium-Regular.otf" );
 	QFontDatabase::addApplicationFont( "./data/font/xolonium/Xolonium-Bold.otf" );
 
+	QFile file( "data/style/global.qss" );
+	file.open(QFile::ReadOnly);
+	QString styles = QLatin1String(file.readAll() );
+	qDebug() << styles;
+	qApp->setStyleSheet( styles );
+
 	mView = new View( this );
 	this->setCentralWidget( mView );
 

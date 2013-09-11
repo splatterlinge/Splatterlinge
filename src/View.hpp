@@ -34,10 +34,6 @@ class QWidget;
 class QGraphicsScene;
 class QResizeEvent;
 
-class StartMenuWindow;
-class DebugWindow;
-class HelpWindow;
-class GfxOptionWindow;
 class Scene;
 class GLWidget;
 class World;

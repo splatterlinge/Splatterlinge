@@ -24,8 +24,7 @@
 #include "Scene.hpp"
 
 #include "HelpWindow.hpp"
-#include "GfxOptionWindow.hpp"
-#include "DebugWindow.hpp"
+#include "OptionWindow.hpp"
 #include "StartMenuWindow.hpp"
 
 #include "TextureRenderer.hpp"
@@ -148,14 +147,14 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 lSkipOVR:
 #endif
 
-	mDebugWindow = new DebugWindow( this );
-	addWidget( mDebugWindow, mDebugWindow->windowFlags() );
-	mDebugWindow->move( 64, 64 );
-	mDebugWindow->hide();
+	mOptionWindow = new OptionWindow( this );
+	addWidget( mOptionWindow );
+	mOptionWindow->move( 64, 64 );
+	mOptionWindow->hide();
 
-	mStartMenuWindow = new StartMenuWindow( this );
+	mStartMenuWindow = new StartMenuWindow( this, mOptionWindow );
 	addWidget( mStartMenuWindow, mStartMenuWindow->windowFlags() );
-	mStartMenuWindow->move( 128, 128 );
+	mStartMenuWindow->move( width()/2, height()/2 );
 	mStartMenuWindow->hide();
 
 	QTimer * secondTimer = new QTimer( this );
@@ -180,7 +179,6 @@ Scene::~Scene()
 	delete mOVRShader;
 #endif
 	delete mEye;
-	delete mDebugWindow;
 	delete mLeftTextureRenderer;
 	delete mRightTextureRenderer;
 }
@@ -725,15 +723,6 @@ void Scene::keyPressEvent( QKeyEvent * event )
 		setMouseGrabbing( !mMouseGrabbing );
 		setPaused( !mMouseGrabbing );
 		break;
-	case Qt::Key_F1:
-		mStartMenuWindow->helpWindow()->setVisible( mStartMenuWindow->helpWindow()->isHidden() );
-		break;
-	case Qt::Key_F2:
-		mStartMenuWindow->gfxOptionWindow()->setVisible( mStartMenuWindow->gfxOptionWindow()->isHidden() );
-		break;
-	case Qt::Key_F3:
-		mDebugWindow->setVisible( mDebugWindow->isHidden() );
-		break;
 #ifdef OVR_ENABLED
 	case Qt::Key_F12:
 		mOVRSensorFusion.Reset();
@@ -762,6 +751,9 @@ void Scene::setSceneRect( const QRectF & rect )
 {
 	QGraphicsScene::setSceneRect( rect );
 	resizeStereoFrameBuffers( rect.size().toSize() );
+
+	mStartMenuWindow->move( rect.width()/6-mStartMenuWindow->width()/2, rect.height()/2-mStartMenuWindow->height()/2 );
+	mOptionWindow->move( rect.width()/3, rect.height()/2-mOptionWindow->height()/2 );
 }
 
 
