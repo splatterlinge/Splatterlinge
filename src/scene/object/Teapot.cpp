@@ -39,7 +39,7 @@ Teapot::Teapot( Scene * scene, const float & size ) :
 {
 	mMaterial = new Material( scene->glWidget(), "KirksEntry" );
 
-	mModel = new StaticModel( scene, "teapot" );
+	mModel = new StaticModel( scene->glWidget(), "teapot" );
 
 	mAudioSample = new AudioSample( "test" );
 	mAudioSample->setLooping( true );

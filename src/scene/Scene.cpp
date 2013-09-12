@@ -494,7 +494,7 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 
 	if( player->killTime() < 10.0f )
 	{
-		qDebug() << player->killTime();
+//		qDebug() << player->killTime();
 
 		if( player->killTime() < 1.0f )
 		{

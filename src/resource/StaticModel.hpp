@@ -105,14 +105,11 @@ protected:
 class StaticModel : public AResource<StaticModelData>
 {
 public:
-	StaticModel( Scene * scene, QString name );
+	StaticModel( GLWidget * glWidget, QString name );
 	virtual ~StaticModel();
 
-	void draw( const QVector<QMatrix4x4> & instances );
+	void draw( const QMatrix4x4 & viewMatrix, const QVector<QMatrix4x4> & instances );
 	void draw();
-
-private:
-	Scene * mScene;
 };
 
 

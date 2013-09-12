@@ -27,6 +27,7 @@
 #include <scene/TextureRenderer.hpp>
 #include <scene/Scene.hpp>
 #include <resource/Material.hpp>
+#include <resource/StaticModel.hpp>
 
 
 const GLfloat Torch::sQuadVertices[] =
@@ -41,11 +42,14 @@ QGLBuffer Torch::sQuadVertexBuffer;
 
 
 Torch::Torch( World * world ) :
-	AWorldObject( world, 1.0f )
+	AWorldObject( world )
 {
 	mFlareSize = 5.0f;
 	mColorCycle = 0.0f;
 	mFlareRotation = 0.0f;
+	mFlarePosition = QVector3D(0,4,0);
+
+	setBoundingSphere( mFlareSize + mFlarePosition.length() );
 
 	if( !sQuadVertexBuffer.isCreated() )
 	{
@@ -59,6 +63,8 @@ Torch::Torch( World * world ) :
 
 	mMaterial = new Material( scene()->glWidget(), "Flare" );
 	world->addLightSource( this );
+
+	mModel = new StaticModel( scene()->glWidget(), "SpearTorch" );
 }
 
 
@@ -71,7 +77,7 @@ Torch::~Torch()
 
 void Torch::updateLightSource( GLenum light )
 {
-	glLight( light, GL_POSITION, QVector4D(	worldPosition(), 1	) );
+	glLight( light, GL_POSITION, QVector4D(	pointToWorld(mFlarePosition), 1	) );
 	glLight( light, GL_AMBIENT, QVector4D(	0, 0, 0, 1	) );
 	glLight( light, GL_DIFFUSE, QVector4D(	color()	) );
 	glLight( light, GL_SPECULAR, QVector4D(	color()	) );
@@ -96,6 +102,7 @@ void Torch::updateSelf( const double & delta )
 
 void Torch::drawSelf()
 {
+	mModel->draw();
 }
 
 
@@ -108,6 +115,7 @@ void Torch::draw2Self()
 	unsigned char visiblePoints;
 
 	glPushMatrix();
+	glTranslate( mFlarePosition );
 	glScale( 0.5f );
 	visiblePoints = mOcclusionTest.randomPointsInUnitSphereVisible( samplingPoints );
 	glPopMatrix();
@@ -133,7 +141,9 @@ void Torch::draw2Self()
 	glVertexPointer( 3, GL_FLOAT, 5*sizeof(GLfloat), (void*)0 );
 	glTexCoordPointer( 2, GL_FLOAT, 5*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)) );
 
-	Bilboard::begin( modelViewMatrix() );
+	QMatrix4x4 flareCenter = modelViewMatrix();
+	flareCenter.translate( mFlarePosition );
+	Bilboard::begin( flareCenter );
 	glScale( mFlareSize );
 	glRotate( mFlareRotation, QVector3D(0,0,1) );
 	glDrawArrays( GL_QUADS, 0, 4 );

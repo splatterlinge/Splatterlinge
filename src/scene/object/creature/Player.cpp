@@ -65,7 +65,7 @@ Player::Player( World * world ) :
 	mCurrentWeapon = QSharedPointer<AWeapon>();
 
 	mTorch = QSharedPointer<Torch>( new Torch( world ) );
-	mTorch->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) + 1.0f );
+	mTorch->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) );
 	world->add( mTorch );
 	mDragTorch = false;
 
@@ -275,7 +275,7 @@ void Player::update2Self( const double & delta )
 		if( mDragTorch )
 		{
 			mTorch->setPosition( mTarget );
-			mTorch->moveY( 1 );
+//			mTorch->moveY( 1 );
 		}
 	}
 }
