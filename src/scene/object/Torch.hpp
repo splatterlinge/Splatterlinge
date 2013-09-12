@@ -34,6 +34,7 @@
 #include <QGLBuffer>
 
 
+class StaticModel;
 class Material;
 
 
@@ -65,6 +66,8 @@ private:
 	float mColorCycle;
 	QVector4D mColor;
 	float mFlareRotation;
+	StaticModel * mModel;
+	QVector3D mFlarePosition;
 };
 
 

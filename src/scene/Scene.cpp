@@ -494,7 +494,7 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 
 	if( player->killTime() < 10.0f )
 	{
-		qDebug() << player->killTime();
+//		qDebug() << player->killTime();
 
 		painter->setBrush( QBrush( QColor(255,0,0,200) ) );
 		painter->drawRect( multi1Rect.left(), multi1Rect.top(), qMin( player->killTime(), 1.0f )*w1, multi1Rect.height() );

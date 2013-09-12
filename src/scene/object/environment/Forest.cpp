@@ -38,7 +38,7 @@ Forest::Forest( Landscape * landscape, const QString & filename, const QPoint & 
 	QPointF position = mLandscape->terrain()->fromMap( mapPosition );
 	QSizeF radi = mLandscape->terrain()->fromMap( QSize( mapRadius, mapRadius ) );
 
-	mModel = new StaticModel( world()->scene(), filename );
+	mModel = new StaticModel( world()->scene()->glWidget(), filename );
 	setPosition( QVector3D( position.x(), 0, position.y() ) );
 	setBoundingSphere( qMax( radi.width(),radi.height() ) );
 
@@ -85,7 +85,7 @@ void Forest::updateSelf( const double & delta )
 void Forest::drawSelf()
 {
 	if( mPriority >= 99-quality() )
-		mModel->draw( mInstances );
+		mModel->draw( scene()->eye()->viewMatrix(), mInstances );
 }
 
 

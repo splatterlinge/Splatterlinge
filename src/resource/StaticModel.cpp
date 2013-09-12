@@ -301,11 +301,10 @@ QString StaticModelData::generateMaterialName( QFile & file, QStringList & field
 }
 
 
-StaticModel::StaticModel( Scene * scene, QString name ) :
-	AResource(),
-	mScene( scene )
+StaticModel::StaticModel( GLWidget * glWidget, QString name ) :
+	AResource()
 {
-	QSharedPointer<StaticModelData> n( new StaticModelData( scene->glWidget(), name ) );
+	QSharedPointer<StaticModelData> n( new StaticModelData( glWidget, name ) );
 	cache( n );
 }
 
@@ -314,7 +313,7 @@ StaticModel::~StaticModel()
 {
 }
 
-void StaticModel::draw( const QVector<QMatrix4x4> & instances )
+void StaticModel::draw( const QMatrix4x4 & viewMatrix, const QVector<QMatrix4x4> & instances )
 {
 	data()->vertexBuffer().bind();
 	data()->indexBuffer().bind();
@@ -334,7 +333,7 @@ void StaticModel::draw( const QVector<QMatrix4x4> & instances )
 
 		foreach( const QMatrix4x4 & instance, instances )
 		{
-			glLoadMatrix( mScene->eye()->viewMatrix() * instance );
+			glLoadMatrix( viewMatrix * instance );
 
 			glDrawElements(
 				data()->mode(),
