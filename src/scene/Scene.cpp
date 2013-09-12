@@ -476,15 +476,15 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	// multi
 	float w1 = rect.width()/10*1;
 	float w2 = rect.width()/10*2;
-	float w3 = rect.width()/10*3;
+	float w4 = rect.width()/10*4;
 	float w5 = rect.width()/10*5;
 	int h = 5;
 	int x = rect.left();
 	int y = rect.top();
-	QRect multi1Rect( x, y, w1, h );
-	QRect multi2Rect( x+w1, y, w2, h );
-	QRect multi5Rect( x+w3, y, w2, h );
-	QRect multi10Rect( x+w5, y, w5+1, h );
+	QRect multi1Rect( x+w5+w4, y, w1, h );
+	QRect multi2Rect( x+w5+w2, y, w2, h );
+	QRect multi5Rect( x+w5, y, w2, h );
+	QRect multi10Rect( x, y, w5+1, h );
 	painter->setPen( QColor(255,255,255,0) );
 	painter->setBrush( QBrush( QColor(255,255,255,50) ) );
 	painter->drawRect( multi1Rect );
@@ -496,23 +496,26 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	{
 		qDebug() << player->killTime();
 
-		painter->setBrush( QBrush( QColor(255,0,0,200) ) );
-		painter->drawRect( multi1Rect.left(), multi1Rect.top(), qMin( player->killTime(), 1.0f )*w1, multi1Rect.height() );
-
-		if( player->killTime() >= 1.0f )
+		if( player->killTime() < 1.0f )
+		{
+			painter->setBrush( QBrush( QColor(255,0,0,200) ) );
+			painter->drawRect( multi1Rect.left(), multi1Rect.top(), w1-qMin( qMax( player->killTime(), 0.0f ), 1.0f )*w1, multi1Rect.height() );
+		}
+		if( player->killTime() < 3.0f )
 		{
 			painter->setBrush( QBrush( QColor(255,255,0,200) ) );
-			painter->drawRect( multi2Rect.left(), multi2Rect.top(), qMin( player->killTime()-1.0f, 2.0f )*w1, multi2Rect.height() );
+			painter->drawRect( multi2Rect.left(), multi2Rect.top(), w2-qMin( qMax( player->killTime()-1.0f, 0.0f ), 2.0f )*w1, multi2Rect.height() );
 		}
-		if( player->killTime() >= 3.0f )
+		if( player->killTime() < 5.0f )
 		{
 			painter->setBrush( QBrush( QColor(0,255,0,200) ) );
-			painter->drawRect( multi5Rect.left(), multi5Rect.top(), qMin( player->killTime()-3.0f, 2.0f )*w1, multi5Rect.height() );
+			painter->drawRect( multi5Rect.left(), multi5Rect.top(), w2-qMin( qMax( player->killTime()-3.0f, 0.0f ), 2.0f )*w1, multi5Rect.height() );
 		}
-		if( player->killTime() >= 5.0f )
+		if( player->killTime() < 10.0f )
 		{
+			qDebug() << w5 << qMin( qMax( player->killTime()-5.0f, 0.0f ), 2.0f )*w1;
 			painter->setBrush( QBrush( QColor(0,0,255,200) ) );
-			painter->drawRect( multi10Rect.left(), multi10Rect.top(), qMin( player->killTime()-5.0f, 5.0f )*w1, multi10Rect.height() );
+			painter->drawRect( multi10Rect.left(), multi10Rect.top(), w5-qMin( qMax( player->killTime()-5.0f, 0.0f ), 5.0f )*w1, multi10Rect.height() );
 		}
 	}
 

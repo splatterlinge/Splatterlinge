@@ -345,7 +345,8 @@ void Player::receiveDamage( int damage, const QVector3D * position, const QVecto
 
 void Player::receivePoints( int points )
 {
-	int time = mKillTimer;
+	float time = mKillTimer;
+	qDebug() << time;
 	float mult = 1;
 	if( time < 1.0f )
 		mult = 5;
