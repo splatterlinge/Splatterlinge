@@ -25,10 +25,15 @@
 #define STARTMENUWINDOW_HPP
 
 #include <QWidget>
+#include <QScrollArea>
 
 class Scene;
 class OptionWindow;
+class HelpWindow;
+class GfxOptionWindow;
+class DebugWindow;
 class QPushButton;
+class QListView;
 
 class StartMenuWindow : public QWidget
 {
@@ -48,6 +53,15 @@ private:
 	Scene * mScene;
 
 	OptionWindow * mOptionWindow;
+
+	QListView * mLevelWindow;
+	QScrollArea * mLevelWindowScroll;
+	HelpWindow * mHelpWindow;
+	QScrollArea * mHelpWindowScroll;
+	GfxOptionWindow * mGfxOptionWindow;
+	QScrollArea * mGfxOptionWindowScroll;
+	DebugWindow * mDebugWindow;
+	QScrollArea * mDebugWindowScroll;
 
 	void initMenu();
 

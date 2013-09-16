@@ -23,10 +23,6 @@
 
 #include "OptionWindow.hpp"
 
-#include "GfxOptionWindow.hpp"
-#include "DebugWindow.hpp"
-#include "HelpWindow.hpp"
-
 #include <resource/Material.hpp>
 #include <scene/object/environment/AVegetation.hpp>
 #include <scene/object/Landscape.hpp>
@@ -50,12 +46,8 @@ OptionWindow::OptionWindow( Scene * scene, QWidget * parent ) :
 	setWindowTitle( tr("Options") );
 	setWindowOpacity( 0.8 );
 
-	addTab( new HelpWindow(), "Help" );
-	addTab( new GfxOptionWindow( scene ), "Graphics" );
-	addTab( new DebugWindow( scene ), "Debug" );
-
-	move( 100, 100 );
-	setMinimumWidth( 400 );
+	setMinimumWidth( 300 );
+	setMinimumHeight( 400 );
 }
 
 

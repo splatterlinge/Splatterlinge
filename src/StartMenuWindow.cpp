@@ -24,6 +24,9 @@
 #include "StartMenuWindow.hpp"
 
 #include "OptionWindow.hpp"
+#include "GfxOptionWindow.hpp"
+#include "DebugWindow.hpp"
+#include "HelpWindow.hpp"
 
 #include <scene/Scene.hpp>
 
@@ -32,6 +35,9 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QBoxLayout>
+#include <QListView>
+#include <QStringList>
+#include <QStringListModel>
 
 
 StartMenuWindow::StartMenuWindow( Scene * scene, OptionWindow * options, QWidget * parent ) :
@@ -44,6 +50,21 @@ StartMenuWindow::StartMenuWindow( Scene * scene, OptionWindow * options, QWidget
 	setWindowOpacity( 1.0 );
 
 	initMenu();
+
+	mHelpWindow = new HelpWindow();
+	mHelpWindowScroll = new QScrollArea();
+	mHelpWindowScroll->setWidget( mHelpWindow );
+	mHelpWindowScroll->setWidgetResizable( true );
+
+	mGfxOptionWindow = new GfxOptionWindow( mScene );
+	mGfxOptionWindowScroll = new QScrollArea();
+	mGfxOptionWindowScroll->setWidget( mGfxOptionWindow );
+	mGfxOptionWindowScroll->setWidgetResizable( true );
+
+	mDebugWindow = new DebugWindow( mScene );
+	mDebugWindowScroll = new QScrollArea();
+	mDebugWindowScroll->setWidget( mDebugWindow );
+	mDebugWindowScroll->setWidgetResizable( true );
 
 	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::FramelessWindowHint );
 }
@@ -104,7 +125,13 @@ void StartMenuWindow::handleNewGameButton()
 void StartMenuWindow::handleOptionsButton()
 {
 	if( !mOptionWindow->isVisible() )
+	{
+		mOptionWindow->clear();
+		mOptionWindow->addTab( mHelpWindowScroll, "Help" );
+		mOptionWindow->addTab( mGfxOptionWindowScroll, "Graphics" );
+		mOptionWindow->addTab( mDebugWindowScroll, "Debug" );
 		mOptionWindow->show();
+	}
 	else
 		mOptionWindow->hide();
 }

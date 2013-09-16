@@ -154,7 +154,7 @@ lSkipOVR:
 
 	mStartMenuWindow = new StartMenuWindow( this, mOptionWindow );
 	addWidget( mStartMenuWindow, mStartMenuWindow->windowFlags() );
-	mStartMenuWindow->move( width()/2, height()/2 );
+	mStartMenuWindow->move( 20, height()/2 );
 	mStartMenuWindow->hide();
 
 	QTimer * secondTimer = new QTimer( this );
@@ -627,7 +627,9 @@ void Scene::setMouseGrabbing( bool enable )
 
 	mMouseGrabbing = enable;
 	if( mMouseGrabbing )
+	{
 		mGLWidget->setCursor( Qt::BlankCursor );
+	}
 	else
 		mGLWidget->setCursor( Qt::ArrowCursor );
 }
@@ -755,8 +757,8 @@ void Scene::setSceneRect( const QRectF & rect )
 	QGraphicsScene::setSceneRect( rect );
 	resizeStereoFrameBuffers( rect.size().toSize() );
 
-	mStartMenuWindow->move( rect.width()/6-mStartMenuWindow->width()/2, rect.height()/2-mStartMenuWindow->height()/2 );
-	mOptionWindow->move( rect.width()/3, rect.height()/2-mOptionWindow->height()/2 );
+	mStartMenuWindow->move( 50, rect.height()/2-mStartMenuWindow->height()/2 );
+	mOptionWindow->move( 50+mStartMenuWindow->width()+50, rect.height()/2-mOptionWindow->height()/2 );
 }
 
 

@@ -41,11 +41,9 @@ HelpWindow::HelpWindow( QWidget * parent ) :
 	setWindowOpacity( 0.8 );
 
 	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
-	layout->addWidget( new QLabel("F1\tThis Window\nF2\tGraphics Options\nF3\tDebug Options") );
+	layout->addWidget( new QLabel("Controls:\n\nW: Walk forward\nS: Walk backward\nA: Walk left\nD: Walk right\n\nMouse: View\nLeft Mouse: Fire") );
 	layout->addSpacerItem( new QSpacerItem( 50, 1, QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 	setLayout( layout );
-
-	setWindowFlags( Qt::Dialog | Qt::FramelessWindowHint );
 }
 
 

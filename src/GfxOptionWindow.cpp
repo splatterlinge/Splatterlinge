@@ -134,8 +134,6 @@ GfxOptionWindow::GfxOptionWindow( Scene * scene, QWidget * parent ) :
 	mLayout->addSpacerItem( new QSpacerItem( 50, 1, QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 
 	setLayout( mLayout );
-
-	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint );
 }
 
 
