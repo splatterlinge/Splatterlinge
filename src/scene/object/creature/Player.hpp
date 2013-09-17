@@ -60,6 +60,7 @@ public:
 
 	const int & armor() const { return mArmor; }
 	const int & points() const { return mPoints; }
+	const QString usageText() const { return mUsageText; }
 	const float & killTime() const { return mKillTimer; }
 	const float time() const { return mAliveTimer; }
 	QSharedPointer<AWeapon> currentWeapon() { return mCurrentWeapon; }
@@ -85,6 +86,7 @@ private:
 	bool mDownPressed;
 	bool mReloadPressed;
 	bool mSpeedPressed;
+	bool mUsePressed;
 	bool mGodMode;
 	bool mOnGround;
 	bool mUnderWater;
@@ -97,7 +99,6 @@ private:
 	float mSpeedCounter;
 	float mSpeedCooldown;
 	bool mDragTeapot;
-	bool mDragTorch;
 	QVector3D mGroundNormal;
 	QSharedPointer<Torch> mTorch;
 	QList< QSharedPointer<AWeapon> > mWeapons;
@@ -105,10 +106,13 @@ private:
 	int mPoints;
 	float mAliveTimer;
 	float mKillTimer;
+	float mTorchTimer;
+	QString mUsageText;
 
 	void updateRotation( const double & delta );
 	void updatePosition( const double & delta );
 	void updateTarget( const double & delta );
+	void updateTorch( const double & delta );
 
 	void drawCrosshair();
 };

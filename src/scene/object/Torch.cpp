@@ -65,6 +65,8 @@ Torch::Torch( World * world ) :
 	world->addLightSource( this );
 
 	mModel = new StaticModel( scene()->glWidget(), "SpearTorch" );
+
+	mVisible = false;
 }
 
 
@@ -77,6 +79,9 @@ Torch::~Torch()
 
 void Torch::updateLightSource( GLenum light )
 {
+	if( !mVisible )
+		return;
+
 	glLight( light, GL_POSITION, QVector4D(	pointToWorld(mFlarePosition), 1	) );
 	glLight( light, GL_AMBIENT, QVector4D(	0, 0, 0, 1	) );
 	glLight( light, GL_DIFFUSE, QVector4D(	color()	) );
@@ -102,13 +107,16 @@ void Torch::updateSelf( const double & delta )
 
 void Torch::drawSelf()
 {
+	if( !mVisible )
+		return;
+
 	mModel->draw();
 }
 
 
 void Torch::draw2Self()
 {
-	if( world()->landscape()->drawingReflection() || world()->landscape()->drawingRefraction() )
+	if( !mVisible || world()->landscape()->drawingReflection() || world()->landscape()->drawingRefraction() )
 		return;
 
 	const unsigned char samplingPoints = 16;

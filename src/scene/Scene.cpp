@@ -473,6 +473,19 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 		QPainter::TextAntialiasing |
 		QPainter::HighQualityAntialiasing );
 
+	// usage text
+	if( !player->usageText().isEmpty() )
+	{
+		QRect usageRect( rect.width()/2-200, rect.height()/2+100, 400, 30 );
+		painter->setPen( QColor(255,255,255,0) );
+		painter->setBrush( QBrush( QColor(11,110,240,80) ) );
+		painter->drawRect( usageRect );
+		painter->setPen( QColor(255,255,255,255) );
+		painter->drawText( usageRect,
+			Qt::AlignCenter | Qt::AlignCenter,
+						   QString( tr("%1").arg(player->usageText())) );
+	}
+
 	// multi
 	float w1 = rect.width()/10*1;
 	float w2 = rect.width()/10*2;
@@ -494,8 +507,6 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 
 	if( player->killTime() < 10.0f )
 	{
-//		qDebug() << player->killTime();
-
 		if( player->killTime() < 1.0f )
 		{
 			painter->setBrush( QBrush( QColor(255,0,0,200) ) );
@@ -513,7 +524,6 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 		}
 		if( player->killTime() < 10.0f )
 		{
-			qDebug() << w5 << qMin( qMax( player->killTime()-5.0f, 0.0f ), 2.0f )*w1;
 			painter->setBrush( QBrush( QColor(0,0,255,200) ) );
 			painter->drawRect( multi10Rect.left(), multi10Rect.top(), w5-qMin( qMax( player->killTime()-5.0f, 0.0f ), 5.0f )*w1, multi10Rect.height() );
 		}
