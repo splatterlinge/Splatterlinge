@@ -173,7 +173,6 @@ private:
 	}
 #endif
 
-
 	bool mMouseGrabbing;
 	bool mBlinkingState;
 
@@ -194,6 +193,9 @@ private:
 	void popAllGL();
 	void updateObjects( const double & delta );
 	void drawObjects();
+
+public slots:
+	void toggleMenu();
 
 private slots:
 	void secondPassed();

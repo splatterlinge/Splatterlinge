@@ -628,25 +628,25 @@ void Scene::halfSecondPassed()
 }
 
 
+void Scene::toggleMenu()
+{
+	setMouseGrabbing( !mMouseGrabbing );
+	mStartMenuWindow->setVisible( !mMouseGrabbing );
+	setPaused( !mMouseGrabbing );
+}
+
+
 void Scene::setMouseGrabbing( bool enable )
 {
 	//HACK: this fixes mouse movements on entering grabbing mode - unfortunately it may produce stack overflows
 	// in QGestureManager::filterEvent( QGraphicsObject *, QEvent * )
 	QCursor::setPos( mGLWidget->mapToGlobal( QPoint( width()/2, height()/2 ) ) );
-	//HACK: this used to prevent the cursor from being visible after enabling grabbing mode when the mouse is on a widget
-	//QCoreApplication::processEvents( QEventLoop::AllEvents );
 
 	mMouseGrabbing = enable;
 	if( mMouseGrabbing )
-	{
-		mGLWidget->setCursor( Qt::BlankCursor );
 		qApp->setOverrideCursor( Qt::BlankCursor );
-	}
 	else
-	{
-		mGLWidget->setCursor( Qt::ArrowCursor );
 		qApp->setOverrideCursor( Qt::ArrowCursor );
-	}
 }
 
 
@@ -739,9 +739,7 @@ void Scene::keyPressEvent( QKeyEvent * event )
 	switch( event->key() )
 	{
 	case Qt::Key_Escape:
-		mStartMenuWindow->setVisible( mMouseGrabbing );
-		setMouseGrabbing( !mMouseGrabbing );
-		setPaused( !mMouseGrabbing );
+		toggleMenu();
 		break;
 #ifdef OVR_ENABLED
 	case Qt::Key_F12:
