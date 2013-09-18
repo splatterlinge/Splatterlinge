@@ -11,19 +11,6 @@ QWidget#startMenu > QPushButton {
 	padding: 10px 30px;
 }
 
-QPushButton:pressed {
-	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                   stop: 0 #dadbde, stop: 1 #f6f7fa);
-}
-
-QPushButton:flat {
-	border: none; /* no border for a flat push button */
-}
-
-QPushButton:default {
-	border-color: navy; /* make the default button prominent */
-}
-
 QTabWidget::pane { /* The tab widget frame */
 	border: 0;
 	background-color: #fff;
@@ -35,24 +22,26 @@ QTabWidget::tab-bar {
 	left: 0;
 }
 
-/* Style the tab using the tab sub-control. Note that
-it reads QTabBar _not_ QTabWidget */
 QTabBar::tab {
 	border: 0;
 	min-width: 9ex;
 	padding: 10px 10px;
 }
 
-QTabBar::tab:selected, QTabBar::tab:hover {
+QTabBar::tab:selected {
 	background: #f00;
 	color: #fff;
 	font-weight: bold;
 }
 
-QTabBar::tab:selected {
+QTabBar::tab:hover {
+	background: #333;
+	color: #fff;
+	font-weight: bold;
 }
 
-QTabBar::tab:!selected {
+QScrollArea {
+	border: 0;
 }
 
 QSlider::groove:horizontal {
