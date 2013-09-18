@@ -594,8 +594,8 @@ void Splatterling::updateSelf( const double & delta )
 
 			if( life() <= 0 )
 			{
-				setState( DYING );
 				world()->player()->receivePoints( 100 );
+				setState( DYING );
 			}
 			break;
 		}
@@ -909,6 +909,7 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 		{
 			mHeadDisintegrated = true;
 			setLife( 0 );
+			world()->player()->receivePoints( 200 );
 			setState( DYING );
 		}
 	}
