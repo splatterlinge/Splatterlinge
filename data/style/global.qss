@@ -40,7 +40,7 @@ it reads QTabBar _not_ QTabWidget */
 QTabBar::tab {
 	border: 0;
 	min-width: 9ex;
-	padding: 10px 5px;
+	padding: 10px 10px;
 }
 
 QTabBar::tab:selected, QTabBar::tab:hover {
@@ -53,4 +53,43 @@ QTabBar::tab:selected {
 }
 
 QTabBar::tab:!selected {
+}
+
+QSlider::groove:horizontal {
+	background: red;
+	height: 8px;
+}
+
+QSlider::handle:horizontal {
+	background: #333;
+	height: 10px;
+	margin: -1px -5px; /* expand outside the groove */
+}
+
+QSlider::add-page:horizontal {
+	background: white;
+	border: 1px solid #ddd;
+}
+
+QSlider::sub-page:horizontal {
+	background: #e50000;
+	border: 1px solid #ddd;
+}
+
+QCheckBox {
+	spacing: 5px;
+}
+
+QCheckBox::indicator {
+	border: 1px solid #ddd;
+	height: 10px;
+	width: 10px;
+}
+
+QCheckBox::indicator:unchecked {
+	background: #fff;
+}
+
+QCheckBox::indicator:checked {
+	background: #e50000;
 }
