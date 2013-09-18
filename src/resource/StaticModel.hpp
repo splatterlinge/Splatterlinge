@@ -37,6 +37,18 @@
 #include <QFileInfo>
 #include <QMatrix4x4>
 
+static QChar   OBJ_COMMENT         = '#';
+static QString OBJ_FACE            = "f";
+static QString OBJ_GROUP           = "g";
+static QChar   OBJ_LINESPLIT       = '\\';
+static QString OBJ_MATERIAL_LIB    = "mtllib";
+static QString OBJ_MATERIAL_USE    = "usemtl";
+static QString OBJ_SMOOTHING       = "s";
+static QString OBJ_VERTEX          = "v";
+static QString OBJ_VERTEX_NORMAL   = "vn";
+static QString OBJ_VERTEX_TEXCOORD = "vt";
+
+
 class Face
 {
 public:

@@ -148,7 +148,7 @@ bool StaticModelData::parse()
 	while( !in.atEnd() ) {
 		line = in.readLine().trimmed();
 
-		while( line.endsWith( '\\' ) )
+		while( line.endsWith( OBJ_LINESPLIT ) )
 		{
 			line.truncate( line.size()-1 );
 			if( in.atEnd() )
@@ -158,7 +158,7 @@ bool StaticModelData::parse()
 			line += in.readLine().trimmed();
 		}
 
-		if( line.startsWith( '#' ) || line.isEmpty() )
+		if( line.startsWith( OBJ_COMMENT ) || line.isEmpty() )
 		{
 			continue;
 		}
@@ -166,35 +166,35 @@ bool StaticModelData::parse()
 		fields = line.split( ' ', QString::SkipEmptyParts );
 		keyword = fields.takeFirst();
 
-		if( keyword == "g" )
+		if( keyword == OBJ_GROUP )
 		{
 			continue;
 		}
-		else if( keyword == "s" )
+		else if( keyword == OBJ_SMOOTHING )
 		{
 			continue;
 		}
-		else if( keyword == "v" )
+		else if( keyword == OBJ_VERTEX )
 		{
 			positions.append( Vector::takeFirstFromStringList3D( fields ) );
 		}
-		else if( keyword == "vt" )
+		else if( keyword == OBJ_VERTEX_TEXCOORD )
 		{
 			texCoords.append( Vector::takeFirstFromStringList2D( fields ) );
 		}
-		else if( keyword == "vn" )
+		else if( keyword == OBJ_VERTEX_NORMAL )
 		{
 			normals.append( Vector::takeFirstFromStringList3D( fields ) );
 		}
-		else if( keyword == "f" )
+		else if( keyword == OBJ_FACE )
 		{
 			faces.append( Face( fields, material, &positions, &texCoords, &normals ) );
 		}
-		else if( keyword == "mtllib" )
+		else if( keyword == OBJ_MATERIAL_LIB )
 		{
 			continue;
 		}
-		else if( keyword == "usemtl" )
+		else if( keyword == OBJ_MATERIAL_USE )
 		{
 			material = generateMaterialName( file, fields );
 		}
