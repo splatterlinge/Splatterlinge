@@ -118,7 +118,10 @@ void StartMenuWindow::handleNewGameButton()
 	delete world;
 	world = new World( mScene, "earth" );
 	mScene->setRoot( world );
+
 	this->setVisible( false );
+	mScene->setPaused( false );
+	mScene->setMouseGrabbing( true );
 }
 
 

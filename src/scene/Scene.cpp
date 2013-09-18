@@ -42,6 +42,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsProxyWidget>
+#include <QApplication>
 #include <QCoreApplication>
 #include <QGLShaderProgram>
 
@@ -639,9 +640,13 @@ void Scene::setMouseGrabbing( bool enable )
 	if( mMouseGrabbing )
 	{
 		mGLWidget->setCursor( Qt::BlankCursor );
+		qApp->setOverrideCursor( Qt::BlankCursor );
 	}
 	else
+	{
 		mGLWidget->setCursor( Qt::ArrowCursor );
+		qApp->setOverrideCursor( Qt::ArrowCursor );
+	}
 }
 
 
