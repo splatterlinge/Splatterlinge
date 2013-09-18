@@ -18,3 +18,6 @@ tools/
 .directory
 .kateproject
 .kateproject.d/
+
+# Sublime-Text
+*.sublime-workspace
