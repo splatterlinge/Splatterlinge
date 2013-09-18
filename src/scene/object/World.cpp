@@ -207,13 +207,7 @@ void World::updateSelfPost( const double & delta )
 
 void World::drawSelf()
 {
-	glLight( GL_LIGHT0, GL_POSITION, mSky->sunDirection() );
-	glLight( GL_LIGHT0, GL_AMBIENT, mSky->ambient() );
-	glLight( GL_LIGHT0, GL_DIFFUSE, mSky->diffuse() );
-	glLight( GL_LIGHT0, GL_SPECULAR, mSky->specular() );
-	glEnable( GL_LIGHT0 );
-
-	int light = 1;
+	int light = 0;
 	QList< ALightSource * >::iterator i;
 	for( i = mLightSources.begin(); i != mLightSources.end(); ++i )
 	{

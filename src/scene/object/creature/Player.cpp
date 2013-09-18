@@ -67,12 +67,11 @@ Player::Player( World * world ) :
 
 	mTorch = QSharedPointer<Torch>( new Torch( world ) );
 	mTorch->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) );
-	world->add( mTorch );
-	mTorch->setVisible( false );
 
 	mPoints = 0;
-	mKillTimer = 0;
-	mAliveTimer = 0;
+	mKillTimer = 0.0f;
+	mTorchTimer = 0.0f;
+	mAliveTimer = 0.0f;
 	mUsageText = "";
 
 	scene()->addKeyListener( this );
@@ -570,14 +569,14 @@ void Player::updateTarget( const double & delta )
 
 void Player::updateTorch( const double & delta )
 {
-	if( mTorch->isVisible() )
+	if( mTorch->parent() )
 	{
-		if( (worldPosition()-mTorch->position()).length() <= 2.5f )
+		if( (position()-mTorch->position()).length() <= 2.5f )
 		{
 			mUsageText = "Press [E] to take torch.";
 			if( mTorchTimer > 0.5f && mUsePressed )
 			{
-				mTorch->setVisible( false );
+				world()->remove( mTorch );
 				mTorchTimer = 0;
 			}
 		}
@@ -586,8 +585,9 @@ void Player::updateTorch( const double & delta )
 	{
 		if( mTorchTimer > 0.5f && mUsePressed )
 		{
-			mTorch->setPosition( worldPosition()+QVector3D(0, -2, 0)+worldDirection()*QVector3D(1, 0, 1) );
-			mTorch->setVisible( true );
+			mTorch->setPosition( position()+direction()*1.0f );
+			mTorch->setPositionY( world()->landscape()->terrain()->getHeight( mTorch->position() ) );
+			world()->add( mTorch );
 			mTorchTimer = 0;
 		}
 	}

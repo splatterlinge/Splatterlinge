@@ -604,7 +604,7 @@ void Splatterling::updateSelf( const double & delta )
 			mWingSound->stop();
 			mHeightAboveGround = 3.0f;
 
-			mVelocityY += -10.0f * delta;	// apply some gravity
+			mVelocityY += -50.0f * delta;	// apply some gravity
 			setPositionY( position().y() + mVelocityY *delta );
 
 			float landscapeHeight;
@@ -834,8 +834,9 @@ bool Splatterling::intersectRightWing( const QVector3D & origin, const QVector3D
 bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & direction, float & intersectionDistance )
 {
 	float rayLength;
+	bool hit = false;
 
-	if(! mHeadDisintegrated )
+	if( !mHeadDisintegrated )
 	{
 		//inner
 		if( Intersection::intersectTriangleFan( PositionData, BodyVertexCount, BodyVertexCount + 9, modelMatrix(), origin, direction, &rayLength ) )
@@ -843,7 +844,7 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 			if( rayLength < intersectionDistance )
 			{
 				intersectionDistance = rayLength;
-				return true;
+				hit = true;
 			}
 		}
 
@@ -853,12 +854,12 @@ bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & di
 			if( rayLength < intersectionDistance )
 			{
 				intersectionDistance = rayLength;
-				return true;
+				hit = true;
 			}
 		}
 	}
 
-	return false;
+	return hit;
 }
 
 

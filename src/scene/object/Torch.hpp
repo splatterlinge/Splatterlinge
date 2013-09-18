@@ -56,9 +56,6 @@ public:
 
 	const QVector4D & color() const { return mColor; }
 
-	void setVisible( bool visible ) { mVisible = visible; }
-	bool isVisible() { return mVisible; }
-
 private:
 	static const GLfloat sQuadVertices[];
 	static QGLBuffer sQuadVertexBuffer;
@@ -71,7 +68,6 @@ private:
 	float mFlareRotation;
 	StaticModel * mModel;
 	QVector3D mFlarePosition;
-	bool mVisible;
 };
 
 

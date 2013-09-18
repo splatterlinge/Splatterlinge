@@ -39,10 +39,12 @@ public:
 
 	bool pointVisible( const QVector3D & point=QVector3D(0,0,0) );
 	unsigned char randomPointsInUnitSphereVisible( const unsigned char & numPoints );
+	unsigned char randomPointsOnUnitSphereVisible( const unsigned char & numPoints );
 
 private:
 	GLuint mQuery;
 	static QGLBuffer sRandomVertexInSphereBuffer;
+	static QGLBuffer sRandomVertexOnSphereBuffer;
 };
 
 
