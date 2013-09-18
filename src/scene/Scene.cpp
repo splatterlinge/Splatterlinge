@@ -148,13 +148,8 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 lSkipOVR:
 #endif
 
-	mOptionWindow = new OptionWindow( this );
-	addWidget( mOptionWindow );
-	mOptionWindow->move( 64, 64 );
-	mOptionWindow->hide();
-
-	mStartMenuWindow = new StartMenuWindow( this, mOptionWindow );
-	addWidget( mStartMenuWindow, mStartMenuWindow->windowFlags() );
+	mStartMenuWindow = new StartMenuWindow( this );
+	addWidget( mStartMenuWindow );
 	mStartMenuWindow->move( 20, height()/2 );
 	mStartMenuWindow->hide();
 
@@ -770,8 +765,12 @@ void Scene::setSceneRect( const QRectF & rect )
 	QGraphicsScene::setSceneRect( rect );
 	resizeStereoFrameBuffers( rect.size().toSize() );
 
-	mStartMenuWindow->move( 50, rect.height()/2-mStartMenuWindow->height()/2 );
-	mOptionWindow->move( 50+mStartMenuWindow->width()+50, rect.height()/2-mOptionWindow->height()/2 );
+	static const float menuBorderFactor = 0.2f;
+	QSizeF menuBorderSize = menuBorderFactor * rect.size() * 0.5f;
+	QSizeF menuSize = (1.0f-menuBorderFactor) * rect.size();
+	QPointF menuPosition = rect.topLeft() + QPointF( menuBorderSize.width(), menuBorderSize.height() );
+	QRect menuRect( menuPosition.toPoint(), menuSize.toSize() );
+	mStartMenuWindow->setGeometry( menuRect );
 }
 
 

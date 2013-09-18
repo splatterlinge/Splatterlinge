@@ -1,14 +1,25 @@
-QWidget#startMenu {
+/********************************
+ * settings for all widgets
+ */
+
+QScrollArea {
+	border: 0;
 	background-color: transparent;
 }
 
-QWidget#startMenu > QPushButton {
+QPushButton {
 	border: 0;
 	border-radius: 0;
-	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ff0000, stop: 1 #e50000);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #aa0000, stop: 1 #660000);
 	color: #fff;
-	min-width: 80px;
-	padding: 10px 30px;
+}
+
+QPushButton:hover {
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ff0000, stop: 1 #aa0000);
+}
+
+QPushButton:pressed {
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ff0000, stop: 1 #ff0000);
 }
 
 QTabWidget::pane { /* The tab widget frame */
@@ -24,24 +35,18 @@ QTabWidget::tab-bar {
 
 QTabBar::tab {
 	border: 0;
-	min-width: 9ex;
+	color: #fff;
+	min-width: 9px;
 	padding: 10px 10px;
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #aa0000, stop: 1 #660000);
 }
 
 QTabBar::tab:selected {
-	background: #f00;
-	color: #fff;
-	font-weight: bold;
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ff0000, stop: 1 #ff0000);
 }
 
 QTabBar::tab:hover {
-	background: #333;
-	color: #fff;
-	font-weight: bold;
-}
-
-QScrollArea {
-	border: 0;
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ff0000, stop: 1 #660000);
 }
 
 QSlider::groove:horizontal {
@@ -81,4 +86,21 @@ QCheckBox::indicator:unchecked {
 
 QCheckBox::indicator:checked {
 	background: #e50000;
+}
+
+
+/********************************
+ * settings for specific widgets
+ */
+
+QWidget#startMenu {
+	background-color: transparent;
+}
+
+QWidget#startMenuHelp > QLabel{
+	color: white;
+}
+
+QScrollArea#startMenuButtons > QPushButton {
+	padding: 10px 30px;
 }

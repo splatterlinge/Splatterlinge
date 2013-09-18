@@ -40,7 +40,7 @@ MainWindow::MainWindow( QWidget * parent ) :
 	QFile file( "data/style/global.qss" );
 	file.open(QFile::ReadOnly);
 	QString styles = QLatin1String(file.readAll() );
-	qDebug() << styles;
+//	qDebug() << styles;
 	qApp->setStyleSheet( styles );
 
 	mView = new View( this );
