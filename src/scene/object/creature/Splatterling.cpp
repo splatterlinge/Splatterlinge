@@ -614,7 +614,7 @@ void Splatterling::updateSelf( const double & delta )
 				}
 			}
 
-			recalculateWingPosition();
+			recalculateWingPosition(delta);
 
 			if( life() <= 0 )
 			{
@@ -953,14 +953,14 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 }
 
 
-void Splatterling::recalculateWingPosition()
+void Splatterling::recalculateWingPosition( const double & delta )
 {
 	if( wingUpMovement )
 	{
-		PositionData[Splatterling::WingOneYPos]   += 0.02f;
-		PositionData[Splatterling::WingOneYPos + 3] += 0.03f;
-		PositionData[Splatterling::WingTwoYPos]   += 0.02f;
-		PositionData[Splatterling::WingTwoYPos + 3] += 0.03f;
+		PositionData[Splatterling::WingOneYPos]   += 2.0f*delta;
+		PositionData[Splatterling::WingOneYPos + 3] += 2.2f*delta;
+		PositionData[Splatterling::WingTwoYPos]   += 2.0f*delta;
+		PositionData[Splatterling::WingTwoYPos + 3] += 2.2*delta;
 
 		if( PositionData[Splatterling::WingOneYPos] >= 4.0f )
 		{
@@ -969,10 +969,11 @@ void Splatterling::recalculateWingPosition()
 	}
 	else
 	{
-		PositionData[Splatterling::WingOneYPos]   -= 0.02f;
-		PositionData[Splatterling::WingOneYPos + 3] -= 0.03f;
-		PositionData[Splatterling::WingTwoYPos]   -= 0.02f;
-		PositionData[Splatterling::WingTwoYPos + 3] -= 0.03f;
+
+		PositionData[Splatterling::WingOneYPos]   -= 2.0f*delta;
+		PositionData[Splatterling::WingOneYPos + 3] -= 2.2f*delta;
+		PositionData[Splatterling::WingTwoYPos]   -= 2.0f*delta;
+		PositionData[Splatterling::WingTwoYPos + 3] -= 2.2*delta;
 
 		if( PositionData[Splatterling::WingOneYPos] <= 0.0f )
 		{

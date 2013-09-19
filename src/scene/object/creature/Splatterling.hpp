@@ -90,7 +90,7 @@ public:
 		float & length, QVector3D * normal = NULL );
 
 	virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL );
-	virtual void recalculateWingPosition( );
+	virtual void recalculateWingPosition( const double & delta );
 
 	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
 	virtual bool intersectRightWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
