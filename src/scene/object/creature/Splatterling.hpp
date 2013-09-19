@@ -60,7 +60,7 @@ public:
 		POSITION_OBJECT = 0,
 		COLOR_OBJECT = 1,
 		TEXTURE_OBJECT = 2,
-		NORMAL_OBJECT = 3,
+		NORMAL_OBJECT = 3
 	};
 	enum
 	{

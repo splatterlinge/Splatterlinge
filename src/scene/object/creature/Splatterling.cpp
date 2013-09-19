@@ -553,10 +553,21 @@ void Splatterling::updateSelf( const double & delta )
 				setRotation( QQuaternion::slerp( rotation(), targetRotation, 5 * delta ) );
 				setPosition( position() + direction()*delta * 8.0 );
 
-				if( mCoolDown == 0.0f )
+				QVector2D playerPosFlat(world()->player()->worldPosition().x(), world()->player()->worldPosition().z());
+				QVector2D splatterPosFlat(worldPosition().x(), worldPosition().z());
+				dist = ( playerPosFlat - splatterPosFlat).length();
+
+				if( dist < 2.0 )
 				{
-					world()->player()->receiveDamage( 1 );
-					mCoolDown = 0.1f;
+					if( mCoolDown == 0.0f )
+					{
+						if(!mSnapSound->isPlaying()){
+							mSnapSound->play();
+						}
+
+						world()->player()->receiveDamage( 1 );
+						mCoolDown = 0.25f;
+					}
 				}
 			}
 			else if( playerDetected )
