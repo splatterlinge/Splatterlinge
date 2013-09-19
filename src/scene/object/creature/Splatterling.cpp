@@ -626,8 +626,17 @@ void Splatterling::updateSelf( const double & delta )
 		{
 			mWingSound->stop();
 
-			mVelocityY += -50.0f * delta;	// apply some gravity
+			mVelocityY += -30.0f * delta;	// apply some gravity
 			setPositionY( position().y() + mVelocityY *delta );
+			doWingUpMove(delta);
+
+			if(mWingLeftDisintegrated){
+				QQuaternion q = QQuaternion::fromAxisAndAngle(0.0f, 0.0f,1.0f, -20.0f*delta);
+				setRotation( rotation()*q );
+			}else if (mWingRightDisintegrated){
+				QQuaternion q = QQuaternion::fromAxisAndAngle(0.0f, 0.0f,1.0f, 20.0f*delta);
+				setRotation( rotation()*q );
+			}
 
 			float landscapeHeight;
 
