@@ -551,7 +551,13 @@ void Splatterling::updateSelf( const double & delta )
 				QVector3D directionToTarget = mTarget;
 				QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
 				setRotation( QQuaternion::slerp( rotation(), targetRotation, 5 * delta ) );
-				setPosition( position() + direction()*delta * 8.0 );
+
+				QVector3D newPos = position() + direction()*delta * 8.0;
+				if(world()->landscape()->terrain()->getHeight(newPos)+2.0 > worldPosition().y()){
+					newPos.setY(world()->landscape()->terrain()->getHeight(newPos)+2.0);
+				}
+
+				setPosition( newPos );
 
 				QVector2D playerPosFlat(world()->player()->worldPosition().x(), world()->player()->worldPosition().z());
 				QVector2D splatterPosFlat(worldPosition().x(), worldPosition().z());
@@ -578,7 +584,14 @@ void Splatterling::updateSelf( const double & delta )
 				QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
 				QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
 				setRotation( QQuaternion::slerp( rotation(), targetRotation, 5 * delta ) );
-				setPosition( position() + direction()*delta * 12.0 );
+
+				QVector3D newPos = position() + direction()*delta * 12.0;
+				if(world()->landscape()->terrain()->getHeight(newPos)+2.0 > worldPosition().y()){
+					newPos.setY(world()->landscape()->terrain()->getHeight(newPos)+2.0);
+					qDebug() << newPos << "playerDetected";
+				}
+
+				setPosition( newPos );
 				recalculationOfRotationAngle = true;
 			}
 			else
