@@ -659,8 +659,8 @@ void Splatterling::updateSelf( const double & delta )
 				if( mWingLeftDisintegrated || mWingRightDisintegrated )
 				{
 					mBodyHittedToGround = true;
-					world()->splatterSystem()->spray( worldPosition(), mVelocityY*(-10.0f) );
-					world()->player()->receivePoints( mVelocityY*(-10.0f) );
+					world()->splatterSystem()->spray( worldPosition(), mVelocityY*(-8.0f) );
+					world()->player()->receivePoints( mVelocityY*(-8.0f) );
 				}
 
 				if(moveWingsToGround(delta)){
