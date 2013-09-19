@@ -397,7 +397,7 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
 
-	mHeightAboveGround = 1.0f;
+	mHeightAboveGround = 1.0f * Splatterling::SplatterlingSizeFactor;
 	mVelocityY = 0.0f;
 	mMaterial = new Material( scene()->glWidget(), "Splatterling" );
 	glGenBuffers( BufferSize, this->BufferName );
@@ -509,7 +509,6 @@ void Splatterling::updateSelf( const double & delta )
 			setPosition( randomPointOnWorld( world() ) + QVector3D( 0, 20, 0 ) );
 			setState( ALIVE );
 			setLife( 50 );
-			mHeightAboveGround = 6.0f;
 
 			randomDestinationPoint();
 
@@ -626,24 +625,27 @@ void Splatterling::updateSelf( const double & delta )
 		case DYING:
 		{
 			mWingSound->stop();
-			mHeightAboveGround = 3.0f;
 
 			mVelocityY += -50.0f * delta;	// apply some gravity
 			setPositionY( position().y() + mVelocityY *delta );
 
 			float landscapeHeight;
 
-			if( world()->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
+			if( world()->landscape()->terrain()->getHeight( worldPosition(), landscapeHeight ) )
 			{
-				if( landscapeHeight + mHeightAboveGround > position().y() )
+				if( landscapeHeight + mHeightAboveGround > worldPosition().y() )
 				{
-					setPositionY( landscapeHeight + mHeightAboveGround );
+					setPositionY( landscapeHeight + mHeightAboveGround);
 					/*if( mVelocityY < 0.0f )
 						mVelocityY = 0.0f;*/
 				}
 			}
 
-			if( !( position().y() > landscapeHeight + mHeightAboveGround ) )
+			if(!mWingLeftDisintegrated && !mWingRightDisintegrated){
+				doWingUpMove(delta);
+			}
+
+			if( !( worldPosition().y() > landscapeHeight + mHeightAboveGround ) )
 			{
 				if( mWingLeftDisintegrated || mWingRightDisintegrated )
 				{
@@ -651,7 +653,10 @@ void Splatterling::updateSelf( const double & delta )
 					world()->splatterSystem()->spray( worldPosition(), mVelocityY*(-10.0f) );
 					world()->player()->receivePoints( mVelocityY*(-10.0f) );
 				}
-				setState( DEAD );
+
+				if(moveWingsToGround(delta)){
+					setState( DEAD );
+				}
 			}
 
 			break;
@@ -915,8 +920,10 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 		if( mDamageOnBodyPart[TARGET_WING_LEFT] >= 5.0f )
 		{
 			mWingLeftDisintegrated = true;
-			setLife( 0 );
-			setState( DYING );
+			if(state() != DEAD){
+				setLife( 0 );
+				setState( DYING );
+			}
 		}
 	}
 	else if( targetBodyPart == TARGET_WING_RIGHT )
@@ -924,8 +931,10 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 		if( mDamageOnBodyPart[TARGET_WING_RIGHT] >= 5.0f )
 		{
 			mWingRightDisintegrated = true;
-			setLife( 0 );
-			setState( DYING );
+			if(state() != DEAD){
+				setLife( 0 );
+				setState( DYING );
+			}
 		}
 	}
 	else if( targetBodyPart == TARGET_HEAD )
@@ -933,9 +942,11 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 		if( mDamageOnBodyPart[TARGET_HEAD] >= 5.0f )
 		{
 			mHeadDisintegrated = true;
-			setLife( 0 );
-			world()->player()->receivePoints( 200 );
-			setState( DYING );
+			if(state() != DEAD){
+				setLife( 0 );
+				world()->player()->receivePoints( 200 );
+				setState( DYING );
+			}
 		}
 	}
 
@@ -957,10 +968,7 @@ void Splatterling::recalculateWingPosition( const double & delta )
 {
 	if( wingUpMovement )
 	{
-		PositionData[Splatterling::WingOneYPos]   += 2.0f*delta;
-		PositionData[Splatterling::WingOneYPos + 3] += 2.2f*delta;
-		PositionData[Splatterling::WingTwoYPos]   += 2.0f*delta;
-		PositionData[Splatterling::WingTwoYPos + 3] += 2.2*delta;
+		doWingUpMove(delta);
 
 		if( PositionData[Splatterling::WingOneYPos] >= 4.0f )
 		{
@@ -969,15 +977,54 @@ void Splatterling::recalculateWingPosition( const double & delta )
 	}
 	else
 	{
-
-		PositionData[Splatterling::WingOneYPos]   -= 2.0f*delta;
-		PositionData[Splatterling::WingOneYPos + 3] -= 2.2f*delta;
-		PositionData[Splatterling::WingTwoYPos]   -= 2.0f*delta;
-		PositionData[Splatterling::WingTwoYPos + 3] -= 2.2*delta;
+		doWingDownMove(delta);
 
 		if( PositionData[Splatterling::WingOneYPos] <= 0.0f )
 		{
 			wingUpMovement = true;
 		}
 	}
+}
+
+void Splatterling::doWingUpMove( const double & delta ){
+	if(PositionData[Splatterling::WingOneYPos] <= 4.0f){
+		PositionData[Splatterling::WingOneYPos]   += 2.0f*delta;
+		PositionData[Splatterling::WingOneYPos + 3] += 2.2f*delta;
+		PositionData[Splatterling::WingTwoYPos]   += 2.0f*delta;
+		PositionData[Splatterling::WingTwoYPos + 3] += 2.2*delta;
+	}
+}
+
+void Splatterling::doWingDownMove( const double & delta ){
+	if(PositionData[Splatterling::WingOneYPos] >= 0.0f){
+		PositionData[Splatterling::WingOneYPos]   -= 2.0f*delta;
+		PositionData[Splatterling::WingOneYPos + 3] -= 2.2f*delta;
+		PositionData[Splatterling::WingTwoYPos]   -= 2.0f*delta;
+		PositionData[Splatterling::WingTwoYPos + 3] -= 2.2*delta;
+	}
+}
+
+bool Splatterling::moveWingsToGround( const double & delta ){
+	QVector3D WingPos(PositionData[Splatterling::WingOneYPos-1], PositionData[Splatterling::WingOneYPos], PositionData[Splatterling::WingOneYPos+1]);
+	WingPos = pointToWorld(WingPos);
+	float height = world()->landscape()->terrain()->getHeight(WingPos);
+	PositionData[Splatterling::WingOneYPos] -= (WingPos.y()-height)-0.01f;
+
+	WingPos = QVector3D(PositionData[Splatterling::WingOneYPos+2], PositionData[Splatterling::WingOneYPos+3], PositionData[Splatterling::WingOneYPos+4]);
+	WingPos = pointToWorld(WingPos);
+	height = world()->landscape()->terrain()->getHeight(WingPos);
+	PositionData[Splatterling::WingOneYPos + 3] -= (WingPos.y()-height)-0.01f;
+
+
+	WingPos = QVector3D(PositionData[Splatterling::WingTwoYPos-1], PositionData[Splatterling::WingTwoYPos], PositionData[Splatterling::WingTwoYPos+1]);
+	WingPos = pointToWorld(WingPos);
+	height = world()->landscape()->terrain()->getHeight(WingPos);
+	PositionData[Splatterling::WingTwoYPos] -= (WingPos.y()-height)-0.01f;
+
+	WingPos = QVector3D(PositionData[Splatterling::WingTwoYPos+2], PositionData[Splatterling::WingTwoYPos+3], PositionData[Splatterling::WingTwoYPos+4]);
+	WingPos = pointToWorld(WingPos);
+	height = world()->landscape()->terrain()->getHeight(WingPos);
+	PositionData[Splatterling::WingTwoYPos + 3] -= (WingPos.y()-height)-0.01f;
+
+	return true;
 }

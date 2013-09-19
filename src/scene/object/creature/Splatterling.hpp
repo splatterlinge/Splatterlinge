@@ -99,6 +99,9 @@ public:
 
 private:
 	virtual void randomDestinationPoint();
+	virtual void doWingUpMove( const double & delta );
+	virtual void doWingDownMove( const double & delta );
+	virtual bool moveWingsToGround( const double & delta );
 	GLUquadric * mQuadric;
 	Material * mMaterial;
 	QVector3D mTarget;
