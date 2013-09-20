@@ -392,12 +392,21 @@ static void initTexCoordArray()
 }
 
 
-Splatterling::Splatterling( World * world ) : ACreature( world )
+Splatterling::Splatterling( World * world , float SplatterlingSizeFactor ) : ACreature( world )
 {
 	mQuadric = gluNewQuadric();
 	gluQuadricTexture( mQuadric, GL_TRUE );
 
-	mHeightAboveGround = 1.0f * Splatterling::SplatterlingSizeFactor;
+	this->mSplatterlingSizeFactor = SplatterlingSizeFactor;
+	this->mAttackCoolDown = mSplatterlingSizeFactor;
+
+	float dx = (Splatterling::MaxSizeSplatterling-0.1f)-Splatterling::MinSizeSplatterling;
+	float dy = (Splatterling::MaxDamage)-Splatterling::MinDamage;
+	float m = dy/dx;
+	float c = Splatterling::MinDamage - (m*Splatterling::MinSizeSplatterling);
+	this->mHitDamage = m * this->mSplatterlingSizeFactor + c;
+
+	mHeightAboveGround = 1.0f * this->mSplatterlingSizeFactor;
 	mVelocityY = 0.0f;
 	mMaterial = new Material( scene()->glWidget(), "Splatterling" );
 	glGenBuffers( BufferSize, this->BufferName );
@@ -430,14 +439,14 @@ Splatterling::Splatterling( World * world ) : ACreature( world )
 
 	for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
 	{
-		PositionData[i] = GlobalPositionData[i] * Splatterling::SplatterlingSizeFactor;
+		PositionData[i] = GlobalPositionData[i] * this->mSplatterlingSizeFactor;
 	}
 
 	mCoolDown = 0.0f;
 	recalculationOfRotationAngle = true;
 	rotationAroundPlayer = -1000.0f;
 
-	setBoundingSphere( Splatterling::SplatterlingBoundingSphereSize * Splatterling::SplatterlingSizeFactor );
+	setBoundingSphere( Splatterling::SplatterlingBoundingSphereSize * this->mSplatterlingSizeFactor );
 
 	initTexCoordArray();
 }
@@ -570,8 +579,8 @@ void Splatterling::updateSelf( const double & delta )
 							mSnapSound->play();
 						}
 
-						world()->player()->receiveDamage( 1 );
-						mCoolDown = 0.25f;
+						world()->player()->receiveDamage( this->mHitDamage );
+						mCoolDown = this->mAttackCoolDown;
 					}
 				}
 			}
@@ -587,7 +596,6 @@ void Splatterling::updateSelf( const double & delta )
 				QVector3D newPos = position() + direction()*delta * 12.0;
 				if(world()->landscape()->terrain()->getHeight(newPos)+2.0 > worldPosition().y()){
 					newPos.setY(world()->landscape()->terrain()->getHeight(newPos)+2.0);
-					qDebug() << newPos << "playerDetected";
 				}
 
 				setPosition( newPos );

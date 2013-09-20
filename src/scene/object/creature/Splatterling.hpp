@@ -43,8 +43,6 @@ public:
 	static const GLsizeiptr TexSize = 72 * 2 * sizeof( GLfloat );
 	static const GLsizeiptr NormalSize = 72 * 3 * sizeof( GLfloat );
 
-
-	static const float SplatterlingSizeFactor = 0.25f;
 	static const int BufferSize = 4;
 	static const float SplatterlingLength = 8.8f;
 	static const float SplatterlingBoundingSphereSize = 18.0f;
@@ -55,6 +53,12 @@ public:
 	static const int WingTwoYPos = ( ( BodyVertexCount + HeadVertexCount ) * 3 ) + ( 3 * 3 ) + 4;
 	static const double RotationStepSize = 2.0;
 	static const int DetectionDistance = 60;
+
+	static const float MinSizeSplatterling = 0.1f;
+	static const float MaxSizeSplatterling = 0.6f;
+	static const float MinDamage = 1.0f;
+	static const float MaxDamage = 3.0f;
+
 	enum
 	{
 		POSITION_OBJECT = 0,
@@ -80,7 +84,7 @@ public:
 	GLuint BufferName[BufferSize];
 
 
-	Splatterling( World * world );
+	Splatterling( World * world , float SplatterlingSizeFactor = 0.25f);
 	~Splatterling();
 
 	virtual void updateSelf( const double & delta );
@@ -96,6 +100,9 @@ public:
 	virtual bool intersectRightWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
 	virtual bool intersectLeftWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
 	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
+
+	static float getMaxSizeSplatterling() { return Splatterling::MaxSizeSplatterling; }
+	static float getMinSizeSplatterling() { return Splatterling::MinSizeSplatterling; }
 
 private:
 	virtual void randomDestinationPoint();
@@ -123,6 +130,9 @@ private:
 	bool mHeadDisintegrated;
 	bool mBodyHittedToGround;
 	float mDamageOnBodyPart[4];
+	float mSplatterlingSizeFactor;
+	float mAttackCoolDown;
+	int mHitDamage;
 };
 
 
