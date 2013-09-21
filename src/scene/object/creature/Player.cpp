@@ -47,6 +47,7 @@ Player::Player( World * world ) :
 	mUpPressed = false;
 	mDownPressed = false;
 	mSpeedPressed = false;
+	mUsePressed = false;
 	mGodMode = true;
 	mOnGround = false;
 	mUnderWater = false;
@@ -66,12 +67,12 @@ Player::Player( World * world ) :
 
 	mTorch = QSharedPointer<Torch>( new Torch( world ) );
 	mTorch->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) );
-	world->add( mTorch );
-	mDragTorch = false;
 
 	mPoints = 0;
-	mKillTimer = 0;
-	mAliveTimer = 0;
+	mKillTimer = 0.0f;
+	mTorchTimer = 0.0f;
+	mAliveTimer = 0.0f;
+	mUsageText = "";
 
 	scene()->addKeyListener( this );
 	scene()->addMouseListener( this );
@@ -100,6 +101,9 @@ void Player::keyPressEvent( QKeyEvent * event )
 		break;
 	case Qt::Key_D:
 		mRightPressed = true;
+		break;
+	case Qt::Key_E:
+		mUsePressed = true;
 		break;
 	case Qt::Key_R:
 		currentWeapon()->reload();
@@ -135,6 +139,9 @@ void Player::keyReleaseEvent( QKeyEvent * event )
 		break;
 	case Qt::Key_D:
 		mRightPressed = false;
+		break;
+	case Qt::Key_E:
+		mUsePressed = false;
 		break;
 	case Qt::Key_Space:
 		mUpPressed = false;
@@ -172,11 +179,6 @@ void Player::mousePressEvent( QGraphicsSceneMouseEvent * event )
 	{
 		mDragTeapot = true;
 	}
-	else if( event->button() == Qt::MiddleButton )
-	{
-		mDragTorch = true;
-	}
-
 }
 
 
@@ -190,10 +192,6 @@ void Player::mouseReleaseEvent( QGraphicsSceneMouseEvent * event )
 	else if( event->button() == Qt::RightButton )
 	{
 		mDragTeapot = false;
-	}
-	else if( event->button() == Qt::MiddleButton )
-	{
-		mDragTorch = false;
 	}
 }
 
@@ -232,6 +230,8 @@ void Player::updateSelf( const double & delta )
 {
 	mAliveTimer += delta;
 	mKillTimer += delta;
+	mTorchTimer += delta;
+	mUsageText = "";
 
 	if( mGodMode )
 	{
@@ -248,6 +248,7 @@ void Player::updateSelf( const double & delta )
 			updateRotation( delta );
 			updatePosition( delta );
 			updateTarget( delta );
+			updateTorch( delta );
 
 			if( mCurrentWeapon )
 			{
@@ -272,18 +273,12 @@ void Player::update2Self( const double & delta )
 		{
 			world()->teapot()->setPosition( mTarget );
 		}
-		if( mDragTorch )
-		{
-			mTorch->setPosition( mTarget );
-//			mTorch->moveY( 1 );
-		}
 	}
 }
 
 
 void Player::drawSelf()
 {
-
 }
 
 
@@ -345,7 +340,7 @@ void Player::receiveDamage( int damage, const QVector3D * position, const QVecto
 
 void Player::receivePoints( int points )
 {
-	int time = mKillTimer;
+	float time = mKillTimer;
 	float mult = 1;
 	if( time < 1.0f )
 		mult = 5;
@@ -569,6 +564,33 @@ void Player::updateTarget( const double & delta )
 	else
 		mTargetAvailable = false;
 	mTarget = position() + direction() * mTargetDistance;
+}
+
+
+void Player::updateTorch( const double & delta )
+{
+	if( mTorch->parent() )
+	{
+		if( (position()-mTorch->position()).length() <= 2.5f )
+		{
+			mUsageText = "Press [E] to take torch.";
+			if( mTorchTimer > 0.5f && mUsePressed )
+			{
+				world()->remove( mTorch );
+				mTorchTimer = 0;
+			}
+		}
+	}
+	else
+	{
+		if( mTorchTimer > 0.5f && mUsePressed )
+		{
+			mTorch->setPosition( position()+direction()*1.0f );
+			mTorch->setPositionY( world()->landscape()->terrain()->getHeight( mTorch->position() ) );
+			world()->add( mTorch );
+			mTorchTimer = 0;
+		}
+	}
 }
 
 

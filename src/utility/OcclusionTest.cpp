@@ -27,6 +27,7 @@
 
 
 QGLBuffer OcclusionTest::sRandomVertexInSphereBuffer;
+QGLBuffer OcclusionTest::sRandomVertexOnSphereBuffer;
 
 
 OcclusionTest::OcclusionTest()
@@ -42,6 +43,18 @@ OcclusionTest::OcclusionTest()
 		sRandomVertexInSphereBuffer.setUsagePattern( QGLBuffer::StaticDraw );
 		sRandomVertexInSphereBuffer.allocate( randomPointsInSphere, sizeof(randomPointsInSphere) );
 		sRandomVertexInSphereBuffer.release();
+	}
+	if( !sRandomVertexOnSphereBuffer.isCreated() )
+	{
+		VertexP3f randomPointsInSphere[256];
+		for( size_t i=0; i<sizeof(randomPointsInSphere)/sizeof(VertexP3f); i++ )
+			randomPointsInSphere[i].position = RandomNumber::inUnitSphere().normalized();
+		sRandomVertexOnSphereBuffer = QGLBuffer( QGLBuffer::VertexBuffer );
+		sRandomVertexOnSphereBuffer.create();
+		sRandomVertexOnSphereBuffer.bind();
+		sRandomVertexOnSphereBuffer.setUsagePattern( QGLBuffer::StaticDraw );
+		sRandomVertexOnSphereBuffer.allocate( randomPointsInSphere, sizeof(randomPointsInSphere) );
+		sRandomVertexOnSphereBuffer.release();
 	}
 	glGenQueries( 1, &mQuery );
 }
@@ -106,6 +119,38 @@ unsigned char OcclusionTest::randomPointsInUnitSphereVisible( const unsigned cha
 	glDrawArrays( GL_POINTS, 0, numPoints );
 	VertexP3f::glDisableClientState();
 	sRandomVertexInSphereBuffer.release();
+	glEndQuery( GL_SAMPLES_PASSED );
+
+	glPopAttrib();
+
+	return sampleCount/samplesPerFragment;
+}
+
+
+unsigned char OcclusionTest::randomPointsOnUnitSphereVisible( const unsigned char & numPoints )
+{
+	GLuint sampleCount = 0;
+	GLuint samplesPerFragment;
+	glGetIntegerv( GL_SAMPLES_ARB, (GLint*)&samplesPerFragment );
+	if( samplesPerFragment == 0 )
+		samplesPerFragment = 1;
+
+	if( glIsQuery( mQuery ) )	// fetch the result of last frame
+		glGetQueryObjectuiv( mQuery, GL_QUERY_RESULT, &sampleCount );
+
+	glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_ENABLE_BIT );
+	glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );	// don't draw anything
+	glDepthMask( GL_FALSE );	// don't write the depth of our testing points to the depth buffer
+	glEnable( GL_DEPTH_TEST );	// essential for occlusion query
+	glDisable( GL_MULTISAMPLE );	// multisampling would cause the query to report too many passed samples
+
+	glBeginQuery( GL_SAMPLES_PASSED, mQuery );
+	sRandomVertexOnSphereBuffer.bind();
+	VertexP3f::glEnableClientState();
+	VertexP3f::glPointerVBO();
+	glDrawArrays( GL_POINTS, 0, numPoints );
+	VertexP3f::glDisableClientState();
+	sRandomVertexOnSphereBuffer.release();
 	glEndQuery( GL_SAMPLES_PASSED );
 
 	glPopAttrib();

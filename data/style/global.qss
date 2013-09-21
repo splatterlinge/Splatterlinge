@@ -1,33 +1,31 @@
-QWidget#startMenu {
+/********************************
+ * settings for all widgets
+ */
+
+QScrollArea {
+	border: 0;
 	background-color: transparent;
 }
 
-QWidget#startMenu > QPushButton {
+QPushButton {
 	border: 0;
 	border-radius: 0;
-	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ff0000, stop: 1 #e50000);
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #aa0000, stop: 1 #660000);
 	color: #fff;
-	min-width: 80px;
-	padding: 10px 30px;
+}
+
+QPushButton:hover {
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ff0000, stop: 1 #aa0000);
 }
 
 QPushButton:pressed {
-	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                   stop: 0 #dadbde, stop: 1 #f6f7fa);
-}
-
-QPushButton:flat {
-	border: none; /* no border for a flat push button */
-}
-
-QPushButton:default {
-	border-color: navy; /* make the default button prominent */
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ff0000, stop: 1 #ff0000);
 }
 
 QTabWidget::pane { /* The tab widget frame */
 	border: 0;
 	background-color: #fff;
-	border-top: 1px solid #e50000;
+	border-top: 0px solid #e50000;
 }
 
 QTabWidget::tab-bar {
@@ -35,22 +33,89 @@ QTabWidget::tab-bar {
 	left: 0;
 }
 
-/* Style the tab using the tab sub-control. Note that
-it reads QTabBar _not_ QTabWidget */
 QTabBar::tab {
 	border: 0;
+	color: #fff;
 	min-width: 9ex;
-	padding: 10px 5px;
+	padding: 10px 20px;
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #aa0000, stop: 1 #660000);
+	border-right: 1px solid #880000;
+	margin-top: 10px;
 }
 
-QTabBar::tab:selected, QTabBar::tab:hover {
-	background: #f00;
-	color: #fff;
-	font-weight: bold;
+QTabBar::tab:last {
+	border-right: 0;
+}
+
+QTabBar::tab:hover {
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ff0000, stop: 1 #aa0000);
 }
 
 QTabBar::tab:selected {
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ffffff, stop: 1 #eeeeee);
+	border-right: 1px solid #ddd;
+	color: #333;
+	font-weight: bold;
+	margin-top: 0;
 }
 
-QTabBar::tab:!selected {
+QTabBar::tab::selected:hover {
+	
+}
+
+QSlider::groove:horizontal {
+	background: red;
+	height: 8px;
+}
+
+QSlider::handle:horizontal {
+	background: #333;
+	height: 10px;
+	width: 20px;
+}
+
+QSlider::add-page:horizontal {
+	background: white;
+	border: 1px solid #ddd;
+}
+
+QSlider::sub-page:horizontal {
+	background: #e50000;
+	border: 1px solid #ddd;
+}
+
+QCheckBox {
+	spacing: 5px;
+	margin-top: 5px;
+}
+
+QCheckBox::indicator {
+	border: 1px solid #ddd;
+	height: 10px;
+	width: 10px;
+}
+
+QCheckBox::indicator:unchecked {
+	background: #fff;
+}
+
+QCheckBox::indicator:checked {
+	background: #e50000;
+}
+
+
+/********************************
+ * settings for specific widgets
+ */
+
+QWidget#startMenu {
+	background-color: transparent;
+}
+
+QWidget#startMenuHelp > QLabel{
+	color: white;
+}
+
+QScrollArea#startMenuButtons > QPushButton {
+	padding: 10px 30px;
 }

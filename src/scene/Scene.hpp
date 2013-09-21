@@ -103,7 +103,6 @@ public:
 	bool stereoUseOVR() const { return mStereoUseOVR; }
 
 	StartMenuWindow * startMenuWindow() { return mStartMenuWindow; }
-	OptionWindow * optionWindow() { return mOptionWindow; }
 
 #ifdef OVR_ENABLED
 	QQuaternion OVROrientation();
@@ -125,7 +124,6 @@ private:
 
 	GLWidget * mGLWidget;
 
-	OptionWindow * mOptionWindow;
 	StartMenuWindow * mStartMenuWindow;
 
 	QElapsedTimer mElapsedTimer;
@@ -173,7 +171,6 @@ private:
 	}
 #endif
 
-
 	bool mMouseGrabbing;
 	bool mBlinkingState;
 
@@ -194,6 +191,9 @@ private:
 	void popAllGL();
 	void updateObjects( const double & delta );
 	void drawObjects();
+
+public slots:
+	void toggleMenu();
 
 private slots:
 	void secondPassed();

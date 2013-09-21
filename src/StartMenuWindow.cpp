@@ -24,6 +24,9 @@
 #include "StartMenuWindow.hpp"
 
 #include "OptionWindow.hpp"
+#include "GfxOptionWindow.hpp"
+#include "DebugWindow.hpp"
+#include "HelpWindow.hpp"
 
 #include <scene/Scene.hpp>
 
@@ -32,18 +35,40 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QBoxLayout>
+#include <QListView>
+#include <QStringList>
+#include <QStringListModel>
+#include <QStackedWidget>
 
 
-StartMenuWindow::StartMenuWindow( Scene * scene, OptionWindow * options, QWidget * parent ) :
+StartMenuWindow::StartMenuWindow( Scene * scene, QWidget * parent ) :
 	QWidget( parent ),
-	mScene( scene ),
-	mOptionWindow( options )
+	mScene( scene )
 {
 	setObjectName( "startMenu" );
 	setWindowTitle( tr( "Start Menu" ) );
 	setWindowOpacity( 1.0 );
 
-	initMenu();
+	mLeftMenuSide = newButtonBox( this );
+	mLeftMenuSide->setObjectName( "startMenuButtons" );
+
+	mRightMenuSide = new QStackedWidget( this );
+
+	mOptions = newOptionTabs( this );
+	mOptions->setObjectName( "startMenuOptions" );
+	mRightMenuSide->addWidget( mOptions );
+
+	mHelp= new HelpWindow();
+	mHelp->setObjectName( "startMenuHelp" );
+	mRightMenuSide->addWidget( mHelp );
+
+	mRightMenuSide->setCurrentWidget( mHelp );
+
+	QBoxLayout * layout = new QBoxLayout( QBoxLayout::LeftToRight, this );
+	layout->addWidget( mLeftMenuSide );
+	layout->addWidget( mRightMenuSide );
+	setLayout( layout );
+
 
 	setWindowFlags( Qt::Dialog | Qt::CustomizeWindowHint | Qt::FramelessWindowHint );
 }
@@ -54,39 +79,66 @@ StartMenuWindow::~StartMenuWindow()
 }
 
 
-void StartMenuWindow::initMenu()
+void StartMenuWindow::resizeEvent( QResizeEvent * event )
 {
-/*
-	QPalette pal = mNewGame->palette( );
-	pal.setColor( QPalette::Active, QPalette::Button, Qt::darkRed );
-	pal.setColor( QPalette::Inactive, QPalette::Button, Qt::darkRed );
-	pal.setColor( QPalette::ButtonText, Qt::white );
-*/
+	QWidget::resizeEvent( event );
+}
+
+
+QWidget * StartMenuWindow::newButtonBox( QWidget * parent )
+{
 	QFont buttonFont = QFont( "Xolonium", 12, QFont::Normal );
 	buttonFont.setBold( true );
 	buttonFont.setPixelSize( 24 );
 
-	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, this );
+	QScrollArea * container = new QScrollArea( parent );
+	QBoxLayout * layout = new QBoxLayout( QBoxLayout::TopToBottom, container );
 
-	mNewGame = new QPushButton( "New Game", this );
-//	mNewGame->setPalette( pal );
-	mNewGame->setFont( buttonFont );
-	layout->addWidget( mNewGame );
-	connect( mNewGame, SIGNAL(released()), this, SLOT(handleNewGameButton()) );
+	QPushButton * newGameButton = new QPushButton( "New Game", this );
+	newGameButton->setFont( buttonFont );
+	layout->addWidget( newGameButton );
+	connect( newGameButton, SIGNAL(released()), this, SLOT(handleNewGameButton()) );
 
-	mOptions = new QPushButton( "Options", this );
-//	mOptions->setPalette( pal );
-	mOptions->setFont( buttonFont );
-	layout->addWidget( mOptions );
-	connect( mOptions, SIGNAL(released()), this, SLOT(handleOptionsButton()) );
+	QPushButton * helpButton = new QPushButton( "Help", this );
+	helpButton->setFont( buttonFont );
+	layout->addWidget( helpButton );
+	connect( helpButton, SIGNAL(released()), this, SLOT(handleHelpButton()) );
 
-	mEnd = new QPushButton( "End Game", this );
-//	mEnd->setPalette( pal );
-	mEnd->setFont( buttonFont );
-	layout->addWidget( mEnd );
-	connect( mEnd, SIGNAL(released()), this, SLOT(handleEndGameButton()) );
+	QPushButton * optionsButton = new QPushButton( "Options", this );
+	optionsButton->setFont( buttonFont );
+	layout->addWidget( optionsButton );
+	connect( optionsButton, SIGNAL(released()), this, SLOT(handleOptionsButton()) );
 
-	setLayout( layout );
+	QPushButton * endButton = new QPushButton( "End Game", this );
+	endButton->setFont( buttonFont );
+	layout->addWidget( endButton );
+	connect( endButton, SIGNAL(released()), this, SLOT(handleEndGameButton()) );
+
+	container->setLayout( layout );
+
+	return container;
+}
+
+
+QWidget * StartMenuWindow::newOptionTabs( QWidget * parent )
+{
+	QTabWidget * optionTabs = new QTabWidget( parent );
+	optionTabs->clear();
+
+	GfxOptionWindow * gfxOptionWindow = new GfxOptionWindow( mScene, optionTabs );
+	QScrollArea * gfxOptionWindowScroll = new QScrollArea();
+	gfxOptionWindowScroll->setWidget( gfxOptionWindow );
+	gfxOptionWindowScroll->setWidgetResizable( true );
+
+	DebugWindow * debugOptionWindow = new DebugWindow( mScene, optionTabs );
+	QScrollArea * debugOptionWindowScroll = new QScrollArea();
+	debugOptionWindowScroll->setWidget( debugOptionWindow );
+	debugOptionWindowScroll->setWidgetResizable( true );
+
+	optionTabs->addTab( gfxOptionWindowScroll, "Graphics" );
+	optionTabs->addTab( debugOptionWindowScroll, "Debug" );
+
+	return optionTabs;
 }
 
 
@@ -97,16 +149,19 @@ void StartMenuWindow::handleNewGameButton()
 	delete world;
 	world = new World( mScene, "earth" );
 	mScene->setRoot( world );
-	this->setVisible( false );
+	mScene->toggleMenu();
+}
+
+
+void StartMenuWindow::handleHelpButton()
+{
+	mRightMenuSide->setCurrentWidget( mHelp );
 }
 
 
 void StartMenuWindow::handleOptionsButton()
 {
-	if( !mOptionWindow->isVisible() )
-		mOptionWindow->show();
-	else
-		mOptionWindow->hide();
+	mRightMenuSide->setCurrentWidget( mOptions );
 }
 
 

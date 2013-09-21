@@ -292,6 +292,8 @@ Sky::Sky( World * world, QString name ) :
 	TexImage( scene()->glWidget(), GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, starMapPathNZ );
 
 	mSunFlareMaterial = new Material( scene()->glWidget(), "Flare" );
+
+	world->addLightSource( this );
 }
 
 
@@ -305,6 +307,7 @@ Sky::~Sky()
 	delete mCloudShader;
 	mCloudPlaneIndexBuffer.destroy();
 	mCloudPlaneVertexBuffer.destroy();
+	world()->removeLightSource( this );
 
 //	sCubeIndexBuffer.destroy();
 //	sCubeVertexBuffer.destroy();
@@ -363,6 +366,19 @@ void Sky::updateSelf( const double & delta )
 	mDiffuse = mBaseColor.toVector3D() * diffuseFactor;
 	mSpecular = mBaseColor.toVector3D() * specularFactor;
 	mAmbient = mBaseColor.toVector3D().normalized() * ambientFactor;
+}
+
+
+void Sky::updateLightSource( GLenum light )
+{
+	glLight( light, GL_POSITION, mSunDirection );
+	glLight( light, GL_AMBIENT, mAmbient );
+	glLight( light, GL_DIFFUSE, mDiffuse );
+	glLight( light, GL_SPECULAR, mSpecular );
+	glLight( light, GL_CONSTANT_ATTENUATION, 1.0f );
+	glLight( light, GL_LINEAR_ATTENUATION, 0.0f );
+	glLight( light, GL_QUADRATIC_ATTENUATION, 0.0f );
+	glEnable( light );
 }
 
 

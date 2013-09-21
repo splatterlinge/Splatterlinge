@@ -47,7 +47,7 @@ Torch::Torch( World * world ) :
 	mFlareSize = 5.0f;
 	mColorCycle = 0.0f;
 	mFlareRotation = 0.0f;
-	mFlarePosition = QVector3D(0,4,0);
+	mFlarePosition = QVector3D(0,1.6,0);
 
 	setBoundingSphere( mFlareSize + mFlarePosition.length() );
 
@@ -78,13 +78,23 @@ Torch::~Torch()
 void Torch::updateLightSource( GLenum light )
 {
 	glLight( light, GL_POSITION, QVector4D(	pointToWorld(mFlarePosition), 1	) );
-	glLight( light, GL_AMBIENT, QVector4D(	0, 0, 0, 1	) );
-	glLight( light, GL_DIFFUSE, QVector4D(	color()	) );
-	glLight( light, GL_SPECULAR, QVector4D(	color()	) );
 	glLight( light, GL_CONSTANT_ATTENUATION, 0.0f );
 	glLight( light, GL_LINEAR_ATTENUATION, 0.05f );
 	glLight( light, GL_QUADRATIC_ATTENUATION, 0.0f );
-	glEnable( light );
+	if( parent() )
+	{
+		glLight( light, GL_AMBIENT, QVector4D(	0, 0, 0, 1	) );
+		glLight( light, GL_DIFFUSE, QVector4D(	color()	) );
+		glLight( light, GL_SPECULAR, QVector4D(	color()	) );
+		glEnable( light );
+	}
+	else
+	{
+		glLight( light, GL_AMBIENT, QVector4D(	0, 0, 0, 1	) );
+		glLight( light, GL_DIFFUSE, QVector4D(	0, 0, 0, 1	) );
+		glLight( light, GL_SPECULAR, QVector4D(	0, 0, 0, 1	) );
+		glDisable( light );
+	}
 }
 
 
@@ -116,8 +126,8 @@ void Torch::draw2Self()
 
 	glPushMatrix();
 	glTranslate( mFlarePosition );
-	glScale( 0.5f );
-	visiblePoints = mOcclusionTest.randomPointsInUnitSphereVisible( samplingPoints );
+	glScale( 0.3f );
+	visiblePoints = mOcclusionTest.randomPointsOnUnitSphereVisible( samplingPoints );
 	glPopMatrix();
 	if( !visiblePoints )
 		return;

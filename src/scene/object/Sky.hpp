@@ -25,6 +25,7 @@
 #define SCENE_OBJECT_SKY_INCLUDED
 
 #include "AWorldObject.hpp"
+#include "ALightSource.hpp"
 
 #include <GLWidget.hpp>
 
@@ -32,13 +33,12 @@
 #include <QString>
 #include <QSize>
 
-#include <resource/Shader.hpp>
-#include <scene/object/AObject.hpp>
 #include <utility/OcclusionTest.hpp>
 #include <geometry/Vertex.hpp>
 
 
 class Scene;
+class Shader;
 class Material;
 
 
@@ -46,7 +46,7 @@ class Material;
 /**
  * Simulates and renders a sky.
  */
-class Sky : public AWorldObject
+class Sky : public AWorldObject, public ALightSource
 {
 public:
 	Sky( World * world, QString name );
@@ -55,6 +55,8 @@ public:
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 	virtual void draw2Self();
+
+	virtual void updateLightSource( GLenum light );
 
 	/// Sets the time of the day.
 	/**
