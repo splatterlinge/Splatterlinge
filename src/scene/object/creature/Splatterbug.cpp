@@ -35,12 +35,26 @@
 Splatterbug::Splatterbug( World * world ) : ACreature( world )
 {
 	mBugSound = new AudioSample("butterfly");
+	mBugSound->setLooping( true );
+	mBugSound->setRolloffFactor( 0.01f );
+	mBugSound->play();
+
+	damageMultiplicationFactor[TARGET_BODY] = 2.0f;
+	damageMultiplicationFactor[TARGET_HEAD] = 3.0f;
+
+	mDamageOnBodyPart[TARGET_BODY] = 0.0f;
+	mDamageOnBodyPart[TARGET_HEAD] = 0.0f;
+
+	mBodyHitted = false;
+	mHeadDisintegrated = false;
 }
 
 
 Splatterbug::~Splatterbug()
 {
-
+	gluDeleteQuadric( mQuadric );
+	delete mMaterial;
+	delete mBugSound;
 }
 
 void Splatterbug::updateSelf( const double & delta )
@@ -65,7 +79,57 @@ AObject * Splatterbug::intersectLine( const AObject * exclude, const QVector3D &
 void Splatterbug::receiveDamage( int damage, const QVector3D * position,
                                  const QVector3D * direction)
 {
-	
+	float rayLength = FLT_MAX;
+	int targetBodyPart = TARGET_BODY;
+
+	QVector3D mTrailStart = ( *position - (*direction) * 0.01f );
+
+	if( intersectBody( mTrailStart, *direction, rayLength ) )
+		targetBodyPart = TARGET_BODY;
+
+	if( intersectHead( mTrailStart, *direction, rayLength ) )
+		targetBodyPart = TARGET_HEAD;
+
+	damage *= damageMultiplicationFactor[targetBodyPart];
+	ACreature::receiveDamage( damage, direction );
+	mDamageOnBodyPart[targetBodyPart] += damage;
+
+	if( targetBodyPart == TARGET_BODY )
+	{
+		if( mDamageOnBodyPart[TARGET_BODY] >= 5.0f )
+		{
+			mBodyHitted = true;
+			if(state() != DEAD){
+				setLife( 0 );
+				world()->player()->receivePoints( 50 );
+				setState( DYING );
+			}
+		}
+	}
+	else if( targetBodyPart == TARGET_HEAD )
+	{
+		if( mDamageOnBodyPart[TARGET_HEAD] >= 5.0f )
+		{
+			mHeadDisintegrated = true;
+			if(state() != DEAD){
+				setLife( 0 );
+				world()->player()->receivePoints( 200 );
+				setState( DYING );
+			}
+		}
+	}
+
+	QVector3D splatterSource;
+
+	if( position )
+		splatterSource = *position;
+	else
+		splatterSource = worldPosition();
+
+	if( state() != DEAD )
+		world()->splatterSystem()->spray( splatterSource, damage );
+	else
+		world()->splatterSystem()->spray( splatterSource, damage / 2.0f );
 }
 
 bool Splatterbug::intersectBody(const QVector3D & origin, const QVector3D & direction, 

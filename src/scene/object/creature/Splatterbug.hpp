@@ -36,6 +36,41 @@ class Splatterbug: public ACreature
 {
 public:
 
+	static const int BufferSize = 4;
+	static const GLsizeiptr PositionSize = 72 * 3 * sizeof( GLfloat );
+	static const GLsizeiptr ColorSize = 72 * 3 * sizeof( GLubyte );
+	static const GLsizeiptr TexSize = 72 * 2 * sizeof( GLfloat );
+	static const GLsizeiptr NormalSize = 72 * 3 * sizeof( GLfloat );
+
+	//Enums
+		enum
+	{
+		POSITION_OBJECT = 0,
+		COLOR_OBJECT = 1,
+		TEXTURE_OBJECT = 2,
+		NORMAL_OBJECT = 3
+	};
+	enum
+	{
+		TARGET_BODY = 0,
+		TARGET_HEAD = 1,
+		TARGET_WING_RIGHT = 2,
+		TARGET_WING_LEFT = 3,
+		TARGET_NOTHING = 4
+	};
+	enum
+	{
+		DEAD_NORMAL =0,
+		DEAD_HEADSHOT= 1,
+		DEAD_WINGSHOT = 2
+	};
+
+	// Public attributes
+	GLuint BufferName[BufferSize];
+	float mDamageOnBodyPart[2];
+	float damageMultiplicationFactor[2];
+	
+	// De-/Constructor
 	Splatterbug( World * world );
 	~Splatterbug();
 
@@ -65,8 +100,19 @@ private:
 	Material * mMaterial;
 	QVector3D mTarget;
 
+	GLuint vboId;
+	GLfloat PositionData[PositionSize/sizeof( GLfloat )];
+	QVector3D destinationPoint;
+
 	float mVelocityY;
 	float mHeightAboveGround;
+
+	int mHitDamage;
+
+	bool playerDetected;
+
+	bool mHeadDisintegrated;
+	bool mBodyHitted;
 
 };
 
