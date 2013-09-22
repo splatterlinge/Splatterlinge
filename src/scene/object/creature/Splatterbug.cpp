@@ -23,5 +23,12 @@
 
 #include "Splatterbug.hpp"
 
+Splatterbug::Splatterbug( World * world ) : ACreature( world )
+{
+}
 
 
+Splatterling::~Splatterling()
+{
+
+}
