@@ -21,8 +21,8 @@
  * along with Splatterlinge. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SPLATTERBUG_HPP_
-#define _SPLATTERBUG_HPP_
+#ifndef SCENE_OBJECT_CREATURE_SPLATTERBUG_INCLUDED
+#define SCENE_OBJECT_CREATURE_SPLATTERBUG_INCLUDED
 
 #include "ACreature.hpp"
 #include "resource/AudioSample.hpp"
@@ -41,27 +41,34 @@ public:
 
 	
 	//Public methods
-	virtual void updateSelf( const double & delta ) = 0;
-	virtual void drawSelf()=0;
+	virtual void updateSelf( const double & delta );
+	virtual void drawSelf();
 
 	virtual AObject * intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
-		float & length, QVector3D * normal = NULL ) = 0;
+		float & length, QVector3D * normal = NULL );
 
-	virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL )=0;
+	virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL );
 	virtual void recalculateWingPosition( const double & delta ) = 0;
 
-	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance) = 0;
+	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
 	virtual bool intersectRightWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance)=0;
 	virtual bool intersectLeftWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance)=0;
-	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance)=0;
+	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
 
 protected:
 	;
 
 private:
-	;
+	AudioSample *mBugSound;
+
+	GLUquadric * mQuadric;
+	Material * mMaterial;
+	QVector3D mTarget;
+
+	float mVelocityY;
+	float mHeightAboveGround;
 
 };
 
-#endif // _SPLATTERBUG_HPP_
+#endif // SCENE_OBJECT_CREATURE_SPLATTERBUG_INCLUDED
 

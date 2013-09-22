@@ -22,13 +22,60 @@
  */
 
 #include "Splatterbug.hpp"
+#include <scene/object/World.hpp>
+#include <resource/Material.hpp>
+#include <effect/SplatterSystem.hpp>
+#include <utility/RandomNumber.hpp>
+#include <utility/Quaternion.hpp>
+#include <utility/Sphere.hpp>
+
+#include <math.h>
+#include <float.h>
 
 Splatterbug::Splatterbug( World * world ) : ACreature( world )
 {
+	mBugSound = new AudioSample("butterfly");
 }
 
 
 Splatterbug::~Splatterbug()
 {
 
+}
+
+void Splatterbug::updateSelf( const double & delta )
+{
+	
+}
+
+void Splatterbug::drawSelf()
+{
+
+}
+
+AObject * Splatterbug::intersectLine( const AObject * exclude, const QVector3D & origin,
+                                      const QVector3D & direction, float & length, 
+                                      QVector3D * normal)
+{
+	AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
+
+	return nearestTarget;
+}
+
+void Splatterbug::receiveDamage( int damage, const QVector3D * position,
+                                 const QVector3D * direction)
+{
+	
+}
+
+bool Splatterbug::intersectBody(const QVector3D & origin, const QVector3D & direction, 
+                                float & intersectionDistance)
+{
+	return true;
+}
+
+bool Splatterbug::intersectHead(const QVector3D & origin, const QVector3D & direction,
+                                float & intersectionDistance)
+{
+	return true;
 }
