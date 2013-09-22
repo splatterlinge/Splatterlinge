@@ -28,7 +28,7 @@ Splatterbug::Splatterbug( World * world ) : ACreature( world )
 }
 
 
-Splatterling::~Splatterling()
+Splatterbug::~Splatterbug()
 {
 
 }

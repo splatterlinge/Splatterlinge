@@ -41,19 +41,19 @@ public:
 
 	
 	//Public methods
-	virtual void updateSelf( const double & delta );
-	virtual void drawSelf();
+	virtual void updateSelf( const double & delta ) = 0;
+	virtual void drawSelf()=0;
 
 	virtual AObject * intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
-		float & length, QVector3D * normal = NULL );
+		float & length, QVector3D * normal = NULL ) = 0;
 
-	virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL );
-	virtual void recalculateWingPosition( const double & delta );
+	virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL )=0;
+	virtual void recalculateWingPosition( const double & delta ) = 0;
 
-	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
-	virtual bool intersectRightWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
-	virtual bool intersectLeftWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
-	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
+	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance) = 0;
+	virtual bool intersectRightWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance)=0;
+	virtual bool intersectLeftWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance)=0;
+	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance)=0;
 
 protected:
 	;
