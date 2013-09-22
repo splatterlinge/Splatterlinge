@@ -95,9 +95,11 @@ World::World( Scene * scene, QString name ) :
 	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) );
 	add( mTeapot );
 
-	mDummy = QSharedPointer<Knife>( new Knife( this ) );
-	mDummy->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) )+5 );
+	/*
+	mDummy = QSharedPointer<Dummy>( new Dummy( this ) );
+	mDummy->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) );
 	add( mDummy );
+	*/
 
 	splatterlingCount = 5;
 

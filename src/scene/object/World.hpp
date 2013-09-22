@@ -37,7 +37,6 @@
 #include "Landscape.hpp"
 #include "environment/Forest.hpp"
 #include "environment/Grass.hpp"
-#include "weapon/Knife.hpp"
 
 #include <QTime>
 #include <QVector>
@@ -122,7 +121,7 @@ private:
 	QSharedPointer<Landscape> mLandscape;
 	QSharedPointer<Teapot> mTeapot;
 	QSharedPointer<Player> mPlayer;
-	QSharedPointer<Knife> mDummy;
+	QSharedPointer<Dummy> mDummy;
 	QList< QSharedPointer<Splatterling> > mSplatterlingList;
 	QVector3D mTarget;
 	QVector3D mTargetNormal;

@@ -64,8 +64,8 @@ Player::Player( World * world ) :
 	mTarget = QVector3D(0,0,0);
 	mDragTeapot = false;
 
-	mWeapons.append( QSharedPointer<AWeapon>( new Knife( world ) ) );
 	mCurrentWeapon = QSharedPointer<AWeapon>();
+	giveWeapon( QSharedPointer<AWeapon>( new Knife( world ) ) );
 
 	mTorch = QSharedPointer<Torch>( new Torch( world ) );
 	mTorch->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) );
