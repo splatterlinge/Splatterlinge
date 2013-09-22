@@ -27,6 +27,7 @@
 #include <effect/SplatterSystem.hpp>
 #include "../World.hpp"
 #include "../Landscape.hpp"
+#include "../weapon/Knife.hpp"
 #include "../weapon/Laser.hpp"
 #include "../weapon/Minigun.hpp"
 
@@ -63,6 +64,7 @@ Player::Player( World * world ) :
 	mTarget = QVector3D(0,0,0);
 	mDragTeapot = false;
 
+	mWeapons.append( QSharedPointer<AWeapon>( new Knife( world ) ) );
 	mCurrentWeapon = QSharedPointer<AWeapon>();
 
 	mTorch = QSharedPointer<Torch>( new Torch( world ) );
