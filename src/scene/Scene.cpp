@@ -587,9 +587,20 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 		painter->drawText( weaponNameRect,
 			Qt::AlignCenter | Qt::AlignHCenter,
 			QString( tr("%1").arg(player->currentWeapon()->name()) ) );
-		if( player->currentWeapon()->clipammo() == 0 )
+		if( player->currentWeapon()->clipsize() != -1 )
 		{
-			if( !mBlinkingState )
+			if( player->currentWeapon()->clipammo() == 0 )
+			{
+				if( !mBlinkingState )
+				{
+					painter->drawText( weaponStatusRect,
+						Qt::AlignCenter | Qt::AlignHCenter,
+						QString( tr("%2 | %3 ")
+							.arg(player->currentWeapon()->clipammo())
+							.arg(player->currentWeapon()->ammo()) ) );
+				}
+			}
+			else
 			{
 				painter->drawText( weaponStatusRect,
 					Qt::AlignCenter | Qt::AlignHCenter,
@@ -597,14 +608,6 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 						.arg(player->currentWeapon()->clipammo())
 						.arg(player->currentWeapon()->ammo()) ) );
 			}
-		}
-		else
-		{
-			painter->drawText( weaponStatusRect,
-				Qt::AlignCenter | Qt::AlignHCenter,
-				QString( tr("%2 | %3 ")
-					.arg(player->currentWeapon()->clipammo())
-					.arg(player->currentWeapon()->ammo()) ) );
 		}
 	}
 }

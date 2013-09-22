@@ -9,6 +9,7 @@ Knife::Knife( World * world ) :
 {
 	mModel = new StaticModel( world->scene()->glWidget(), "knife" );
 
+	mName = "Knife";
 	mFired = false;
 	mHitting = false;
 	mRotation = 0.0f;
@@ -68,8 +69,8 @@ void Knife::updateSelf( const double &delta )
 			{
 				mHitting = false;
 
-				mTrailStart = worldPosition();
-				mTrailDirection = worldDirection();
+				mTrailStart = world()->player()->position();
+				mTrailDirection = world()->player()->direction();
 				mTrailLength = mRange;
 				AObject * target = world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength );
 				mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
