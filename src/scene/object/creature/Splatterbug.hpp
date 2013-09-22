@@ -26,11 +26,27 @@
 
 #include "ACreature.hpp"
 #include "resource/AudioSample.hpp"
+#include <GLWidget.hpp>
+#include <QGLBuffer>
 
+#include <resource/Material.hpp>
+#include <effect/SplatterSystem.hpp>
+#include <utility/RandomNumber.hpp>
+#include <utility/Intersection.hpp>
+#include <utility/Quaternion.hpp>
+#include <utility/Sphere.hpp>
+
+#include <math.h>
+#include <float.h>
+#include <QDebug>
 
 struct GLUquadric;
 class Material;
 
+
+
+
+class StaticModel;
 
 class Splatterbug: public ACreature 
 {
@@ -83,11 +99,9 @@ public:
 		float & length, QVector3D * normal = NULL );
 
 	virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL );
-	virtual void recalculateWingPosition( const double & delta ) = 0;
 
 	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
-	virtual bool intersectRightWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance)=0;
-	virtual bool intersectLeftWing(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance)=0;
+	
 	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
 
 protected:
@@ -98,6 +112,7 @@ private:
 
 	GLUquadric * mQuadric;
 	Material * mMaterial;
+	StaticModel * mModel;
 	QVector3D mTarget;
 
 	GLuint vboId;

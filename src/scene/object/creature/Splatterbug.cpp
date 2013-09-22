@@ -23,6 +23,8 @@
 
 #include "Splatterbug.hpp"
 #include <scene/object/World.hpp>
+#include <scene/TextureRenderer.hpp>
+//#include <scene/Scene.hpp>
 #include <resource/Material.hpp>
 #include <effect/SplatterSystem.hpp>
 #include <utility/RandomNumber.hpp>
@@ -34,6 +36,11 @@
 
 Splatterbug::Splatterbug( World * world ) : ACreature( world )
 {
+	mModel = new StaticModel(scene()->glWidget (), "bug");	
+	mMaterial = new Material( scene()->glWidget(), "Splatterling" );
+	
+	glGenBuffers( BufferSize, this->BufferName );
+	
 	mBugSound = new AudioSample("butterfly");
 	mBugSound->setLooping( true );
 	mBugSound->setRolloffFactor( 0.01f );
@@ -47,6 +54,8 @@ Splatterbug::Splatterbug( World * world ) : ACreature( world )
 
 	mBodyHitted = false;
 	mHeadDisintegrated = false;
+	mVelocityY = 0.0f;
+
 }
 
 
@@ -64,7 +73,7 @@ void Splatterbug::updateSelf( const double & delta )
 
 void Splatterbug::drawSelf()
 {
-
+	mModel->draw();
 }
 
 AObject * Splatterbug::intersectLine( const AObject * exclude, const QVector3D & origin,
@@ -135,11 +144,11 @@ void Splatterbug::receiveDamage( int damage, const QVector3D * position,
 bool Splatterbug::intersectBody(const QVector3D & origin, const QVector3D & direction, 
                                 float & intersectionDistance)
 {
-	return true;
+	return false;
 }
 
 bool Splatterbug::intersectHead(const QVector3D & origin, const QVector3D & direction,
                                 float & intersectionDistance)
 {
-	return true;
+	return false;
 }

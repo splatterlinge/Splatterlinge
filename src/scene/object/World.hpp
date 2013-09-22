@@ -33,6 +33,7 @@
 #include "creature/Player.hpp"
 #include "creature/Dummy.hpp"
 #include "creature/Splatterling.hpp"
+#include "creature/Splatterbug.hpp"
 #include "Sky.hpp"
 #include "Landscape.hpp"
 #include "environment/Forest.hpp"
@@ -101,6 +102,8 @@ public:
 	QSharedPointer<Player> player() { return mPlayer; }
 	QSharedPointer<Teapot> teapot() { return mTeapot; }
 
+	QSharedPointer<Splatterbug> bug() { return mBug; }
+
 private:
 	class SplatterInteractor : public ParticleSystem::Interactable
 	{
@@ -122,6 +125,7 @@ private:
 	QSharedPointer<Teapot> mTeapot;
 	QSharedPointer<Player> mPlayer;
 	QSharedPointer<Dummy> mDummy;
+	QSharedPointer<Splatterbug> mBug;
 	QList< QSharedPointer<Splatterling> > mSplatterlingList;
 	QVector3D mTarget;
 	QVector3D mTargetNormal;

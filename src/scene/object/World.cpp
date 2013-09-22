@@ -95,6 +95,9 @@ World::World( Scene * scene, QString name ) :
 	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) );
 	add( mTeapot );
 
+	mBug = QSharedPointer<Splatterbug>( new Splatterbug( this ) );
+	add( mBug );
+
 	/*
 	mDummy = QSharedPointer<Dummy>( new Dummy( this ) );
 	add( mDummy );
