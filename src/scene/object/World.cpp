@@ -100,8 +100,10 @@ World::World( Scene * scene, QString name ) :
 
 	/*
 	mDummy = QSharedPointer<Dummy>( new Dummy( this ) );
+	mDummy->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) );
 	add( mDummy );
 	*/
+
 	splatterlingCount = 5;
 
 	respawnEnemies();

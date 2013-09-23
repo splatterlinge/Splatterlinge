@@ -52,7 +52,9 @@ public:
 	static const int WingOneYPos = ( ( BodyVertexCount + HeadVertexCount ) * 3 ) + 4;
 	static const int WingTwoYPos = ( ( BodyVertexCount + HeadVertexCount ) * 3 ) + ( 3 * 3 ) + 4;
 	static const double RotationStepSize = 2.0;
-	static const int DetectionDistance = 60;
+	static const int DetectionDistanceDay = 60;
+	static const int DetectionDistanceNight = 15;
+	static const int DetectionDistanceOfTorch = 80;
 
 	static const float MinSizeSplatterling = 0.1f;
 	static const float MaxSizeSplatterling = 0.6f;
@@ -109,6 +111,9 @@ private:
 	virtual void doWingUpMove( const double & delta );
 	virtual void doWingDownMove( const double & delta );
 	virtual bool moveWingsToGround( const double & delta );
+	virtual bool isTorchDetected( float & distToTorch );
+	virtual bool isPlayerDetected( float & distToPlayer );
+	virtual void flyAroundTarget( QVector3D & mTarget, bool & recalculationOfRotationAngle, const double & delta );
 	GLUquadric * mQuadric;
 	Material * mMaterial;
 	QVector3D mTarget;
@@ -133,6 +138,9 @@ private:
 	float mSplatterlingSizeFactor;
 	float mAttackCoolDown;
 	int mHitDamage;
+	int mActDetectionDistance;
+	bool mNightActive;
+	bool mTorchDetected;
 };
 
 
