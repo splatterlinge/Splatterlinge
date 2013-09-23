@@ -66,6 +66,7 @@ public:
 	QSharedPointer<AWeapon> currentWeapon() { return mCurrentWeapon; }
 	const QList< QSharedPointer<AWeapon> > & weapons() const { return mWeapons; }
 	void giveWeapon( QSharedPointer<AWeapon> weapon );
+	QSharedPointer<Torch> getTorch() { return mTorch; }
 
 	void setArmor( const int & armor ) { mArmor = armor; }
 

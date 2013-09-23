@@ -449,6 +449,10 @@ Splatterling::Splatterling( World * world , float SplatterlingSizeFactor ) : ACr
 	setBoundingSphere( Splatterling::SplatterlingBoundingSphereSize * this->mSplatterlingSizeFactor );
 
 	initTexCoordArray();
+
+	mNightActive = false;
+	mActDetectionDistance = Splatterling::DetectionDistanceDay;
+	mTorchDetected = false;
 }
 
 
@@ -476,7 +480,7 @@ static QVector3D randomPointOnWorld( World * world )
 
 		distanceToPlayer = ( world->player()->position() - pos ).length();
 
-		if( distanceToPlayer > Splatterling::DetectionDistance*2.0f && distanceToPlayer < Splatterling::DetectionDistance*5.0f)
+		if( distanceToPlayer > Splatterling::DetectionDistanceDay*2.0f && distanceToPlayer < Splatterling::DetectionDistanceDay*5.0f)
 		{
 			distanceIsValid = true;
 		}
@@ -525,47 +529,28 @@ void Splatterling::updateSelf( const double & delta )
 		}
 		case ALIVE:
 		{
+			mNightActive = world()->sky().data()->timeOfDay() > 0.6f && world()->sky().data()->timeOfDay() < 0.9f;
+
+			if(mNightActive)
+			{
+				mActDetectionDistance = DetectionDistanceNight;
+			}else{
+				mActDetectionDistance = DetectionDistanceDay;
+			}
+
 			mWingSound->setPositionAutoVelocity( this->worldPosition(), delta );
 			mSnapSound->setPositionAutoVelocity( this->worldPosition(), delta );
-			QVector3D vectPlayerSplatter = world()->player()->worldPosition() - worldPosition();
-			GLfloat dist = ( vectPlayerSplatter ).length();
-			vectPlayerSplatter = vectPlayerSplatter.normalized();
 
-			double anglePlayerInSight = acos( QVector3D::dotProduct( vectPlayerSplatter, worldDirection() ) ) * 360 / M_PI;
+			GLfloat dist;
+			playerDetected = isPlayerDetected(dist);
 
-			if( anglePlayerInSight < 100 && anglePlayerInSight > -100 && dist < 2.0f * Splatterling::DetectionDistance )
-			{
-				playerDetected = true;
-			}
-			else if( dist < Splatterling::DetectionDistance )
-			{
-				playerDetected = true;
-			}
-			else
-			{
-				playerDetected = false;
-			}
+			GLfloat distToTorch;
+			mTorchDetected = isTorchDetected(distToTorch);
 
 			if( dist < 10 )
 			{
 				//Player in front of player
-				if( recalculationOfRotationAngle )
-				{
-					mTarget = QVector3D( mTarget.x(), worldPosition().y(), mTarget.z() );
-					mTarget = ( mTarget - worldPosition() ).normalized();
-					recalculationOfRotationAngle = false;
-				}
-
-				QVector3D directionToTarget = mTarget;
-				QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
-				setRotation( QQuaternion::slerp( rotation(), targetRotation, 5 * delta ) );
-
-				QVector3D newPos = position() + direction()*delta * 8.0;
-				if(world()->landscape()->terrain()->getHeight(newPos)+2.0 > worldPosition().y()){
-					newPos.setY(world()->landscape()->terrain()->getHeight(newPos)+2.0);
-				}
-
-				setPosition( newPos );
+				flyAroundTarget(mTarget, recalculationOfRotationAngle, delta);
 
 				QVector2D playerPosFlat(world()->player()->worldPosition().x(), world()->player()->worldPosition().z());
 				QVector2D splatterPosFlat(worldPosition().x(), worldPosition().z());
@@ -600,6 +585,27 @@ void Splatterling::updateSelf( const double & delta )
 
 				setPosition( newPos );
 				recalculationOfRotationAngle = true;
+			}
+			else if( mTorchDetected )
+			{
+				//torch detected
+				if(distToTorch > 8.0f){
+					mTarget = world()->player()->getTorch().data()->worldPosition();
+					mTarget += QVector3D( 0, 1, 0 );
+					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+					QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
+					setRotation( QQuaternion::slerp( rotation(), targetRotation, 5 * delta ) );
+
+					QVector3D newPos = position() + direction()*delta * 12.0;
+					if(world()->landscape()->terrain()->getHeight(newPos)+2.0 > worldPosition().y()){
+						newPos.setY(world()->landscape()->terrain()->getHeight(newPos)+2.0);
+					}
+
+					setPosition( newPos );
+					recalculationOfRotationAngle = true;
+				}else{
+					flyAroundTarget(mTarget, recalculationOfRotationAngle, delta);
+				}
 			}
 			else
 			{
@@ -987,7 +993,7 @@ void Splatterling::recalculateWingPosition( const double & delta )
 	{
 		doWingUpMove(delta);
 
-		if( PositionData[Splatterling::WingOneYPos] >= 4.0f )
+		if( PositionData[Splatterling::WingOneYPos] >= 8.0f * mSplatterlingSizeFactor )
 		{
 			wingUpMovement = false;
 		}
@@ -1004,7 +1010,7 @@ void Splatterling::recalculateWingPosition( const double & delta )
 }
 
 void Splatterling::doWingUpMove( const double & delta ){
-	if(PositionData[Splatterling::WingOneYPos] <= 4.0f){
+	if(PositionData[Splatterling::WingOneYPos] <= 8.0f * mSplatterlingSizeFactor){
 		PositionData[Splatterling::WingOneYPos]   += 2.0f*delta;
 		PositionData[Splatterling::WingOneYPos + 3] += 2.2f*delta;
 		PositionData[Splatterling::WingTwoYPos]   += 2.0f*delta;
@@ -1044,4 +1050,69 @@ bool Splatterling::moveWingsToGround( const double & delta ){
 	PositionData[Splatterling::WingTwoYPos + 3] -= (WingPos.y()-height)-0.01f;
 
 	return true;
+}
+
+bool Splatterling::isTorchDetected( float & distToTorch ){
+	if(mNightActive){
+		if(world()->player()->getTorch()->parent() != NULL){
+
+			QVector3D vectTorchSplatter = world()->player()->getTorch().data()->worldPosition() - worldPosition();
+			distToTorch = ( vectTorchSplatter ).length();
+			vectTorchSplatter = vectTorchSplatter.normalized();
+			double angleTorchInSight = acos( QVector3D::dotProduct( vectTorchSplatter, worldDirection() ) ) * 360 / M_PI;
+
+			if( angleTorchInSight < 100 && angleTorchInSight > -100 && distToTorch < 2.0f * Splatterling::DetectionDistanceOfTorch )
+			{
+				return true;
+			}
+			else if( distToTorch < Splatterling::DetectionDistanceOfTorch )
+			{
+				return true;
+			}
+		}
+	}
+
+	distToTorch = 10000.0;
+	return false;
+}
+
+bool Splatterling::isPlayerDetected(float & distToPlayer ){
+	QVector3D vectPlayerSplatter = world()->player()->worldPosition() - worldPosition();
+	distToPlayer = ( vectPlayerSplatter ).length();
+	vectPlayerSplatter = vectPlayerSplatter.normalized();
+
+	double anglePlayerInSight = acos( QVector3D::dotProduct( vectPlayerSplatter, worldDirection() ) ) * 360 / M_PI;
+
+	if( anglePlayerInSight < 100 && anglePlayerInSight > -100 && distToPlayer < 2.0f * mActDetectionDistance )
+	{
+		return true;
+	}
+	else if( distToPlayer < mActDetectionDistance )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void Splatterling::flyAroundTarget( QVector3D & mTarget, bool & recalculationOfRotationAngle, const double & delta ){
+	if( recalculationOfRotationAngle )
+	{
+		mTarget = QVector3D( mTarget.x(), worldPosition().y(), mTarget.z() );
+		mTarget = ( mTarget - worldPosition() ).normalized();
+		recalculationOfRotationAngle = false;
+	}
+
+	QVector3D directionToTarget = mTarget;
+	QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
+	setRotation( QQuaternion::slerp( rotation(), targetRotation, 5 * delta ) );
+
+	QVector3D newPos = position() + direction()*delta * 8.0;
+	if(world()->landscape()->terrain()->getHeight(newPos)+2.0 > worldPosition().y()){
+		newPos.setY(world()->landscape()->terrain()->getHeight(newPos)+2.0);
+	}
+
+	setPosition( newPos );
 }
