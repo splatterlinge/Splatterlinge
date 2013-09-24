@@ -20,4 +20,5 @@ tools/
 .kateproject.d/
 
 # Sublime-Text
+*.subline-project
 *.sublime-workspace
