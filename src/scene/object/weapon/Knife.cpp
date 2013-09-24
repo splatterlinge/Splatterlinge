@@ -55,15 +55,15 @@ void Knife::updateSelf( const double &delta )
 	{
 		if( mHitting )
 		{
-			if( mRotation < -3.0f )
+			if( mRotation < -60.0f )
 			{
 				mDirection = -mDirection;
 			}
 
 			if( mDirection < 0.0f )
-				mRotation += mDirection*delta*20;
+				mRotation += mDirection*delta*300;
 			else
-				mRotation += mDirection*delta*30;
+				mRotation += mDirection*delta*400;
 
 			if( mRotation > 0.0f )
 			{
@@ -104,8 +104,8 @@ void Knife::drawSelf()
 
 	glPushMatrix();
 
-	glScalef( 0.02,0.02,0.02 );
-	glTranslatef( 30,-250-mRotation*5,-40+mRotation*20 );
+	glScalef( 0.1, 0.1, 0.1 );
+	glTranslatef( 5, -2, 0 );
 	glRotatef( mRotation, 1.0f, 0.0f, 0.0f );
 	mModel->draw();
 
