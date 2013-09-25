@@ -30,6 +30,8 @@
 #include "../weapon/Knife.hpp"
 #include "../weapon/Laser.hpp"
 #include "../weapon/Minigun.hpp"
+#include "../weapon/Lightsaber.hpp"
+#include "../weapon/Fliegenklatsche.hpp"
 
 #include <float.h>
 
@@ -66,6 +68,8 @@ Player::Player( World * world ) :
 
 	mCurrentWeapon = QSharedPointer<AWeapon>();
 	giveWeapon( QSharedPointer<AWeapon>( new Knife( world ) ) );
+	giveWeapon( QSharedPointer<AWeapon>( new Lightsaber( world ) ) );
+	giveWeapon( QSharedPointer<AWeapon>( new Fliegenklatsche( world ) ) );
 
 	mTorch = QSharedPointer<Torch>( new Torch( world ) );
 	mTorch->setPositionY( world->landscape()->terrain()->getHeight( QPointF(0,0) ) );
