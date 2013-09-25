@@ -22,6 +22,7 @@
  */
 
 #include "Splatterbug.hpp"
+
 #include <scene/object/World.hpp>
 #include <scene/TextureRenderer.hpp>
 //#include <scene/Scene.hpp>
@@ -30,14 +31,16 @@
 #include <utility/RandomNumber.hpp>
 #include <utility/Quaternion.hpp>
 #include <utility/Sphere.hpp>
+#include <utility/Capsule.hpp>
 
 #include <math.h>
 #include <float.h>
 
 Splatterbug::Splatterbug( World * world ) : ACreature( world )
 {
-	mModel = new StaticModel(scene()->glWidget (), "bug");	
-	mMaterial = new Material( scene()->glWidget(), "Splatterling" );
+    mModel = new StaticModel(scene()->glWidget (), "Splatterbug");
+    mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
+
 	
 	glGenBuffers( BufferSize, this->BufferName );
 	
@@ -61,19 +64,19 @@ Splatterbug::Splatterbug( World * world ) : ACreature( world )
 
 Splatterbug::~Splatterbug()
 {
-	gluDeleteQuadric( mQuadric );
-	delete mMaterial;
-	delete mBugSound;
-}
-
-void Splatterbug::updateSelf( const double & delta )
-{
-	
+    delete mMaterial;
+    delete mBugSound;
 }
 
 void Splatterbug::drawSelf()
 {
-	mModel->draw();
+    mMaterial->bind();
+
+    glPushMatrix();
+    mModel->draw();
+    glPopMatrix();
+
+    mMaterial->release();
 }
 
 AObject * Splatterbug::intersectLine( const AObject * exclude, const QVector3D & origin,
@@ -151,4 +154,78 @@ bool Splatterbug::intersectHead(const QVector3D & origin, const QVector3D & dire
                                 float & intersectionDistance)
 {
 	return false;
+}
+
+QVector<AObject*> Splatterbug::collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal )
+{
+    QVector<AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
+    float depth;
+    QVector3D tmpNormal(0,1,0);
+
+    if( Capsule::intersectSphere( position(), position()+QVector3D(0,2,0), boundingSphereRadius()/2.0f, center, radius, &tmpNormal, &depth ) )
+    {
+        collides.append( this );
+        center += tmpNormal * depth;
+        if( normal )
+            *normal = tmpNormal;
+    }
+
+    return collides;
+}
+
+static QVector3D randomPointOnWorld( World * world )
+{
+    QVector3D pos( RandomNumber::minMax(-100,100), 0, RandomNumber::minMax(-100,100) );
+    pos.setY( world->landscape()->terrain()->getHeight( pos ) );
+    return pos;
+}
+
+
+void Splatterbug::updateSelf( const double & delta )
+{
+    switch( state() )
+    {
+        case SPAWNING:
+        {
+            setPosition( randomPointOnWorld( world() ) + QVector3D(0,10,0) );
+            setState( ALIVE );
+            setLife( 100 );
+            mHeightAboveGround = 6.0f;
+            break;
+        }
+
+        case ALIVE:
+        {
+            mTarget = world()->teapot()->worldPosition();
+            QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+            QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D(0,1,0) );
+            setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
+            setPosition( position() + direction()*delta*10.0 );
+            if( life() <= 0 )
+                setState( DYING );
+            break;
+        }
+
+        case DYING:
+            setState( DEAD );
+            mHeightAboveGround = 3.0f;
+            break;
+
+        case DEAD:
+            break;
+    }
+
+    mVelocityY += -3.0f * delta;	// apply some gravity
+    setPositionY( position().y() + mVelocityY * delta );
+
+    float landscapeHeight;
+    if( world()->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
+    {
+        if( landscapeHeight + mHeightAboveGround > position().y() )
+        {
+            setPositionY( landscapeHeight + mHeightAboveGround );
+            if( mVelocityY < 0.0f )
+                mVelocityY = 0.0f;
+        }
+    }
 }

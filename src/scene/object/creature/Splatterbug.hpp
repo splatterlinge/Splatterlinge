@@ -103,7 +103,7 @@ public:
 	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
 	
 	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance);
-
+    virtual QVector<AObject*> collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal );
 protected:
 	;
 
