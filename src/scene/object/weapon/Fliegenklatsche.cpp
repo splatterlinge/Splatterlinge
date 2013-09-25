@@ -15,7 +15,7 @@ Fliegenklatsche::Fliegenklatsche( World * world ) :
 	mDirection = 0.0f;
 	mCooldown = 0.0f;
 	mRange = 10.0f;
-	mDamage = 2000.0f;
+	mDamage = 50.0f;
 }
 
 

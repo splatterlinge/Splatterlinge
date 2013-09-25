@@ -16,7 +16,7 @@ Knife::Knife( World * world ) :
 	mDirection = 0.0f;
 	mCooldown = 0.0f;
 	mRange = 10.0f;
-	mDamage = 200.0f;
+	mDamage = 100.0f;
 }
 
 
