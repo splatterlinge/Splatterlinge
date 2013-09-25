@@ -1,55 +1,55 @@
-#include "Knife.hpp"
+#include "Lightsaber.hpp"
 
 
 #include <resource/StaticModel.hpp>
 
 
-Knife::Knife( World * world ) :
+Lightsaber::Lightsaber( World * world ) :
 	AWeapon( world, -1, -1, -1 )
 {
-	mModel = new StaticModel( world->scene()->glWidget(), "knife" );
+	mModel = new StaticModel( world->scene()->glWidget(), "lightsaber" );
 
-	mName = "Knife";
+	mName = "Lightsaber";
 	mFired = false;
 	mHitting = false;
 	mRotation = 0.0f;
 	mDirection = 0.0f;
 	mCooldown = 0.0f;
 	mRange = 10.0f;
-	mDamage = 100.0f;
+	mDamage = 2000.0f;
 }
 
 
-Knife::~Knife()
+Lightsaber::~Lightsaber()
 {
 	delete mModel;
 }
 
-void Knife::triggerPressed()
+void Lightsaber::triggerPressed()
 {
 	mFired = true;
 }
 
 
-void Knife::triggerReleased()
+void Lightsaber::triggerReleased()
 {
 	mFired = false;
 }
 
 
-void Knife::holster()
+void Lightsaber::holster()
 {
 	mDrawn = false;
 }
 
 
-void Knife::pull()
+void Lightsaber::pull()
 {
 	mDrawn = true;
 }
 
 
-void Knife::updateSelf( const double &delta )
+void Lightsaber::updateSelf( const double &delta )
 {
 	if( mDrawn )
 	{
@@ -97,7 +97,7 @@ void Knife::updateSelf( const double &delta )
 }
 
 
-void Knife::drawSelf()
+void Lightsaber::drawSelf()
 {
 	if( !mDrawn )
 		return;

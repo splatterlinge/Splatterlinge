@@ -1,55 +1,54 @@
-#include "Knife.hpp"
-
+#include "Fliegenklatsche.hpp"
 
 #include <resource/StaticModel.hpp>
 
 
-Knife::Knife( World * world ) :
+Fliegenklatsche::Fliegenklatsche( World * world ) :
 	AWeapon( world, -1, -1, -1 )
 {
-	mModel = new StaticModel( world->scene()->glWidget(), "knife" );
+	mModel = new StaticModel( world->scene()->glWidget(), "fliegenklatsche" );
 
-	mName = "Knife";
+	mName = "Fliegenklatsche";
 	mFired = false;
 	mHitting = false;
 	mRotation = 0.0f;
 	mDirection = 0.0f;
 	mCooldown = 0.0f;
 	mRange = 10.0f;
-	mDamage = 100.0f;
+	mDamage = 50.0f;
 }
 
 
-Knife::~Knife()
+Fliegenklatsche::~Fliegenklatsche()
 {
 	delete mModel;
 }
 
-void Knife::triggerPressed()
+void Fliegenklatsche::triggerPressed()
 {
 	mFired = true;
 }
 
 
-void Knife::triggerReleased()
+void Fliegenklatsche::triggerReleased()
 {
 	mFired = false;
 }
 
 
-void Knife::holster()
+void Fliegenklatsche::holster()
 {
 	mDrawn = false;
 }
 
 
-void Knife::pull()
+void Fliegenklatsche::pull()
 {
 	mDrawn = true;
 }
 
 
-void Knife::updateSelf( const double &delta )
+void Fliegenklatsche::updateSelf( const double &delta )
 {
 	if( mDrawn )
 	{
@@ -97,7 +96,7 @@ void Knife::updateSelf( const double &delta )
 }
 
 
-void Knife::drawSelf()
+void Fliegenklatsche::drawSelf()
 {
 	if( !mDrawn )
 		return;
