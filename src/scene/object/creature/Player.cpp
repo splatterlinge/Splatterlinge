@@ -67,8 +67,6 @@ Player::Player( World * world ) :
 	mDragTeapot = false;
 
 	mCurrentWeapon = QSharedPointer<AWeapon>();
-	giveWeapon( QSharedPointer<AWeapon>( new Knife( world ) ) );
-	giveWeapon( QSharedPointer<AWeapon>( new Lightsaber( world ) ) );
 	giveWeapon( QSharedPointer<AWeapon>( new Fliegenklatsche( world ) ) );
 
 	mTorch = QSharedPointer<Torch>( new Torch( world ) );

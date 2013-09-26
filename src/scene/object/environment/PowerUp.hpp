@@ -44,7 +44,9 @@ public:
 		HEALTH,
 		ARMOR,
 		WEAPON_LASER,
-		WEAPON_MINIGUN
+		WEAPON_MINIGUN,
+		WEAPON_KNIFE,
+		WEAPON_LIGHTSABER
 	};
 
 private:
@@ -55,6 +57,7 @@ private:
 	float mRotationAngle;
 	float mRespawnCoolDown;
 	bool mRespawning;
+	bool mRandom;
 	PowerType mPowerType;
 };
 

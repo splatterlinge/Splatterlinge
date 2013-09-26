@@ -23,8 +23,11 @@
 
 #include "PowerUp.hpp"
 
+#include "../weapon/Knife.hpp"
 #include "../weapon/Laser.hpp"
+#include "../weapon/Lightsaber.hpp"
 #include "../weapon/Minigun.hpp"
+
 
 #include <scene/Scene.hpp>
 
@@ -39,6 +42,7 @@ PowerUp::PowerUp( Landscape * landscape, QString type, const QPoint & mapPositio
 	respawn();
 
 	setBoundingSphere( 1.0f );
+	mRandom = false;
 
 	if( type == "health" )
 	{
@@ -60,6 +64,13 @@ PowerUp::PowerUp( Landscape * landscape, QString type, const QPoint & mapPositio
 		mPowerType = WEAPON_MINIGUN;
 		mMaterial = new Material( landscape->scene()->glWidget(), "PowerUp_Weapon_Minigun" );
 	}
+	else if( type == "weapon_random" )
+	{
+		mPowerType = PowerType(RandomNumber::minMax(0, 5));
+		mRandom = true;
+		qDebug() << "pick up" << mPowerType;
+		mMaterial = new Material( landscape->scene()->glWidget(), "PowerUp_Weapon_Random" );
+	}
 }
 
 
@@ -78,6 +89,11 @@ void PowerUp::respawn()
 	setPosition( pos );
 	mRespawnCoolDown = RandomNumber::minMax( 1.0f, 3.0f );
 	mRespawning = true;
+
+	if( mRandom )
+	{
+		mPowerType = PowerType(RandomNumber::minMax(0, 5));
+	}
 }
 
 
@@ -117,6 +133,12 @@ void PowerUp::updateSelf( const double & delta )
 				case WEAPON_MINIGUN:
 					player->giveWeapon( QSharedPointer<AWeapon>( new Minigun( world() ) ) );
 					break;
+				case WEAPON_KNIFE:
+					player->giveWeapon( QSharedPointer<AWeapon>( new Knife( world() ) ) );
+					break;
+				case WEAPON_LIGHTSABER:
+					player->giveWeapon( QSharedPointer<AWeapon>( new Lightsaber( world() ) ) );
+					break;
 			}
 			respawn();
 		}
@@ -134,6 +156,8 @@ void PowerUp::drawSelf()
 			case ARMOR:
 			case WEAPON_LASER:
 			case WEAPON_MINIGUN:
+			case WEAPON_KNIFE:
+			case WEAPON_LIGHTSABER:
 				glPushMatrix();
 
 				glDisable( GL_CULL_FACE );
