@@ -1011,19 +1011,19 @@ void Splatterling::recalculateWingPosition( const double & delta )
 
 void Splatterling::doWingUpMove( const double & delta ){
 	if(PositionData[Splatterling::WingOneYPos] <= 8.0f * mSplatterlingSizeFactor){
-		PositionData[Splatterling::WingOneYPos]   += 2.0f*delta;
-		PositionData[Splatterling::WingOneYPos + 3] += 2.2f*delta;
-		PositionData[Splatterling::WingTwoYPos]   += 2.0f*delta;
-		PositionData[Splatterling::WingTwoYPos + 3] += 2.2*delta;
+		PositionData[Splatterling::WingOneYPos]   += 8.0f*delta;
+		PositionData[Splatterling::WingOneYPos + 3] += 8.2f*delta;
+		PositionData[Splatterling::WingTwoYPos]   += 8.0f*delta;
+		PositionData[Splatterling::WingTwoYPos + 3] += 8.2*delta;
 	}
 }
 
 void Splatterling::doWingDownMove( const double & delta ){
 	if(PositionData[Splatterling::WingOneYPos] >= 0.0f){
-		PositionData[Splatterling::WingOneYPos]   -= 2.0f*delta;
-		PositionData[Splatterling::WingOneYPos + 3] -= 2.2f*delta;
-		PositionData[Splatterling::WingTwoYPos]   -= 2.0f*delta;
-		PositionData[Splatterling::WingTwoYPos + 3] -= 2.2*delta;
+		PositionData[Splatterling::WingOneYPos]   -= 8.0f*delta;
+		PositionData[Splatterling::WingOneYPos + 3] -= 8.2f*delta;
+		PositionData[Splatterling::WingTwoYPos]   -= 8.0f*delta;
+		PositionData[Splatterling::WingTwoYPos + 3] -= 8.2*delta;
 	}
 }
 
