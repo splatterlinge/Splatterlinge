@@ -83,7 +83,7 @@ void Fliegenklatsche::updateSelf( const double &delta )
 	{
 		if( mHitting )
 		{
-			mStep += delta*4;
+			mStep += delta*10;
 			mRotation = (pow(mStep, 4)*0.23f + pow(mStep, 3)*(-2) + pow(mStep, 2)*4.5f + mStep*(-1));
 
 			if( mStep > 3.21f && !mHit )
@@ -104,7 +104,7 @@ void Fliegenklatsche::updateSelf( const double &delta )
 				mHit = true;
 			}
 
-			if( mStep > 4.84f )
+			if( mStep > 4.9f )
 			{
 				mHitting = false;
 			}
