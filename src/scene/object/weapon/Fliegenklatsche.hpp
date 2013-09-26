@@ -28,6 +28,7 @@
 
 class Material;
 class StaticModel;
+class AudioSample;
 
 class Fliegenklatsche : public AWeapon
 {
@@ -49,6 +50,7 @@ private:
 	bool mDrawn;
 	bool mFired;
 	bool mHitting;
+	bool mHit;
 	float mCooldown;
 	float mStep;
 	float mRotation;
@@ -59,6 +61,7 @@ private:
 	QVector3D mTrailStart;
 	QVector3D mTrailDirection;
 	QVector3D mTrailEnd;
+	AudioSample * mHitSound;
 };
 
 #endif // FLIEGENKLATSCHE_HPP

@@ -24,6 +24,7 @@
 #include "Fliegenklatsche.hpp"
 
 #include <resource/StaticModel.hpp>
+#include <resource/AudioSample.hpp>
 
 
 Fliegenklatsche::Fliegenklatsche( World * world ) :
@@ -33,18 +34,23 @@ Fliegenklatsche::Fliegenklatsche( World * world ) :
 
 	mName = "Fliegenklatsche";
 	mFired = false;
+	mHit = false;
 	mHitting = false;
 	mRotation = 0.0f;
 	mStep = 0.0f;
 	mCooldown = 0.0f;
 	mRange = 10.0f;
 	mDamage = 20.0f;
+
+	mHitSound = new AudioSample( "flyswatter" );
+	mHitSound->setLooping( false );
 }
 
 
 Fliegenklatsche::~Fliegenklatsche()
 {
 	delete mModel;
+	delete mHitSound;
 }
 
 void Fliegenklatsche::triggerPressed()
@@ -78,11 +84,11 @@ void Fliegenklatsche::updateSelf( const double &delta )
 		if( mHitting )
 		{
 			mStep += delta*4;
-			mRotation = (pow(mStep, 3)*(-2)+pow(mStep, 2)*4.5f+mStep*(-1));
+			mRotation = (pow(mStep, 4)*0.23f + pow(mStep, 3)*(-2) + pow(mStep, 2)*4.5f + mStep*(-1));
 
-			if( mStep > 2.0f )
+			if( mStep > 3.21f && !mHit )
 			{
-				mHitting = false;
+				mHitSound->play();
 
 				mTrailStart = world()->player()->position();
 				mTrailDirection = world()->player()->direction();
@@ -94,11 +100,19 @@ void Fliegenklatsche::updateSelf( const double &delta )
 				{
 					victim->receiveDamage( mDamage, &mTrailEnd, &mTrailDirection );
 				}
+
+				mHit = true;
+			}
+
+			if( mStep > 4.84f )
+			{
+				mHitting = false;
 			}
 		}
 		else if( mFired && mCooldown <= 0.0f )
 		{
 			mHitting = true;
+			mHit = false;
 			mStep = 0.0f;
 			mRotation = 0.0f;
 			mCooldown = 1.0f;
@@ -120,9 +134,9 @@ void Fliegenklatsche::drawSelf()
 	glPushMatrix();
 
 	glScalef( 0.1, 0.1, 0.1 );
-	glTranslatef( 5, -2, 0 );
-	glRotatef( -mRotation*50, 1.0f, 0.0f, 0.0f );
-	glRotatef( 20.0f-mRotation*10, 0.0f, 1.0f, 0.0f );
+	glTranslatef( 7, -2, 0 );
+	glRotatef( -mRotation*30, 1.0f, 0.0f, 0.0f );
+	glRotatef( 5.0f-mRotation, 0.0f, 1.0f, 0.0f );
 	mModel->draw();
 
 	glPopMatrix();
