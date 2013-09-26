@@ -35,10 +35,10 @@ Fliegenklatsche::Fliegenklatsche( World * world ) :
 	mFired = false;
 	mHitting = false;
 	mRotation = 0.0f;
-	mDirection = 0.0f;
+	mStep = 0.0f;
 	mCooldown = 0.0f;
 	mRange = 10.0f;
-	mDamage = 50.0f;
+	mDamage = 20.0f;
 }
 
 
@@ -77,17 +77,10 @@ void Fliegenklatsche::updateSelf( const double &delta )
 	{
 		if( mHitting )
 		{
-			if( mRotation < -60.0f )
-			{
-				mDirection = -mDirection;
-			}
+			mStep += delta*4;
+			mRotation = (pow(mStep, 3)*(-2)+pow(mStep, 2)*4.5f+mStep*(-1));
 
-			if( mDirection < 0.0f )
-				mRotation += mDirection*delta*300;
-			else
-				mRotation += mDirection*delta*400;
-
-			if( mRotation > 0.0f )
+			if( mStep > 2.0f )
 			{
 				mHitting = false;
 
@@ -106,8 +99,8 @@ void Fliegenklatsche::updateSelf( const double &delta )
 		else if( mFired && mCooldown <= 0.0f )
 		{
 			mHitting = true;
-			mRotation = 0;
-			mDirection = -1.0;
+			mStep = 0.0f;
+			mRotation = 0.0f;
 			mCooldown = 1.0f;
 		}
 	}
@@ -128,7 +121,8 @@ void Fliegenklatsche::drawSelf()
 
 	glScalef( 0.1, 0.1, 0.1 );
 	glTranslatef( 5, -2, 0 );
-	glRotatef( mRotation, 1.0f, 0.0f, 0.0f );
+	glRotatef( -mRotation*50, 1.0f, 0.0f, 0.0f );
+	glRotatef( 20.0f-mRotation*10, 0.0f, 1.0f, 0.0f );
 	mModel->draw();
 
 	glPopMatrix();

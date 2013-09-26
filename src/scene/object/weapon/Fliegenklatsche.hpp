@@ -50,7 +50,7 @@ private:
 	bool mFired;
 	bool mHitting;
 	float mCooldown;
-	float mDirection;
+	float mStep;
 	float mRotation;
 	float mRange;
 	float mTrailLength;
