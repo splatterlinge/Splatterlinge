@@ -43,9 +43,6 @@
 struct GLUquadric;
 class Material;
 
-
-
-
 class StaticModel;
 
 class Splatterbug: public ACreature 
@@ -53,10 +50,16 @@ class Splatterbug: public ACreature
 public:
 
 	static const int BufferSize = 4;
-	static const GLsizeiptr PositionSize = 72 * 3 * sizeof( GLfloat );
-	static const GLsizeiptr ColorSize = 72 * 3 * sizeof( GLubyte );
-	static const GLsizeiptr TexSize = 72 * 2 * sizeof( GLfloat );
-	static const GLsizeiptr NormalSize = 72 * 3 * sizeof( GLfloat );
+    static const GLsizeiptr PositionSize = 932 * 3 * sizeof( GLfloat );
+    static const GLsizeiptr TexSize = 479 * 2 * sizeof( GLfloat );
+    static const GLsizeiptr NormalSize = 932 * 3 * sizeof( GLfloat );
+
+    static const int DetectionDistanceDay = 60;
+    static const int DetectionDistanceNight = 15;
+    static const int DetectionDistanceOfTorch = 80;
+
+    static const float SplatterbugLength = 8.8f;
+    static const float SplatterbugBoundingSphereSize = 18.0f;
 
 	//Enums
 		enum
@@ -69,16 +72,16 @@ public:
 	enum
 	{
 		TARGET_BODY = 0,
-		TARGET_HEAD = 1,
-		TARGET_WING_RIGHT = 2,
-		TARGET_WING_LEFT = 3,
-		TARGET_NOTHING = 4
-	};
+        TARGET_HEAD = 1,
+        TARGET_WING_RIGHT = 2,
+        TARGET_WING_LEFT = 3,
+        TARGET_NOTHING = 4
+    };
 	enum
 	{
 		DEAD_NORMAL =0,
-		DEAD_HEADSHOT= 1,
-		DEAD_WINGSHOT = 2
+        DEAD_HEADSHOT= 1,
+        DEAD_WINGSHOT = 2
 	};
 
 	// Public attributes
@@ -121,13 +124,24 @@ private:
 
 	float mVelocityY;
 	float mHeightAboveGround;
+    float mSplatterlingSizeFactor;
+    float mCoolDown;
+    float mAttackCoolDown;
 
 	int mHitDamage;
+    int mActDetectionDistance;
 
 	bool playerDetected;
-
+    bool mNightActive;
+    bool mTorchDetected;
 	bool mHeadDisintegrated;
 	bool mBodyHitted;
+
+    void setRandomDestination(void);
+    bool isPlayerDetected(float & distToPlayer );
+    bool isTorchDetected( float & distToTorch );
+
+
 
 };
 
