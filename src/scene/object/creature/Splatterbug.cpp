@@ -22393,8 +22393,8 @@ Splatterbug::Splatterbug( World * world ) : ACreature( world )
 	mHeadDisintegrated = false;
 	mVelocityY = 0.0f;
     mCoolDown = 0.0f;
-    mSplatterlingSizeFactor = 3.5f;
-
+    this->mAttackCoolDown = 5;
+    this->mHitDamage = 5;
     mActDetectionDistance = Splatterbug::DetectionDistanceDay;
 
     for( unsigned int i = 0; i < PositionSize / sizeof( GLfloat ); i++ )
@@ -22403,7 +22403,7 @@ Splatterbug::Splatterbug( World * world ) : ACreature( world )
     }
 
     //setBoundingSphere( Splatterbug::SplatterbugBoundingSphereSize * this->mSplatterlingSizeFactor );
-    setBoundingSphere( Splatterbug::SplatterbugBoundingSphereSize * 0.1f );
+    setBoundingSphere( Splatterbug::SplatterbugBoundingSphereSize*0.1f );
 }
 
 
@@ -22583,56 +22583,6 @@ static QVector3D randomPointOnWorld( World * world )
     return pos;
 }
 
-
-//void Splatterbug::updateSelf( const double & delta )
-//{
-//    switch( state() )
-//    {
-//        case SPAWNING:
-//        {
-//            setPosition( randomPointOnWorld( world() ) + QVector3D(0,10,0) );
-//            setState( ALIVE );
-//            setLife( 100 );
-//            mHeightAboveGround = 6.0f;
-//            break;
-//        }
-
-//        case ALIVE:
-//        {
-//            mTarget = world()->player()->worldPosition();
-//            QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
-//            QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D(0,1,0) );
-//            setRotation( QQuaternion::slerp( rotation(), targetRotation, 0.05 ) );
-//            setPosition( position() + direction()*delta*10.0 );
-//            if( life() <= 0 )
-//                setState( DYING );
-//            break;
-//        }
-
-//        case DYING:
-//            setState( DEAD );
-//            mHeightAboveGround = 3.0f;
-//            break;
-
-//        case DEAD:
-//            break;
-//    }
-
-//    mVelocityY += -3.0f * delta;	// apply some gravity
-//    setPositionY( position().y() + mVelocityY * delta );
-
-//    float landscapeHeight;
-//    if( world()->landscape()->terrain()->getHeight( position(), landscapeHeight ) )
-//    {
-//        if( landscapeHeight + mHeightAboveGround > position().y() )
-//        {
-//            setPositionY( landscapeHeight + mHeightAboveGround );
-//            if( mVelocityY < 0.0f )
-//                mVelocityY = 0.0f;
-//        }
-//    }
-//}
-
 void Splatterbug::setRandomDestination()
 {
     QVector2D twoDimPosXZ;
@@ -22742,7 +22692,7 @@ void Splatterbug::updateSelf( const double & delta )
                 QVector2D splatterPosFlat(worldPosition().x(), worldPosition().z());
                 dist = ( playerPosFlat - splatterPosFlat).length();
 
-                if( dist < 2.0 )
+                if( dist < 4.0 )
                 {
                     if( mCoolDown == 0.0f )
                     {

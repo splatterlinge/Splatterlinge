@@ -90,7 +90,7 @@ public:
 	float damageMultiplicationFactor[2];
 	
 	// De-/Constructor
-	Splatterbug( World * world );
+    Splatterbug( World * world );
 	~Splatterbug();
 
 	
