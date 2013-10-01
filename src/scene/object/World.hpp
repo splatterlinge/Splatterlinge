@@ -104,6 +104,8 @@ public:
 
 	QSharedPointer<Splatterbug> bug() { return mBug; }
 
+	void activateRespawn() { respawnTime = 0.3f; respawnActive=true; }
+
 private:
 	class SplatterInteractor : public ParticleSystem::Interactable
 	{
@@ -133,6 +135,8 @@ private:
 	SplatterSystem * mSplatterSystem;
 	QList< ALightSource * > mLightSources;
 	int splatterlingCount;
+	float respawnTime;
+	bool respawnActive;
 };
 
 
