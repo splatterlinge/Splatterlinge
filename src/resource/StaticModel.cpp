@@ -38,18 +38,25 @@ Face::Face( QStringList &fields, QString &material, QVector<QVector3D> *position
 	while( !fields.isEmpty() )
 	{
 		points = fields.takeFirst().split( '/' );
+		qDebug() << points;
 
 		if( !points.isEmpty() )
 		{
-			vertex.position = positions->at( points.takeFirst().toInt()-1 );
+			int pos = points.takeFirst().toInt()-1;
+			if( pos != -1 )
+				vertex.position = positions->at( pos );
 		}
 		if( !points.isEmpty() )
 		{
-			vertex.texCoord = texCoords->at( points.takeFirst().toInt()-1 );
+			int pos = points.takeFirst().toInt()-1;
+			if( pos != -1 )
+				vertex.texCoord = texCoords->at( pos );
 		}
 		if( !points.isEmpty() )
 		{
-			vertex.normal = normals->at( points.takeFirst().toInt()-1 );
+			int pos = points.takeFirst().toInt()-1;
+			if( pos != -1 )
+				vertex.normal = normals->at( pos );
 		}
 
 		this->points.append( vertex );
