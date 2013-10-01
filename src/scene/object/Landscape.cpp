@@ -26,6 +26,7 @@
 #include "environment/Forest.hpp"
 #include "environment/Grass.hpp"
 #include "environment/PowerUp.hpp"
+#include "environment/Flower.hpp"
 
 #include <scene/Scene.hpp>
 #include <scene/TextureRenderer.hpp>
@@ -121,6 +122,12 @@ Landscape::Landscape( World * world, QString name ) :
 			else if( type == "grass" )
 			{
 				f = QSharedPointer<AObject>( new Grass( this,
+					s.value("model").toString(), s.value("position").toPoint(),
+					s.value("radius").toInt(), s.value("number").toInt(), s.value("priority").toInt()) );
+			}
+			else if( type == "flower" )
+			{
+				f = QSharedPointer<AObject>( new Flower( this,
 					s.value("model").toString(), s.value("position").toPoint(),
 					s.value("radius").toInt(), s.value("number").toInt(), s.value("priority").toInt()) );
 			}
