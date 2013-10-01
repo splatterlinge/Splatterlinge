@@ -687,6 +687,7 @@ void Splatterling::updateSelf( const double & delta )
 
 				if(moveWingsToGround(delta)){
 					setState( DEAD );
+					world()->activateRespawn();
 				}
 			}
 

@@ -122,6 +122,8 @@ World::World( Scene * scene, QString name ) :
 	);
 	mSplatterInteractor = new SplatterInteractor( *this );
 	mSplatterSystem->particleSystem()->setInteractionCallback( mSplatterInteractor );
+
+	respawnActive = false;
 }
 
 
@@ -188,10 +190,18 @@ void World::updateSelf( const double & delta )
 	if( mTimeReverse )
 		mTimeOfDay -= 0.2f * delta;
 
-	if( mTimeOfDay > 1.0f ){
+	if( mTimeOfDay > 1.0f )
 		mTimeOfDay -= 1.0f;
-		splatterlingCount +=1;
-		respawnEnemies();
+
+	if( respawnActive )
+	{
+		respawnTime -= 0.01f * delta;
+		if( respawnTime <= 0.0f )
+		{
+			splatterlingCount +=1;
+			respawnEnemies();
+			respawnActive = false;
+		}
 	}
 
 	mSky->setTimeOfDay( mTimeOfDay );
