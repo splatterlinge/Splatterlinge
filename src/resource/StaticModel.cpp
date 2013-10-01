@@ -38,7 +38,6 @@ Face::Face( QStringList &fields, QString &material, QVector<QVector3D> *position
 	while( !fields.isEmpty() )
 	{
 		points = fields.takeFirst().split( '/' );
-		qDebug() << points;
 
 		if( !points.isEmpty() )
 		{
