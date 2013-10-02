@@ -275,14 +275,14 @@ void World::respawnEnemies(){
 		}
 	}
 
-    for( int i = 0 ; i<mSplatterBugList.length(); i++)
-    {
-        if (mSplatterBugList.at(i).data()->state() == ACreature::DEAD)
-        {
-            remove(mSplatterBugList.at(i));
-            mSplatterBugList.removeAt(i);
-        }
-    }
+	for( int i = 0 ; i<mSplatterBugList.length(); i++)
+	{
+		if (mSplatterBugList.at(i).data()->state() == ACreature::DEAD)
+		{
+			remove(mSplatterBugList.at(i));
+			mSplatterBugList.removeAt(i);
+		}
+	}
 
 	int numberOfEnemiesToAdd = splatterlingCount-mSplatterlingList.length();
 	for (int i = 0; i < numberOfEnemiesToAdd; i++) {
@@ -290,9 +290,9 @@ void World::respawnEnemies(){
 		add( mSplatterlingList.last() );
 	}
 
-    for(int i =0; i < 10; i++)
-    {
-        mSplatterBugList.append(QSharedPointer<Splatterbug>(new Splatterbug(this) ));
-        add(mSplatterBugList.last());
-    }
+	for(int i =0; i < 10; i++)
+	{
+		mSplatterBugList.append(QSharedPointer<Splatterbug>(new Splatterbug(this) ));
+		add(mSplatterBugList.last());
+	}
 }
