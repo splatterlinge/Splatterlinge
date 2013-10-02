@@ -133,9 +133,9 @@ void Dummy::drawSelf()
 }
 
 
-AObject * Dummy::intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal )
+const AObject * Dummy::intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal ) const
 {
-	AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
+	const AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
 
 	float rayLength;
 	if( Sphere::intersectCulledRay( worldPosition(), 4, origin, direction, &rayLength ) )

@@ -89,16 +89,16 @@ void Forest::drawSelf()
 }
 
 
-QVector<AObject*> Forest::collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal )
+QVector<const AObject*> Forest::collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal ) const
 {
-	QVector<AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
+	QVector<const AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
 	float depth;
 	QVector3D tmpNormal;
 
 	if( !Sphere::intersectSphere( position(), boundingSphereRadius(), center, radius, &tmpNormal, &depth ) )
 		return collides;	// return if we aren't even near the forest
 
-	for( QVector<QMatrix4x4>::iterator i = mInstances.begin(); i != mInstances.end(); ++i )
+	for( QVector<QMatrix4x4>::const_iterator i = mInstances.constBegin(); i != mInstances.constEnd(); ++i )
 	{
 		float treeScale = (*i).column(0).length();
 		QVector3D treeBottom = (*i).column(3).toVector3D() + (*i).mapVector( QVector3D(0,-10,0) );

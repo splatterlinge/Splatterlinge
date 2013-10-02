@@ -201,16 +201,16 @@ void AObject::drawBoundingShpere()
 }
 
 
-AObject * AObject::intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
-	float & length, QVector3D * normal )
+const AObject * AObject::intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
+	float & length, QVector3D * normal ) const
 {
-	AObject * nearestTarget = NULL;
-	QList< QSharedPointer<AObject> >::iterator i;
-	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
+	const AObject * nearestTarget = NULL;
+	QList< QSharedPointer<AObject> >::const_iterator i;
+	for( i = mSubNodes.constBegin(); i != mSubNodes.constEnd(); ++i )
 	{
 		if( (*i).data() != exclude )
 		{
-			AObject * target = (*i)->intersectLine( exclude, origin, direction, length, normal );
+			const AObject * target = (*i)->intersectLine( exclude, origin, direction, length, normal );
 			if( target )
 				nearestTarget = target;
 		}
@@ -219,12 +219,12 @@ AObject * AObject::intersectLine( const AObject * exclude, const QVector3D & ori
 }
 
 
-QVector<AObject*> AObject::collideSphere( const AObject * exclude, const float & radius,
-	QVector3D & center, QVector3D * normal )
+QVector<const AObject*> AObject::collideSphere( const AObject * exclude, const float & radius,
+	QVector3D & center, QVector3D * normal ) const
 {
-	QVector<AObject*> collisions;
-	QList< QSharedPointer<AObject> >::iterator i;
-	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
+	QVector<const AObject*> collisions;
+	QList< QSharedPointer<AObject> >::const_iterator i;
+	for( i = mSubNodes.constBegin(); i != mSubNodes.constEnd(); ++i )
 	{
 		if( (*i).data() != exclude )
 			collisions << ((*i)->collideSphere( exclude, radius, center, normal ));

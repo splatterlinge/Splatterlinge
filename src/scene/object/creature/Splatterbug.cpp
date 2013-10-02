@@ -22375,9 +22375,9 @@ Splatterbug::Splatterbug( World * world ) : ACreature( world )
     mModel = new StaticModel( scene()->glWidget(), "Splatterbug");
     mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
 
-	
+
 	glGenBuffers( BufferSize, this->BufferName );
-	
+
     mBugSound = new AudioSample("bug_walk");
 	mBugSound->setLooping( true );
 	mBugSound->setRolloffFactor( 0.01f );
@@ -22426,11 +22426,11 @@ void Splatterbug::drawSelf()
 
 }
 
-AObject * Splatterbug::intersectLine( const AObject * exclude, const QVector3D & origin,
-                                      const QVector3D & direction, float & length, 
-                                      QVector3D * normal)
+const AObject * Splatterbug::intersectLine( const AObject * exclude, const QVector3D & origin,
+                                      const QVector3D & direction, float & length,
+                                      QVector3D * normal) const
 {
-    AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
+    const AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
     float rayLength;
 
 
@@ -22524,8 +22524,8 @@ void Splatterbug::receiveDamage( int damage, const QVector3D * position,
 		world()->splatterSystem()->spray( splatterSource, damage / 2.0f );
 }
 
-bool Splatterbug::intersectBody(const QVector3D & origin, const QVector3D & direction, 
-                                float & intersectionDistance)
+bool Splatterbug::intersectBody(const QVector3D & origin, const QVector3D & direction,
+                                float & intersectionDistance) const
 {
     float rayLength;
 
@@ -22554,14 +22554,14 @@ bool Splatterbug::intersectBody(const QVector3D & origin, const QVector3D & dire
 }
 
 bool Splatterbug::intersectHead(const QVector3D & origin, const QVector3D & direction,
-                                float & intersectionDistance)
+                                float & intersectionDistance) const
 {
 	return false;
 }
 
-QVector<AObject*> Splatterbug::collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal )
+QVector<const AObject*> Splatterbug::collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal ) const
 {
-    QVector<AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
+    QVector<const AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
     float depth;
     QVector3D tmpNormal(0,1,0);
 

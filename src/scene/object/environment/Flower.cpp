@@ -89,9 +89,9 @@ void Flower::drawSelf()
 }
 
 
-QVector<AObject*> Flower::collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal )
+QVector<const AObject*> Flower::collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal )
 {
-	QVector<AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
+	QVector<const AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
 	float depth;
 	QVector3D tmpNormal;
 

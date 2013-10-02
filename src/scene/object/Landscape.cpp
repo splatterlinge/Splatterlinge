@@ -339,18 +339,18 @@ void Landscape::drawPatch( const QRectF & rect )
 }
 
 
-AObject * Landscape::intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal )
+const AObject * Landscape::intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal ) const
 {
-	AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
+	const AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
 	if( mTerrain->intersectLine( origin, direction, length, normal ) )
 		nearestTarget = this;
 	return nearestTarget;
 }
 
 
-QVector<AObject*> Landscape::collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal )
+QVector<const AObject*> Landscape::collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal ) const
 {
-	QVector<AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
+	QVector<const AObject*> collides = AObject::collideSphere( exclude, radius, center, normal );
 
 	float landscapeHeight;
 	if( mTerrain->getHeight( center, landscapeHeight ) )

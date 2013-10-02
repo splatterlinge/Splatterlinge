@@ -55,11 +55,11 @@ public:
 	virtual void drawSelfPost();
 	virtual void draw2SelfPost();
 
-	virtual AObject * intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
-		float & length, QVector3D * normal = NULL );
+	virtual const AObject * intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
+		float & length, QVector3D * normal = NULL ) const;
 
-	virtual QVector<AObject*> collideSphere( const AObject * exclude, const float & radius,
-		QVector3D & center, QVector3D * normal = NULL );
+	virtual QVector<const AObject*> collideSphere( const AObject * exclude, const float & radius,
+		QVector3D & center, QVector3D * normal = NULL ) const;
 
 	void drawPatch( const QRectF & rect );
 

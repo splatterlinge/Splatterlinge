@@ -93,7 +93,7 @@ void Fliegenklatsche::updateSelf( const double &delta )
 				mTrailStart = world()->player()->position();
 				mTrailDirection = world()->player()->direction();
 				mTrailLength = mRange;
-				AObject * target = world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength );
+				AObject * target = const_cast<AObject*>( world()->intersectLine( this, mTrailStart, mTrailDirection, mTrailLength ) );
 				mTrailEnd = mTrailStart + mTrailDirection*mTrailLength;
 				ACreature * victim = dynamic_cast<ACreature*>(target);
 				if( victim )

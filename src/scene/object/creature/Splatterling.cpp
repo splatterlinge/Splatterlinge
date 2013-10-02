@@ -788,9 +788,9 @@ void Splatterling::drawSelf()
 }
 
 
-AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal )
+const AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction, float & length, QVector3D * normal ) const
 {
-	AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
+	const AObject * nearestTarget = AObject::intersectLine( exclude, origin, direction, length, normal );
 	float rayLength;
 
 	if( Sphere::intersectCulledRay( worldPosition(), boundingSphereRadius(), origin, direction, &rayLength ) )
@@ -826,7 +826,7 @@ AObject * Splatterling::intersectLine( const AObject * exclude, const QVector3D 
 }
 
 
-bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & direction, float & intersectionDistance )
+bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & direction, float & intersectionDistance ) const
 {
 	float rayLength;
 
@@ -854,7 +854,7 @@ bool Splatterling::intersectBody( const QVector3D & origin, const QVector3D & di
 }
 
 
-bool Splatterling::intersectLeftWing( const QVector3D & origin, const QVector3D & direction, float & intersectionDistance )
+bool Splatterling::intersectLeftWing( const QVector3D & origin, const QVector3D & direction, float & intersectionDistance ) const
 {
 	QVector3D v[3];
 
@@ -882,7 +882,7 @@ bool Splatterling::intersectLeftWing( const QVector3D & origin, const QVector3D 
 	return hit;
 }
 
-bool Splatterling::intersectRightWing( const QVector3D & origin, const QVector3D & direction, float & intersectionDistance )
+bool Splatterling::intersectRightWing( const QVector3D & origin, const QVector3D & direction, float & intersectionDistance ) const
 {
 	QVector3D v[3];
 
@@ -911,7 +911,7 @@ bool Splatterling::intersectRightWing( const QVector3D & origin, const QVector3D
 }
 
 
-bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & direction, float & intersectionDistance )
+bool Splatterling::intersectHead( const QVector3D & origin, const QVector3D & direction, float & intersectionDistance ) const
 {
 	float rayLength;
 	bool hit = false;
