@@ -78,11 +78,11 @@ public:
 	AObject & operator=( const AObject & other );
 
 	/// Transform a vector from local object space to world space
-	const QVector4D toWorld( const QVector4D & v ) { validateMatrix(); return mModelMatrix * v; }
+	const QVector4D toWorld( const QVector4D & v ) const { validateMatrix(); return mModelMatrix * v; }
 	/// Transform a point vectorfrom local object space to world space
-	const QVector3D pointToWorld( const QVector3D & v ) { validateMatrix(); return (mModelMatrix * QVector4D(v,1)).toVector3D(); }
+	const QVector3D pointToWorld( const QVector3D & v ) const { validateMatrix(); return (mModelMatrix * QVector4D(v,1)).toVector3D(); }
 	/// Transform a direction vector from local object space to world space
-	const QVector3D directionToWorld( const QVector3D & v ) { validateMatrix(); return (mModelMatrix * QVector4D(v,0)).toVector3D(); }
+	const QVector3D directionToWorld( const QVector3D & v ) const { validateMatrix(); return (mModelMatrix * QVector4D(v,0)).toVector3D(); }
 
 	/// Returns the transformation matrix to eye space - only valid while drawing
 	const QMatrix4x4 & modelViewMatrix() const { return mModelViewMatrix; }
@@ -160,8 +160,8 @@ public:
 	 *  this will be set to the distance from origin to the intersection point.
 	 * @param normal Optionally return surface normal.
 	 */
-	virtual AObject * intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
-		float & length, QVector3D * normal = NULL );
+	virtual const AObject * intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
+		float & length, QVector3D * normal = NULL ) const;
 
 	/// Recursively collision-test a sphere with an object and the object's objects
 	/**
@@ -170,8 +170,8 @@ public:
 	 * @param center The center of the sphere - if an intersection occurs, this will be set to a nonintersecting position.
 	 * @param normal Optionally return surface normal.
 	 */
-	virtual QVector<AObject*> collideSphere( const AObject * exclude, const float & radius,
-		QVector3D & center, QVector3D * normal = NULL );
+	virtual QVector<const AObject*> collideSphere( const AObject * exclude, const float & radius,
+		QVector3D & center, QVector3D * normal = NULL ) const;
 
 	/// Updates this object and all of it's sub-objects
 	void update( const double & delta );

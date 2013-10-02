@@ -42,8 +42,8 @@ public:
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
 
-	virtual AObject * intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
-		float & length, QVector3D * normal = NULL );
+	virtual const AObject * intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
+		float & length, QVector3D * normal = NULL ) const;
 
 	virtual void receiveDamage( int damage, const QVector3D * position=NULL, const QVector3D * direction=NULL );
 private:
