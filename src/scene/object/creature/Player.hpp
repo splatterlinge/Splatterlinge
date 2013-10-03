@@ -70,6 +70,11 @@ public:
 
 	void setArmor( const int & armor ) { mArmor = armor; }
 
+	const QString textMessage() const { return mTextMessage; }
+	const float textZoom() const { return mTextZoom; }
+	const float textFade() const { return mTextFade; }
+	const float textTime() const { return mTextTime; }
+
 protected:
 
 private:
@@ -110,12 +115,18 @@ private:
 	float mTorchTimer;
 	QString mUsageText;
 
+	QString mTextMessage;
+	float mTextZoom;
+	int mTextFade;
+	float mTextTime;
+
 	void updateRotation( const double & delta );
 	void updatePosition( const double & delta );
 	void updateTarget( const double & delta );
 	void updateTorch( const double & delta );
 
 	void drawCrosshair();
+	void drawMessage( const QString message );
 };
 
 

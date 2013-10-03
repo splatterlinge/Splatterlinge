@@ -478,8 +478,22 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 		painter->drawRect( usageRect );
 		painter->setPen( QColor(255,255,255,255) );
 		painter->drawText( usageRect,
-			Qt::AlignCenter | Qt::AlignCenter,
+			Qt::AlignCenter | Qt::AlignHCenter,
 						   QString( tr("%1").arg(player->usageText())) );
+	}
+
+	if( !player->textMessage().isEmpty() )
+	{
+		QFont old = painter->font();
+		QFont f = painter->font();
+		f.setPointSize(1+player->textZoom()*3);
+		painter->setFont(f);
+		QRect usageRect( 0, 100, rect.width(), 200 );
+		painter->setPen( QColor(255,255,255,player->textFade()) );
+		painter->drawText( usageRect,
+			Qt::AlignCenter | Qt::AlignTop,
+						   QString( tr("%1").arg(player->textMessage())) );
+		painter->setFont(old);
 	}
 
 	// multi

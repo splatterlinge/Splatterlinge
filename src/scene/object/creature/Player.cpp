@@ -78,6 +78,11 @@ Player::Player( World * world ) :
 	mAliveTimer = 0.0f;
 	mUsageText = "";
 
+	mTextMessage = "";
+	mTextZoom = 0.0f;
+	mTextFade = 0;
+	mTextTime = 0.0f;
+
 	scene()->addKeyListener( this );
 	scene()->addMouseListener( this );
 }
@@ -237,6 +242,18 @@ void Player::updateSelf( const double & delta )
 	mTorchTimer += delta;
 	mUsageText = "";
 
+	if( mTextTime > 0.0f && !mTextMessage.isEmpty() )
+	{
+		mTextZoom += delta*10;
+		mTextFade -= delta*100;
+		mTextTime -= delta;
+	}
+	else
+	{
+		mTextFade = 0.0f;
+		mTextMessage = "";
+	}
+
 	if( mGodMode )
 	{
 		setState( ALIVE );
@@ -356,7 +373,18 @@ void Player::receivePoints( int points )
 		mult = 1.5;
 	mPoints += points * mult;
 
+	drawMessage( QString::number(points * mult) );
+
 	mKillTimer = 0;
+}
+
+
+void Player::drawMessage( const QString message )
+{
+	mTextMessage = message;
+	mTextZoom = 0.0f;
+	mTextTime = 2.0f;
+	mTextFade = 255;
 }
 
 
