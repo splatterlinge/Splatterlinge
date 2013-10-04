@@ -55,6 +55,7 @@ public:
 	static const int DetectionDistanceDay = 60;
 	static const int DetectionDistanceNight = 15;
 	static const int DetectionDistanceOfTorch = 80;
+	static const float FlyAroundRange = 11.0f;
 
 	static const float MinSizeSplatterling = 0.1f;
 	static const float MaxSizeSplatterling = 0.6f;

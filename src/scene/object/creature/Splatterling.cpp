@@ -559,7 +559,7 @@ void Splatterling::updateSelf( const double & delta )
 			if( playerDetected )
 			{
 
-				if( dist < 10 )
+				if( dist < Splatterling::FlyAroundRange )
 				{
 					//Player in front of player
 					if(recalculationOfRotationAngle){
@@ -605,7 +605,7 @@ void Splatterling::updateSelf( const double & delta )
 			else if( mTorchDetected )
 			{
 				//torch detected
-				if(distToTorch > 10.0f){
+				if( distToTorch > Splatterling::FlyAroundRange ){
 					mTarget = world()->player()->getTorch().data()->worldPosition();
 					mTarget += QVector3D( 0, 1, 0 );
 					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
@@ -624,7 +624,7 @@ void Splatterling::updateSelf( const double & delta )
 						mTarget = world()->player()->getTorch().data()->worldPosition();
 						mTarget += QVector3D( 0, 1, 0 );
 					}
-					flyAroundTarget(mTarget, recalculationOfRotationAngle, delta, dist);
+					flyAroundTarget(mTarget, recalculationOfRotationAngle, delta, distToTorch);
 				}
 			}
 			else
@@ -1118,7 +1118,7 @@ bool Splatterling::isPlayerDetected(float & distToPlayer ){
 	}
 }
 
-void Splatterling::flyAroundTarget( QVector3D & mTarget, bool & recalculationOfRotationAngle, const double & delta, const float & dist){
+void Splatterling::flyAroundTarget( QVector3D & mTarget, bool & recalculationOfRotationAngle, const double & delta, const float & dist ){
 	if( recalculationOfRotationAngle )
 	{
 		mTargetForFlyAroundAngleCalculation = mTarget+QVector3D(0,-1,0);
@@ -1127,7 +1127,7 @@ void Splatterling::flyAroundTarget( QVector3D & mTarget, bool & recalculationOfR
 		recalculationOfRotationAngle = false;
 	}
 
-	if(	dist >= 9.4f )
+	if(	dist >= ( Splatterling::FlyAroundRange-0.2f ) )
 	{
 		QQuaternion targetRotation = QQuaternion::fromAxisAndAngle( 0,1,0, mRotationAngle*delta );
 		setRotation( rotation()*targetRotation );
