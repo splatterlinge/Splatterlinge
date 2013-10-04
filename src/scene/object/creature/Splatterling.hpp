@@ -112,8 +112,8 @@ private:
 	void doWingUpMove( const double & delta );
 	void doWingDownMove( const double & delta );
 	bool moveWingsToGround( const double & delta );
-	bool isTorchDetected( float & distToTorch );
-	bool isPlayerDetected( float & distToPlayer );
+	void isTorchDetected( float & distToTorch );
+	void isPlayerDetected( float & distToPlayer );
 	void flyAroundTarget( QVector3D & mTarget, bool & recalculationOfRotationAngle, const double & delta, const float & dist );
 	GLUquadric * mQuadric;
 	Material * mMaterial;

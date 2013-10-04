@@ -557,10 +557,10 @@ void Splatterling::updateSelf( const double & delta )
 			mSnapSound->setPositionAutoVelocity( this->worldPosition(), delta );
 
 			GLfloat dist;
-			playerDetected = isPlayerDetected(dist);
+			isPlayerDetected(dist);
 
 			GLfloat distToTorch;
-			mTorchDetected = isTorchDetected(distToTorch);
+			isTorchDetected(distToTorch);
 
 			if( playerDetected )
 			{
@@ -1080,7 +1080,7 @@ bool Splatterling::moveWingsToGround( const double & delta ){
 	return true;
 }
 
-bool Splatterling::isTorchDetected( float & distToTorch ){
+void Splatterling::isTorchDetected( float & distToTorch ){
 	if(mNightActive){
 		if(world()->player()->getTorch()->parent() != NULL){
 
@@ -1091,20 +1091,22 @@ bool Splatterling::isTorchDetected( float & distToTorch ){
 
 			if( angleTorchInSight < 100 && angleTorchInSight > -100 && distToTorch < 2.0f * Splatterling::DetectionDistanceOfTorch )
 			{
-				return true;
+				mTorchDetected = true;
+				return;
 			}
 			else if( distToTorch < Splatterling::DetectionDistanceOfTorch )
 			{
-				return true;
+				mTorchDetected = true;
+				return;
 			}
 		}
 	}
 
 	distToTorch = 10000.0;
-	return false;
+	mTorchDetected = false;
 }
 
-bool Splatterling::isPlayerDetected(float & distToPlayer ){
+void Splatterling::isPlayerDetected(float & distToPlayer ){
 	QVector3D vectPlayerSplatter = world()->player()->worldPosition() - worldPosition();
 	distToPlayer = ( vectPlayerSplatter ).length();
 	vectPlayerSplatter = vectPlayerSplatter.normalized();
@@ -1113,15 +1115,15 @@ bool Splatterling::isPlayerDetected(float & distToPlayer ){
 
 	if( anglePlayerInSight < 100 && anglePlayerInSight > -100 && distToPlayer < 2.0f * mActDetectionDistance )
 	{
-		return true;
+		playerDetected = true;
 	}
 	else if( distToPlayer < mActDetectionDistance )
 	{
-		return true;
+		playerDetected = true;
 	}
 	else
 	{
-		return false;
+		playerDetected = false;
 	}
 }
 
