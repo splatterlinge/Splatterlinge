@@ -461,7 +461,13 @@ Splatterling::Splatterling( World * world , float SplatterlingSizeFactor ) : ACr
 	mNightActive = false;
 	mActDetectionDistance = Splatterling::DetectionDistanceDay;
 	mTorchDetected = false;
-	mRotationAngle = 100.0f;
+
+	if( this->mHitDamage >= 3)
+		mRotationAngle = 90.0f;
+	else if( this->mHitDamage == 2)
+		mRotationAngle = 135.0f;
+	else
+		mRotationAngle = 160.0f;
 }
 
 
@@ -1130,15 +1136,23 @@ void Splatterling::flyAroundTarget( QVector3D & mTarget, bool & recalculationOfR
 
 	if(	dist >= ( Splatterling::FlyAroundRange-0.2f ) )
 	{
-		QQuaternion targetRotation = QQuaternion::fromAxisAndAngle( 0,1,0, mRotationAngle*delta );
-		setRotation( rotation()*targetRotation );
-
 		QVector3D vectTargetSplatter = mTargetForFlyAroundAngleCalculation-worldPosition();
 		vectTargetSplatter = vectTargetSplatter.normalized();
 
-		double anglePlayerInSight = acos( QVector3D::dotProduct( vectTargetSplatter, worldDirection() ) ) * 180 / M_PI;
+		double angleTargetInSight = acos( QVector3D::dotProduct( vectTargetSplatter, worldDirection() ) ) * 180 / M_PI;
 
-		if( !(anglePlayerInSight < 60) )
+		QVector3D vectForAngleRotDirCalc = (vectTargetSplatter + worldDirection()).normalized();
+		float crossProd = vectTargetSplatter.x()*vectForAngleRotDirCalc.z()-vectTargetSplatter.z()*vectForAngleRotDirCalc.x();
+
+		if(crossProd > 0){
+			QQuaternion targetRotation = QQuaternion::fromAxisAndAngle( 0,1,0, mRotationAngle*delta );
+			setRotation( rotation()*targetRotation );
+		}else{
+			QQuaternion targetRotation = QQuaternion::fromAxisAndAngle( 0,1,0, -mRotationAngle*delta );
+			setRotation( rotation()*targetRotation );
+		}
+
+		if( !(angleTargetInSight < 60) )
 		{
 			recalculationOfRotationAngle = true;
 			return;
