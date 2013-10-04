@@ -55,6 +55,7 @@ public:
 	static const int DetectionDistanceDay = 60;
 	static const int DetectionDistanceNight = 15;
 	static const int DetectionDistanceOfTorch = 80;
+	static const float FlyAroundRange = 11.0f;
 
 	static const float MinSizeSplatterling = 0.1f;
 	static const float MaxSizeSplatterling = 0.6f;
@@ -107,13 +108,13 @@ public:
 	static float getMinSizeSplatterling() { return Splatterling::MinSizeSplatterling; }
 
 private:
-	virtual void randomDestinationPoint();
-	virtual void doWingUpMove( const double & delta );
-	virtual void doWingDownMove( const double & delta );
-	virtual bool moveWingsToGround( const double & delta );
-	virtual bool isTorchDetected( float & distToTorch );
-	virtual bool isPlayerDetected( float & distToPlayer );
-	virtual void flyAroundTarget( QVector3D & mTarget, bool & recalculationOfRotationAngle, const double & delta );
+	void randomDestinationPoint();
+	void doWingUpMove( const double & delta );
+	void doWingDownMove( const double & delta );
+	bool moveWingsToGround( const double & delta );
+	void isTorchDetected( float & distToTorch );
+	void isPlayerDetected( float & distToPlayer );
+	void flyAroundTarget( QVector3D & mTarget, bool & recalculationOfRotationAngle, const double & delta, const float & dist );
 	GLUquadric * mQuadric;
 	Material * mMaterial;
 	QVector3D mTarget;
@@ -141,6 +142,9 @@ private:
 	int mActDetectionDistance;
 	bool mNightActive;
 	bool mTorchDetected;
+	float mRotationAngle;
+	QVector3D mTargetForFlyAroundAngleCalculation;
+	bool leftRotation;
 };
 
 
