@@ -706,6 +706,7 @@ void Splatterling::updateSelf( const double & delta )
 			break;
 		}
 		case DEAD:
+			setPositionY(position().y() - 0.01f * delta);
 			break;
 	}
 
