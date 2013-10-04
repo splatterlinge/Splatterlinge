@@ -130,6 +130,7 @@ Landscape::Landscape( World * world, QString name ) :
 				f = QSharedPointer<AObject>( new Flower( this,
 					s.value("model").toString(), s.value("position").toPoint(),
 					s.value("radius").toInt(), s.value("number").toInt(), s.value("priority").toInt()) );
+				mFlower = f;
 			}
 
 			mVegetation.append( f );

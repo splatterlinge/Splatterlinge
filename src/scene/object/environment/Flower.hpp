@@ -43,12 +43,14 @@ public:
 
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
+	QVector<QVector3D> getInstances(){ return mPositions; }
 
 	virtual QVector<const AObject*> collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal );
 
 private:
 	Landscape * mLandscape;
 	QVector<QMatrix4x4> mInstances;
+	QVector<QVector3D> mPositions;
 	StaticModel * mModel;
 };
 

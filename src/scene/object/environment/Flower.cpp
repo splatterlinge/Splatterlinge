@@ -40,7 +40,7 @@ Flower::Flower( Landscape * landscape, const QString & filename, const QPoint & 
 
 	mModel = new StaticModel( world()->scene()->glWidget(), filename );
 	setPosition( QVector3D( position.x(), 0, position.y() ) );
-	setBoundingSphere( qMax( radi.width(),radi.height() ) );
+//	setBoundingSphere( qMax( radi.width(),radi.height() ) );
 
 	for( int i=0; i<number; i++ )
 	{
@@ -61,12 +61,13 @@ Flower::Flower( Landscape * landscape, const QString & filename, const QPoint & 
 
 		QMatrix4x4 pos;
 		pos.translate( treePos );
-		pos.scale( RandomNumber::minMax( 0.1f, 0.25f ) );
+		pos.scale( RandomNumber::minMax( 0.3f, 0.4f ) );
 		pos.rotate( RandomNumber::minMax( -10.0f, 10.0f ), 1.0f, 0.0f, 0.0f );
 		pos.rotate( RandomNumber::minMax( 0.0f, 360.0f ), 0.0f, 1.0f, 0.0f );
 		pos.rotate( RandomNumber::minMax( -10.0f, 10.0f ), 1.0f, 0.0f, 0.0f );
 
 		mInstances.append( pos );
+		mPositions.append( treePos );
 	}
 }
 

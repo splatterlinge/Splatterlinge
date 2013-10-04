@@ -55,12 +55,14 @@ public:
 	static const int DetectionDistanceDay = 60;
 	static const int DetectionDistanceNight = 15;
 	static const int DetectionDistanceOfTorch = 80;
+	static const int DetectionDistanceOfFlower = 100;
 	static const float FlyAroundRange = 11.0f;
 
 	static const float MinSizeSplatterling = 0.1f;
 	static const float MaxSizeSplatterling = 0.6f;
 	static const float MinDamage = 1.0f;
 	static const float MaxDamage = 3.0f;
+	static const float MaxFlyAroundFlowerTimer = 30.0f;
 
 	enum
 	{
@@ -114,6 +116,8 @@ private:
 	bool moveWingsToGround( const double & delta );
 	void isTorchDetected( float & distToTorch );
 	void isPlayerDetected( float & distToPlayer );
+	void isFlowerDetected( float & distToFlower, const double & delta );
+	void updateNearestFlowerPosition();
 	void flyAroundTarget( QVector3D & mTarget, bool & recalculationOfRotationAngle, const double & delta, const float & dist );
 	GLUquadric * mQuadric;
 	Material * mMaterial;
@@ -145,6 +149,11 @@ private:
 	float mRotationAngle;
 	QVector3D mTargetForFlyAroundAngleCalculation;
 	bool leftRotation;
+	bool mFlowerDetected;
+	bool mFlowersAvailable;
+	QVector3D mDetectedFlowerPosition;
+	float mFlowerFlyTimer;
+	bool mFlowerIsInteresting;
 };
 
 

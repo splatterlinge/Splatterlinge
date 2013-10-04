@@ -63,6 +63,8 @@ public:
 
 	void drawPatch( const QRectF & rect );
 
+	QSharedPointer<AObject> getFlowers(){ return mFlower; }
+
 	Terrain * terrain() { return mTerrain; }
 	const Terrain * terrain() const { return mTerrain; }
 	const float & waterHeight() const { return mWaterHeight; }
@@ -126,6 +128,7 @@ private:
 	QString mName;
 	QVector<Blob*> mBlobs;
 	QVector< QSharedPointer<AObject> > mVegetation;
+	QSharedPointer<AObject> mFlower;
 	QVector< QSharedPointer<AObject> > mPowerUps;
 	Terrain * mTerrain;
 	Filter * mTerrainFilter;

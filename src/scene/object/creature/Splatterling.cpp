@@ -30,6 +30,8 @@
 #include <utility/Intersection.hpp>
 #include <utility/Quaternion.hpp>
 #include <utility/Sphere.hpp>
+#include <scene/object/environment/Flower.hpp>
+#include <scene/object/AObject.hpp>
 
 #include <math.h>
 #include <float.h>
@@ -468,6 +470,24 @@ Splatterling::Splatterling( World * world , float SplatterlingSizeFactor ) : ACr
 		mRotationAngle = 135.0f;
 	else
 		mRotationAngle = 160.0f;
+
+	this->mFlowerDetected = false;
+	this->mFlowerIsInteresting = true;
+
+	AObject* landFlower = world->landscape()->getFlowers().data();
+	Flower * flowers = dynamic_cast<Flower*>(landFlower);
+	if( flowers )
+	{
+		if( flowers->getInstances().size() > 0 )
+			mFlowersAvailable = true;
+		else
+			mFlowersAvailable = false;
+	}else{
+		mFlowersAvailable = false;
+	}
+
+	this->mFlowerFlyTimer = Splatterling::MaxFlyAroundFlowerTimer;
+	updateNearestFlowerPosition();
 }
 
 
@@ -562,6 +582,9 @@ void Splatterling::updateSelf( const double & delta )
 			GLfloat distToTorch;
 			isTorchDetected(distToTorch);
 
+			GLfloat distToFlower;
+			isFlowerDetected(distToFlower, delta);
+
 			if( playerDetected )
 			{
 
@@ -631,6 +654,38 @@ void Splatterling::updateSelf( const double & delta )
 						mTarget += QVector3D( 0, 1, 0 );
 					}
 					flyAroundTarget(mTarget, recalculationOfRotationAngle, delta, distToTorch);
+				}
+			}
+			else if( mFlowerDetected )
+			{
+				//flower detected
+				if( distToFlower > Splatterling::FlyAroundRange ){
+					mTarget = mDetectedFlowerPosition;
+					mTarget += QVector3D( 0, 1, 0 );
+					QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+					QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
+					setRotation( QQuaternion::slerp( rotation(), targetRotation, 5 * delta ) );
+
+					QVector3D newPos = position() + direction()*delta * 12.0;
+					if(world()->landscape()->terrain()->getHeight(newPos)+2.0 > worldPosition().y()){
+						newPos.setY(world()->landscape()->terrain()->getHeight(newPos)+2.0);
+					}
+
+					setPosition( newPos );
+					recalculationOfRotationAngle = true;
+				}else{
+					if(recalculationOfRotationAngle){
+						mTarget = mDetectedFlowerPosition;
+						mTarget += QVector3D( 0, 1, 0 );
+					}
+					flyAroundTarget(mTarget, recalculationOfRotationAngle, delta, distToFlower);
+
+					mFlowerFlyTimer -=delta;
+					if(mFlowerFlyTimer < 0)
+					{
+						mFlowerFlyTimer = 0.0f;
+						this->mFlowerIsInteresting = false;
+					}
 				}
 			}
 			else
@@ -1124,6 +1179,54 @@ void Splatterling::isPlayerDetected(float & distToPlayer ){
 	else
 	{
 		playerDetected = false;
+	}
+}
+
+void Splatterling::isFlowerDetected( float & distToFlower, const double & delta){
+
+	if(!mFlowersAvailable)
+	{
+		mFlowerDetected = false;
+	}else if(!mFlowerIsInteresting)
+	{
+		mFlowerFlyTimer +=delta;
+		mFlowerDetected = false;
+		if(mFlowerDetected > Splatterling::MaxFlyAroundFlowerTimer)
+		{
+			mFlowerFlyTimer = Splatterling::MaxFlyAroundFlowerTimer;
+			this->mFlowerIsInteresting = true;
+		}
+	}else
+	{
+		updateNearestFlowerPosition();
+		QVector3D vectFlowerSplatter = mDetectedFlowerPosition - worldPosition();
+		distToFlower = ( vectFlowerSplatter ).length();
+
+		if( distToFlower < Splatterling::DetectionDistanceOfFlower )
+		{
+			mFlowerDetected = true;
+		}
+		else
+		{
+			mFlowerDetected = false;
+		}
+	}
+}
+
+void Splatterling::updateNearestFlowerPosition(){
+	if( mFlowersAvailable ){
+		AObject* landFlower = world()->landscape()->getFlowers().data();
+		Flower * flowers = dynamic_cast<Flower*>(landFlower);
+		float shortestDist = world()->landscape()->terrain()->mapSize().width();
+
+		for (int i = 0; i < flowers->getInstances().size(); ++i) {
+			float tmpDistToFlower =  (flowers->getInstances().at(i)-worldPosition()).length();
+			if( tmpDistToFlower < shortestDist)
+			{
+				shortestDist = tmpDistToFlower;
+				mDetectedFlowerPosition = flowers->getInstances().at(i);
+			}
+		}
 	}
 }
 
