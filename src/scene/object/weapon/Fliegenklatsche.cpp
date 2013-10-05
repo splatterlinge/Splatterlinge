@@ -28,7 +28,7 @@
 
 
 Fliegenklatsche::Fliegenklatsche( World * world ) :
-	AWeapon( world, -1, -1, -1 )
+	AWeapon( world )
 {
 	mModel = new StaticModel( world->scene()->glWidget(), "fliegenklatsche" );
 

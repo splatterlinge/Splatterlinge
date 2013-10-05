@@ -52,7 +52,7 @@ public:
 	static const int WingOneYPos = ( ( BodyVertexCount + HeadVertexCount ) * 3 ) + 4;
 	static const int WingTwoYPos = ( ( BodyVertexCount + HeadVertexCount ) * 3 ) + ( 3 * 3 ) + 4;
 	static const double RotationStepSize = 2.0;
-	static const int DetectionDistanceDay = 60;
+	static const int DetectionDistanceDay = 30;
 	static const int DetectionDistanceNight = 15;
 	static const int DetectionDistanceOfTorch = 80;
 	static const int DetectionDistanceOfFlower = 100;

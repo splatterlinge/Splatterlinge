@@ -27,7 +27,10 @@
 
 
 AWeapon::AWeapon( World * world ) :
-	AWorldObject::AWorldObject( world )
+	AWorldObject::AWorldObject( world ),
+	mAmmo( -1 ),
+	mClipAmmo( -1 ),
+	mClipSize( -1 )
 {
 }
 

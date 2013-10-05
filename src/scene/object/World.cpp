@@ -75,6 +75,9 @@ World::World( Scene * scene, QString name ) :
 		QString landscapeName = s.value( "landscapeName", "earth" ).toString();
 	s.endGroup();
 
+	mLevel = 1;
+	mLevelTime = 0.0f;
+	mLevelDuration = 20.0f;
 	mTimeLapse = false;
 	mTimeReverse = false;
 	mTimeOfDay = 0.0f;
@@ -95,18 +98,7 @@ World::World( Scene * scene, QString name ) :
 	mTeapot->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) );
 	add( mTeapot );
 
-	mBug = QSharedPointer<Splatterbug>( new Splatterbug( this ) );
-	add( mBug );
-
-	/*
-	mDummy = QSharedPointer<Dummy>( new Dummy( this ) );
-	mDummy->setPositionY( mLandscape->terrain()->getHeight( QPointF(0,0) ) );
-	add( mDummy );
-	*/
-
-	splatterlingCount = 5;
-
-	respawnEnemies();
+	addRandomEnemy();
 
 	scene->addKeyListener( this );
 
@@ -122,8 +114,6 @@ World::World( Scene * scene, QString name ) :
 	);
 	mSplatterInteractor = new SplatterInteractor( *this );
 	mSplatterSystem->particleSystem()->setInteractionCallback( mSplatterInteractor );
-
-	respawnActive = false;
 }
 
 
@@ -193,15 +183,14 @@ void World::updateSelf( const double & delta )
 	if( mTimeOfDay > 1.0f )
 		mTimeOfDay -= 1.0f;
 
-	if( respawnActive )
+	mLevelTime += delta;
+	if( mLevelTime >= mLevelDuration )
 	{
-		respawnTime -= 0.01f * delta;
-		if( respawnTime <= 0.0f )
-		{
-			splatterlingCount +=1;
-			respawnEnemies();
-			respawnActive = false;
-		}
+		mLevelTime = 0.0f;
+		mLevel++;
+		player()->drawMessage(QString("Level %1").arg(level()));
+		respawnEnemies();
+		addRandomEnemy();
 	}
 
 	mSky->setTimeOfDay( mTimeOfDay );
@@ -265,34 +254,32 @@ void World::SplatterInteractor::particleInteraction( const double & delta, Parti
 	}
 }
 
-void World::respawnEnemies(){
-
-	for( int i = 0; i < mSplatterlingList.length(); ++i )
+void World::respawnEnemies()
+{
+	for( int i = 0; i < mEnemies.length(); ++i )
 	{
-		if(mSplatterlingList.at(i).data()->state() == ACreature::DEAD){
-			remove(mSplatterlingList.at(i));
-			mSplatterlingList.removeAt(i);
-		}
-	}
-
-	for( int i = 0 ; i<mSplatterBugList.length(); i++)
-	{
-		if (mSplatterBugList.at(i).data()->state() == ACreature::DEAD)
+		if( mEnemies.at(i).data()->state() == ACreature::DEAD )
 		{
-			remove(mSplatterBugList.at(i));
-			mSplatterBugList.removeAt(i);
+			mEnemies.at(i)->setState( ACreature::SPAWNING );
 		}
 	}
+}
 
-	int numberOfEnemiesToAdd = splatterlingCount-mSplatterlingList.length();
-	for (int i = 0; i < numberOfEnemiesToAdd; i++) {
-		mSplatterlingList.append( QSharedPointer<Splatterling>( new Splatterling(this, RandomNumber::minMax(Splatterling::getMinSizeSplatterling(), Splatterling::getMaxSizeSplatterling())) ) );
-		add( mSplatterlingList.last() );
-	}
-
-	for(int i =0; i < 10; i++)
+void World::addRandomEnemy()
+{
+	QSharedPointer<ACreature> newEnemy;
+	switch( qrand()%1 )
 	{
-		mSplatterBugList.append(QSharedPointer<Splatterbug>(new Splatterbug(this) ));
-		add(mSplatterBugList.last());
+		case 0:
+			newEnemy = QSharedPointer<ACreature>(new Splatterling( this, 0.25*(mLevel*0.25) ));
+			break;
+		case 1:
+			//TODO: implement bug; uncomment next line; increase modulo in switch above
+			//newEnemy = QSharedPointer<ACreature>(new Splatterbug(this));
+			break;
 	}
+	if( newEnemy.isNull() )
+		return;
+	mEnemies.append( newEnemy );
+	add( newEnemy );
 }

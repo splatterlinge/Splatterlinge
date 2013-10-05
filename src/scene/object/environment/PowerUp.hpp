@@ -41,7 +41,7 @@ public:
 
 	enum PowerType
 	{
-		HEALTH,
+		HEALTH = 0,
 		ARMOR,
 		WEAPON_LASER,
 		WEAPON_MINIGUN,

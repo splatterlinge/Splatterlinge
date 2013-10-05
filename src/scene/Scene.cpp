@@ -479,7 +479,7 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 		painter->setPen( QColor(255,255,255,255) );
 		painter->drawText( usageRect,
 			Qt::AlignCenter | Qt::AlignHCenter,
-						   QString( tr("%1").arg(player->usageText())) );
+			QString( tr("%1").arg(player->usageText())) );
 	}
 
 	if( !player->textMessage().isEmpty() )
@@ -492,7 +492,7 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 		painter->setPen( QColor(255,255,255,player->textFade()) );
 		painter->drawText( usageRect,
 			Qt::AlignCenter | Qt::AlignTop,
-						   QString( tr("%1").arg(player->textMessage())) );
+			QString( tr("%1").arg(player->textMessage())) );
 		painter->setFont(old);
 	}
 
@@ -544,7 +544,7 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	painter->setPen( QColor(255,255,255,200) );
 	painter->drawText( pointsRect,
 		Qt::AlignLeft | Qt::AlignTop,
-					   QString( tr("Points: %1").arg(player->points())) );
+		QString( tr("Level: %1\nPoints: %2").arg(world->level()).arg(player->points())) );
 
 	// timer
 	QRect timerRect( rect.width()/2-100, 10, 200, 30 );
@@ -559,8 +559,8 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	painter->drawText( timerRect,
 		Qt::AlignCenter | Qt::AlignTop,
 		QString( tr("%1:%2").
-				 arg(QString::number(mm), 2, '0').
-				 arg(QString::number(ss), 2, '0') ) );
+			arg(QString::number(mm), 2, '0').
+			arg(QString::number(ss), 2, '0') ) );
 	painter->setFont(old);
 
 	// player armor

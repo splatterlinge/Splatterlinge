@@ -102,9 +102,10 @@ public:
 	QSharedPointer<Player> player() { return mPlayer; }
 	QSharedPointer<Teapot> teapot() { return mTeapot; }
 
-	QSharedPointer<Splatterbug> bug() { return mBug; }
+//	QSharedPointer<Splatterbug> bug() { return mBug; }
 
-	void activateRespawn() { respawnTime = 0.3f; respawnActive=true; }
+	void addRandomEnemy();
+	int level() { return mLevel; }
 
 private:
 	class SplatterInteractor : public ParticleSystem::Interactable
@@ -127,16 +128,15 @@ private:
 	QSharedPointer<Teapot> mTeapot;
 	QSharedPointer<Player> mPlayer;
 	QSharedPointer<Dummy> mDummy;
-    QList< QSharedPointer<Splatterbug> > mSplatterBugList;
-	QSharedPointer<Splatterbug> mBug;
-	QList< QSharedPointer<Splatterling> > mSplatterlingList;
+//	QList< QSharedPointer<Splatterbug> > mSplatterBugList;
+	QList< QSharedPointer<ACreature> > mEnemies;
 	QVector3D mTarget;
 	QVector3D mTargetNormal;
 	SplatterSystem * mSplatterSystem;
 	QList< ALightSource * > mLightSources;
-	int splatterlingCount;
-	float respawnTime;
-	bool respawnActive;
+	float mLevelTime;
+	float mLevelDuration;
+	int mLevel;
 };
 
 

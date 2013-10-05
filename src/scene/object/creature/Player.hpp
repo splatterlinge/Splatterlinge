@@ -75,6 +75,8 @@ public:
 	const float textFade() const { return mTextFade; }
 	const float textTime() const { return mTextTime; }
 
+	void drawMessage( const QString message );
+
 protected:
 
 private:
@@ -126,7 +128,6 @@ private:
 	void updateTorch( const double & delta );
 
 	void drawCrosshair();
-	void drawMessage( const QString message );
 };
 
 

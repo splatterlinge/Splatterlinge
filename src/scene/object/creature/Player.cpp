@@ -245,13 +245,12 @@ void Player::updateSelf( const double & delta )
 	if( mTextTime > 0.0f && !mTextMessage.isEmpty() )
 	{
 		mTextZoom += delta*10;
-		mTextFade -= delta*100;
+		mTextFade -= delta*50;
 		mTextTime -= delta;
 	}
 	else
 	{
 		mTextFade = 0.0f;
-		mTextMessage = "";
 	}
 
 	if( mGodMode )
@@ -383,7 +382,7 @@ void Player::drawMessage( const QString message )
 {
 	mTextMessage = message;
 	mTextZoom = 0.0f;
-	mTextTime = 2.0f;
+	mTextTime = 4.0f;
 	mTextFade = 255;
 }
 

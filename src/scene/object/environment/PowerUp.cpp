@@ -37,12 +37,10 @@ PowerUp::PowerUp( Landscape * landscape, QString type, const QPoint & mapPositio
 	mLandscape( landscape ),
 	mPosition( mapPosition ),
 	mRadius( mapRadius ),
-	mRotationAngle( 0.0f )
+	mRotationAngle( 0.0f ),
+	mRandom(false)
 {
-	respawn();
-
 	setBoundingSphere( 1.0f );
-	mRandom = false;
 
 	if( type == "health" )
 	{
@@ -68,9 +66,9 @@ PowerUp::PowerUp( Landscape * landscape, QString type, const QPoint & mapPositio
 	{
 		mPowerType = PowerType(RandomNumber::minMax(0, 5));
 		mRandom = true;
-		qDebug() << "pick up" << mPowerType;
 		mMaterial = new Material( landscape->scene()->glWidget(), "PowerUp_Weapon_Random" );
 	}
+	respawn();
 }
 
 

@@ -557,9 +557,13 @@ void Splatterling::updateSelf( const double & delta )
 			setPosition( randomPointOnWorld( world() ) + QVector3D( 0, 20, 0 ) );
 			setState( ALIVE );
 			setLife( 50 );
-
+			wingUpMovement = false;
+			playerDetected = false;
+			mWingRightDisintegrated = false;
+			mWingLeftDisintegrated = false;
+			mHeadDisintegrated = false;
+			mBodyHittedToGround = false;
 			randomDestinationPoint();
-
 			break;
 		}
 		case ALIVE:
@@ -760,7 +764,6 @@ void Splatterling::updateSelf( const double & delta )
 
 				if(moveWingsToGround(delta)){
 					setState( DEAD );
-					world()->activateRespawn();
 				}
 			}
 
@@ -1092,7 +1095,8 @@ void Splatterling::recalculateWingPosition( const double & delta )
 	}
 }
 
-void Splatterling::doWingUpMove( const double & delta ){
+void Splatterling::doWingUpMove( const double & delta )
+{
 	if(PositionData[Splatterling::WingOneYPos] <= 8.0f * mSplatterlingSizeFactor){
 		PositionData[Splatterling::WingOneYPos]   += 8.0f*delta;
 		PositionData[Splatterling::WingOneYPos + 3] += 8.2f*delta;
@@ -1101,7 +1105,8 @@ void Splatterling::doWingUpMove( const double & delta ){
 	}
 }
 
-void Splatterling::doWingDownMove( const double & delta ){
+void Splatterling::doWingDownMove( const double & delta )
+{
 	if(PositionData[Splatterling::WingOneYPos] >= 0.0f){
 		PositionData[Splatterling::WingOneYPos]   -= 8.0f*delta;
 		PositionData[Splatterling::WingOneYPos + 3] -= 8.2f*delta;
@@ -1110,7 +1115,8 @@ void Splatterling::doWingDownMove( const double & delta ){
 	}
 }
 
-bool Splatterling::moveWingsToGround( const double & delta ){
+bool Splatterling::moveWingsToGround( const double & delta )
+{
 	QVector3D WingPos(PositionData[Splatterling::WingOneYPos-1], PositionData[Splatterling::WingOneYPos], PositionData[Splatterling::WingOneYPos+1]);
 	WingPos = pointToWorld(WingPos);
 	float height = world()->landscape()->terrain()->getHeight(WingPos);
@@ -1135,7 +1141,8 @@ bool Splatterling::moveWingsToGround( const double & delta ){
 	return true;
 }
 
-void Splatterling::isTorchDetected( float & distToTorch ){
+void Splatterling::isTorchDetected( float & distToTorch )
+{
 	if(mNightActive){
 		if(world()->player()->getTorch()->parent() != NULL){
 
@@ -1161,7 +1168,8 @@ void Splatterling::isTorchDetected( float & distToTorch ){
 	mTorchDetected = false;
 }
 
-void Splatterling::isPlayerDetected(float & distToPlayer ){
+void Splatterling::isPlayerDetected(float & distToPlayer )
+{
 	QVector3D vectPlayerSplatter = world()->player()->worldPosition() - worldPosition();
 	distToPlayer = ( vectPlayerSplatter ).length();
 	vectPlayerSplatter = vectPlayerSplatter.normalized();
@@ -1213,13 +1221,16 @@ void Splatterling::isFlowerDetected( float & distToFlower, const double & delta)
 	}
 }
 
-void Splatterling::updateNearestFlowerPosition(){
-	if( mFlowersAvailable ){
+void Splatterling::updateNearestFlowerPosition()
+{
+	if( mFlowersAvailable )
+	{
 		AObject* landFlower = world()->landscape()->getFlowers().data();
 		Flower * flowers = dynamic_cast<Flower*>(landFlower);
 		float shortestDist = world()->landscape()->terrain()->mapSize().width();
 
-		for (int i = 0; i < flowers->getInstances().size(); ++i) {
+		for (int i = 0; i < flowers->getInstances().size(); ++i)
+		{
 			float tmpDistToFlower =  (flowers->getInstances().at(i)-worldPosition()).length();
 			if( tmpDistToFlower < shortestDist)
 			{
@@ -1230,7 +1241,8 @@ void Splatterling::updateNearestFlowerPosition(){
 	}
 }
 
-void Splatterling::flyAroundTarget( QVector3D & mTarget, bool & recalculationOfRotationAngle, const double & delta, const float & dist ){
+void Splatterling::flyAroundTarget( QVector3D & mTarget, bool & recalculationOfRotationAngle, const double & delta, const float & dist )
+{
 	if( recalculationOfRotationAngle )
 	{
 		mTargetForFlyAroundAngleCalculation = mTarget+QVector3D(0,-1,0);
@@ -1239,7 +1251,7 @@ void Splatterling::flyAroundTarget( QVector3D & mTarget, bool & recalculationOfR
 		recalculationOfRotationAngle = false;
 	}
 
-	if(	dist >= ( Splatterling::FlyAroundRange-0.2f ) )
+	if( dist >= ( Splatterling::FlyAroundRange-0.2f ) )
 	{
 		QVector3D vectTargetSplatter = mTargetForFlyAroundAngleCalculation-worldPosition();
 		vectTargetSplatter = vectTargetSplatter.normalized();
@@ -1262,7 +1274,6 @@ void Splatterling::flyAroundTarget( QVector3D & mTarget, bool & recalculationOfR
 			recalculationOfRotationAngle = true;
 			return;
 		}
-
 	}
 
 	QVector3D directionToTarget = mTarget;
@@ -1270,7 +1281,8 @@ void Splatterling::flyAroundTarget( QVector3D & mTarget, bool & recalculationOfR
 	setRotation( QQuaternion::slerp( rotation(), targetRotation, 5 * delta ) );
 
 	QVector3D newPos = position() + direction()*delta * 8.0;
-	if(world()->landscape()->terrain()->getHeight(newPos)+2.0 > worldPosition().y()){
+	if(world()->landscape()->terrain()->getHeight(newPos)+2.0 > worldPosition().y())
+	{
 		newPos.setY(world()->landscape()->terrain()->getHeight(newPos)+2.0);
 	}
 	setPosition( newPos );
