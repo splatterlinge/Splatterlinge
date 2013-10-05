@@ -540,7 +540,7 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 	}
 
 	// points
-	QRect pointsRect( rect.left()+10, rect.top()+10, 200, 30 );
+	QRect pointsRect( rect.left()+10, rect.top()+10, 200, 60 );
 	painter->setPen( QColor(255,255,255,200) );
 	painter->drawText( pointsRect,
 		Qt::AlignLeft | Qt::AlignTop,
