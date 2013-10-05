@@ -72,7 +72,7 @@ public:
 
 	const QString textMessage() const { return mTextMessage; }
 	const float textZoom() const { return mTextZoom; }
-	const float textFade() const { return mTextFade; }
+	const int textFade() const { return mTextFade; }
 	const float textTime() const { return mTextTime; }
 
 	void drawMessage( const QString message );
