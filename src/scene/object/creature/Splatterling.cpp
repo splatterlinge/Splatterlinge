@@ -564,6 +564,12 @@ void Splatterling::updateSelf( const double & delta )
 			mHeadDisintegrated = false;
 			mBodyHittedToGround = false;
 			randomDestinationPoint();
+			mVelocityY = 0.0f;
+
+			for( unsigned int i = (PositionSize / sizeof( GLfloat )-18); i < PositionSize / sizeof( GLfloat ); i++ )
+			{
+				PositionData[i] = GlobalPositionData[i] * this->mSplatterlingSizeFactor;
+			}
 			break;
 		}
 		case ALIVE:
