@@ -489,7 +489,7 @@ void Scene::drawHUD( QPainter * painter, const QRectF & rect )
 		f.setPointSize(1+player->textZoom()*3);
 		painter->setFont(f);
 		QRect usageRect( 0, 100, rect.width(), 200 );
-		painter->setPen( QColor(255,255,255,player->textFade()) );
+		painter->setPen( QColor(255,255,255, qMax(0, player->textFade())) );
 		painter->drawText( usageRect,
 			Qt::AlignCenter | Qt::AlignTop,
 			QString( tr("%1").arg(player->textMessage())) );
