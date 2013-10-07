@@ -435,10 +435,12 @@ Splatterling::Splatterling( World * world , float SplatterlingSizeFactor ) : ACr
 	mWingSound->setLooping( true );
 	mWingSound->setRolloffFactor( 0.01f );
 	mWingSound->play();
+	mWingSound->setPitch( 1.0f/mHitDamage );
 
 	mSnapSound = new AudioSample( "neck_snap" );
 	mSnapSound->setLooping( false );
 	mSnapSound->setRolloffFactor( 0.01f );
+	mSnapSound->setPitch( 1.0f/mSplatterlingSizeFactor );
 
 	damageMultiplicationFactor[TARGET_BODY] = 2.0f;
 	damageMultiplicationFactor[TARGET_HEAD] = 3.0f;
