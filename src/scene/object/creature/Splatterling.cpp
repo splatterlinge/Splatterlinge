@@ -722,7 +722,7 @@ void Splatterling::updateSelf( const double & delta )
 
 			if( life() <= 0 )
 			{
-				world()->player()->receivePoints( 100 );
+				world()->player()->receivePoints( 100 * (1.0+mSplatterlingSizeFactor) );
 				setState( DYING );
 			}
 			break;
@@ -765,7 +765,7 @@ void Splatterling::updateSelf( const double & delta )
 				{
 					mBodyHittedToGround = true;
 					world()->splatterSystem()->spray( worldPosition(), mVelocityY*(-8.0f) );
-					world()->player()->receivePoints( mVelocityY*(-8.0f) );
+					world()->player()->receivePoints( mVelocityY*(-8.0f) * (1.0+mSplatterlingSizeFactor) );
 				}
 
 				if(moveWingsToGround(delta)){
@@ -1059,7 +1059,7 @@ void Splatterling::receiveDamage( int damage, const QVector3D * position, const 
 			mHeadDisintegrated = true;
 			if(state() != DEAD){
 				setLife( 0 );
-				world()->player()->receivePoints( 200 );
+				world()->player()->receivePoints( 200*(1.0+mSplatterlingSizeFactor) );
 				setState( DYING );
 			}
 		}
