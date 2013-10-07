@@ -571,6 +571,11 @@ void Splatterling::updateSelf( const double & delta )
 			randomDestinationPoint();
 			mVelocityY = 0.0f;
 
+			mDamageOnBodyPart[TARGET_BODY] = 0.0f;
+			mDamageOnBodyPart[TARGET_HEAD] = 0.0f;
+			mDamageOnBodyPart[TARGET_WING_LEFT] = 0.0f;
+			mDamageOnBodyPart[TARGET_WING_RIGHT] = 0.0f;
+
 			for( unsigned int i = (PositionSize / sizeof( GLfloat )-18); i < PositionSize / sizeof( GLfloat ); i++ )
 			{
 				PositionData[i] = GlobalPositionData[i] * this->mSplatterlingSizeFactor;
