@@ -58,7 +58,7 @@ public:
 	static const int DetectionDistanceOfFlower = 100;
 	static const float FlyAroundRange = 11.0f;
 
-	static const float MinSizeSplatterling = 0.1f;
+	static const float MinSizeSplatterling = 0.0625f;
 	static const float MaxSizeSplatterling = 0.6f;
 	static const float MinDamage = 1.0f;
 	static const float MaxDamage = 3.0f;

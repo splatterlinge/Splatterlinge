@@ -409,6 +409,9 @@ Splatterling::Splatterling( World * world , float SplatterlingSizeFactor ) : ACr
 
 	this->mSplatterlingSizeFactor = SplatterlingSizeFactor;
 	this->mAttackCoolDown = mSplatterlingSizeFactor;
+	if(this->mAttackCoolDown < 0.2)
+		this->mAttackCoolDown = 0.2f;
+
 
 	float dx = (Splatterling::MaxSizeSplatterling-0.1f)-Splatterling::MinSizeSplatterling;
 	float dy = (Splatterling::MaxDamage)-Splatterling::MinDamage;

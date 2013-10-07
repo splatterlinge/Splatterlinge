@@ -40,7 +40,7 @@ Flower::Flower( Landscape * landscape, const QString & filename, const QPoint & 
 
 	mModel = new StaticModel( world()->scene()->glWidget(), filename );
 	setPosition( QVector3D( position.x(), 0, position.y() ) );
-//	setBoundingSphere( qMax( radi.width(),radi.height() ) );
+	setBoundingSphere( qMax( radi.width(),radi.height() ) );
 
 	for( int i=0; i<number; i++ )
 	{
