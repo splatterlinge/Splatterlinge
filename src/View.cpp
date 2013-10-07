@@ -134,8 +134,8 @@ void View::initScene()
 	SplatterQuality::setMaximum( SplatterQuality::fromString(
 		settings.value( "splatterQuality", SplatterQuality::toString(SplatterQuality::HIGH) ).toString()
 	));
-	Landscape::Blob::setQuality( settings.value( "landscapeBlobQuality" ).toInt() );
-	AVegetation::setQuality( settings.value( "landscapeVegetationQuality" ).toInt() );
+	Landscape::Blob::setQuality( settings.value( "landscapeBlobQuality", 99 ).toInt() );
+	AVegetation::setQuality( settings.value( "landscapeVegetationQuality", 99 ).toInt() );
 
 	mScene = new Scene( mGLWidget, this );
 	mWorld = new World( mScene, "earth" );
