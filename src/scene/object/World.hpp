@@ -102,8 +102,6 @@ public:
 	QSharedPointer<Player> player() { return mPlayer; }
 	QSharedPointer<Teapot> teapot() { return mTeapot; }
 
-//	QSharedPointer<Splatterbug> bug() { return mBug; }
-
 	void addRandomEnemy();
 	int level() { return mLevel; }
 
@@ -111,7 +109,7 @@ private:
 	class SplatterInteractor : public ParticleSystem::Interactable
 	{
 	public:
-		SplatterInteractor( World & world ) : mWorld(world) {}
+        SplatterInteractor( World & world ) : mWorld(world) {}
 		virtual ~SplatterInteractor() {}
 		virtual void particleInteraction( const double & delta, ParticleSystem::Particle & particle );
 	private:
@@ -128,7 +126,6 @@ private:
 	QSharedPointer<Teapot> mTeapot;
 	QSharedPointer<Player> mPlayer;
 	QSharedPointer<Dummy> mDummy;
-//	QList< QSharedPointer<Splatterbug> > mSplatterBugList;
 	QList< QSharedPointer<ACreature> > mEnemies;
 	QVector3D mTarget;
 	QVector3D mTargetNormal;

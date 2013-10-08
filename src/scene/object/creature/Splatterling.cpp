@@ -435,10 +435,12 @@ Splatterling::Splatterling( World * world , float SplatterlingSizeFactor ) : ACr
 	mWingSound->setLooping( true );
 	mWingSound->setRolloffFactor( 0.01f );
 	mWingSound->play();
+	mWingSound->setPitch( 1.0f/mHitDamage );
 
 	mSnapSound = new AudioSample( "neck_snap" );
 	mSnapSound->setLooping( false );
 	mSnapSound->setRolloffFactor( 0.01f );
+	mSnapSound->setPitch( 1.0f/mSplatterlingSizeFactor );
 
 	damageMultiplicationFactor[TARGET_BODY] = 2.0f;
 	damageMultiplicationFactor[TARGET_HEAD] = 3.0f;
@@ -568,6 +570,11 @@ void Splatterling::updateSelf( const double & delta )
 			mBodyHittedToGround = false;
 			randomDestinationPoint();
 			mVelocityY = 0.0f;
+
+			mDamageOnBodyPart[TARGET_BODY] = 0.0f;
+			mDamageOnBodyPart[TARGET_HEAD] = 0.0f;
+			mDamageOnBodyPart[TARGET_WING_LEFT] = 0.0f;
+			mDamageOnBodyPart[TARGET_WING_RIGHT] = 0.0f;
 
 			for( unsigned int i = (PositionSize / sizeof( GLfloat )-18); i < PositionSize / sizeof( GLfloat ); i++ )
 			{

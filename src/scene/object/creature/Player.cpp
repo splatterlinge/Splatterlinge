@@ -278,6 +278,7 @@ void Player::updateSelf( const double & delta )
 			break;
 		case DYING:
 			setState( DEAD );
+			drawMessage( "GAME OVER!" );
 			break;
 		case DEAD:
 			break;

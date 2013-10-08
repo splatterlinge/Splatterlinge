@@ -33,17 +33,18 @@
 #include <math.h>
 #include <float.h>
 unsigned int SplatterbugNumVerts = 159;
-Splatterbug::Splatterbug( World * world ) : ACreature( world )
+Splatterbug::Splatterbug( World * world, float damage ) : ACreature( world )
 {
     mModel = new StaticModel( scene()->glWidget(), "Splatterbug");
-    mMaterial = new Material( scene()->glWidget(), "KirksEntry" );
+    mMaterial = new Material( scene()->glWidget(), "Splatterbug_Splatterbug" );
     glGenBuffers( BufferSize, this->BufferName );
     mBugSound = new AudioSample("bug_walk2");
-    mBugBiteSound = new AudioSample("test");
+    mBugBiteSound = new AudioSample("neck_snap");
+    mBugBiteSound->setLooping( false );
     mBugSound->setLooping( true );
     mBugSound->setRolloffFactor( 0.01f );
-    mBugSound->play();
 
+    mBugSound->play();
     mBugBiteSound->setRolloffFactor( 0.01f );
     damageMultiplicationFactor[TARGET_BODY] = 2.0f;
     mDamageOnBodyPart[TARGET_BODY] = 0.0f;
@@ -52,9 +53,8 @@ Splatterbug::Splatterbug( World * world ) : ACreature( world )
     mVelocityY = 0.0f;
     mCoolDown = 0.0f;
     this->mAttackCoolDown = 5;
-    this->mHitDamage = 5;
+    this->mHitDamage = damage;
     mActDetectionDistance = Splatterbug::DetectionDistanceDay;
-
     //setBoundingSphere( Splatterbug::SplatterbugBoundingSphereSize * this->mSplatterlingSizeFactor );
     setBoundingSphere( Splatterbug::SplatterbugBoundingSphereSize*0.1f );
 }
@@ -62,6 +62,7 @@ Splatterbug::~Splatterbug()
 {
     delete mMaterial;
     delete mBugSound;
+    delete mBugBiteSound;
 }
 void Splatterbug::drawSelf()
 {
@@ -113,18 +114,6 @@ void Splatterbug::receiveDamage( int damage, const QVector3D * position,
                         }
                 }
         }
-        else if( targetBodyPart == TARGET_HEAD )
-        {
-                if( mDamageOnBodyPart[TARGET_HEAD] >= 5.0f )
-                {
-                        mHeadDisintegrated = true;
-                        if(state() != DEAD){
-                                setLife( 0 );
-                                world()->player()->receivePoints( 200 );
-                                setState( DYING );
-                        }
-                }
-        }
         QVector3D splatterSource;
         if( position )
                 splatterSource = *position;
@@ -135,11 +124,9 @@ void Splatterbug::receiveDamage( int damage, const QVector3D * position,
         else
                 world()->splatterSystem()->spray( splatterSource, damage / 2.0f );
 }
-
-
 static QVector3D randomPointOnWorld( World * world )
 {
-    QVector3D pos( RandomNumber::minMax(-100,100), 0, RandomNumber::minMax(-100,100) );
+    QVector3D pos( RandomNumber::minMax(2,3), 0, RandomNumber::minMax(2,3) );
     pos.setY( world->landscape()->terrain()->getHeight( pos ) );
     return pos;
 }
@@ -235,7 +222,6 @@ void Splatterbug::updateSelf( const double & delta )
                 QVector2D playerPosFlat(world()->player()->worldPosition().x(), world()->player()->worldPosition().z());
                 QVector2D splatterPosFlat(worldPosition().x(), worldPosition().z());
                 dist = ( playerPosFlat - splatterPosFlat).length();
-                qDebug() <<"dist: " << dist;
                 if( dist < 3.0 )
                 {
                     if( mCoolDown == 0.0f )
@@ -252,17 +238,19 @@ void Splatterbug::updateSelf( const double & delta )
             {
                 //Player near get him
                 mTarget = world()->player()->worldPosition();
-                mTarget += QVector3D( 0, 1, 0 );
-                QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+                QVector3D directionToTarget = ( mTarget - worldPosition() );
+                directionToTarget.setY(0);
+                directionToTarget.normalize();
                 QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
-                setRotation( QQuaternion::slerp( rotation(), targetRotation, 5 * delta ) );
+                setRotation( targetRotation + worldRot * delta);
+
                 QVector3D newPos = position() + direction()*delta * 12.0;
-                float worldPos =world()->landscape()->terrain()->getHeight(newPos);
-                float curWorldPos  =worldPosition().y();
-                if(worldPos < curWorldPos){
-                    newPos.setY(worldPos);
-                }
+                float worldPos =world()->landscape()->terrain()->getHeight(newPos)+12*delta;
+
+                newPos.setY(worldPos);
+
                 setPosition( newPos );
+
             }
             else if( mTorchDetected )
             {

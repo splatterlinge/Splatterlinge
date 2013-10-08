@@ -268,14 +268,14 @@ void World::respawnEnemies()
 void World::addRandomEnemy()
 {
 	QSharedPointer<ACreature> newEnemy;
-	switch( qrand()%1 )
+	switch( qrand()%2 )
 	{
 		case 0:
 			newEnemy = QSharedPointer<ACreature>(new Splatterling( this, 0.25*(mLevel*0.25) ));
 			break;
 		case 1:
 			//TODO: implement bug; uncomment next line; increase modulo in switch above
-			//newEnemy = QSharedPointer<ACreature>(new Splatterbug(this));
+            newEnemy = QSharedPointer<ACreature>(new Splatterbug(this, 0.5f*(mLevel*5.0f)));
 			break;
 	}
 	if( newEnemy.isNull() )

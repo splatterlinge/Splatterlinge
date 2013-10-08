@@ -50,16 +50,16 @@ class Splatterbug: public ACreature
 public:
 
 	static const int BufferSize = 4;
-    static const GLsizeiptr PositionSize = 932 * 3 * sizeof( GLfloat );
-    static const GLsizeiptr TexSize = 479 * 2 * sizeof( GLfloat );
-    static const GLsizeiptr NormalSize = 932 * 3 * sizeof( GLfloat );
+	static const GLsizeiptr PositionSize = 159 * 3 * sizeof( GLfloat );
+	static const GLsizeiptr TexSize = 26 * 2 * sizeof( GLfloat );
+	static const GLsizeiptr NormalSize = 159 * 3 * sizeof( GLfloat );
 
-    static const int DetectionDistanceDay = 60;
-    static const int DetectionDistanceNight = 15;
-    static const int DetectionDistanceOfTorch = 80;
+	static const int DetectionDistanceDay = 60;
+	static const int DetectionDistanceNight = 15;
+	static const int DetectionDistanceOfTorch = 80;
 
-    static const float SplatterbugLength = 8.8f;
-    static const float SplatterbugBoundingSphereSize = 18.0f;
+	static const float SplatterbugLength = 8.8f;
+	static const float SplatterbugBoundingSphereSize = 18.0f;
 
 	//Enums
 		enum
@@ -72,16 +72,16 @@ public:
 	enum
 	{
 		TARGET_BODY = 0,
-        TARGET_HEAD = 1,
-        TARGET_WING_RIGHT = 2,
-        TARGET_WING_LEFT = 3,
-        TARGET_NOTHING = 4
-    };
+		TARGET_HEAD = 1,
+		TARGET_WING_RIGHT = 2,
+		TARGET_WING_LEFT = 3,
+		TARGET_NOTHING = 4
+	};
 	enum
 	{
 		DEAD_NORMAL =0,
-        DEAD_HEADSHOT= 1,
-        DEAD_WINGSHOT = 2
+		DEAD_HEADSHOT= 1,
+		DEAD_WINGSHOT = 2
 	};
 
 	// Public attributes
@@ -90,18 +90,17 @@ public:
 	float damageMultiplicationFactor[2];
 
 	// De-/Constructor
-    Splatterbug( World * world );
+    Splatterbug( World * world, float damage );
 	~Splatterbug();
 
 
 	//Public methods
 	virtual void updateSelf( const double & delta );
 	virtual void drawSelf();
-
 	virtual const AObject * intersectLine( const AObject * exclude, const QVector3D & origin, const QVector3D & direction,
 		float & length, QVector3D * normal = NULL ) const;
 
-	virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL );
+    virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL );
 protected:
 	;
 
@@ -120,22 +119,22 @@ private:
 
 	float mVelocityY;
 	float mHeightAboveGround;
-    float mSplatterlingSizeFactor;
-    float mCoolDown;
-    float mAttackCoolDown;
+	float mSplatterlingSizeFactor;
+	float mCoolDown;
+	float mAttackCoolDown;
 
 	int mHitDamage;
-    int mActDetectionDistance;
+	int mActDetectionDistance;
 
 	bool playerDetected;
-    bool mNightActive;
-    bool mTorchDetected;
+	bool mNightActive;
+	bool mTorchDetected;
 	bool mHeadDisintegrated;
 	bool mBodyHitted;
 
-    void setRandomDestination(void);
-    bool isPlayerDetected(float & distToPlayer );
-    bool isTorchDetected( float & distToTorch );
+	void setRandomDestination(void);
+	bool isPlayerDetected(float & distToPlayer );
+	bool isTorchDetected( float & distToTorch );
 
 
 
