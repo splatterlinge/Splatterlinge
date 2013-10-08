@@ -102,16 +102,12 @@ public:
 		float & length, QVector3D * normal = NULL ) const;
 
 	virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL );
-
-	virtual bool intersectBody(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance) const;
-
-	virtual bool intersectHead(const QVector3D & origin, const QVector3D & direction, float & intersectionDistance) const;
-    virtual QVector<const AObject*> collideSphere( const AObject * exclude, const float & radius, QVector3D & center, QVector3D * normal ) const;
 protected:
 	;
 
 private:
-	AudioSample *mBugSound;
+	AudioSample *mBugSound;    
+    AudioSample *mBugBiteSound;
 
 	GLUquadric * mQuadric;
 	Material * mMaterial;
