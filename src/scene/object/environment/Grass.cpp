@@ -23,6 +23,7 @@
 
 #include "Grass.hpp"
 
+#include <scene/object/Eye.hpp>
 #include <scene/object/World.hpp>
 #include <scene/object/Landscape.hpp>
 #include <utility/Capsule.hpp>

@@ -23,6 +23,7 @@
 
 #include "World.hpp"
 
+#include <scene/object/Eye.hpp>
 #include <scene/Scene.hpp>
 #include <utility/RandomNumber.hpp>
 #include <geometry/ParticleSystem.hpp>

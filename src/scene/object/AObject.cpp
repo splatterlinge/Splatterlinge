@@ -23,6 +23,7 @@
 
 #include "AObject.hpp"
 
+#include <scene/object/Eye.hpp>
 #include <scene/Scene.hpp>
 #include <GLWidget.hpp>
 

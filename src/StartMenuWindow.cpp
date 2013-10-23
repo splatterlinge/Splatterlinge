@@ -29,6 +29,7 @@
 #include "HelpWindow.hpp"
 
 #include <scene/Scene.hpp>
+#include <scene/object/World.hpp>
 
 #include <QDebug>
 #include <QPushButton>

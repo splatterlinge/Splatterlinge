@@ -23,6 +23,7 @@
 
 #include "Knife.hpp"
 
+#include "../World.hpp"
 
 #include <resource/StaticModel.hpp>
 

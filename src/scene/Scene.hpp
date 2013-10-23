@@ -24,10 +24,8 @@
 #ifndef SCENE_INCLUDED
 #define SCENE_INCLUDED
 
-#include "object/Eye.hpp"
-#include "scene/object/World.hpp"
-#include "scene/object/creature/Player.hpp"
 
+#include <utility/glWrappers.hpp>
 #include <QGraphicsScene>
 #include <QElapsedTimer>
 #include <QRectF>
@@ -54,6 +52,8 @@ class AMouseListener;
 class AKeyListener;
 class TextureRenderer;
 class Shader;
+class Eye;
+class AObject;
 
 
 /// Scene manager and interface to Qt

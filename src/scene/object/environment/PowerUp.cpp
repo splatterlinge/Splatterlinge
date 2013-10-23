@@ -30,6 +30,10 @@
 
 
 #include <scene/Scene.hpp>
+#include <resource/Material.hpp>
+#include <utility/RandomNumber.hpp>
+#include "../creature/Player.hpp"
+#include "../World.hpp"
 
 
 PowerUp::PowerUp( Landscape * landscape, QString type, const QPoint & mapPosition, int mapRadius ) :

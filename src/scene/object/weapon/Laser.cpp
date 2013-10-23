@@ -26,6 +26,7 @@
 #include "../World.hpp"
 
 
+#include <scene/object/Eye.hpp>
 #include <geometry/ParticleSystem.hpp>
 #include <resource/AudioSample.hpp>
 #include <resource/Material.hpp>

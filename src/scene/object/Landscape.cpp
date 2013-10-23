@@ -28,6 +28,9 @@
 #include "environment/PowerUp.hpp"
 #include "environment/Flower.hpp"
 
+#include "World.hpp"
+
+#include <scene/object/Eye.hpp>
 #include <scene/Scene.hpp>
 #include <scene/TextureRenderer.hpp>
 #include <geometry/Terrain.hpp>
