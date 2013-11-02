@@ -23,6 +23,7 @@
 
 #include "Flower.hpp"
 
+#include <scene/object/Eye.hpp>
 #include <scene/object/World.hpp>
 #include <scene/object/Landscape.hpp>
 #include <resource/StaticModel.hpp>

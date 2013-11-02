@@ -27,6 +27,7 @@
 #include <utility/Interpolation.hpp>
 #include <resource/Shader.hpp>
 #include <resource/Material.hpp>
+#include <scene/object/Eye.hpp>
 #include <scene/TextureRenderer.hpp>
 #include <scene/Scene.hpp>
 

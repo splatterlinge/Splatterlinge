@@ -24,6 +24,7 @@
 
 #include "Lightsaber.hpp"
 
+#include "../World.hpp"
 
 #include <resource/StaticModel.hpp>
 

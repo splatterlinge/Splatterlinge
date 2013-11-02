@@ -221,21 +221,6 @@ void Splatterbug::updateSelf( const double & delta )
                 worldRot.setX(worldRot.x() + 1);
             }
 
-            if(worldRot.y() < 0.0){
-                worldRot.setY(worldRot.y() - 1);
-            }
-            else{
-                 worldRot.setY(worldRot.y() + 1);
-            }
-
-            if(worldRot.z() < 0){
-                worldRot.setZ(worldRot.z() - 1);
-            }
-            else{
-
-                worldRot.setZ(worldRot.z() + 1);
-            }
-
             mNightActive = world()->sky().data()->timeOfDay() > 0.6f && world()->sky().data()->timeOfDay() < 0.9f;
             if(mNightActive)
             {
@@ -266,14 +251,6 @@ void Splatterbug::updateSelf( const double & delta )
                     }
                 }
 
-                //Player near get him
-                mTarget = world()->player()->worldPosition();
-                QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
-                directionToTarget.setY(0);
-                directionToTarget.normalize();
-                QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
-
-                setRotation( targetRotation + worldRot * delta);
             }
             else if( playerDetected )
             {

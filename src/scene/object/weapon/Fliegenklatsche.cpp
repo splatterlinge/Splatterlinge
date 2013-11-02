@@ -23,6 +23,8 @@
 
 #include "Fliegenklatsche.hpp"
 
+#include "../World.hpp"
+
 #include <resource/StaticModel.hpp>
 #include <resource/AudioSample.hpp>
 

@@ -28,6 +28,7 @@
 #include <scene/object/Landscape.hpp>
 #include <scene/Scene.hpp>
 #include <scene/object/World.hpp>
+#include <scene/object/Eye.hpp>
 
 #include <QBoxLayout>
 #include <QCheckBox>

@@ -27,6 +27,8 @@
 #include "OptionWindow.hpp"
 #include "StartMenuWindow.hpp"
 
+#include "object/World.hpp"
+#include "object/Eye.hpp"
 #include "TextureRenderer.hpp"
 #include "AMouseListener.hpp"
 #include "AKeyListener.hpp"
