@@ -32,12 +32,11 @@
 #include <utility/Capsule.hpp>
 #include <math.h>
 #include <float.h>
-unsigned int SplatterbugNumVerts = 159;
+
 Splatterbug::Splatterbug( World * world, float damage ) : ACreature( world )
 {
     mModel = new StaticModel( scene()->glWidget(), "Splatterbug");
     mMaterial = new Material( scene()->glWidget(), "Splatterbug_Splatterbug" );
-    glGenBuffers( BufferSize, this->BufferName );
     mBugSound = new AudioSample("bug_walk2");
     mBugBiteSound = new AudioSample("neck_snap");
     mBugBiteSound->setLooping( false );
@@ -49,32 +48,34 @@ Splatterbug::Splatterbug( World * world, float damage ) : ACreature( world )
     damageMultiplicationFactor[TARGET_BODY] = 2.0f;
     mDamageOnBodyPart[TARGET_BODY] = 0.0f;
     mBodyHitted = false;
-    mHeadDisintegrated = false;
     mVelocityY = 0.0f;
     mCoolDown = 0.0f;
     this->mAttackCoolDown = 5;
     this->mHitDamage = damage;
     mActDetectionDistance = Splatterbug::DetectionDistanceDay;
-    //setBoundingSphere( Splatterbug::SplatterbugBoundingSphereSize * this->mSplatterlingSizeFactor );
-    setBoundingSphere( Splatterbug::SplatterbugBoundingSphereSize*0.1f );
+    setBoundingSphere( (Splatterbug::SplatterbugBoundingSphereSize*0.01f * this->mHitDamage) );
 }
+
 Splatterbug::~Splatterbug()
 {
     delete mMaterial;
     delete mBugSound;
     delete mBugBiteSound;
 }
+
 void Splatterbug::drawSelf()
 {
     glColor4f(1,1,1,1);
     glNormal3f(0,1,0);
     mMaterial->bind();
     glPushMatrix();
-    glScalef(0.2,0.2,0.2);
+    glScalef(0.20 * (this->mHitDamage*0.22),0.20 * (this->mHitDamage*0.22),0.20 * (this->mHitDamage*0.22));
+    //glScalef(0.2 ,0.2, 0.2);
     mModel->draw();
     glPopMatrix();
     mMaterial->release();
 }
+
 const AObject * Splatterbug::intersectLine( const AObject * exclude, const QVector3D & origin,
                                       const QVector3D & direction, float & length,
                                       QVector3D * normal) const
@@ -85,51 +86,54 @@ const AObject * Splatterbug::intersectLine( const AObject * exclude, const QVect
     {
         if( rayLength < length )
         {
-                       // intersection closer than previous intersections?
-                    length = rayLength;
-                    if( normal )        // interested in normal?
-                        *normal = origin - worldPosition();
-                    nearestTarget = this;
-             }
+            // intersection closer than previous intersections?
+            length = rayLength;
+            if( normal )        // interested in normal?
+                *normal = origin - worldPosition();
+            nearestTarget = this;
         }
+    }
     return nearestTarget;
 }
+
 void Splatterbug::receiveDamage( int damage, const QVector3D * position,
                                  const QVector3D * direction)
 {
-        int targetBodyPart = TARGET_BODY;
-        targetBodyPart = TARGET_BODY;
-        damage *= damageMultiplicationFactor[targetBodyPart];
-        ACreature::receiveDamage( damage, direction );
-        mDamageOnBodyPart[targetBodyPart] += damage;
-        if( targetBodyPart == TARGET_BODY )
+    int targetBodyPart = TARGET_BODY;
+    targetBodyPart = TARGET_BODY;
+    damage *= damageMultiplicationFactor[targetBodyPart];
+    ACreature::receiveDamage( damage, direction );
+    mDamageOnBodyPart[targetBodyPart] += damage;
+    if( targetBodyPart == TARGET_BODY )
+    {
+        if( 5.0f <= mDamageOnBodyPart[TARGET_BODY] )
         {
-                if( mDamageOnBodyPart[TARGET_BODY] >= 5.0f )
-                {
-                        mBodyHitted = true;
-                        if(state() != DEAD){
-                                setLife( 0 );
-                                world()->player()->receivePoints( 50 );
-                                setState( DYING );
-                        }
-                }
+            mBodyHitted = true;
+            if(state() != DEAD){
+                setLife( 0 );
+                world()->player()->receivePoints( 50 );
+                setState( DYING );
+            }
         }
-        QVector3D splatterSource;
-        if( position )
-                splatterSource = *position;
-        else
-                splatterSource = worldPosition();
-        if( state() != DEAD )
-                world()->splatterSystem()->spray( splatterSource, damage );
-        else
-                world()->splatterSystem()->spray( splatterSource, damage / 2.0f );
+    }
+    QVector3D splatterSource;
+    if( position )
+        splatterSource = *position;
+    else
+        splatterSource = worldPosition();
+    if( state() != DEAD )
+        world()->splatterSystem()->spray( splatterSource, damage );
+    else
+        world()->splatterSystem()->spray( splatterSource, damage / 2.0f );
 }
+
 static QVector3D randomPointOnWorld( World * world )
 {
     QVector3D pos( RandomNumber::minMax(2,3), 0, RandomNumber::minMax(2,3) );
     pos.setY( world->landscape()->terrain()->getHeight( pos ) );
     return pos;
 }
+
 void Splatterbug::setRandomDestination()
 {
     QVector2D twoDimPosXZ;
@@ -139,18 +143,23 @@ void Splatterbug::setRandomDestination()
         pos = QVector3D( RandomNumber::minMax( this->position().x() - 100, this->position().x() + 100 ), 0, RandomNumber::minMax( this->position().z() - 100, this->position().z() + 100 ) );
         twoDimPosXZ = QVector2D(pos.x(), (pos.z()/(world()->landscape()->terrain()->size().z()/2.0f))*(world()->landscape()->terrain()->size().x()/2.0f) );
         float dist = (twoDimPosXZ - QVector2D(0,0)).length();
+
         if( dist < (world()->landscape()->terrain()->size().x()/2.0f) ){
             destinationPointValid = true;
         }
     }while (!destinationPointValid);
+
     pos.setY( this->world()->landscape()->terrain()->getHeight( pos ) + 0.5 );
     destinationPoint = pos;
 }
+
 bool Splatterbug::isPlayerDetected(float & distToPlayer ){
     QVector3D vectPlayerSplatter = world()->player()->worldPosition() - worldPosition();
     distToPlayer = ( vectPlayerSplatter ).length();
     vectPlayerSplatter = vectPlayerSplatter.normalized();
+
     double anglePlayerInSight = acos( QVector3D::dotProduct( vectPlayerSplatter, worldDirection() ) ) * 360 / M_PI;
+
     if( anglePlayerInSight < 100 && anglePlayerInSight > -100 && distToPlayer < 2.0f * mActDetectionDistance )
     {
         return true;
@@ -190,9 +199,9 @@ void Splatterbug::updateSelf( const double & delta )
     {
         case SPAWNING:
         {
-            setPosition( randomPointOnWorld( world() ) + QVector3D( 0, 20, 0 ) );
+            setPosition( randomPointOnWorld( world() ));
             setState( ALIVE );
-            setLife( 50 );
+            setLife( 50 + this->mHitDamage);
             setRandomDestination();
             break;
         }
@@ -200,10 +209,33 @@ void Splatterbug::updateSelf( const double & delta )
         {
             QQuaternion worldRot = QQuaternion::fromAxisAndAngle(0,0,1,0);
             World * world2 = dynamic_cast<World*>(scene()->root());
+
             if( world2 )
             {
-               worldRot = QQuaternion::nlerp( rotation(), world2->landscape()->terrain()->getNormalRotation(position()), 33.0*delta );
+               worldRot = QQuaternion::nlerp( rotation(), world2->landscape()->terrain()->getNormalRotation(position()), 33.0*delta);
             }
+            if(worldRot.x() < 0.0){
+                worldRot.setX(worldRot.x() - 1);
+            }
+            else{
+                worldRot.setX(worldRot.x() + 1);
+            }
+
+            if(worldRot.y() < 0.0){
+                worldRot.setY(worldRot.y() - 1);
+            }
+            else{
+                 worldRot.setY(worldRot.y() + 1);
+            }
+
+            if(worldRot.z() < 0){
+                worldRot.setZ(worldRot.z() - 1);
+            }
+            else{
+
+                worldRot.setZ(worldRot.z() + 1);
+            }
+
             mNightActive = world()->sky().data()->timeOfDay() > 0.6f && world()->sky().data()->timeOfDay() < 0.9f;
             if(mNightActive)
             {
@@ -233,22 +265,31 @@ void Splatterbug::updateSelf( const double & delta )
                         mCoolDown = this->mAttackCoolDown;
                     }
                 }
+
+                //Player near get him
+                mTarget = world()->player()->worldPosition();
+                QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+                directionToTarget.setY(0);
+                directionToTarget.normalize();
+                QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
+
+                setRotation( targetRotation + worldRot * delta);
             }
             else if( playerDetected )
             {
                 //Player near get him
                 mTarget = world()->player()->worldPosition();
-                QVector3D directionToTarget = ( mTarget - worldPosition() );
+                QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
                 directionToTarget.setY(0);
                 directionToTarget.normalize();
                 QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
                 setRotation( targetRotation + worldRot * delta);
 
-                QVector3D newPos = position() + direction()*delta * 12.0;
-                float worldPos =world()->landscape()->terrain()->getHeight(newPos)+12*delta;
+                //Geschwindigkeit des Bugs
+                QVector3D newPos = position() + direction() * delta * 10.0;
+                float worldPos =world()->landscape()->terrain()->getHeight(newPos) + 2.0* delta;
 
                 newPos.setY(worldPos);
-
                 setPosition( newPos );
 
             }
@@ -261,6 +302,8 @@ void Splatterbug::updateSelf( const double & delta )
                     QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
                     QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
                     setRotation( QQuaternion::slerp( rotation(), targetRotation, 5 * delta ) );
+
+
                     QVector3D newPos = position() + direction()*delta * 12.0;
                     if(world()->landscape()->terrain()->getHeight(newPos)+2.0 > worldPosition().y()){
                         newPos.setY(world()->landscape()->terrain()->getHeight(newPos)+2.0);
@@ -277,8 +320,10 @@ void Splatterbug::updateSelf( const double & delta )
                 {
                     mTarget = destinationPoint;
                     QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+                    directionToTarget.setY(0);
+                    directionToTarget.normalize();
                     QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
-                    setRotation( QQuaternion::slerp( rotation(), targetRotation, 5 * delta ) );
+                    setRotation( targetRotation + worldRot * delta);
                     setPosition( position() + direction()*delta * 10.0 );
                 }
                 else

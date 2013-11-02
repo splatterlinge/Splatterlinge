@@ -49,45 +49,22 @@ class Splatterbug: public ACreature
 {
 public:
 
-	static const int BufferSize = 4;
-	static const GLsizeiptr PositionSize = 159 * 3 * sizeof( GLfloat );
-	static const GLsizeiptr TexSize = 26 * 2 * sizeof( GLfloat );
-	static const GLsizeiptr NormalSize = 159 * 3 * sizeof( GLfloat );
-
-	static const int DetectionDistanceDay = 60;
+    static const int DetectionDistanceDay = 50;
 	static const int DetectionDistanceNight = 15;
 	static const int DetectionDistanceOfTorch = 80;
 
-	static const float SplatterbugLength = 8.8f;
-	static const float SplatterbugBoundingSphereSize = 18.0f;
+    static const float SplatterbugBoundingSphereSize = 25.0f;
 
 	//Enums
-		enum
+    enum
 	{
-		POSITION_OBJECT = 0,
-		COLOR_OBJECT = 1,
-		TEXTURE_OBJECT = 2,
-		NORMAL_OBJECT = 3
-	};
-	enum
-	{
-		TARGET_BODY = 0,
-		TARGET_HEAD = 1,
-		TARGET_WING_RIGHT = 2,
-		TARGET_WING_LEFT = 3,
-		TARGET_NOTHING = 4
-	};
-	enum
-	{
-		DEAD_NORMAL =0,
-		DEAD_HEADSHOT= 1,
-		DEAD_WINGSHOT = 2
-	};
+        TARGET_BODY = 0,
+        eNumOfTagets
+    }eTarget;
 
 	// Public attributes
-	GLuint BufferName[BufferSize];
-	float mDamageOnBodyPart[2];
-	float damageMultiplicationFactor[2];
+    float mDamageOnBodyPart[eNumOfTagets];
+    float damageMultiplicationFactor[eNumOfTagets];
 
 	// De-/Constructor
     Splatterbug( World * world, float damage );
@@ -102,19 +79,16 @@ public:
 
     virtual void receiveDamage( int damage, const QVector3D * position = NULL, const QVector3D * direction = NULL );
 protected:
-	;
 
 private:
 	AudioSample *mBugSound;    
     AudioSample *mBugBiteSound;
 
-	GLUquadric * mQuadric;
 	Material * mMaterial;
 	StaticModel * mModel;
 	QVector3D mTarget;
 
 	GLuint vboId;
-	GLfloat PositionData[PositionSize/sizeof( GLfloat )];
 	QVector3D destinationPoint;
 
 	float mVelocityY;
