@@ -50,6 +50,7 @@ Splatterbug::Splatterbug( World * world, float damage ) : ACreature( world )
     mCoolDown = 0.0f;
     this->mAttackCoolDown = 5;
     this->mHitDamage = damage;
+    this->mSpeed = 0.0f;
     mActDetectionDistance = Splatterbug::DetectionDistanceDay;
     setBoundingSphere( (Splatterbug::SplatterbugBoundingSphereSize*0.01f * this->mHitDamage) );
 }
@@ -68,7 +69,6 @@ void Splatterbug::drawSelf()
     mMaterial->bind();
     glPushMatrix();
     glScalef(0.20 * (this->mHitDamage*0.22),0.20 * (this->mHitDamage*0.22),0.20 * (this->mHitDamage*0.22));
-    //glScalef(0.2 ,0.2, 0.2);
     mModel->draw();
     glPopMatrix();
     mMaterial->release();
@@ -102,6 +102,7 @@ void Splatterbug::receiveDamage( int damage, const QVector3D * position,
     damage *= damageMultiplicationFactor[targetBodyPart];
     ACreature::receiveDamage( damage, direction );
     mDamageOnBodyPart[targetBodyPart] += damage;
+    qDebug()<<"Damage: " <<damage;
     if( targetBodyPart == TARGET_BODY )
     {
         if( 5.0f <= mDamageOnBodyPart[TARGET_BODY] )
@@ -110,13 +111,26 @@ void Splatterbug::receiveDamage( int damage, const QVector3D * position,
             if(state() != DEAD){
 
                 if(0 != this->life()){
-                    world()->player()->receivePoints( 50 + (1+ mHitDamage));
+
+                    if(1 >= damage && 5 <= damage){
+                         setSpeed(getSpeed()-0.1);
+                    }
+                    else if( 5 >= damage && 20 <= damage){
+                        setSpeed(getSpeed()-0.5);
+                    }
+                    else if(20 >= damage && 50 <= damage){
+                        setSpeed(getSpeed()-1.0);
+                    }
+                    else{
+                        setSpeed(getSpeed()-3.0);
+                    }
                 }
                 else
                 {
                     setState( DYING );
                 }
             }
+            world()->player()->receivePoints( 50 + (1+ mHitDamage));
         }
     }
     QVector3D splatterSource;
@@ -130,10 +144,28 @@ void Splatterbug::receiveDamage( int damage, const QVector3D * position,
         world()->splatterSystem()->spray( splatterSource, damage / 2.0f );
 }
 
+
 static QVector3D randomPointOnWorld( World * world )
 {
-    QVector3D pos( RandomNumber::minMax(2,3), 0, RandomNumber::minMax(2,3) );
-    pos.setY( world->landscape()->terrain()->getHeight( pos ) );
+    QVector3D terrainSize = world->landscape()->terrain()->size();
+    QVector3D terrainOffset = world->landscape()->terrain()->offset();
+    QVector3D pos;
+    GLfloat distanceToPlayer = 0.0f;
+    bool distanceIsValid = false;
+    do
+    {
+        pos = QVector3D( RandomNumber::minMax( terrainOffset.x(), terrainSize.x() + terrainOffset.x() ), 0, RandomNumber::minMax( terrainOffset.z(), terrainSize.z() + terrainOffset.z() ) );
+        pos.setY( world->landscape()->terrain()->getHeight( pos ) );
+
+        distanceToPlayer = ( world->player()->position() - pos ).length();
+
+        if( distanceToPlayer > Splatterbug::DetectionDistanceDay*2.0f && distanceToPlayer < Splatterbug::DetectionDistanceDay*5.0f)
+        {
+            distanceIsValid = true;
+        }
+    }
+    while( pos.y() <= world->landscape()->waterHeight() || !distanceIsValid );
+
     return pos;
 }
 
@@ -205,7 +237,9 @@ void Splatterbug::updateSelf( const double & delta )
         {
             setPosition( randomPointOnWorld( world() ));
             setState( ALIVE );
-            setLife( 20 * this->mHitDamage);
+            setLife( 7 * this->mHitDamage);
+            //The bigger a bug is the slower it is
+            setSpeed(14.0 - (this->mHitDamage*0.3) );
             setRandomDestination();
             break;
         }
@@ -322,20 +356,31 @@ void Splatterbug::updateSelf( const double & delta )
         mCoolDown = 0.0f;
 }
 
+//movement of a bug
 void Splatterbug::setNewPosition(const QVector3D arg_Vec, const double &arg_delta, const QQuaternion &arg_world_rot){
 
     mTarget = arg_Vec;
+    QVector3D newPos;
     QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
     QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
     directionToTarget.setY(0);
     directionToTarget.normalize();
     setRotation( targetRotation + arg_world_rot * arg_delta);
-
-    //Speed of a bug
-    QVector3D newPos = position() + direction() * arg_delta * 10.0;
+    newPos = position() + direction() * arg_delta * getSpeed();
     float worldPos =world()->landscape()->terrain()->getHeight(newPos) + 2.0 * arg_delta;
 
     newPos.setY(worldPos);
     setPosition( newPos );
 
+}
+
+//setting the speed of a bug
+void Splatterbug::setSpeed(const float &arg_Speed){
+    if(0 >= arg_Speed)
+    {
+        mSpeed =1.0;
+    }
+    else{
+        mSpeed = arg_Speed;
+    }
 }
