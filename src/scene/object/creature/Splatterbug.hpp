@@ -109,6 +109,7 @@ private:
 	void setRandomDestination(void);
 	bool isPlayerDetected(float & distToPlayer );
 	bool isTorchDetected( float & distToTorch );
+    void setNewPosition(const QVector3D arg_Vec, const double & arg_delta, const QQuaternion & arg_world_rot);
 
 
 
