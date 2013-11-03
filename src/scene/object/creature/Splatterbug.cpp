@@ -139,6 +139,7 @@ void Splatterbug::setRandomDestination()
     QVector2D twoDimPosXZ;
     QVector3D pos;
     bool destinationPointValid = false;
+
     do{
         pos = QVector3D( RandomNumber::minMax( this->position().x() - 100, this->position().x() + 100 ), 0, RandomNumber::minMax( this->position().z() - 100, this->position().z() + 100 ) );
         twoDimPosXZ = QVector2D(pos.x(), (pos.z()/(world()->landscape()->terrain()->size().z()/2.0f))*(world()->landscape()->terrain()->size().x()/2.0f) );
@@ -207,12 +208,15 @@ void Splatterbug::updateSelf( const double & delta )
         }
         case ALIVE:
         {
-            QQuaternion worldRot = QQuaternion::fromAxisAndAngle(0,0,1,0);
             World * world2 = dynamic_cast<World*>(scene()->root());
+            QQuaternion worldRot = QQuaternion::fromAxisAndAngle(0,0,1,0);
+            QQuaternion bugRotation = rotation();
+            QQuaternion landscapeRotationAtPos = world2->landscape()->terrain()->getNormalRotation(position());
+
 
             if( world2 )
-            {
-               worldRot = QQuaternion::nlerp( rotation(), world2->landscape()->terrain()->getNormalRotation(position()), 33.0*delta);
+            {                                                                      // Parameter 3 has to be between 0 and 1
+               worldRot = QQuaternion::nlerp( bugRotation, landscapeRotationAtPos, delta * 33.0);
             }
             if(worldRot.x() < 0.0){
                 worldRot.setX(worldRot.x() - 1);
@@ -262,7 +266,7 @@ void Splatterbug::updateSelf( const double & delta )
                 QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
                 setRotation( targetRotation + worldRot * delta);
 
-                //Geschwindigkeit des Bugs
+                //Speed of a bug
                 QVector3D newPos = position() + direction() * delta * 10.0;
                 float worldPos =world()->landscape()->terrain()->getHeight(newPos) + 2.0* delta;
 
@@ -297,11 +301,17 @@ void Splatterbug::updateSelf( const double & delta )
                 {
                     mTarget = destinationPoint;
                     QVector3D directionToTarget = ( mTarget - worldPosition() ).normalized();
+                    QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
                     directionToTarget.setY(0);
                     directionToTarget.normalize();
-                    QQuaternion targetRotation = Quaternion::lookAt( directionToTarget, QVector3D( 0, 1, 0 ) );
                     setRotation( targetRotation + worldRot * delta);
-                    setPosition( position() + direction()*delta * 10.0 );
+
+                    //Speed of a bug
+                    QVector3D newPos = position() + direction() * delta * 10.0;
+                    float worldPos =world()->landscape()->terrain()->getHeight(newPos) + 2.0* delta;
+
+                    newPos.setY(worldPos);
+                    setPosition( newPos );
                 }
                 else
                 {
