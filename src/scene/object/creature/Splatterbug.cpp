@@ -102,7 +102,7 @@ void Splatterbug::receiveDamage( int damage, const QVector3D * position,
     damage *= damageMultiplicationFactor[targetBodyPart];
     ACreature::receiveDamage( damage, direction );
     mDamageOnBodyPart[targetBodyPart] += damage;
-    qDebug()<<"Damage: " <<damage;
+
     if( targetBodyPart == TARGET_BODY )
     {
         if( 5.0f <= mDamageOnBodyPart[TARGET_BODY] )
@@ -144,6 +144,17 @@ void Splatterbug::receiveDamage( int damage, const QVector3D * position,
         world()->splatterSystem()->spray( splatterSource, damage / 2.0f );
 }
 
+/*
+
+static QVector3D randomPointOnWorld( World * world )
+{
+    QVector3D pos( RandomNumber::minMax(2,3), 0, RandomNumber::minMax(2,3) );
+    pos.setY( world->landscape()->terrain()->getHeight( pos ) );
+    return pos;
+}
+
+
+ */
 
 static QVector3D randomPointOnWorld( World * world )
 {
@@ -238,7 +249,7 @@ void Splatterbug::updateSelf( const double & delta )
             setPosition( randomPointOnWorld( world() ));
             setState( ALIVE );
             setLife( 7 * this->mHitDamage);
-            //The bigger a bug is the slower it is
+            //The bigger a bug the slower it is
             setSpeed(14.0 - (this->mHitDamage*0.3) );
             setRandomDestination();
             break;
