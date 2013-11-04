@@ -26,19 +26,13 @@
 
 #include "ACreature.hpp"
 #include "resource/AudioSample.hpp"
-#include <GLWidget.hpp>
-#include <QGLBuffer>
 
-#include <resource/Material.hpp>
+
 #include <effect/SplatterSystem.hpp>
-#include <utility/RandomNumber.hpp>
 #include <utility/Intersection.hpp>
 #include <utility/Quaternion.hpp>
 #include <utility/Sphere.hpp>
 
-#include <math.h>
-#include <float.h>
-#include <QDebug>
 
 struct GLUquadric;
 class Material;
@@ -86,25 +80,22 @@ private:
 
 	Material * mMaterial;
 	StaticModel * mModel;
-	QVector3D mTarget;
 
-	GLuint vboId;
+    QVector3D mTarget;
 	QVector3D destinationPoint;
 
 	float mVelocityY;
 	float mHeightAboveGround;
-	float mSplatterlingSizeFactor;
 	float mCoolDown;
 	float mAttackCoolDown;
     float mSpeed;
 
 	int mHitDamage;
-	int mActDetectionDistance;
+    int mActDetectionDistance;
 
 	bool playerDetected;
 	bool mNightActive;
 	bool mTorchDetected;
-	bool mHeadDisintegrated;
 	bool mBodyHitted;
 
 	void setRandomDestination(void);

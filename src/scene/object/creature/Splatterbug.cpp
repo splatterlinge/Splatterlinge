@@ -20,16 +20,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Splatterlinge. If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Splatterbug.hpp"
 #include <scene/object/World.hpp>
-#include <scene/TextureRenderer.hpp>
-#include <resource/Material.hpp>
-#include <effect/SplatterSystem.hpp>
-#include <utility/RandomNumber.hpp>
-#include <utility/Quaternion.hpp>
-#include <utility/Sphere.hpp>
-#include <math.h>
-#include <float.h>
 
 Splatterbug::Splatterbug( World * world, float damage ) : ACreature( world )
 {

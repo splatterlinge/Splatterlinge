@@ -274,8 +274,7 @@ void World::addRandomEnemy()
 		case 0:
 			newEnemy = QSharedPointer<ACreature>(new Splatterling( this, 0.25*(mLevel*0.25) ));
 			break;
-		case 1:
-			//TODO: implement bug; uncomment next line; increase modulo in switch above
+        case 1:
             newEnemy = QSharedPointer<ACreature>(new Splatterbug(this, 0.5f*(mLevel*5.0f)));
 			break;
 	}
