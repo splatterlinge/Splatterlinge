@@ -145,7 +145,7 @@ private:
 	OVR::DeviceManager * mOVRDeviceManager;
 	OVR::HMDDevice * mOVRHMDDevice;
 	OVR::SensorDevice * mOVRSensorDevice;
-	OVR::SensorFusion mOVRSensorFusion;
+	OVR::SensorFusion * mOVRSensorFusion;
 	OVR::HMDInfo mOVRHMDInfo;
 	float OVRLensViewportShift( const OVR::HMDInfo & hmdInfo ) const
 	{

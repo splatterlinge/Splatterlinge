@@ -93,7 +93,7 @@ void AObject::update( const double & delta )
 {
 	syncMatrix();
 	updateSelf( delta );
-	QList< QSharedPointer<AObject> >::iterator i;
+	QLinkedList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
 		(*i)->update( delta );
@@ -105,7 +105,7 @@ void AObject::update( const double & delta )
 void AObject::update2( const double & delta )
 {
 	update2Self( delta );
-	QList< QSharedPointer<AObject> >::iterator i;
+	QLinkedList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
 		(*i)->update2( delta );
@@ -123,7 +123,7 @@ void AObject::draw()
 	glLoadMatrix( mModelViewMatrix );
 	drawSelf();
 
-	QList< QSharedPointer<AObject> >::iterator i;
+	QLinkedList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
 		if( (*i)->boundingSphereRadius() > FLT_EPSILON )	// nonzero radius -> do frustum culling
@@ -150,7 +150,7 @@ void AObject::draw2()
 	glLoadMatrix( mModelViewMatrix );
 	draw2Self();
 
-	QList< QSharedPointer<AObject> >::iterator i;
+	QLinkedList< QSharedPointer<AObject> >::iterator i;
 	for( i = mSubNodes.begin(); i != mSubNodes.end(); ++i )
 	{
 		if( (*i)->boundingSphereRadius() > FLT_EPSILON )	// nonzero radius -> do frustum culling
@@ -206,7 +206,7 @@ const AObject * AObject::intersectLine( const AObject * exclude, const QVector3D
 	float & length, QVector3D * normal ) const
 {
 	const AObject * nearestTarget = NULL;
-	QList< QSharedPointer<AObject> >::const_iterator i;
+	QLinkedList< QSharedPointer<AObject> >::const_iterator i;
 	for( i = mSubNodes.constBegin(); i != mSubNodes.constEnd(); ++i )
 	{
 		if( (*i).data() != exclude )
@@ -224,7 +224,7 @@ QVector<const AObject*> AObject::collideSphere( const AObject * exclude, const f
 	QVector3D & center, QVector3D * normal ) const
 {
 	QVector<const AObject*> collisions;
-	QList< QSharedPointer<AObject> >::const_iterator i;
+	QLinkedList< QSharedPointer<AObject> >::const_iterator i;
 	for( i = mSubNodes.constBegin(); i != mSubNodes.constEnd(); ++i )
 	{
 		if( (*i).data() != exclude )

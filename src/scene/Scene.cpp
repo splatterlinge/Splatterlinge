@@ -146,7 +146,13 @@ Scene::Scene( GLWidget * glWidget, QObject * parent ) :
 		mStereoUseOVR = false;
 		goto lSkipOVR;
 	}
-	mOVRSensorFusion.AttachToSensor( mOVRSensorDevice );
+	mOVRSensorFusion = new OVR::SensorFusion( mOVRSensorDevice );
+	if( !mOVRSensorFusion )
+	{
+		qCritical() << "!!! Could not get OVR SensorFusion!";
+		mStereoUseOVR = false;
+		goto lSkipOVR;
+	}
 lSkipOVR:
 #endif
 
@@ -185,7 +191,7 @@ Scene::~Scene()
 #ifdef OVR_ENABLED
 QQuaternion Scene::OVROrientation()
 {
-	OVR::Quatf hmdOrient = mOVRSensorFusion.GetOrientation();
+	OVR::Quatf hmdOrient = mOVRSensorFusion->GetOrientation();
 	return QQuaternion( -hmdOrient.z, -hmdOrient.y, -hmdOrient.x, -hmdOrient.w ) * QQuaternion::fromAxisAndAngle(0,0,1,-180);
 }
 #endif
@@ -757,7 +763,7 @@ void Scene::keyPressEvent( QKeyEvent * event )
 		break;
 #ifdef OVR_ENABLED
 	case Qt::Key_F12:
-		mOVRSensorFusion.Reset();
+		mOVRSensorFusion->Reset();
 		break;
 #endif
 	default:

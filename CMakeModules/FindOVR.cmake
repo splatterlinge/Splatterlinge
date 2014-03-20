@@ -3,7 +3,7 @@
 #  OVR_INCLUDES - include directories for OVR
 #  OVR_LIBRARIES - libraries to link against OVR
 #  OVR_FOUND - true if OVR has been found and can be used
-#  OBR_DEFINITIONS - defines OVR_ENABLED
+#  OVR_DEFINITIONS - defines OVR_ENABLED
 
 if(NOT OVR_SDK_ROOT)
 	set(OVR_SDK_ROOT "/opt/OculusSDK")

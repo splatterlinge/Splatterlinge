@@ -146,7 +146,7 @@ public:
 	/// Returns a pointer to this object's scene
 	Scene * scene() { return mScene; }
 	/// Returns all child objects
-	QList< QSharedPointer<AObject> > & subNodes() { return mSubNodes; }
+	QLinkedList< QSharedPointer<AObject> > & subNodes() { return mSubNodes; }
 
 	/// Returns the bounding sphere
 	const float & boundingSphereRadius() const { return mBoundingSphereRadius; }
@@ -217,7 +217,7 @@ private:
 	QVector3D mPosition;
 	QQuaternion mRotation;
 	float mBoundingSphereRadius;
-	QList< QSharedPointer<AObject> > mSubNodes;
+	QLinkedList< QSharedPointer<AObject> > mSubNodes;
 	FrustumTest mFrustumTest;
 	QMatrix4x4 mModelViewMatrix;
 
